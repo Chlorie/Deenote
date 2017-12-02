@@ -1,0 +1,931 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class EditorController : MonoBehaviour
+{
+    //-Editor activation-
+    public bool activated = false;
+    //Grid
+    public int xGrid = 0, tGrid = 0;
+    public float xGridOffset = 0.0f;
+    private List<XGrid> xGrids = new List<XGrid>();
+    public InputField xGridInputField;
+    public InputField tGridInputField;
+    public InputField xGridOffsetInputField;
+    public Slider xGridOffsetSlider;
+    //Beat lines
+    private float fillFrom, fillTo, fillWithBPM;
+    public InputField fillFromInputField;
+    public InputField fillToInputField;
+    public InputField fillWithBPMInputField;
+    //Chart
+    public Chart chart;
+    public int maxUndoStep = 100;
+    private List<Chart> undoCharts = new List<Chart>();
+    private int currentStep = 0;
+    //Note Selection
+    public List<NoteSelect> noteSelect = new List<NoteSelect>();
+    private List<List<NoteSelect>> undoNoteSelect = new List<List<NoteSelect>>();
+    private int amountSelected = 0;
+    public Text amountSel;
+    public InputField positionSel;
+    public InputField timeSel;
+    public InputField sizeSel;
+    public InputField shiftSel;
+    public Text isLinkSel;
+    public Text pianoSoundsSel;
+    public Button pianoSoundsButton;
+    public RectTransform dragIndicator;
+    //Note Placement
+    private bool snapToGrid = false;
+    public Toggle snapToGridToggle;
+    private bool showNoteIndicator = true;
+    private Vector2 notePlacingPos = new Vector2(0.0f, -1.0f);
+    public GameObject noteIndicator;
+    public SpriteRenderer noteIndicatorSprite;
+    //Interpolate
+    private List<float> lagrangeInterpolation = new List<float>();
+    //Mouse Actions
+    public Vector2 dragStartPoint = new Vector2();
+    public Vector2 dragEndPoint = new Vector2();
+    public bool ignoreAllInput = false;
+    private bool dropCurrentDrag = false;
+    //Other scripts
+    public BPMCalculatorController bpmCalc;
+    public StageController stage;
+    public PianoSoundEditor pianoSoundEditor;
+    //GameObjects
+    public GameObject border;
+    public GameObject editPanel;
+    public GameObject piano;
+    //General
+    public void ActivateEditor()
+    {
+        while (undoCharts.Count > 0) undoCharts.RemoveAt(0);
+        while (noteSelect.Count > 0) noteSelect.RemoveAt(0);
+        while (undoNoteSelect.Count > 0) undoNoteSelect.RemoveAt(0);
+        for (int i = 0; i < chart.notes.Count; i++) noteSelect.Add(new NoteSelect { editor = this, note = chart.notes[i] });
+        currentStep = 0;
+    }
+    public void ToggleEditPanelState()
+    {
+        bool activated = !editPanel.activeSelf;
+        editPanel.SetActive(activated);
+    }
+    //Settings
+    public void ToggleBorder(bool isOn)
+    {
+        border.SetActive(isOn);
+    }
+    public void XGridNumber(string input)
+    {
+        int gridNumber = Utility.GetInt(input);
+        int i;
+        float position;
+        if (gridNumber > 25) gridNumber = 25;
+        if (gridNumber < 0) gridNumber = 0;
+        xGrid = gridNumber;
+        xGridInputField.text = "" + xGrid;
+        for (i = 0; i < xGrid; i++)
+        {
+            xGrids[i].SetActive(true);
+            position = (i + 0.5f) / xGrid * 4 - 2 + xGridOffset;
+            if (position < -2.0f) position += 4.0f;
+            if (position > 2.0f) position -= 4.0f;
+            xGrids[i].MoveTo(position * Parameters.maximumNoteWidth);
+        }
+        for (; i < 25; i++)
+        {
+            xGrids[i].SetActive(false);
+            xGrids[i].MoveTo(0.0f);
+        }
+    }
+    public void TGridNumber(string input)
+    {
+        int gridNumber = Utility.GetInt(input);
+        if (gridNumber > 99) gridNumber = 99;
+        if (gridNumber < 0) gridNumber = 0;
+        tGrid = gridNumber;
+        tGridInputField.text = "" + tGrid;
+        stage.ResetStage();
+    }
+    public void XGridOffsetInput(string input)
+    {
+        float offset = Utility.GetFloat(input);
+        float position;
+        int i;
+        if (offset > 1.0f) offset = 1.0f; if (offset < -1.0f) offset = -1.0f;
+        xGridOffset = offset;
+        xGridOffsetInputField.text = offset.ToString("F2");
+        xGridOffsetSlider.value = xGridOffset;
+        for (i = 0; i < xGrid; i++)
+        {
+            xGrids[i].SetActive(true);
+            position = (i + 0.5f) / xGrid * 4 - 2 + xGridOffset;
+            if (position < -2.0f) position += 4.0f;
+            if (position > 2.0f) position -= 4.0f;
+            xGrids[i].MoveTo(position * Parameters.maximumNoteWidth);
+        }
+        for (; i < 25; i++)
+        {
+            xGrids[i].SetActive(false);
+            xGrids[i].MoveTo(0.0f);
+        }
+    }
+    public void XGridOffsetSlider()
+    {
+        int i;
+        float position, value = xGridOffsetSlider.value;
+        xGridOffset = value;
+        xGridOffsetInputField.text = xGridOffset.ToString("F2");
+        for (i = 0; i < xGrid; i++)
+        {
+            xGrids[i].SetActive(true);
+            position = (i + 0.5f) / xGrid * 4 - 2 + xGridOffset;
+            if (position < -2.0f) position += 4.0f;
+            if (position > 2.0f) position -= 4.0f;
+            xGrids[i].MoveTo(position * Parameters.maximumNoteWidth);
+        }
+        for (; i < 25; i++)
+        {
+            xGrids[i].SetActive(false);
+            xGrids[i].MoveTo(0.0f);
+        }
+    }
+    public void ToggleSnapToGrid(bool isOn)
+    {
+        snapToGrid = isOn;
+    }
+    public void ToggleNoteIndicator(bool isOn)
+    {
+        showNoteIndicator = isOn;
+        noteIndicator.SetActive(isOn);
+    }
+    //-Barlines-
+    public void FillBeatLines()
+    {
+        int i = 0, time = 0;
+        float cur = fillFrom;
+        RegisterUndoStep();
+        for (i = 0; i < chart.beats.Count && chart.beats[i] + Parameters.minBeatLength < fillFrom; i++) ;
+        while (chart.beats.Count > i && chart.beats[i] - Parameters.minBeatLength < fillTo) chart.beats.RemoveAt(i);
+        for (i = 0; i < chart.beats.Count && chart.beats[i] < fillFrom; i++) ;
+        if (fillWithBPM > 0.0f)
+            while (cur + (60 * time) / fillWithBPM < fillTo)
+            {
+                chart.beats.Insert(i, cur + (60 * time) / fillWithBPM);
+                i++; time++;
+            }
+        stage.ResetStage();
+    }
+    public void FillFromChange()
+    {
+        float from = Utility.GetFloat(fillFromInputField.text);
+        if (from < 0.0f) from = 0.0f;
+        if (from > stage.musicLength) from = stage.musicLength;
+        fillFrom = from; fillFromInputField.text = from.ToString("F3");
+    }
+    public void FillToChange()
+    {
+        float to = Utility.GetFloat(fillToInputField.text);
+        if (to < 0.0f) to = 0.0f;
+        if (to > stage.musicLength) to = stage.musicLength;
+        fillTo = to; fillToInputField.text = to.ToString("F3");
+    }
+    public void FillWithBPMChange()
+    {
+        float bpm = Utility.GetFloat(fillWithBPMInputField.text);
+        if (bpm < 0.0f) bpm = 0.0f;
+        if (bpm > 1200.0f) bpm = 1200.0f;
+        fillWithBPM = bpm; fillWithBPMInputField.text = bpm.ToString("F3");
+    }
+    //-Undo/Redo-
+    public void RegisterUndoStep()
+    {
+        if (undoCharts.Count > currentStep)
+        {
+            undoCharts.RemoveAt(currentStep);
+            undoNoteSelect.RemoveAt(currentStep);
+        }
+        undoCharts.Add(Utility.CopyChart(chart));
+        undoNoteSelect.Add(new List<NoteSelect>(noteSelect));
+        currentStep++;
+        if (undoCharts.Count > maxUndoStep)
+        {
+            undoCharts.RemoveAt(0);
+            undoNoteSelect.RemoveAt(0);
+            currentStep--;
+        }
+    }
+    public void Undo()
+    {
+        if (currentStep > 0)
+        {
+            if (undoCharts.Count == currentStep)
+            {
+                undoCharts.Add(Utility.CopyChart(chart));
+                undoNoteSelect.Add(new List<NoteSelect>(noteSelect));
+            }
+            currentStep--;
+            chart = undoCharts[currentStep];
+            noteSelect = undoNoteSelect[currentStep];
+            stage.chart = chart;
+            stage.projectController.project.charts[stage.diff] = chart;
+            SyncStage();
+            SyncSelectedAmount();
+            SyncSelectedNotes();
+        }
+    }
+    public void Redo()
+    {
+        if (undoCharts.Count > currentStep + 1)
+        {
+            currentStep++;
+            chart = undoCharts[currentStep];
+            noteSelect = undoNoteSelect[currentStep];
+            stage.chart = chart;
+            stage.projectController.project.charts[stage.diff] = chart;
+            SyncStage();
+            SyncSelectedAmount();
+            SyncSelectedNotes();
+        }
+    }
+    //Selection Panel
+    public void UpdateSelectedAmount(int value, bool mode) //mode=false: add by value | mode=true: change to value
+    {
+        if (mode)
+            amountSelected = value;
+        else
+            amountSelected += value;
+        ChangeSelectionPanelValues();
+        if (amountSelected != 0) BPMFieldAutoComplete();
+    }
+    private void SyncSelectedAmount()
+    {
+        int count = 0;
+        foreach (NoteSelect i in noteSelect)
+            if (i.prevSelected != i.selected)
+                count++;
+        amountSelected = count;
+        ChangeSelectionPanelValues();
+        if (amountSelected != 0) BPMFieldAutoComplete();
+    }
+    private void BPMFieldAutoComplete()
+    {
+        int i;
+        for (i = 0; i < noteSelect.Count; i++) if (noteSelect[i].prevSelected != noteSelect[i].selected) break;
+        fillFrom = chart.notes[i].time; fillFromInputField.text = fillFrom.ToString("F3");
+        if (amountSelected >= 2)
+        {
+            int j;
+            for (j = noteSelect.Count - 1; j >= 0; j--) if (noteSelect[j].prevSelected != noteSelect[j].selected) break;
+            fillTo = chart.notes[j].time; fillToInputField.text = fillTo.ToString("F3");
+            if (fillTo - fillFrom > Parameters.minBeatLength)
+            {
+                fillWithBPM = 60.0f / (chart.notes[j].time - chart.notes[i].time);
+                fillWithBPMInputField.text = fillWithBPM.ToString("F3");
+            }
+        }
+    }
+    public void ChangeSelectionPanelValues()
+    {
+        float pos = 0, time = 0, size = 0, shift = 0;
+        bool isLink = true, flag = true;
+        List<PianoSound> sounds = null;
+        int i, j;
+        amountSel.text = "Selected " + amountSelected + " note" + (amountSelected < 2 ? "" : "s");
+        bool selectedAny = amountSelected > 0;
+        if (selectedAny)
+        {
+            positionSel.interactable = sizeSel.interactable = shiftSel.interactable = true;
+            timeSel.interactable = pianoSoundsButton.interactable = true;
+            flag = false;
+            for (i = 0; i < noteSelect.Count; i++)
+                if (noteSelect[i].prevSelected != noteSelect[i].selected) //note i is selected
+                {
+                    pos = chart.notes[i].position;
+                    flag = true;
+                    break;
+                }
+            while (flag && i < noteSelect.Count)
+            {
+                if (pos != chart.notes[i].position && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
+                i++;
+            }
+            positionSel.text = flag ? pos.ToString("F3") : "Several values";
+            flag = false;
+            for (i = 0; i < noteSelect.Count; i++)
+                if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                {
+                    time = chart.notes[i].time;
+                    flag = true;
+                    break;
+                }
+            while (flag && i < noteSelect.Count)
+            {
+                if (time != chart.notes[i].time && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
+                i++;
+            }
+            timeSel.text = flag ? time.ToString("F3") : "Several values";
+            flag = false;
+            for (i = 0; i < noteSelect.Count; i++)
+                if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                {
+                    size = chart.notes[i].size;
+                    flag = true;
+                    break;
+                }
+            while (flag && i < noteSelect.Count)
+            {
+                if (size != chart.notes[i].size && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
+                i++;
+            }
+            sizeSel.text = flag ? size.ToString("F3") : "Several values";
+            flag = false;
+            for (i = 0; i < noteSelect.Count; i++)
+                if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                {
+                    shift = chart.notes[i].shift;
+                    flag = true;
+                    break;
+                }
+            while (flag && i < noteSelect.Count)
+            {
+                if (shift != chart.notes[i].shift && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
+                i++;
+            }
+            shiftSel.text = flag ? shift.ToString("F3") : "Several values";
+            flag = false;
+            for (i = 0; i < noteSelect.Count; i++)
+                if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                {
+                    isLink = chart.notes[i].isLink;
+                    flag = true;
+                    break;
+                }
+            while (flag && i < noteSelect.Count)
+            {
+                if (isLink != chart.notes[i].isLink && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
+                i++;
+            }
+            isLinkSel.text = flag ? (isLink ? "True" : "False") : "Several values";
+            flag = false;
+            for (i = 0; i < noteSelect.Count; i++)
+                if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                {
+                    sounds = chart.notes[i].sounds;
+                    flag = true;
+                    break;
+                }
+            while (flag && i < noteSelect.Count)
+            {
+                if (sounds.Count != chart.notes[i].sounds.Count && noteSelect[i].prevSelected != noteSelect[i].selected)
+                    flag = false;
+                else
+                    for (j = 0; j < sounds.Count; j++)
+                        if (noteSelect[i].prevSelected != noteSelect[i].selected &&
+                            (sounds[j].delay != chart.notes[i].sounds[j].delay ||
+                            sounds[j].duration != chart.notes[i].sounds[j].duration ||
+                            sounds[j].pitch != chart.notes[i].sounds[j].pitch ||
+                            sounds[j].volume != chart.notes[i].sounds[j].volume))
+                        {
+                            flag = false;
+                            break;
+                        }
+                i++;
+            }
+            pianoSoundsSel.text = flag ? "Click to view" : "Several values";
+        }
+        else
+        {
+            positionSel.interactable = sizeSel.interactable = shiftSel.interactable = false;
+            timeSel.interactable = pianoSoundsButton.interactable = false;
+            positionSel.text = sizeSel.text = shiftSel.text = "Not Available";
+            isLinkSel.text = timeSel.text = pianoSoundsSel.text = "Not Available";
+        }
+    }
+    public void ChangeSelectedNoteSize()
+    {
+        float size = Utility.GetFloat(sizeSel.text);
+        if (size <= 0.1f) size = 0.1f; if (size >= 5.0f) size = 5.0f;
+        sizeSel.text = size.ToString("F3");
+        RegisterUndoStep();
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                chart.notes[i].size = size;
+        SyncStage();
+    }
+    public void ChangeSelectedNotePosition()
+    {
+        float pos = Utility.GetFloat(positionSel.text);
+        if (pos < -2.0f) pos = -2.0f; if (pos > 2.0f) pos = 2.0f;
+        positionSel.text = pos.ToString("F3");
+        RegisterUndoStep();
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                chart.notes[i].position = pos;
+        SyncStage();
+    }
+    public void ChangeSelectedNoteShift()
+    {
+        float shift = Utility.GetFloat(shiftSel.text);
+        shiftSel.text = shift.ToString("F3");
+        RegisterUndoStep();
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                chart.notes[i].shift = shift;
+        SyncStage();
+    }
+    public void ChangeSelectedNoteTime()
+    {
+        float time = Utility.GetFloat(timeSel.text);
+        if (time < 0.0f) time = 0.0f;
+        if (time > stage.musicLength) time = stage.musicLength;
+        timeSel.text = time.ToString("F3");
+        RegisterUndoStep();
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                chart.notes[i].time = time;
+        SortNotes();
+        SyncStage();
+    }
+    public void ChangeSelectedNotePianoSound()
+    {
+        pianoSoundsButton.interactable = false;
+        bool flag = false;
+        int i, j;
+        List<PianoSound> sounds = null;
+        for (i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                sounds = chart.notes[i].sounds;
+                flag = true;
+                break;
+            }
+        while (flag && i < noteSelect.Count)
+        {
+            if (sounds.Count != chart.notes[i].sounds.Count && noteSelect[i].prevSelected != noteSelect[i].selected)
+                flag = false;
+            else
+                for (j = 0; j < sounds.Count; j++)
+                    if (noteSelect[i].prevSelected != noteSelect[i].selected &&
+                        (sounds[j].delay != chart.notes[i].sounds[j].delay ||
+                        sounds[j].duration != chart.notes[i].sounds[j].duration ||
+                        sounds[j].pitch != chart.notes[i].sounds[j].pitch ||
+                        sounds[j].volume != chart.notes[i].sounds[j].volume))
+                    {
+                        flag = false;
+                        break;
+                    }
+            i++;
+        }
+        piano.SetActive(true);
+        pianoSoundEditor.Activate(this, flag ? sounds : new List<PianoSound>());
+    }
+    public void PianoSoundFinishedEdit(List<PianoSound> sounds)
+    {
+        piano.SetActive(false);
+        if (sounds != null)
+        {
+            RegisterUndoStep();
+            for (int i = 0; i < noteSelect.Count; i++)
+                if (noteSelect[i].prevSelected != noteSelect[i].selected)
+                    chart.notes[i].sounds = sounds;
+            SyncStage();
+        }
+        pianoSoundsButton.interactable = true;
+    }
+    //Mouse Actions
+    private void SendDragUpdate()
+    {
+        foreach (NoteSelect i in noteSelect) i.UpdateState();
+    }
+    private void SendDragEnd()
+    {
+        foreach (NoteSelect i in noteSelect) i.EndDrag();
+    }
+    private void DeselectAll()
+    {
+        foreach (NoteSelect i in noteSelect) i.prevSelected = i.selected = false;
+        UpdateSelectedAmount(0, true);
+    }
+    private Vector2 SetDragPosition(Vector2 original)
+    {
+        Vector2 point = new Vector2(0.0f, 0.0f);
+        Vector3 pos = Utility.GetMouseWorldPos();
+        if (pos.y <= -1.0f) return original;
+        point.x = pos.x / Parameters.maximumNoteWidth;
+        if (pos.x < -2 * Parameters.maximumNoteWidth) point.x = -2;
+        if (pos.x > 2 * Parameters.maximumNoteWidth) point.x = 2;
+        pos.z -= 32;
+        if (pos.z < 0.0f) pos.z = 0.0f;
+        if (pos.z > Parameters.maximumNoteRange) pos.z = Parameters.maximumNoteRange;
+        point.y = stage.timeSlider.value + pos.z * Parameters.NoteFallTime(stage.chartPlaySpeed) / Parameters.maximumNoteRange;
+        if (point.y > stage.musicLength) point.y = stage.musicLength;
+        return point;
+    }
+    private void UpdateDragIndicator()
+    {
+        float xMax = dragStartPoint.x > dragEndPoint.x ? dragStartPoint.x : dragEndPoint.x;
+        float xMin = dragStartPoint.x + dragEndPoint.x - xMax;
+        xMax *= Parameters.maximumNoteWidth; xMin *= Parameters.maximumNoteWidth;
+        float yMax = dragStartPoint.y > dragEndPoint.y ? dragStartPoint.y : dragEndPoint.y;
+        float yMin = dragStartPoint.y + dragEndPoint.y - yMax;
+        yMax = (yMax - stage.timeSlider.value) / Parameters.NoteFallTime(stage.chartPlaySpeed) * Parameters.maximumNoteRange;
+        yMin = (yMin - stage.timeSlider.value) / Parameters.NoteFallTime(stage.chartPlaySpeed) * Parameters.maximumNoteRange;
+        yMax = yMax < Parameters.maximumNoteRange ? yMax : Parameters.maximumNoteRange;
+        yMin = yMin > 0.0f ? yMin : 0.0f;
+        dragIndicator.offsetMax = new Vector2(xMax, yMax);
+        dragIndicator.offsetMin = new Vector2(xMin, yMin);
+    }
+    private void CloseDragIndicator()
+    {
+        dragIndicator.offsetMax = new Vector2(0.0f, 0.0f);
+        dragIndicator.offsetMin = new Vector2(0.0f, 0.0f);
+    }
+    //Grid & Note Placement
+    private Vector2 QuantizePosition(Vector2 pos)
+    {
+        if (pos.x > 2.0f || pos.x < -2.0f) return pos;
+        float position;
+        float minDistance = 4.0f, snapX = pos.x, snapT = pos.y;
+        //Snap to X grid
+        if (Mathf.Abs(pos.x + 2.0f) < minDistance) { minDistance = Mathf.Abs(pos.x + 2.0f); snapX = -2.0f; }
+        if (Mathf.Abs(pos.x - 2.0f) < minDistance) { minDistance = Mathf.Abs(pos.x - 2.0f); snapX = 2.0f; }
+        for (int i = 0; i < xGrid; i++)
+        {
+            position = (i + 0.5f) / xGrid * 4 - 2 + xGridOffset;
+            if (position < -2.0f) position += 4.0f;
+            if (position > 2.0f) position -= 4.0f;
+            if (Mathf.Abs(pos.x - position) < minDistance)
+            {
+                minDistance = Mathf.Abs(pos.x - position);
+                snapX = position;
+            }
+        }
+        if (xGrid == 0) snapX = pos.x;
+        //Snap to T grid
+        if (tGrid != 0 && chart.beats.Count > 0 && pos.y >= chart.beats[0] && pos.y <= chart.beats[chart.beats.Count - 1])
+        {
+            int i;
+            for (i = 0; i < chart.beats.Count; i++)
+                if (chart.beats[i] == pos.y)
+                {
+                    snapT = pos.y;
+                    break;
+                }
+                else if (chart.beats[i] > pos.y)
+                    break;
+            if (chart.beats[i] > pos.y)
+            {
+                float dif = chart.beats[i] - chart.beats[i - 1], min = chart.beats[i], max;
+                while (min > pos.y) min -= dif / tGrid;
+                max = min + dif / tGrid;
+                if (pos.y > (max + min) / 2)
+                    snapT = max;
+                else
+                    snapT = min;
+            }
+        }
+        return new Vector2(snapX, snapT);
+    }
+    //Note Manipulations
+    private void AddNote(Note note, bool selected) //Be aware that by default Note is a reference
+    {
+        int i, j;
+        for (i = 0; i < chart.notes.Count; i++)
+            if (chart.notes[i].time > note.time || (chart.notes[i].time == note.time && chart.notes[i].position > note.position))
+                break;
+        for (j = 0; j < chart.notes.Count; j++)
+        {
+            if (chart.notes[j].nextLink >= i) chart.notes[j].nextLink++;
+            if (chart.notes[j].prevLink >= i) chart.notes[j].prevLink++;
+        }
+        chart.notes.Insert(i, note);
+        noteSelect.Insert(i, new NoteSelect { note = note, editor = this, prevSelected = false, selected = false });
+    }
+    private void NoteIndexQuickSort(List<int> index, int low, int high)
+    {
+        int pivot = index[low];
+        int i = low, j = high;
+        float pivotKey = chart.notes[pivot].time;
+        while (i < j)
+        {
+            while (i < j && chart.notes[index[j]].time >= pivotKey) j--;
+            index[i] = index[j];
+            while (i < j && chart.notes[index[i]].time <= pivotKey) i++;
+            index[j] = index[i];
+        }
+        index[i] = pivot;
+        if (low < i - 1) NoteIndexQuickSort(index, low, i - 1);
+        if (i + 1 < high) NoteIndexQuickSort(index, i + 1, high);
+    }
+    private void SortNotes() //Must be called after note property changes
+    {
+        List<int> index = new List<int>();
+        List<int> inv = new List<int>(new int[chart.notes.Count]);
+        for (int i = 0; i < chart.notes.Count; i++) index.Add(i);
+        NoteIndexQuickSort(index, 0, chart.notes.Count - 1);
+        for (int i = 0; i < chart.notes.Count; i++) inv[index[i]] = i;
+        foreach(Note note in chart.notes)
+        {
+            if (note.prevLink != -1) note.prevLink = inv[note.prevLink];
+            if (note.nextLink != -1) note.nextLink = inv[note.nextLink];
+        }
+        List<Note> notes = new List<Note>(new Note[chart.notes.Count]);
+        for (int i = 0; i < chart.notes.Count; i++) notes[i] = chart.notes[index[i]];
+        List<bool> selected = new List<bool>(new bool[chart.notes.Count]);
+        for (int i = 0; i < chart.notes.Count; i++) selected[i] = noteSelect[i].prevSelected;
+        for (int i = 0; i < chart.notes.Count; i++)
+        {
+            noteSelect[i].note = notes[i];
+            noteSelect[i].prevSelected = selected[index[i]];
+        }
+        List<bool> sorted = new List<bool>(new bool[chart.notes.Count]);
+        chart.notes = notes;
+        int swapCount;
+        do
+        {
+            swapCount = 0;
+            for (int i = 0; i < chart.notes.Count; i++)
+                if (chart.notes[i].nextLink != -1 && i > chart.notes[i].nextLink)
+                {
+                    swapCount++;
+                    int next = chart.notes[i].nextLink;
+                    chart.notes[i].nextLink = chart.notes[next].nextLink;
+                    chart.notes[next].nextLink = i;
+                    chart.notes[next].prevLink = chart.notes[i].prevLink;
+                    chart.notes[i].prevLink = next;
+                }
+        } while (swapCount > 0);
+    }
+    private void SyncSelectedNotes()
+    {
+        for (int i = 0; i < chart.notes.Count; i++) noteSelect[i].note = chart.notes[i];
+    }
+    private void SyncStage()
+    {
+        Utility.GetInGameNoteIDs(chart, ref stage.inGameNoteIDs);
+        stage.ResetStage();
+    }
+    private void DeleteSelectedNotes()
+    {
+        List<int> deleted = new List<int>();
+        int d = 0;
+        RegisterUndoStep();
+        for (int i = 0; i < noteSelect.Count; i++)
+        {
+            deleted.Add(d);
+            if (noteSelect[i].prevSelected != noteSelect[i].selected) d++;
+        }
+        for (int i = 0; i < noteSelect.Count; i++)
+        {
+            int prev = chart.notes[i].prevLink, next = chart.notes[i].nextLink;
+            if (noteSelect[i].prevSelected != noteSelect[i].selected && prev != -1 && next != -1)
+            {
+                chart.notes[prev].nextLink = next - deleted[next];
+                chart.notes[next].prevLink = prev - deleted[prev];
+            }
+            else
+            {
+                if (prev != -1) chart.notes[i].prevLink -= deleted[prev];
+                if (next != -1) chart.notes[i].nextLink -= deleted[next];
+            }
+        }
+        for (int i = noteSelect.Count - 1; i >= 0; i--)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                noteSelect.RemoveAt(i);
+                chart.notes.RemoveAt(i);
+            }
+        UpdateSelectedAmount(0, true);
+        SyncStage();
+    }
+    public void LinkSelectedNotes()
+    {
+        RegisterUndoStep();
+        UnlinkSelectedNotes(false);
+        int prev = -1;
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                chart.notes[i].prevLink = prev;
+                if (prev != -1) chart.notes[prev].nextLink = i;
+                chart.notes[i].isLink = true;
+                prev = i;
+            }
+        chart.notes[prev].nextLink = -1;
+        stage.ResetStage();
+        ChangeSelectionPanelValues();
+    }
+    public void UnlinkSelectedNotes(bool undo) //undo=true: register undo step
+    {
+        if (undo) RegisterUndoStep();
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                if (chart.notes[i].prevLink != -1) chart.notes[chart.notes[i].prevLink].nextLink = chart.notes[i].nextLink;
+                if (chart.notes[i].nextLink != -1) chart.notes[chart.notes[i].nextLink].prevLink = chart.notes[i].prevLink;
+                chart.notes[i].nextLink = chart.notes[i].prevLink = -1;
+                chart.notes[i].isLink = false;
+            }
+        if (undo) stage.ResetStage();
+        ChangeSelectionPanelValues();
+    }
+    public void QuantizeSelectedNotes()
+    {
+        RegisterUndoStep();
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                Vector2 pos = QuantizePosition(new Vector2(chart.notes[i].position, chart.notes[i].time));
+                chart.notes[i].position = pos.x;
+                chart.notes[i].time = pos.y;
+            }
+        SortNotes();
+        SyncStage();
+        ChangeSelectionPanelValues();
+    }
+    private void AdjustSelectedNoteTime(float time)
+    {
+        RegisterUndoStep();
+        for (int i = 0; i < chart.notes.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                chart.notes[i].time += time;
+                if (chart.notes[i].time < 0.0f) chart.notes[i].time = 0.0f;
+                if (chart.notes[i].time > stage.musicLength) chart.notes[i].time = stage.musicLength;
+            }
+        SortNotes();
+        SyncStage();
+        ChangeSelectionPanelValues();
+    }
+    private void AdjustSelectedNotePosition(float pos)
+    {
+        RegisterUndoStep();
+        for (int i = 0; i < chart.notes.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                chart.notes[i].position += pos;
+                if (chart.notes[i].position < -2.0f) chart.notes[i].position = -2.0f;
+                if (chart.notes[i].position > 2.0f) chart.notes[i].position = 2.0f;
+            }
+        SyncStage();
+        ChangeSelectionPanelValues();
+    }
+    private void AdjustSelectedNoteTimeByGrid(int amount)
+    {
+        if (tGrid == 0) return;
+
+        SyncStage();
+        ChangeSelectionPanelValues();
+    }
+    private void AdjustSelectedNotePositionByGrid(int amount)
+    {
+        if (xGrid == 0) return;
+
+        SyncStage();
+        ChangeSelectionPanelValues();
+    }
+    //Updated Every Frame
+    private void MouseActions()
+    {
+        //Select button
+        if (Input.GetMouseButtonDown(Parameters.selectButton) && !ignoreAllInput && !dropCurrentDrag && activated) //Select button pressed
+        {
+            //If the mouse is out of range when pressed, ignoreCurrentDrag
+            dragStartPoint = SetDragPosition(dragStartPoint);
+            if (Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth)
+                dropCurrentDrag = true;
+            else
+            {
+                if (!Utility.FunctionalKeysHeld(Utility.CTRL))
+                    DeselectAll();
+                dragEndPoint = SetDragPosition(dragEndPoint);
+                SendDragUpdate();
+                UpdateDragIndicator();
+            }
+        }
+        else if (Input.GetMouseButtonUp(Parameters.selectButton) && activated) //Select button released
+        {
+            if (dropCurrentDrag)
+                dropCurrentDrag = false;
+            else
+            {
+                SendDragEnd();
+                CloseDragIndicator();
+            }
+        }
+        else if (Input.GetMouseButton(Parameters.selectButton) && !ignoreAllInput && !dropCurrentDrag && activated) //Select button being held
+        {
+            noteIndicator.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+            dragEndPoint = SetDragPosition(dragEndPoint);
+            SendDragUpdate();
+            UpdateDragIndicator();
+        }
+        //Place button
+        if (Input.GetMouseButtonDown(Parameters.placeButton) && !ignoreAllInput && !dropCurrentDrag && !Input.GetMouseButton(Parameters.selectButton))
+            if (!(Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth))
+            {
+                DeselectAll();
+                Note note = new Note
+                {
+                    isLink = false,
+                    nextLink = -1,
+                    prevLink = -1,
+                    position = notePlacingPos.x,
+                    shift = 0.0f,
+                    size = 1.0f,
+                    sounds = new List<PianoSound>(),
+                    time = notePlacingPos.y
+                };
+                RegisterUndoStep();
+                AddNote(note, false);
+                SyncStage();
+            }
+    }
+    private void MoveNoteIndicator()
+    {
+        //No interpolation curve
+        if (Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth)
+        {
+            noteIndicator.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+            notePlacingPos = new Vector2(0.0f, -1.0f);
+        }
+        else
+        {
+            Vector2 pos= SetDragPosition(new Vector2(0.0f, 0.0f));
+            if (snapToGrid) pos = QuantizePosition(pos);
+            float x, z, alpha = 0.5f;
+            x = pos.x * Parameters.maximumNoteWidth;
+            z = (pos.y - stage.timeSlider.value) * Parameters.maximumNoteRange / Parameters.NoteFallTime(stage.chartPlaySpeed) + 32.0f;
+            if (z > Parameters.alpha1NoteRange)
+                alpha *= (Parameters.maximumNoteRange - z) / (Parameters.maximumNoteRange - Parameters.alpha1NoteRange);
+            noteIndicator.transform.position = new Vector3(x, 0.0f, z);
+            noteIndicatorSprite.color = new Color(1.0f, 1.0f, 1.0f, alpha);
+            notePlacingPos = pos;
+        }
+        //With interpolation curve
+    }
+    private void Shortcuts()
+    {
+        if (activated && !stage.ignoreAllInput && !ignoreAllInput)
+        {
+            if (Utility.DetectKeys(KeyCode.Z, Utility.CTRL)) //Ctrl+Z
+                Undo();
+            if (Utility.DetectKeys(KeyCode.Z, Utility.CTRL + Utility.SHIFT)) //Ctrl+Shift+Z
+                Redo();
+            if (Utility.DetectKeys(KeyCode.Delete)) //Delete
+                DeleteSelectedNotes();
+            if (Utility.DetectKeys(KeyCode.G)) //G
+            {
+                snapToGrid = !snapToGrid;
+                snapToGridToggle.isOn = snapToGrid;
+            }
+            if (Utility.DetectKeys(KeyCode.A, Utility.CTRL)) //Ctrl+A
+            {
+                foreach (NoteSelect i in noteSelect) i.prevSelected = true;
+                SyncSelectedAmount();
+            }
+            if (Utility.DetectKeys(KeyCode.L)) //L
+                LinkSelectedNotes();
+            if (Utility.DetectKeys(KeyCode.U)) //U
+                UnlinkSelectedNotes(true);
+            if (Utility.DetectKeys(KeyCode.Q)) //Q
+                QuantizeSelectedNotes();
+            if (Utility.DetectKeys(KeyCode.W)) //W
+                AdjustSelectedNoteTime(0.001f);
+            if (Utility.DetectKeys(KeyCode.S)) //S
+                AdjustSelectedNoteTime(-0.001f);
+            if (Utility.DetectKeys(KeyCode.A)) //A
+                AdjustSelectedNotePosition(-0.01f);
+            if (Utility.DetectKeys(KeyCode.D)) //D
+                AdjustSelectedNotePosition(0.01f);
+            if (Utility.DetectKeys(KeyCode.W, Utility.ALT)) //Alt+W
+                AdjustSelectedNoteTime(0.01f);
+            if (Utility.DetectKeys(KeyCode.S, Utility.ALT)) //Alt+S
+                AdjustSelectedNoteTime(-0.01f);
+            if (Utility.DetectKeys(KeyCode.A, Utility.ALT)) //Alt+A
+                AdjustSelectedNotePosition(-0.1f);
+            if (Utility.DetectKeys(KeyCode.D, Utility.ALT)) //Alt+D
+                AdjustSelectedNotePosition(0.1f);
+        }
+    }
+    private void Start()
+    {
+        fillFromInputField.text = fillToInputField.text = fillWithBPMInputField.text = "0.000";
+        fillFrom = fillTo = fillWithBPM = 0.0f;
+    }
+    public void Initialize()
+    {
+        for (int i = 0; i < 25; i++) xGrids.Add(new XGrid());
+    }
+    private void Update()
+    {
+        Shortcuts();
+        MoveNoteIndicator();
+        MouseActions();
+    }
+}

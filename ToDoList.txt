@@ -1,0 +1,204 @@
+2017-04-25
+	Planned
+		F0001 * 修复播放时数组越界bug
+		F0002 * 优化JSON读取代码
+		F0003 * 更改Extra难度的音符贴图
+		F0004 * 优化按键音播放
+		N0001 * 带文件名输入框的文件夹选择窗口
+		N0002 * 在已有项目打开时创建或打开项目
+		N0003 * JSON谱面整体导出功能
+		N0004 * 将项目另存为其他文件功能
+		N0005 * 加入FPS显示开关
+		N0006 * 音乐/按键音的音量调节功能
+		N0007 * 谱面下落速度调节
+		N0008 * 音乐播放速度调节
+		N0009 * 加入部分快捷键
+	Finished
+		F0001 修复播放时数组越界bug
+		F0002 优化JSON读取代码
+		N0002 在已有项目打开时创建或打开项目
+		N0007 谱面下落速度调节
+		N0008 音乐播放速度调节
+2017-04-26
+	Finished
+		F0003 更改Extra难度的音符贴图
+		N0001 带文件名输入框的文件夹选择窗口
+		N0009 加入部分快捷键
+2017-04-27
+	Planned
+		F0005 * 导出JSON文件改为赋文件名初值的带文件名输入框文件夹选择窗口
+		N0010 * 加入程序内置手动BPM测试器（为自制谱面功能做准备）
+		N0011 * 用(Shift)Up/Down键（快速）控制进度条
+		N0012 * 实现普通播放与反ズレ播放
+	Finished
+		N0011 用(Shift)Up/Down键（快速）控制进度条
+		N0012 实现普通播放与反ズレ播放
+2017-04-28
+	Finished
+		N0004 将项目另存为其他文件功能
+		F0005 导出JSON文件改为赋文件名初值的带文件名输入框文件夹选择窗口
+2017-04-29
+	Planned
+		N0013 * note落到判定线上时的判定线特效
+		N0014 * note进入画面时alpha从0渐变的特效
+	Finished
+		F0004 优化按键音播放
+		N0003 JSON谱面整体导出功能
+2017-04-30
+	Planned
+		F0006 * 实例化note后立即获得该note下的SpriteRenderer以减少播放时的GetComponent调用次数
+		F0007 * 将对note的控制部分从StageController中分离出来作为一个新的MonoBehaviour使结构更清晰
+	Finished
+		F0006 实例化note后立即获得该note下的SpriteRenderer以减少播放时的GetComponent调用次数
+		N0014 note进入画面时alpha从0渐变的特效
+2017-05-01
+	Planned
+		N0015 * 加入note特效的逐帧动画
+2017-05-02
+	Planned
+		F0008 * 根据stage是否载入调整Settings板块的高度
+		N0016 * Combo数特效
+		N0017 * 确定Edit板块的基本UI设置
+		N0018 * 加入About
+	Finished
+		F0007 将对note的控制部分从StageController中分离出来作为一个新的MonoBehaviour使结构更清晰
+		N0015 加入note特效的逐帧动画
+2017-05-06
+	Planned
+		N0019 * 加入note的圆形波特效
+		N0020 * 加入note的竖直波特效
+		N0021 * 加入note的Charming光效
+	Finished
+		N0019 加入note的圆形波特效
+		N0020 加入note的竖直波特效
+2017-05-07
+	Planned
+		F0009 * 修复Import新谱面之后等级信息被覆盖的bug
+		F0010 * 修复带文件名输入框的文件夹选择窗口不输入文件名时确认按钮可点击的bug
+		F0011 * 修复重复新建项目时确认按钮保持可点击状态的bug
+2017-05-10
+	Finished
+		N0013 note落到判定线上时的判定线特效
+2017-05-14
+	Planned
+		N0022 * 格线显示
+		N0023 BPM的显示(在Edit板块中设置开关)
+		N0024 * 在同一组黄条间添加连线，并在Edit板块中设置开关
+		N0025 * note被选中的效果
+		N0026 * 选定note功能
+		N0027 * 选定一区域内所有note
+		N0028 * 在Edit板块中加入已选中note的信息显示，并可由用户更改其中的值
+		N0029 * 给定起点及BPM生成格线功能
+		N0030 * 格线密度修改功能
+		N0031 * 在选定单个note时N0029中的起点自动改为该note的time值
+	Finished
+		F0008 根据stage是否载入调整Settings板块的高度（改为在Edit板块中实现）
+		F0009 修复Import新谱面之后等级信息被覆盖的bug
+		N0016 Combo数特效
+2017-05-15
+	Finished
+		N0017 确定Edit板块的基本UI设置
+		N0021 加入note的Charming光效
+2017-05-16
+	Finished
+		F0010 修复带文件名输入框的文件夹选择窗口不输入文件名时确认按钮可点击的bug
+		F0011 修复重复新建项目时确认按钮保持可点击状态的bug
+		N0005 FPS显示开关
+		N0010 程序内置手动BPM测试器（为自制谱面功能做准备）
+		N0018 加入About
+2017-05-17
+	Planned
+		N0032 * 在Stage打开时滑动鼠标滚轮调节谱面进度
+		N0033 * 鼠标滚轮灵敏度调节（在Settings中）
+		N0034 * 选择note时按住Ctrl多选
+	Finished
+		N0006 音乐/按键音的音量调节
+2017-05-24
+	Finished
+		N0030 格线密度修改功能
+2017-07-01
+	Finished
+		N0022 格线显示
+		N0029 给定起点及BPM生成格线功能
+2017-08-14
+	Finished
+		N0024 在同一组黄条间添加连线，并在Edit板块中设置开关
+2017-08-15
+	Planned
+		N0035 * Undo/Redo功能
+	Finished
+		N0035 Undo/Redo功能
+2017-08-16
+	Planned
+		N0037 * 添加新note
+		N0038 * 在Edit板块中加入吸附到格线选项并加入快捷键
+		N0039 * 按Delete删除选中的所有note
+		N0040 * 按Ctrl+A选中所有note
+		N0041 量化选中的所有note
+		N0042 * 连接选中的所有note
+		N0043 * 将选中所有note变回tap note
+	Finished
+		N0032 在Stage打开时滑动鼠标滚轮调节谱面进度
+		N0033 鼠标滚轮灵敏度调节（在Settings中）
+2017-08-18
+	Planned
+		N0044 * Load谱面时可以导入Cytus V2谱面进行直转（纸张功能）
+	Finished
+		N0044 Load谱面时可以导入Cytus V2谱面进行直转（纸张功能）
+2017-09-30
+	Finished
+		N0025 note被选中的效果
+		N0026 选定note功能
+		N0027 选定一区域内所有note
+		N0034 选择note时按住Ctrl多选
+2017-10-02
+	Planned
+		N0045 * 选中多个note的时候N0029终点改成选中的最后一个note, 将BPM数值改为使一拍时间为最前后两note时间差的值
+		N0046 剪切, 复制, 粘贴
+		N0047 由多个note的位置构建Lagrange多项式插值函数, 并在Stage上显示该曲线, 使得吸附到格线开启时可在曲线上放置新note
+		N0048 在插值曲线上以起始点为起点间隔相同时间差放置note
+		N0049 * 查看并修改PianoSound值
+		N0050 * note摆放位置指示(添加开关)
+	Finished
+		N0031 在选定单个note时N0029中的起点自动改为该note的time值
+		N0038 在Edit板块中加入吸附到格线选项并加入快捷键
+		N0039 按Delete删除选中的所有note
+		N0045 选中多个note的时候N0029终点改成选中的最后一个note, 将BPM数值改为使一拍时间为最前后两note时间差的值
+2017-10-03
+	Finished
+		N0037 添加新note
+		N0040 按Ctrl+A选中所有note
+		N0042 连接选中的所有note
+		N0043 将选中所有note变回tap note
+		N0050 note摆放位置指示(添加开关)
+2017-10-04
+	Planned
+		F0012 * 修复撤销后无法正常保存文件的bug
+2017-10-06
+	Finished
+		F0012 修复撤销后无法正常保存文件的bug
+2017-11-12
+	Planned
+		F0013 * 重制部分UI
+		F0014 * 同步四张谱面的拍线信息
+2017-11-14
+	Planned
+		N0051 将选定note组做关于中线/note组中间位置的镜像
+		N0052 * 按WASD对选中note进行微调(1ms/0.01)
+		N0053 * 按Alt+WASD对选中note进行粗调(10ms/0.1)
+		N0054 按Shift+WASD将选中note移动当前一格距离
+	Finished
+		F0013 重制部分UI
+		F0014 同步四张谱面的拍线信息 
+		N0052 按WASD对选中note进行微调(1ms/0.01)
+		N0053 按Alt+WASD对选中note进行粗调(10ms/0.1)
+2017-11-23
+	Planned
+		N0055 * 文件扩展名关联以及用程序打开文件
+2017-11-24
+	Finished
+		N0055 文件扩展名关联以及用程序打开文件
+2017-11-27
+	Finished
+		N0028 在Edit板块中加入已选中note的信息显示，并可由用户更改其中的值
+		N0049 查看并修改PianoSound值
