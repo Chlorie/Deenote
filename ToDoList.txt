@@ -186,7 +186,7 @@
 		N0051 将选定note组做关于中线/note组中间位置的镜像
 		N0052 * 按WASD对选中note进行微调(1ms/0.01)
 		N0053 * 按Alt+WASD对选中note进行粗调(10ms/0.1)
-		N0054 按Shift+WASD将选中note移动当前一格距离
+		N0054 * 按Shift+WASD将选中note移动当前一格距离
 	Finished
 		F0013 重制部分UI
 		F0014 同步四张谱面的拍线信息 
@@ -202,3 +202,9 @@
 	Finished
 		N0028 在Edit板块中加入已选中note的信息显示，并可由用户更改其中的值
 		N0049 查看并修改PianoSound值
+2017-12-03
+	Planned
+		N0056 修改note信息时可以输入函数(精细平移,函数图像)
+		F0015 更改note摆放位置指示的显示方式(剪切复制粘贴功能需要)
+	Finished
+		N0054 按Shift+WASD将选中note移动当前一格距离

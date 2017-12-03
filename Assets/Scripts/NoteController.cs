@@ -27,8 +27,6 @@ public class NoteController : MonoBehaviour
     private bool soundPlayed = false;
     private bool inRange = true;
     public AudioSource audioSource;
-    //public AudioSource pianoPrefab;
-    //public List<AudioSource> pianoSources;
     public PianoSoundsLoader piano;
     public AudioClip clickClip;
     private Color waveColor;
@@ -44,11 +42,6 @@ public class NoteController : MonoBehaviour
         linkLine.SetActive(false);
         stage.SetPrevNoteID(id);
         stage.ReturnNote(this);
-        //for (int i = pianoSources.Count - 1; i >= 0; i--)
-        //{
-        //    Destroy(pianoSources[i].gameObject);
-        //    pianoSources.RemoveAt(i);
-        //}
     }
     private void PositionUpdate()
     {
@@ -93,13 +86,6 @@ public class NoteController : MonoBehaviour
                     if (stage.pianoVolume > 0)
                         piano.PlayNote(sound.pitch, sound.volume * stage.pianoVolume / 100, stage.musicPlaySpeed / 10.0f,
                             sound.duration, sound.delay);
-                    //AudioSource pianoSource = Instantiate(pianoPrefab, gameObject.transform);
-                    //float pitch, volume;
-                    //pianoSource.clip = piano.GetPianoAudioClip(sound.pitch, sound.volume, out pitch, out volume);
-                    //pitch *= stage.musicPlaySpeed / 10.0f;
-                    //pianoSource.pitch = pitch; pianoSource.volume = volume;
-                    //pianoSource.Play();
-                    //pianoSource.PlayDelayed(sound.delay / pitch);
                 }
             }
         }
@@ -250,15 +236,7 @@ public class NoteController : MonoBehaviour
     }
     private void Update()
     {
-        //noteSprite.sortingOrder = id - stage.returnNoteID;
         time = stage.timeSlider.value;
-        //for (int i = 0; i < curNote.sounds.Count; i++)
-        //{
-        //    if (i < pianoSources.Count && pianoSources[i].time > curNote.sounds[i].duration)
-        //    {
-        //        pianoSources[i].Stop();
-        //    }
-        //}
         CheckForReturn();
         PositionUpdate();
     }
