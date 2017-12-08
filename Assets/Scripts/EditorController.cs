@@ -299,6 +299,8 @@ public class EditorController : MonoBehaviour
         bool isLink = true, flag = true;
         List<PianoSound> sounds = null;
         int i, j;
+        amountSelected = 0;
+        for (i = 0; i < chart.notes.Count; i++) if (noteSelect[i].prevSelected != noteSelect[i].selected) amountSelected++;
         amountSel.text = "Selected " + amountSelected + " note" + (amountSelected < 2 ? "" : "s");
         bool selectedAny = amountSelected > 0;
         if (selectedAny)
@@ -684,19 +686,19 @@ public class EditorController : MonoBehaviour
             if (noteSelect[i].prevSelected != noteSelect[i].selected) d++;
         }
         for (int i = 0; i < noteSelect.Count; i++)
-        {
-            int prev = chart.notes[i].prevLink, next = chart.notes[i].nextLink;
-            if (noteSelect[i].prevSelected != noteSelect[i].selected && prev != -1 && next != -1)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
             {
-                chart.notes[prev].nextLink = next - deleted[next];
-                chart.notes[next].prevLink = prev - deleted[prev];
+                int prev = chart.notes[i].prevLink, next = chart.notes[i].nextLink;
+                if (prev != -1) chart.notes[prev].nextLink = next;
+                if (next != -1) chart.notes[next].prevLink = prev;
             }
-            else
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected == noteSelect[i].selected && chart.notes[i].isLink)
             {
+                int prev = chart.notes[i].prevLink, next = chart.notes[i].nextLink;
                 if (prev != -1) chart.notes[i].prevLink -= deleted[prev];
                 if (next != -1) chart.notes[i].nextLink -= deleted[next];
             }
-        }
         for (int i = noteSelect.Count - 1; i >= 0; i--)
             if (noteSelect[i].prevSelected != noteSelect[i].selected)
             {
@@ -914,6 +916,7 @@ public class EditorController : MonoBehaviour
             }
             SortNotes();
             SyncStage();
+            ChangeSelectionPanelValues();
         }
         pasteMode = false;
     }

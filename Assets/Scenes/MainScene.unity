@@ -58382,7 +58382,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Deenote by HCl \u2013 Version 0.5\r\n\n*Bad English Alert*\r\n\n-Things
+  m_Text: "Deenote by HCl \u2013 Version 0.5.1\r\n\r\n*Bad English Alert*\r\n\r\n-Things
     that must be mentioned-\r\n     Thank you for using my app!\r\n     Something
     I must mention in the beginning: This application can only be used to make fan
     made charts of Deemo, and it is strictly prohibited to use this app for any commercial
@@ -58400,19 +58400,21 @@ MonoBehaviour:
     \    Just enjoy yourself making some fun charts with this app. Hope you love it.\r\n\r\n-Update
     History-\r\n     Planned in upcoming versions\r\n          Automatic note filling
     (interpolating).\r\n          Other features.\r\n          Built-in user manual.\r\n
-    \    Deenote 0.5 (12-08-2017)\r\n          Copy/Paste functions.\r\n          Quantize
-    notes.\r\n     Deenote 0.4 (11-27-2017)\r\n          Full edit function of note
-    properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File extension association.\r\n
-    \    Deenote 0.3 build 2 (11-16-2017)\r\n          Minor changes to beat line
-    saving.\r\n          Edit panel UI redesigned.\r\n     Deenote 0.3 build 1 (11-13-2017)\r\n
-    \         Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n          Add new notes.\r\n
-    \         Link/Unlink selected notes.\r\n          Note placement indicator.\r\n
-    \    Deenote 0.2 (10-03-2017)\r\n          Added color tint for selected notes.\r\n
-    \         Remove notes.\r\n          Beat line filling field auto-fill.\r\n     Deenote
-    0.1 (09-30-2017)\r\n          Added all visual effects for chart viewing function.\r\n
-    \         Added a manual BPM calculator.\r\n          Volume control for the sounds.\r\n
-    \         Beat line filling and displaying.\r\n          Link lines between slide
-    notes.\r\n          Undo/Redo functions.\r\n          Fixed a few bugs.\r\n          Select
+    \    Deenote 0.5.1 (12-08-2017)\r\n          Fixed the bug when deleting slide
+    notes the remaining slide notes are incorrectly linked.\r\n     Deenote 0.5 (12-08-2017)\r\n
+    \         Copy/Paste functions.\r\n          Quantize notes.\r\n     Deenote 0.4
+    (11-27-2017)\r\n          Full edit function of note properties.\r\n     Deenote
+    0.3.1 (11-25-2017)\r\n          File extension association.\r\n     Deenote 0.3
+    build 2 (11-16-2017)\r\n          Minor changes to beat line saving.\r\n          Edit
+    panel UI redesigned.\r\n     Deenote 0.3 build 1 (11-13-2017)\r\n          Bug
+    fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n          Add new notes.\r\n          Link/Unlink
+    selected notes.\r\n          Note placement indicator.\r\n     Deenote 0.2 (10-03-2017)\r\n
+    \         Added color tint for selected notes.\r\n          Remove notes.\r\n
+    \         Beat line filling field auto-fill.\r\n     Deenote 0.1 (09-30-2017)\r\n
+    \         Added all visual effects for chart viewing function.\r\n          Added
+    a manual BPM calculator.\r\n          Volume control for the sounds.\r\n          Beat
+    line filling and displaying.\r\n          Link lines between slide notes.\r\n
+    \         Undo/Redo functions.\r\n          Fixed a few bugs.\r\n          Select
     notes.\r\n          (Hidden feature: Convert Cytus v2 charts into Deemo charts.
     In my opinion no one would like to use this or even care about this.)\r\n     Deemo
     Chart Editor 0.2 (05-06-2017)\r\n          Added some shortcuts.\r\n          JSON
