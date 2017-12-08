@@ -20,6 +20,23 @@ public class NoteIndicatorController : MonoBehaviour
     public LinkLine linkLine;
     public float placeTime;
     public float placePos;
+    public Note Note
+    {
+        get
+        {
+            return new Note
+            {
+                isLink = note.isLink,
+                prevLink = note.prevLink,
+                nextLink = note.nextLink,
+                position = placePos,
+                time = placeTime,
+                shift = note.shift,
+                size = note.size,
+                sounds = note.sounds
+            };
+        }
+    }
     public void Initialize(EditorController controller, Note cur, Note next, float length)
     {
         if (linkLine == null) linkLine = new LinkLine();

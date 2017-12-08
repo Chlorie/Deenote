@@ -58348,7 +58348,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 227.091, y: -660}
-  m_SizeDelta: {x: 434.182, y: 1500}
+  m_SizeDelta: {x: 434.182, y: 1550}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1946390857
 MonoBehaviour:
@@ -58382,55 +58382,56 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "-Things that must be mentioned-\r\n     Thank you for using my app!\r\n
-    \    Something I must mention in the beginning: This application can only be used
-    to make fan made charts of Deemo, and it is strictly prohibited to use this app
-    for any commercial purposes. This app is only for making fan made charts for fun,
-    if you somehow know methods to import fan made charts into the game, DO NOT distribute
-    the cracked/modified game to others (or even make it public). You\u2019ll probably
-    have a bad time if you do so.\r\n\r\n-Random things-\r\n     [Self-introduction?]\r\n
-    \    I'm a rhythm game player known as HCl on the Internet. I'm 17 years old and
-    currently studying Computational Mathematics in USTC (University of Science and
-    Technology of China) for the third year.\r\n     [About this app?]\r\n     I'm
-    making this app just for fun. Still a C#/Unity3D newbie so there may be tons of
-    bugs in my code, but who cares? (No, everyone cares.) Since I'm still a student,
-    and as you all know everyone is pretty busy in the third year in university, so
-    I don't have much time to develop this thing. Don't push me please.\r\n     [Anything
-    else?]\r\n     Just enjoy yourself making some fun charts with this app. Hope
-    you love it.\r\n\r\n-Update History-\r\n     Planned in upcoming versions\r\n
-    \         Copy/Paste functions.\r\n          Quantize notes.\r\n          Automatic
-    note filling (interpolating).\r\n          Other features.\r\n          Built-in
-    user manual.\n     Deenote 0.4\r (11-27-2017)\n          Full edit function of
-    note properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File extension
-    association.\r\n     Deenote 0.3 build 2 (11-16-2017)\r\n          Minor changes
-    to beat line saving.\r\n          Edit panel UI redesigned.\r\n     Deenote 0.3
-    build 1 (11-13-2017)\r\n          Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n
-    \         Add new notes.\r\n          Link/Unlink selected notes.\r\n          Note
-    placement indicator.\r\n     Deenote 0.2 (10-03-2017)\r\n          Added color
-    tint for selected notes.\r\n          Remove notes.\r\n          Beat line filling
-    field auto-fill.\r\n     Deenote 0.1 (09-30-2017)\r\n          Added all visual
-    effects for chart viewing function.\r\n          Added a manual BPM calculator.\r\n
-    \         Volume control for the sounds.\r\n          Beat line filling and displaying.\r\n
-    \         Link lines between slide notes.\r\n          Undo/Redo functions.\r\n
-    \         Fixed a few bugs.\r\n          Select notes.\r\n          (Hidden feature:
-    Convert Cytus v2 charts into Deemo charts. In my opinion no one would like to
-    use this or even care about this.)\r\n     Deemo Chart Editor 0.2 (05-06-2017)\r\n
-    \         Added some shortcuts.\r\n          JSON file exporting.\r\n          \"Save
-    as\" feature.\r\n          Added some visual effects (Lowered alpha values for
-    the notes that are far away, added frame-by-frame disappearing animation and shock
-    wave/circle animation for notes that hit the judge line).\r\n          Fixed a
-    few bugs.\r\n     Deemo Chart Editor 0.1 (04-27-2017)\r\n          Chart viewing
-    function finished. No effects yet.\r\n\r\n-Known bugs-\r\n     Many bugs about
-    UI and shortcut keys (for example if you try to open another project while you're
-    still in the piano sound editing screen, the piano would probably stay there and
-    it may cause some problems). It's not that I don't know how to fix but it's really
-    a tedious job and it will take much time... Please give me enough time...\r\n
-    \    Some buttons may not work cause the functions are still not implemented.
-    Please wait...\r\n\r\n-If you've found more bugs...-\r\n     Feel free to contact
-    me if you've found any bugs. QQ: 1357008522 / Twitter: @Hydrochlorie\r\n     \r\n-Special
-    thanks-\r\n     Thanks to the developers of Cytunity and Deemo Note Memory for
-    inspiration.\r\n     Millions of thanks to rkevin and \u3086\u3086 for technical
-    support!\r"
+  m_Text: "Deenote by HCl \u2013 Version 0.5\r\n\n*Bad English Alert*\r\n\n-Things
+    that must be mentioned-\r\n     Thank you for using my app!\r\n     Something
+    I must mention in the beginning: This application can only be used to make fan
+    made charts of Deemo, and it is strictly prohibited to use this app for any commercial
+    purposes. This app is only for making fan made charts for fun, if you somehow
+    know methods to import fan made charts into the game, DO NOT distribute the cracked/modified
+    game to others (or even make it public). You\u2019ll probably have a bad time
+    if you do so.\r\n\r\n-Random things-\r\n     [Self-introduction?]\r\n     I'm
+    a rhythm game player known as HCl on the Internet. I'm 17 years old and currently
+    studying Computational Mathematics in USTC (University of Science and Technology
+    of China) for the third year.\r\n     [About this app?]\r\n     I'm making this
+    app just for fun. Still a C#/Unity3D newbie so there may be tons of bugs in my
+    code, but who cares? (No, everyone cares.) Since I'm still a student, and as you
+    all know everyone is pretty busy in the third year in university, so I don't have
+    much time to develop this thing. Don't push me please.\r\n     [Anything else?]\r\n
+    \    Just enjoy yourself making some fun charts with this app. Hope you love it.\r\n\r\n-Update
+    History-\r\n     Planned in upcoming versions\r\n          Automatic note filling
+    (interpolating).\r\n          Other features.\r\n          Built-in user manual.\r\n
+    \    Deenote 0.5 (12-08-2017)\r\n          Copy/Paste functions.\r\n          Quantize
+    notes.\r\n     Deenote 0.4 (11-27-2017)\r\n          Full edit function of note
+    properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File extension association.\r\n
+    \    Deenote 0.3 build 2 (11-16-2017)\r\n          Minor changes to beat line
+    saving.\r\n          Edit panel UI redesigned.\r\n     Deenote 0.3 build 1 (11-13-2017)\r\n
+    \         Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n          Add new notes.\r\n
+    \         Link/Unlink selected notes.\r\n          Note placement indicator.\r\n
+    \    Deenote 0.2 (10-03-2017)\r\n          Added color tint for selected notes.\r\n
+    \         Remove notes.\r\n          Beat line filling field auto-fill.\r\n     Deenote
+    0.1 (09-30-2017)\r\n          Added all visual effects for chart viewing function.\r\n
+    \         Added a manual BPM calculator.\r\n          Volume control for the sounds.\r\n
+    \         Beat line filling and displaying.\r\n          Link lines between slide
+    notes.\r\n          Undo/Redo functions.\r\n          Fixed a few bugs.\r\n          Select
+    notes.\r\n          (Hidden feature: Convert Cytus v2 charts into Deemo charts.
+    In my opinion no one would like to use this or even care about this.)\r\n     Deemo
+    Chart Editor 0.2 (05-06-2017)\r\n          Added some shortcuts.\r\n          JSON
+    file exporting.\r\n          \"Save as\" feature.\r\n          Added some visual
+    effects (Lowered alpha values for the notes that are far away, added frame-by-frame
+    disappearing animation and shock wave/circle animation for notes that hit the
+    judge line).\r\n          Fixed a few bugs.\r\n     Deemo Chart Editor 0.1 (04-27-2017)\r\n
+    \         Chart viewing function finished. No effects yet.\r\n\r\n-Known bugs-\r\n
+    \    Many bugs about UI and shortcut keys (for example if you try to open another
+    project while you're still in the piano sound editing screen, the piano would
+    probably stay there and it may cause some problems). It's not that I don't know
+    how to fix but it's really a tedious job and it will take much time... Please
+    give me enough time...\r\n     Some buttons may not work cause the functions are
+    not yet implemented. Please wait...\r\n\r\n-If you've found more bugs or want
+    to suggest some new features-\r\n     Feel free to contact me if so. QQ: 1357008522
+    / Twitter: @Hydrochlorie / E-mail (plz don\u2019t spam...): myosotis@mail.ustc.edu.cn\r\n
+    \    \r\n-Special thanks-\r\n     Thanks to the developers of Cytunity and Deemo
+    Note Memory for inspiration.\r\n     Millions of thanks to rkevin and \u3086\u3086
+    for technical support! \r"
 --- !u!222 &1946390858
 CanvasRenderer:
   m_ObjectHideFlags: 0

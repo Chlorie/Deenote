@@ -208,7 +208,7 @@ public class EditorController : MonoBehaviour
     //-Undo/Redo-
     public void RegisterUndoStep()
     {
-        if (undoCharts.Count > currentStep)
+        while (undoCharts.Count > currentStep)
         {
             undoCharts.RemoveAt(currentStep);
             undoNoteSelect.RemoveAt(currentStep);
@@ -596,7 +596,7 @@ public class EditorController : MonoBehaviour
         return new Vector2(snapX, snapT);
     }
     //Note Manipulations
-    private void AddNote(Note note, bool selected) //Be aware that by default Note is a reference
+    private void AddNote(Note note) //Be aware that by default Note is a reference
     {
         int i, j;
         for (i = 0; i < chart.notes.Count; i++)
@@ -842,8 +842,9 @@ public class EditorController : MonoBehaviour
         SyncStage();
         ChangeSelectionPanelValues();
     }
-    public void CopySelectedNotes() //undo=true: register undo step
+    public void CopySelectedNotes()
     {
+        pasteMode = false;
         while (clipBoard.Count > 0) clipBoard.RemoveAt(0);
         List<int> index = new List<int>(new int[chart.notes.Count]);
         int count = 0, firstPos = -1;
@@ -893,7 +894,27 @@ public class EditorController : MonoBehaviour
     }
     private void PlaceNotes()
     {
-
+        if (!pasteMode)
+        {
+            RegisterUndoStep();
+            AddNote(noteIndicators[0].Note);
+            SyncStage();
+        }
+        else
+        {
+            RegisterUndoStep();
+            int noteCount = chart.notes.Count;
+            for (int i = 0; i < noteIndicators.Count; i++)
+            {
+                Note note = noteIndicators[i].Note;
+                if (note.prevLink != -1) note.prevLink += noteCount;
+                if (note.nextLink != -1) note.nextLink += noteCount;
+                chart.notes.Add(note);
+                noteSelect.Add(new NoteSelect { editor = this, note = note, prevSelected = true, selected = false });
+            }
+            SortNotes();
+            SyncStage();
+        }
         pasteMode = false;
     }
     //Note indicators
