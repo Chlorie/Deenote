@@ -112,7 +112,7 @@ public class ProjectController : MonoBehaviour
     }
     public void SelectSong() //Project - New - Select Song
     {
-        string[] acceptedExtension = { ".wav" }; //By now only .wav music files are accepted
+        string[] acceptedExtension = { ".wav", ".ogg" }; //By now only .wav and .ogg music files are accepted
         directorySelectorController.ActivateSelection(acceptedExtension, "SelectSong");
     }
     public void SelectFile() //Project - New - Select Folder

@@ -134,7 +134,7 @@
 		N0038 * 在Edit板块中加入吸附到格线选项并加入快捷键
 		N0039 * 按Delete删除选中的所有note
 		N0040 * 按Ctrl+A选中所有note
-		N0041 量化选中的所有note
+		N0041 * 量化选中的所有note
 		N0042 * 连接选中的所有note
 		N0043 * 将选中所有note变回tap note
 	Finished
@@ -154,7 +154,7 @@
 2017-10-02
 	Planned
 		N0045 * 选中多个note的时候N0029终点改成选中的最后一个note, 将BPM数值改为使一拍时间为最前后两note时间差的值
-		N0046 剪切, 复制, 粘贴
+		N0046 * 剪切, 复制, 粘贴
 		N0047 由多个note的位置构建Lagrange多项式插值函数, 并在Stage上显示该曲线, 使得吸附到格线开启时可在曲线上放置新note
 		N0048 在插值曲线上以起始点为起点间隔相同时间差放置note
 		N0049 * 查看并修改PianoSound值
@@ -205,6 +205,21 @@
 2017-12-03
 	Planned
 		N0056 修改note信息时可以输入函数(精细平移,函数图像)
-		F0015 更改note摆放位置指示的显示方式(剪切复制粘贴功能需要)
+		F0015 * 更改note摆放位置指示的显示方式(剪切复制粘贴功能需要)
 	Finished
 		N0054 按Shift+WASD将选中note移动当前一格距离
+2017-12-08
+	Finished
+		F0015 更改note摆放位置指示的显示方式(剪切复制粘贴功能需要)
+		N0041 量化选中的所有note
+		N0046 剪切, 复制, 粘贴
+2017-12-09
+	Planned
+		N0057 在note附近显示note编号(并且加入开关)
+		N0058 选中note信息栏加入ID项, 可以输入ID来选中note
+		N0059 (Optional)加入对压缩音乐格式的支持
+2017-12-10
+	Planned
+		F0016 修复UI逻辑带来的各种bug
+		N0060 将编辑器设置存到userpref中
+		N0061 用LineRenderer重写UILine, 黄条连线
