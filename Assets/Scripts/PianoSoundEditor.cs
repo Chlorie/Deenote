@@ -13,7 +13,7 @@ public class PianoSoundEditor : MonoBehaviour
     {
         sounds.PlayNote(key, 95, 1.0f);
         PianoSoundItem item = itemPool.GetObject();
-        item.Initialize(0.0f, 0.0f, key, 127, this);
+        item.Initialize(0.0f, 0.0f, key, 0, this);
         items.Add(item);
     }
     public void Activate(EditorController edit, List<PianoSound> sounds)

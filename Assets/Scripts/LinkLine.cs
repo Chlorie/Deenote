@@ -15,6 +15,7 @@ public class LinkLine
     }
     public void MoveTo(Vector3 point1, Vector3 point2)
     {
+        near.image.color = Parameters.linkLineColor;
         Color finalColor = Parameters.linkLineColor;
         float slope, intercept;
         float farMinX, farMaxX, nearMinX, nearMaxX;
@@ -102,6 +103,12 @@ public class LinkLine
                 far.image.fillAmount = farFillAmount;
             }
         }
+    }
+    public void AlphaMultiply(float multiplier)
+    {
+        Color nearColor = near.image.color, farColor = far.image.color;
+        nearColor.a *= multiplier; farColor.a *= multiplier;
+        near.image.color = nearColor; far.image.color = farColor;
     }
     public void SetActive(bool status)
     {

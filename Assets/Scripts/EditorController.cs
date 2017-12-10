@@ -41,10 +41,13 @@ public class EditorController : MonoBehaviour
     //Note Placement
     private bool snapToGrid = false;
     public Toggle snapToGridToggle;
-    private bool showNoteIndicator = true;
-    private Vector2 notePlacingPos = new Vector2(0.0f, -1.0f);
-    public GameObject noteIndicator;
+    private List<Note> clipBoard = new List<Note>();
+    public GameObject noteIndicatorsToggler;
     public SpriteRenderer noteIndicatorSprite;
+    private List<NoteIndicatorController> noteIndicators = new List<NoteIndicatorController>();
+    public Transform noteIndicatorParent;
+    public NoteIndicatorPool noteIndicatorPool;
+    private bool pasteMode = false;
     //Interpolate
     private List<float> lagrangeInterpolation = new List<float>();
     //Mouse Actions
@@ -63,6 +66,8 @@ public class EditorController : MonoBehaviour
     //General
     public void ActivateEditor()
     {
+        noteIndicatorPool.Initialize();
+
         while (undoCharts.Count > 0) undoCharts.RemoveAt(0);
         while (noteSelect.Count > 0) noteSelect.RemoveAt(0);
         while (undoNoteSelect.Count > 0) undoNoteSelect.RemoveAt(0);
@@ -84,7 +89,7 @@ public class EditorController : MonoBehaviour
         int gridNumber = Utility.GetInt(input);
         int i;
         float position;
-        if (gridNumber > 25) gridNumber = 25;
+        if (gridNumber > 40) gridNumber = 40;
         if (gridNumber < 0) gridNumber = 0;
         xGrid = gridNumber;
         xGridInputField.text = "" + xGrid;
@@ -105,7 +110,7 @@ public class EditorController : MonoBehaviour
     public void TGridNumber(string input)
     {
         int gridNumber = Utility.GetInt(input);
-        if (gridNumber > 99) gridNumber = 99;
+        if (gridNumber > 64) gridNumber = 64;
         if (gridNumber < 0) gridNumber = 0;
         tGrid = gridNumber;
         tGridInputField.text = "" + tGrid;
@@ -160,8 +165,7 @@ public class EditorController : MonoBehaviour
     }
     public void ToggleNoteIndicator(bool isOn)
     {
-        showNoteIndicator = isOn;
-        noteIndicator.SetActive(isOn);
+        noteIndicatorsToggler.SetActive(isOn);
     }
     //-Barlines-
     public void FillBeatLines()
@@ -204,7 +208,7 @@ public class EditorController : MonoBehaviour
     //-Undo/Redo-
     public void RegisterUndoStep()
     {
-        if (undoCharts.Count > currentStep)
+        while (undoCharts.Count > currentStep)
         {
             undoCharts.RemoveAt(currentStep);
             undoNoteSelect.RemoveAt(currentStep);
@@ -295,6 +299,8 @@ public class EditorController : MonoBehaviour
         bool isLink = true, flag = true;
         List<PianoSound> sounds = null;
         int i, j;
+        amountSelected = 0;
+        for (i = 0; i < chart.notes.Count; i++) if (noteSelect[i].prevSelected != noteSelect[i].selected) amountSelected++;
         amountSel.text = "Selected " + amountSelected + " note" + (amountSelected < 2 ? "" : "s");
         bool selectedAny = amountSelected > 0;
         if (selectedAny)
@@ -592,7 +598,7 @@ public class EditorController : MonoBehaviour
         return new Vector2(snapX, snapT);
     }
     //Note Manipulations
-    private void AddNote(Note note, bool selected) //Be aware that by default Note is a reference
+    private void AddNote(Note note) //Be aware that by default Note is a reference
     {
         int i, j;
         for (i = 0; i < chart.notes.Count; i++)
@@ -643,7 +649,6 @@ public class EditorController : MonoBehaviour
             noteSelect[i].note = notes[i];
             noteSelect[i].prevSelected = selected[index[i]];
         }
-        List<bool> sorted = new List<bool>(new bool[chart.notes.Count]);
         chart.notes = notes;
         int swapCount;
         do
@@ -681,19 +686,19 @@ public class EditorController : MonoBehaviour
             if (noteSelect[i].prevSelected != noteSelect[i].selected) d++;
         }
         for (int i = 0; i < noteSelect.Count; i++)
-        {
-            int prev = chart.notes[i].prevLink, next = chart.notes[i].nextLink;
-            if (noteSelect[i].prevSelected != noteSelect[i].selected && prev != -1 && next != -1)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
             {
-                chart.notes[prev].nextLink = next - deleted[next];
-                chart.notes[next].prevLink = prev - deleted[prev];
+                int prev = chart.notes[i].prevLink, next = chart.notes[i].nextLink;
+                if (prev != -1) chart.notes[prev].nextLink = next;
+                if (next != -1) chart.notes[next].prevLink = prev;
             }
-            else
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected == noteSelect[i].selected && chart.notes[i].isLink)
             {
+                int prev = chart.notes[i].prevLink, next = chart.notes[i].nextLink;
                 if (prev != -1) chart.notes[i].prevLink -= deleted[prev];
                 if (next != -1) chart.notes[i].nextLink -= deleted[next];
             }
-        }
         for (int i = noteSelect.Count - 1; i >= 0; i--)
             if (noteSelect[i].prevSelected != noteSelect[i].selected)
             {
@@ -768,6 +773,7 @@ public class EditorController : MonoBehaviour
         for (int i = 0; i < chart.notes.Count; i++)
             if (noteSelect[i].prevSelected != noteSelect[i].selected)
             {
+                if (chart.notes[i].position < -2.0f || chart.notes[i].position > 2.0f) continue;
                 chart.notes[i].position += pos;
                 if (chart.notes[i].position < -2.0f) chart.notes[i].position = -2.0f;
                 if (chart.notes[i].position > 2.0f) chart.notes[i].position = 2.0f;
@@ -777,17 +783,219 @@ public class EditorController : MonoBehaviour
     }
     private void AdjustSelectedNoteTimeByGrid(int amount)
     {
-        if (tGrid == 0) return;
-
+        if (tGrid == 0 || chart.beats.Count == 0) return;
+        RegisterUndoStep();
+        int beatIndex = 0, i = 0;
+        while (i < chart.notes.Count && chart.notes[i].time <= chart.beats[0]) i++;
+        for (i = 0; i < chart.notes.Count && chart.notes[i].time <= chart.beats[chart.beats.Count - 1]; i++)
+        {
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                float minDistance = stage.musicLength;
+                while (chart.beats[beatIndex + 1] < chart.notes[i].time) beatIndex++;
+                if (amount == -1 && chart.notes[i].time - chart.beats[0] < 1e-4)
+                {
+                    chart.notes[i].time = chart.beats[0];
+                    continue;
+                }
+                else if (amount == 1 && chart.beats[chart.beats.Count - 1] - chart.notes[i].time < 1e-4)
+                {
+                    chart.notes[i].time = chart.beats[chart.beats.Count - 1];
+                    continue;
+                }
+                else if (amount == 1 && chart.beats[beatIndex + 1] - chart.notes[i].time < 1e-4) beatIndex++;
+                float beatTime = chart.beats[beatIndex + 1] - chart.beats[beatIndex];
+                float adjusted = 0.0f;
+                for (int j = 0; j <= tGrid; j++)
+                {
+                    float time = chart.beats[beatIndex] + beatTime / tGrid * j;
+                    float diff = amount * (time - chart.notes[i].time);
+                    if (diff > 1e-4f && diff < minDistance) { minDistance = diff; adjusted = time; }
+                }
+                chart.notes[i].time = adjusted;
+            }
+        }
         SyncStage();
         ChangeSelectionPanelValues();
     }
     private void AdjustSelectedNotePositionByGrid(int amount)
     {
         if (xGrid == 0) return;
-
+        RegisterUndoStep();
+        for (int i = 0; i < chart.notes.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                if (chart.notes[i].position < -2.0f || chart.notes[i].position > 2.0f) continue;
+                float minDistance = 4.0f;
+                float adjusted = 0.0f;
+                float diff;
+                diff = amount * (2.0002f - chart.notes[i].position);
+                if (diff > 1e-4f) { minDistance = diff; adjusted = 2.0f; }
+                diff = amount * (-2.0002f - chart.notes[i].position);
+                if (diff > 1e-4f) { minDistance = diff; adjusted = -2.0f; }
+                for (int j = 0; j < xGrid; j++)
+                {
+                    float position = (j + 0.5f) / xGrid * 4 - 2 + xGridOffset;
+                    diff = amount * (position - chart.notes[i].position);
+                    if (diff > 1e-4f && diff < minDistance) { minDistance = diff; adjusted = position; }
+                }
+                chart.notes[i].position = adjusted;
+            }
         SyncStage();
         ChangeSelectionPanelValues();
+    }
+    public void CopySelectedNotes()
+    {
+        pasteMode = false;
+        while (clipBoard.Count > 0) clipBoard.RemoveAt(0);
+        List<int> index = new List<int>(new int[chart.notes.Count]);
+        int count = 0, firstPos = -1;
+        for (int i = 0; i < chart.notes.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                index[i] = count++;
+                if (count == 1) firstPos = i;
+            }
+        if (firstPos == -1) return;
+        List<int> prevLink = new List<int>(new int[chart.notes.Count]);
+        List<int> nextLink = new List<int>(new int[chart.notes.Count]);
+        for (int i = 0; i < chart.notes.Count; i++) prevLink[i] = nextLink[i] = -1;
+        for (int i = 0; i < chart.notes.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected && chart.notes[i].isLink)
+            {
+                int prev = chart.notes[i].prevLink;
+                while (prev != -1 && noteSelect[prev].prevSelected == noteSelect[prev].selected) prev = chart.notes[prev].prevLink;
+                prevLink[i] = prev == -1 ? -1 : index[prev];
+                if (prev != -1) nextLink[prev] = index[i];
+            }
+        for (int i = 0; i < chart.notes.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                Note note = new Note
+                {
+                    isLink = chart.notes[i].isLink,
+                    prevLink = prevLink[i],
+                    nextLink = nextLink[i],
+                    position = chart.notes[i].position,
+                    time = chart.notes[i].time - chart.notes[firstPos].time,
+                    shift = chart.notes[i].shift,
+                    size = chart.notes[i].size,
+                    sounds = chart.notes[i].sounds
+                };
+                clipBoard.Add(note);
+            }
+    }
+    public void CutSelectedNotes()
+    {
+        CopySelectedNotes();
+        DeleteSelectedNotes();
+    }
+    public void PasteNotes()
+    {
+        if (clipBoard.Count != 0) pasteMode = true;
+    }
+    private void PlaceNotes()
+    {
+        if (!pasteMode)
+        {
+            RegisterUndoStep();
+            AddNote(noteIndicators[0].Note);
+            SyncStage();
+        }
+        else
+        {
+            RegisterUndoStep();
+            int noteCount = chart.notes.Count;
+            for (int i = 0; i < noteIndicators.Count; i++)
+            {
+                Note note = noteIndicators[i].Note;
+                if (note.prevLink != -1) note.prevLink += noteCount;
+                if (note.nextLink != -1) note.nextLink += noteCount;
+                chart.notes.Add(note);
+                noteSelect.Add(new NoteSelect { editor = this, note = note, prevSelected = true, selected = false });
+            }
+            SortNotes();
+            SyncStage();
+            ChangeSelectionPanelValues();
+        }
+        pasteMode = false;
+    }
+    //Note indicators
+    public void UpdateNoteIndicators()
+    {
+        // Check for destroying and instantiating
+        if (pasteMode)
+        {
+            int indicatorCount = clipBoard.Count;
+            while (noteIndicators.Count > indicatorCount) ReturnIndicator(indicatorCount);
+            for (int i = 0; i < noteIndicators.Count; i++) UpdateNoteIndicatorValue(i);
+            for (int i = noteIndicators.Count; i < indicatorCount; i++) GetNoteIndicator(i);
+        }
+        else
+        {
+            while (noteIndicators.Count > 1) ReturnIndicator(1);
+            NoteIndicatorController indicator;
+            if (noteIndicators.Count == 0)
+            {
+                indicator = noteIndicatorPool.GetObject();
+                noteIndicators.Add(indicator);
+            }
+            else
+                indicator = noteIndicators[0];
+            indicator.gameObject.SetActive(true);
+            indicator.gameObject.transform.SetParent(noteIndicatorParent);
+            Note note = new Note
+            {
+                isLink = false,
+                prevLink = -1,
+                nextLink = -1,
+                position = 0.0f,
+                shift = 0.0f,
+                size = 1.0f,
+                sounds = new List<PianoSound>(),
+                time = 0.0f
+            };
+            indicator.Initialize(this, note, note, stage.musicLength);
+        }
+        // Update
+        float stageTime = stage.timeSlider.value;
+        if (Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth)
+            foreach (NoteIndicatorController indicator in noteIndicators) indicator.NoColor();
+        else
+        {
+            Vector2 pos = SetDragPosition(new Vector2(0.0f, 0.0f));
+            if (snapToGrid) pos = QuantizePosition(pos);
+            foreach (NoteIndicatorController indicator in noteIndicators)
+            {
+                float offset = pos.x;
+                if (pasteMode) offset -= clipBoard[0].position;
+                indicator.Move(pos.y, offset, stageTime);
+            }
+            // Reminder: what if the first note is out of stage
+        }
+    }
+    private void GetNoteIndicator(int id)
+    {
+        NoteIndicatorController indicator;
+        indicator = noteIndicatorPool.GetObject();
+        noteIndicators.Add(indicator);
+        UpdateNoteIndicatorValue(id);
+    }
+    private void UpdateNoteIndicatorValue(int id)
+    {
+        NoteIndicatorController indicator = noteIndicators[id];
+        indicator.gameObject.SetActive(true);
+        indicator.gameObject.transform.SetParent(noteIndicatorParent);
+        Note nextLink = clipBoard[id].isLink && clipBoard[id].nextLink != -1 ? clipBoard[clipBoard[id].nextLink] : clipBoard[id];
+        indicator.Initialize(this, clipBoard[id], nextLink, stage.musicLength);
+    }
+    public void ReturnIndicator(int id)
+    {
+        noteIndicators[id].gameObject.SetActive(false);
+        noteIndicators[id].linkLine.SetActive(false);
+        noteIndicators[id].gameObject.transform.localPosition = Vector3.zero;
+        noteIndicatorPool.ReturnObject(noteIndicators[id]);
+        noteIndicators.RemoveAt(id);
     }
     //Updated Every Frame
     private void MouseActions()
@@ -820,7 +1028,7 @@ public class EditorController : MonoBehaviour
         }
         else if (Input.GetMouseButton(Parameters.selectButton) && !ignoreAllInput && !dropCurrentDrag && activated) //Select button being held
         {
-            noteIndicator.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+            foreach (NoteIndicatorController indicator in noteIndicators) indicator.NoColor();
             dragEndPoint = SetDragPosition(dragEndPoint);
             SendDragUpdate();
             UpdateDragIndicator();
@@ -830,44 +1038,8 @@ public class EditorController : MonoBehaviour
             if (!(Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth))
             {
                 DeselectAll();
-                Note note = new Note
-                {
-                    isLink = false,
-                    nextLink = -1,
-                    prevLink = -1,
-                    position = notePlacingPos.x,
-                    shift = 0.0f,
-                    size = 1.0f,
-                    sounds = new List<PianoSound>(),
-                    time = notePlacingPos.y
-                };
-                RegisterUndoStep();
-                AddNote(note, false);
-                SyncStage();
+                PlaceNotes();
             }
-    }
-    private void MoveNoteIndicator()
-    {
-        //No interpolation curve
-        if (Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth)
-        {
-            noteIndicator.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
-            notePlacingPos = new Vector2(0.0f, -1.0f);
-        }
-        else
-        {
-            Vector2 pos= SetDragPosition(new Vector2(0.0f, 0.0f));
-            if (snapToGrid) pos = QuantizePosition(pos);
-            float x, z, alpha = 0.5f;
-            x = pos.x * Parameters.maximumNoteWidth;
-            z = (pos.y - stage.timeSlider.value) * Parameters.maximumNoteRange / Parameters.NoteFallTime(stage.chartPlaySpeed) + 32.0f;
-            if (z > Parameters.alpha1NoteRange)
-                alpha *= (Parameters.maximumNoteRange - z) / (Parameters.maximumNoteRange - Parameters.alpha1NoteRange);
-            noteIndicator.transform.position = new Vector3(x, 0.0f, z);
-            noteIndicatorSprite.color = new Color(1.0f, 1.0f, 1.0f, alpha);
-            notePlacingPos = pos;
-        }
-        //With interpolation curve
     }
     private void Shortcuts()
     {
@@ -911,6 +1083,20 @@ public class EditorController : MonoBehaviour
                 AdjustSelectedNotePosition(-0.1f);
             if (Utility.DetectKeys(KeyCode.D, Utility.ALT)) //Alt+D
                 AdjustSelectedNotePosition(0.1f);
+            if (Utility.DetectKeys(KeyCode.W, Utility.SHIFT)) //Shift+W
+                AdjustSelectedNoteTimeByGrid(1);
+            if (Utility.DetectKeys(KeyCode.S, Utility.SHIFT)) //Shift+S
+                AdjustSelectedNoteTimeByGrid(-1);
+            if (Utility.DetectKeys(KeyCode.A, Utility.SHIFT)) //Shift+A
+                AdjustSelectedNotePositionByGrid(-1);
+            if (Utility.DetectKeys(KeyCode.D, Utility.SHIFT)) //Shift+D
+                AdjustSelectedNotePositionByGrid(1);
+            if (Utility.DetectKeys(KeyCode.C, Utility.CTRL)) //Ctrl+C
+                CopySelectedNotes();
+            if (Utility.DetectKeys(KeyCode.X, Utility.CTRL)) //Ctrl+X
+                CutSelectedNotes();
+            if (Utility.DetectKeys(KeyCode.V, Utility.CTRL)) //Ctrl+V
+                PasteNotes();
         }
     }
     private void Start()
@@ -924,8 +1110,11 @@ public class EditorController : MonoBehaviour
     }
     private void Update()
     {
-        Shortcuts();
-        MoveNoteIndicator();
-        MouseActions();
+        if (activated)
+        {
+            Shortcuts();
+            UpdateNoteIndicators();
+            MouseActions();
+        }
     }
 }

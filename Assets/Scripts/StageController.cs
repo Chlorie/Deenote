@@ -164,7 +164,7 @@ public class StageController : MonoBehaviour
         musicEnds = false;
         ResetStage();
     }
-    private NoteController InitNoteObject(int noteID)
+    private void InitNoteObject(int noteID)
     {
         NoteController note;
         note = notePool.GetObject();
@@ -172,7 +172,6 @@ public class StageController : MonoBehaviour
         note.gameObject.SetActive(true);
         note.gameObject.transform.SetParent(noteParentTransform);
         note.Activate(noteID, chart.notes[noteID], this, pianoSoundsLoader);
-        return note;
     }
     private TGridController InitTGridObject(TGridID id)
     {
@@ -453,7 +452,6 @@ public class StageController : MonoBehaviour
         line.rectTransform.SetParent(editor.border.transform);
         line = Utility.DrawLineInWorldSpace(new Vector3(15, 0, 32 + Parameters.maximumNoteRange), new Vector3(15, 0, 32 + Parameters.alpha1NoteRange), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinderAlpha, 4);
         line.rectTransform.SetParent(editor.border.transform);
-
         editor.Initialize();
     }
     private void Update()
