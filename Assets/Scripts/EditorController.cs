@@ -15,6 +15,7 @@ public class EditorController : MonoBehaviour
     public InputField tGridInputField;
     public InputField xGridOffsetInputField;
     public Slider xGridOffsetSlider;
+    public Toggle borderToggle;
     //Beat lines
     private float fillFrom, fillTo, fillWithBPM;
     public InputField fillFromInputField;
@@ -39,13 +40,13 @@ public class EditorController : MonoBehaviour
     public Button pianoSoundsButton;
     public RectTransform dragIndicator;
     //Note Placement
-    private bool snapToGrid = false;
+    public bool snapToGrid = false;
     public Toggle snapToGridToggle;
     private List<Note> clipBoard = new List<Note>();
     public GameObject noteIndicatorsToggler;
-    public SpriteRenderer noteIndicatorSprite;
     private List<NoteIndicatorController> noteIndicators = new List<NoteIndicatorController>();
     public Transform noteIndicatorParent;
+    public Toggle noteIndicatorToggle;
     public NoteIndicatorPool noteIndicatorPool;
     private bool pasteMode = false;
     //Interpolate
@@ -1099,6 +1100,21 @@ public class EditorController : MonoBehaviour
                 PasteNotes();
         }
     }
+    private void LoadPlayerPrefs()
+    {
+        xGridInputField.text = PlayerPrefs.GetInt("XGrid Count", xGrid).ToString();
+        XGridNumber(xGridInputField.text);
+        tGridInputField.text = PlayerPrefs.GetInt("TGrid Count", tGrid).ToString();
+        TGridNumber(tGridInputField.text);
+        xGridOffsetInputField.text = PlayerPrefs.GetFloat("XGrid Offset", xGridOffset).ToString();
+        XGridOffsetInput(xGridOffsetInputField.text);
+        snapToGridToggle.isOn = Utility.PlayerPrefsGetBool("Snap To Grid", snapToGrid);
+        ToggleSnapToGrid(snapToGridToggle.isOn);
+        noteIndicatorToggle.isOn = Utility.PlayerPrefsGetBool("Show Indicator", noteIndicatorsToggler.activeSelf);
+        ToggleNoteIndicator(noteIndicatorToggle.isOn);
+        borderToggle.isOn = Utility.PlayerPrefsGetBool("Show Border", border.activeSelf);
+        ToggleBorder(borderToggle.isOn);
+    }
     private void Start()
     {
         fillFromInputField.text = fillToInputField.text = fillWithBPMInputField.text = "0.000";
@@ -1107,6 +1123,7 @@ public class EditorController : MonoBehaviour
     public void Initialize()
     {
         for (int i = 0; i < 25; i++) xGrids.Add(new XGrid());
+        LoadPlayerPrefs();
     }
     private void Update()
     {

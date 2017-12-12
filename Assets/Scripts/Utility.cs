@@ -401,4 +401,12 @@ public class Utility: MonoBehaviour
     {
         debugText.text = text;
     }
+    public static void PlayerPrefsSetBool(string key, bool value)
+    {
+        PlayerPrefs.SetInt(key, value ? 1 : 0);
+    }
+    public static bool PlayerPrefsGetBool(string key, bool defaultValue)
+    {
+        return PlayerPrefs.GetInt(key, defaultValue ? 1 : 0) == 1;
+    }
 }

@@ -40,7 +40,9 @@ public class ProjectController : MonoBehaviour
     private float lastAutoSaveTime = 0.0f;
     private float autoSaveTime = 300.0f;
     public Toggle autoSaveToggle;
+    public Toggle vSyncToggle;
     private bool autoSaveState = true;
+    private bool vSync = true;
     //-About the project-
     private AudioClip songAudioClip; //Audio clip of the song
     private string projectFileName; //Name of the project file
@@ -170,11 +172,11 @@ public class ProjectController : MonoBehaviour
         project.songName = songFile.Name;
         project.charts = new Chart[4];
         for (int i = 0; i < 4; i++)
-        {
-            project.charts[i] = new Chart();
-            project.charts[i].difficulty = i;
-            project.charts[i].level = "1";
-        }
+            project.charts[i] = new Chart
+            {
+                difficulty = i,
+                level = "1"
+            };
         stage.musicSource.clip = songAudioClip;
         infoPanelButton.SetActive(true);
         chartsPanelButton.SetActive(true);
@@ -186,6 +188,7 @@ public class ProjectController : MonoBehaviour
     }
     public void SaveProject() //Project - Save
     {
+        SavePlayerPrefs();
         if (project != null)
         {
             if (currentInStage != -1)
@@ -358,6 +361,11 @@ public class ProjectController : MonoBehaviour
         autoSaveState = autoSaveToggle.isOn;
         if (autoSaveState) lastAutoSaveTime = Time.time;
     }
+    public void ToggleVSync(bool on)
+    {
+        vSync = on;
+        QualitySettings.vSyncCount = on ? 1 : 0;
+    }
     public void OpenAbout()
     {
         aboutWindow.SetActive(true);
@@ -392,8 +400,36 @@ public class ProjectController : MonoBehaviour
         aboutCanvas.SetActive(false);
         aboutCanvas.SetActive(true);
     }
+    private void LoadPlayerPrefs()
+    {
+        autoSaveToggle.isOn = Utility.PlayerPrefsGetBool("Autosave", autoSaveToggle.isOn);
+        ToggleAutoSave();
+        vSyncToggle.isOn = Utility.PlayerPrefsGetBool("VSync On", vSyncToggle.isOn);
+        ToggleVSync(vSyncToggle.isOn);
+    }
+    public void SavePlayerPrefs()
+    {
+        Utility.PlayerPrefsSetBool("Autosave", autoSaveState);
+        Utility.PlayerPrefsSetBool("Light Effect", stage.lightEffectState);
+        Utility.PlayerPrefsSetBool("Show FPS", stage.showFPS);
+        Utility.PlayerPrefsSetBool("VSync On", vSync);
+        PlayerPrefs.SetInt("Mouse Wheel Sensitivity", stage.mouseSens);
+        PlayerPrefs.SetInt("Note Speed", stage.chartPlaySpeed);
+        PlayerPrefs.SetInt("Music Speed", stage.musicPlaySpeed);
+        PlayerPrefs.SetInt("Effect Volume", stage.effectVolume);
+        PlayerPrefs.SetInt("Music Volume", stage.musicVolume);
+        PlayerPrefs.SetInt("Piano Volume", stage.pianoVolume);
+        Utility.PlayerPrefsSetBool("Show Link Line", stage.linkLineParent.gameObject.activeSelf);
+        PlayerPrefs.SetInt("XGrid Count", stage.editor.xGrid);
+        PlayerPrefs.SetFloat("XGrid Offset", stage.editor.xGridOffset);
+        PlayerPrefs.SetInt("TGrid Count", stage.editor.tGrid);
+        Utility.PlayerPrefsSetBool("Snap To Grid", stage.editor.snapToGrid);
+        Utility.PlayerPrefsSetBool("Show Indicator", stage.editor.noteIndicatorsToggler.activeSelf);
+        Utility.PlayerPrefsSetBool("Show Border", stage.editor.border.activeSelf);
+    }
     private void Start()
     {
+        LoadPlayerPrefs();
         Utility.debugText = debugText;
         project = null;
         PanelSelectionInit();

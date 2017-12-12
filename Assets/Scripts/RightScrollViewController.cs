@@ -14,6 +14,7 @@ public class RightScrollViewController : MonoBehaviour
     }
     public void QuitScreenYes() //The *I'm sure! Quit now!* thing
     {
+        FindObjectOfType<ProjectController>().SavePlayerPrefs();
         Application.Quit();
     }
     public void QuitScreenNo() //The *take me back to my project* thing

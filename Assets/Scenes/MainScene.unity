@@ -4378,8 +4378,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 80.5, y: -35}
-  m_SizeDelta: {x: 161, y: 105}
+  m_AnchoredPosition: {x: 83.875, y: -35}
+  m_SizeDelta: {x: 167.75, y: 105}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &106396575
 MonoBehaviour:
@@ -4552,7 +4552,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &115743988
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7039,7 +7039,7 @@ Transform:
   - {fileID: 671580211}
   - {fileID: 513598981}
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &175363366
 GameObject:
@@ -8339,7 +8339,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &222868804
 GameObject:
@@ -10065,7 +10065,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 30, y: 30}
+  m_SizeDelta: {x: 25, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &274632298
 MonoBehaviour:
@@ -12771,7 +12771,7 @@ RectTransform:
   - {fileID: 1796991379}
   - {fileID: 1054758637}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -14295,8 +14295,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 80.5, y: -173.5}
-  m_SizeDelta: {x: 161, y: 137}
+  m_AnchoredPosition: {x: 83.875, y: -173.5}
+  m_SizeDelta: {x: 167.75, y: 137}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &427744188
 GameObject:
@@ -14580,7 +14580,7 @@ RectTransform:
   m_Children:
   - {fileID: 2066608829}
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -15635,6 +15635,7 @@ MonoBehaviour:
   - {fileID: 2062809293}
   - {fileID: 1635905081}
   autoSaveToggle: {fileID: 2105722103}
+  vSyncToggle: {fileID: 1841223374}
   project:
     name: 
     chartMaker: 
@@ -16122,13 +16123,14 @@ RectTransform:
   - {fileID: 2105722102}
   - {fileID: 1211377133}
   - {fileID: 1874784339}
+  - {fileID: 1841223373}
   - {fileID: 508933414}
   m_Father: {fileID: 1032904075}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 85.875, y: -134.5}
+  m_AnchoredPosition: {x: 85.875, y: -319.5}
   m_SizeDelta: {x: 167.75, y: 185}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &498475207
@@ -16684,11 +16686,11 @@ RectTransform:
   - {fileID: 712381312}
   - {fileID: 1716791414}
   m_Father: {fileID: 498475206}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -159}
+  m_AnchoredPosition: {x: 0, y: -187}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &513598980
@@ -17229,8 +17231,6 @@ MonoBehaviour:
   stageActivated: 0
   musicSource: {fileID: 1139855605}
   clickSoundSource: {fileID: 1681155177}
-  linkSound: {fileID: 8300000, guid: 5c297d75b184b3b40aac96f65fc51aea, type: 3}
-  noteSound: {fileID: 8300000, guid: 5c297d75b184b3b40aac96f65fc51aea, type: 3}
   stageLight: {fileID: 1141096097}
   lightEffectToggle: {fileID: 1211377134}
   lightEffectState: 1
@@ -17253,6 +17253,7 @@ MonoBehaviour:
   comboController: {fileID: 1518713981}
   musicPlaySpeed: 10
   chartPlaySpeed: 10
+  musicVolume: 100
   effectVolume: 100
   pianoVolume: 100
   mouseSens: 10
@@ -17274,6 +17275,7 @@ MonoBehaviour:
   musicSpeedDeciText: {fileID: 1374673395}
   musicSpeedChangeSetting: {fileID: 30113391}
   editor: {fileID: 1713018614}
+  showFPS: 0
   fpsToggle: {fileID: 1874784340}
   stageCamera: {fileID: 1004995602}
   timeSlider: {fileID: 167698727}
@@ -17287,6 +17289,7 @@ MonoBehaviour:
   linkLineParent: {fileID: 354658180}
   mouseDetector: {fileID: 589081333}
   projectController: {fileID: 477390342}
+  linkLineToggle: {fileID: 168369147}
   pianoSoundsLoader: {fileID: 78514220}
   musicLength: 0
 --- !u!4 &527769570
@@ -22604,7 +22607,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 85.875, y: -22}
+  m_AnchoredPosition: {x: 85.875, y: -247}
   m_SizeDelta: {x: 167.75, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &709670158
@@ -24452,7 +24455,7 @@ RectTransform:
   m_Children:
   - {fileID: 235606638}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -26087,7 +26090,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &824064065
 RectTransform:
   m_ObjectHideFlags: 0
@@ -26213,6 +26216,74 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 824161480}
+--- !u!1 &828028102
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 828028103}
+  - component: {fileID: 828028105}
+  - component: {fileID: 828028104}
+  m_Layer: 5
+  m_Name: Checkmark
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &828028103
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 828028102}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2048815546}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 25, y: 25}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &828028104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 828028102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &828028105
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 828028102}
 --- !u!1 &829808660
 GameObject:
   m_ObjectHideFlags: 0
@@ -29046,8 +29117,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 80.5, y: -140}
-  m_SizeDelta: {x: 161, y: 137}
+  m_AnchoredPosition: {x: 83.875, y: -277}
+  m_SizeDelta: {x: 167.75, y: 137}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &927282485
 MonoBehaviour:
@@ -40457,6 +40528,80 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -5}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 1}
+--- !u!1 &1292609066
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1292609067}
+  - component: {fileID: 1292609069}
+  - component: {fileID: 1292609068}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1292609067
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1292609066}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1841223373}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 15, y: -2.5}
+  m_SizeDelta: {x: -30, y: -5}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1292609068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1292609066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 7f462b86a1c6f99478de44a4ae83a4c6, type: 3}
+    m_FontSize: 17
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: VSync On
+--- !u!222 &1292609069
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1292609066}
 --- !u!1 &1296256448
 GameObject:
   m_ObjectHideFlags: 0
@@ -40795,6 +40940,99 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1302459984}
+--- !u!1 &1306980199
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1306980203}
+  - component: {fileID: 1306980202}
+  - component: {fileID: 1306980201}
+  - component: {fileID: 1306980200}
+  m_Layer: 5
+  m_Name: LinesCanvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1306980200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1306980199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &1306980201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1306980199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+--- !u!223 &1306980202
+Canvas:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1306980199}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 1
+  m_Camera: {fileID: 1004995602}
+  m_PlaneDistance: 20
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 25
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!224 &1306980203
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1306980199}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!1 &1311020723
 GameObject:
   m_ObjectHideFlags: 0
@@ -52026,6 +52264,7 @@ MonoBehaviour:
   tGridInputField: {fileID: 1665749450}
   xGridOffsetInputField: {fileID: 182486592}
   xGridOffsetSlider: {fileID: 1920174828}
+  borderToggle: {fileID: 381017206}
   fillFromInputField: {fileID: 403442815}
   fillToInputField: {fileID: 161164478}
   fillWithBPMInputField: {fileID: 1010521304}
@@ -52045,10 +52284,11 @@ MonoBehaviour:
   pianoSoundsSel: {fileID: 1780707344}
   pianoSoundsButton: {fileID: 1665912754}
   dragIndicator: {fileID: 235606638}
+  snapToGrid: 0
   snapToGridToggle: {fileID: 1272269336}
   noteIndicatorsToggler: {fileID: 120140879}
-  noteIndicatorSprite: {fileID: 0}
   noteIndicatorParent: {fileID: 175363367}
+  noteIndicatorToggle: {fileID: 1672461599}
   noteIndicatorPool: {fileID: 175363368}
   dragStartPoint: {x: 0, y: 0}
   dragEndPoint: {x: 0, y: 0}
@@ -53023,7 +53263,7 @@ RectTransform:
   - {fileID: 1453877975}
   - {fileID: 354658180}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -55863,6 +56103,98 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1837406247}
+--- !u!1 &1841223372
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1841223373}
+  - component: {fileID: 1841223374}
+  m_Layer: 5
+  m_Name: VSyncToggle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1841223373
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1841223372}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 2048815546}
+  - {fileID: 1292609067}
+  m_Father: {fileID: 498475206}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 3.75, y: -156}
+  m_SizeDelta: {x: -7.5, y: 25}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &1841223374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1841223372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 2109663825, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2048815547}
+  toggleTransition: 1
+  graphic: {fileID: 828028104}
+  m_Group: {fileID: 0}
+  onValueChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 477390342}
+        m_MethodName: ToggleVSync
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  m_IsOn: 1
 --- !u!1 &1843825512
 GameObject:
   m_ObjectHideFlags: 0
@@ -56701,7 +57033,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 0
+  m_IsOn: 1
 --- !u!1 &1874828099
 GameObject:
   m_ObjectHideFlags: 0
@@ -58382,7 +58714,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Deenote by HCl \u2013 Version 0.5.2\r\n\r\n*Bad English Alert*\r\n\r\n-Things
+  m_Text: "Deenote by HCl \u2013 Version 0.5.3\r\n\r\n*Bad English Alert*\r\n\r\n-Things
     that must be mentioned-\r\n     Thank you for using my app!\r\n     Something
     I must mention in the beginning: This application can only be used to make fan
     made charts of Deemo, and it is strictly prohibited to use this app for any commercial
@@ -58400,42 +58732,43 @@ MonoBehaviour:
     \    Just enjoy yourself making some fun charts with this app. Hope you love it.\r\n\r\n-Update
     History-\r\n     Planned in upcoming versions\r\n          Automatic note filling
     (interpolating).\r\n          Other features.\r\n          Built-in user manual.\r\n
-    \    Deenote 0.5.2 (12-10-2017)\r\n          Changed default volume of piano sounds
-    from 127 to 0.\r\n          Now you can import ogg music files.\r\n     Deenote
-    0.5.1 (12-08-2017)\r\n          Fixed the bug when deleting slide notes the remaining
-    slide notes are incorrectly linked.\r\n     Deenote 0.5 (12-08-2017)\r\n          Copy/Paste
-    functions.\r\n          Quantize notes.\r\n     Deenote 0.4 (11-27-2017)\r\n          Full
-    edit function of note properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File
-    extension association.\r\n     Deenote 0.3 build 2 (11-16-2017)\r\n          Minor
-    changes to beat line saving.\r\n          Edit panel UI redesigned.\r\n     Deenote
-    0.3 build 1 (11-13-2017)\r\n          Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n
-    \         Add new notes.\r\n          Link/Unlink selected notes.\r\n          Note
-    placement indicator.\r\n     Deenote 0.2 (10-03-2017)\r\n          Added color
-    tint for selected notes.\r\n          Remove notes.\r\n          Beat line filling
-    field auto-fill.\r\n     Deenote 0.1 (09-30-2017)\r\n          Added all visual
-    effects for chart viewing function.\r\n          Added a manual BPM calculator.\r\n
-    \         Volume control for the sounds.\r\n          Beat line filling and displaying.\r\n
-    \         Link lines between slide notes.\r\n          Undo/Redo functions.\r\n
-    \         Fixed a few bugs.\r\n          Select notes.\r\n          (Hidden feature:
-    Convert Cytus v2 charts into Deemo charts. In my opinion no one would like to
-    use this or even care about this.)\r\n     Deemo Chart Editor 0.2 (05-06-2017)\r\n
-    \         Added some shortcuts.\r\n          JSON file exporting.\r\n          \"Save
-    as\" feature.\r\n          Added some visual effects (Lowered alpha values for
-    the notes that are far away, added frame-by-frame disappearing animation and shock
-    wave/circle animation for notes that hit the judge line).\r\n          Fixed a
-    few bugs.\r\n     Deemo Chart Editor 0.1 (04-27-2017)\r\n          Chart viewing
-    function finished. No effects yet.\r\n\r\n-Known bugs-\r\n     Many bugs about
-    UI and shortcut keys (for example if you try to open another project while you're
-    still in the piano sound editing screen, the piano would probably stay there and
-    it may cause some problems). It's not that I don't know how to fix but it's really
-    a tedious job and it will take much time... Please give me enough time...\r\n
-    \    Some buttons may not work cause the functions are not yet implemented. Please
-    wait...\r\n\r\n-If you've found more bugs or want to suggest some new features-\r\n
-    \    Feel free to contact me if so. QQ: 1357008522 / Twitter: @Hydrochlorie /
-    E-mail (plz don\u2019t spam...): myosotis@mail.ustc.edu.cn\r\n     \r\n-Special
-    thanks-\r\n     Thanks to the developers of Cytunity and Deemo Note Memory for
-    inspiration.\r\n     Millions of thanks to rkevin and \u3086\u3086 for technical
-    support! \r"
+    \    Deenote 0.5.3 (12-10-2017)\r\n          Added toggle for VSync.\r\n          Now
+    editor settings are saved as well. \r\n     Deenote 0.5.2 (12-10-2017)\r\n          Changed
+    default volume of piano sounds from 127 to 0.\r\n          Now you can import
+    ogg music files.\r\n     Deenote 0.5.1 (12-08-2017)\r\n          Fixed the bug
+    when deleting slide notes the remaining slide notes are incorrectly linked.\r\n
+    \    Deenote 0.5 (12-08-2017)\r\n          Copy/Paste functions.\r\n          Quantize
+    notes.\r\n     Deenote 0.4 (11-27-2017)\r\n          Full edit function of note
+    properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File extension association.\r\n
+    \    Deenote 0.3 build 2 (11-16-2017)\r\n          Minor changes to beat line
+    saving.\r\n          Edit panel UI redesigned.\r\n     Deenote 0.3 build 1 (11-13-2017)\r\n
+    \         Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n          Add new notes.\r\n
+    \         Link/Unlink selected notes.\r\n          Note placement indicator.\r\n
+    \    Deenote 0.2 (10-03-2017)\r\n          Added color tint for selected notes.\r\n
+    \         Remove notes.\r\n          Beat line filling field auto-fill.\r\n     Deenote
+    0.1 (09-30-2017)\r\n          Added all visual effects for chart viewing function.\r\n
+    \         Added a manual BPM calculator.\r\n          Volume control for the sounds.\r\n
+    \         Beat line filling and displaying.\r\n          Link lines between slide
+    notes.\r\n          Undo/Redo functions.\r\n          Fixed a few bugs.\r\n          Select
+    notes.\r\n          (Hidden feature: Convert Cytus v2 charts into Deemo charts.
+    In my opinion no one would like to use this or even care about this.)\r\n     Deemo
+    Chart Editor 0.2 (05-06-2017)\r\n          Added some shortcuts.\r\n          JSON
+    file exporting.\r\n          \"Save as\" feature.\r\n          Added some visual
+    effects (Lowered alpha values for the notes that are far away, added frame-by-frame
+    disappearing animation and shock wave/circle animation for notes that hit the
+    judge line).\r\n          Fixed a few bugs.\r\n     Deemo Chart Editor 0.1 (04-27-2017)\r\n
+    \         Chart viewing function finished. No effects yet.\r\n\r\n-Known bugs-\r\n
+    \    Many bugs about UI and shortcut keys (for example if you try to open another
+    project while you're still in the piano sound editing screen, the piano would
+    probably stay there and it may cause some problems). It's not that I don't know
+    how to fix but it's really a tedious job and it will take much time... Please
+    give me enough time...\r\n     Some buttons may not work cause the functions are
+    not yet implemented. Please wait...\r\n\r\n-If you've found more bugs or want
+    to suggest some new features-\r\n     Feel free to contact me if so. QQ: 1357008522
+    / Twitter: @Hydrochlorie / E-mail (plz don\u2019t spam...): myosotis@mail.ustc.edu.cn\r\n
+    \    \r\n-Special thanks-\r\n     Thanks to the developers of Cytunity and Deemo
+    Note Memory for inspiration.\r\n     Millions of thanks to rkevin and \u3086\u3086
+    for technical support! \r"
 --- !u!222 &1946390858
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -60896,6 +61229,75 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2047733775}
+--- !u!1 &2048815545
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 2048815546}
+  - component: {fileID: 2048815548}
+  - component: {fileID: 2048815547}
+  m_Layer: 5
+  m_Name: Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2048815546
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2048815545}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 828028103}
+  m_Father: {fileID: 1841223373}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 10, y: -15}
+  m_SizeDelta: {x: 25, y: 25}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2048815547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2048815545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.27450982}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &2048815548
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2048815545}
 --- !u!1 &2051608255
 GameObject:
   m_ObjectHideFlags: 0
@@ -63463,7 +63865,7 @@ RectTransform:
   - {fileID: 1253754762}
   - {fileID: 930105811}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
