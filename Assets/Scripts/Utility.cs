@@ -16,12 +16,12 @@ public class Utility: MonoBehaviour
     public static GameObject emptyImage;
     public static float stageHeight;
     public static float stageWidth;
-    public static Sprite cylinder;
-    public static Sprite cylinderAlpha;
     public static Transform cameraUICanvas;
     public static RectTransform xGridParent;
     public static RectTransform linkLineParent;
     public static Collider mouseHitDetector;
+    public static LinePool linePool;
+    public static Transform lineCanvas;
     public static void GetInGameNoteIDs(Chart chart, ref List<int> noteIDs)
     {
         int id = -1;
@@ -367,26 +367,15 @@ public class Utility: MonoBehaviour
         copy.speed = chart.speed;
         return copy;
     }
-    public static UILine DrawLineInWorldSpace(Vector3 point1, Vector3 point2, Color color, Sprite sprite, int width)
+    public static Line DrawLineInWorldSpace(Vector3 point1, Vector3 point2, Color color, float width, float alpha = 1.0f)
     {
-        Vector3 lPoint1 = stageCamera.WorldToScreenPoint(point1);
-        Vector3 lPoint2 = stageCamera.WorldToScreenPoint(point2);
-        UILine newLine = new UILine(lPoint1, lPoint2, width, color, sprite);
-        return newLine;
-    }
-    public static void MoveLineInWorldSpace(UILine source, Vector3 point1, Vector3 point2, Color color, Sprite sprite = null, int width = -1)
-    {
-        Sprite spr = sprite;
-        MoveLineInWorldSpace(source, point1, point2, width);
-        source.image.color = color;
-        if (spr == null) spr = source.image.sprite;
-        source.image.sprite = spr;
-    }
-    public static void MoveLineInWorldSpace(UILine source, Vector3 point1, Vector3 point2, int width = -1)
-    {
-        Vector3 lPoint1 = stageCamera.WorldToScreenPoint(point1);
-        Vector3 lPoint2 = stageCamera.WorldToScreenPoint(point2);
-        source.MoveTo(lPoint1, lPoint2, width);
+        Line line = linePool.GetObject();
+        line.Width = width;
+        line.MoveTo(point1, point2);
+        line.Color = color;
+        line.AlphaMultiplier = alpha;
+        line.SetActive(true);
+        return line;
     }
     public static Vector3 GetMouseWorldPos()
     {
@@ -396,6 +385,12 @@ public class Utility: MonoBehaviour
             return hit.point;
         else
             return new Vector3(0, -10, 0);
+    }
+    public static Vector3 WorldToScreenPoint(Vector3 worldPos)
+    {
+        Vector3 res = stageCamera.WorldToScreenPoint(worldPos);
+        res.z = 0.0f;
+        return res;
     }
     public static void DebugText(string text)
     {

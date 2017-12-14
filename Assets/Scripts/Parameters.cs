@@ -75,4 +75,6 @@ public static class Parameters
     //Mouse Actions with Notes
     public static float tAxisRange = 0.02f;
     public static float xAxisRange = 0.50f;
+    //Line Renderers
+    public static float lineWidth = 1.0f;
 }

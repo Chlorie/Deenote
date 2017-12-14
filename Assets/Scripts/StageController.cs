@@ -70,14 +70,14 @@ public class StageController : MonoBehaviour
     public Text fpsText;
     public bool ignoreAllInput = false;
     public GameObject emptyImage;
-    public Sprite cylinder;
-    public Sprite cylinderAlpha;
     public RectTransform cameraUICanvas;
     public RectTransform xGridParent;
     public RectTransform linkLineParent;
     public Collider mouseDetector;
     public ProjectController projectController;
     public Toggle linkLineToggle;
+    public LinePool linePool;
+    public Transform lineCanvas;
     //-About sounds playing-
     public PianoSoundsLoader pianoSoundsLoader;
     public float musicLength = 0.0f; //In seconds
@@ -456,24 +456,33 @@ public class StageController : MonoBehaviour
         Utility.stageHeight = cameraUICanvas.rect.height;
         Utility.stageWidth = stageCamera.pixelWidth;
         Utility.emptyImage = emptyImage;
-        Utility.cylinder = cylinder;
-        Utility.cylinderAlpha = cylinderAlpha;
         Utility.cameraUICanvas = cameraUICanvas;
         Utility.xGridParent = xGridParent;
         Utility.linkLineParent = linkLineParent;
         Utility.mouseHitDetector = mouseDetector;
+        Utility.linePool = linePool;
+        Utility.lineCanvas = lineCanvas;
+        linePool.Initialize();
         //Load player prefs
         LoadPlayerPrefs();
         //Draw border
-        UILine line;
-        line = Utility.DrawLineInWorldSpace(new Vector3(-15, 0, 32 + Parameters.alpha1NoteRange), new Vector3(-15, 0, 32), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinder, 4);
-        line.rectTransform.SetParent(editor.border.transform);
-        line = Utility.DrawLineInWorldSpace(new Vector3(15, 0, 32 + Parameters.alpha1NoteRange), new Vector3(15, 0, 32), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinder, 4);
-        line.rectTransform.SetParent(editor.border.transform);
-        line = Utility.DrawLineInWorldSpace(new Vector3(-15, 0, 32 + Parameters.maximumNoteRange), new Vector3(-15, 0, 32 + Parameters.alpha1NoteRange), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinderAlpha, 4);
-        line.rectTransform.SetParent(editor.border.transform);
-        line = Utility.DrawLineInWorldSpace(new Vector3(15, 0, 32 + Parameters.maximumNoteRange), new Vector3(15, 0, 32 + Parameters.alpha1NoteRange), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinderAlpha, 4);
-        line.rectTransform.SetParent(editor.border.transform);
+        Line line;
+        line = Utility.DrawLineInWorldSpace
+        (
+            new Vector3(-15.0f, 0.0f, 32.0f + Parameters.maximumNoteRange),
+            new Vector3(-15.0f, 0.0f, 32.0f),
+            new Color(42.0f / 255, 42.0f / 255, 42.0f / 255),
+            0.06f
+        );
+        line.transform.SetParent(editor.border.transform);
+        line = Utility.DrawLineInWorldSpace
+        (
+            new Vector3(15.0f, 0.0f, 32.0f + Parameters.maximumNoteRange),
+            new Vector3(15.0f, 0.0f, 32.0f),
+            new Color(42.0f / 255, 42.0f / 255, 42.0f / 255),
+            0.06f
+        );
+        line.transform.SetParent(editor.border.transform);
         editor.Initialize();
     }
     private void Update()

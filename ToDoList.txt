@@ -221,10 +221,13 @@
 2017-12-10
 	Planned
 		F0016 修复UI逻辑带来的各种bug
-		N0060 将编辑器设置存到PlayerPrefs中
-		N0061 用LineRenderer重写UILine, 黄条连线
+		N0060 * 将编辑器设置存到PlayerPrefs中
+		N0061 * 用LineRenderer重写UILine, 黄条连线
 		N0062 * 增加垂直同步的开关
 2017-12-11
 	Finished
+		N0060 将编辑器设置存到PlayerPrefs中
 		N0062 增加垂直同步的开关
-		
+2017-12-14
+	Finished
+		N0061 用LineRenderer重写UILine, 黄条连线

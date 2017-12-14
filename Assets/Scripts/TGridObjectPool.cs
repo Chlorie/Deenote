@@ -16,8 +16,8 @@ public class TGridObjectPool : MonoBehaviour
                 objectAvailable[i] = false;
                 return pooledObjects[i];
             }
-        UILine grid = new UILine(Vector3.zero, Vector3.up, 3, Color.white, Utility.cylinder);
-        grid.rectTransform.SetParent(parent);
+        Line grid = Utility.DrawLineInWorldSpace(Vector3.zero, Vector3.up, Color.white, 0.035f);
+        grid.transform.SetParent(parent);
         grid.gameObject.AddComponent<TGridController>();
         TGridController lineObject = grid.gameObject.GetComponent<TGridController>();
         lineObject.grid = grid;
@@ -43,8 +43,8 @@ public class TGridObjectPool : MonoBehaviour
     {
         while (pooledObjects.Count < pooledAmount)
         {
-            UILine grid = new UILine(Vector3.zero, Vector3.up, 3, Color.white, Utility.cylinder);
-            grid.rectTransform.SetParent(parent);
+            Line grid = Utility.DrawLineInWorldSpace(Vector3.zero, Vector3.up, Color.white, 0.035f);
+            grid.transform.SetParent(parent);
             grid.gameObject.AddComponent<TGridController>();
             TGridController lineObject = grid.gameObject.GetComponent<TGridController>();
             lineObject.grid = grid;
