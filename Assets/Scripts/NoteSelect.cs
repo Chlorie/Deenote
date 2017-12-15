@@ -16,7 +16,6 @@ public class NoteSelect
         float maxX = editor.dragStartPoint.x + editor.dragEndPoint.x - minX;
         float minT = editor.dragStartPoint.y < editor.dragEndPoint.y ? editor.dragStartPoint.y : editor.dragEndPoint.y;
         float maxT = editor.dragStartPoint.y + editor.dragEndPoint.y - minT;
-        StageController stage = editor.stage;
         selected = (note.position < maxX + Parameters.xAxisRange * note.size &&
             note.position > minX - Parameters.xAxisRange * note.size &&
             note.time < maxT + Parameters.tAxisRange &&

@@ -58568,7 +58568,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 227.091, y: -660}
-  m_SizeDelta: {x: 434.182, y: 1800}
+  m_SizeDelta: {x: 434.182, y: 1820}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1946390857
 MonoBehaviour:
@@ -58602,7 +58602,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Deenote by HCl \u2013 Version 0.5.4\r\n\r\n*Bad English Alert*\r\n\r\n-Things
+  m_Text: "Deenote by HCl \u2013 Version 0.5.5\r\n\r\n*Bad English Alert*\r\n\r\n-Things
     that must be mentioned-\r\n     Thank you for using my app!\r\n     Something
     I must mention in the beginning: This application can only be used to make fan
     made charts of Deemo, and it is strictly prohibited to use this app for any commercial
@@ -58620,6 +58620,7 @@ MonoBehaviour:
     \    Just enjoy yourself making some fun charts with this app. Hope you love it.\r\n\r\n-Update
     History-\r\n     Planned in upcoming versions\r\n          Automatic note filling
     (interpolating).\r\n          Other features.\r\n          Built-in user manual.\r\n
+    \    Deenote 0.5.5 (12-15-2017)\r\n          Added support for mp3 music files.\r\n
     \    Deenote 0.5.4 (12-14-2017)\r\n          Completely reworked on the code of
     line displaying.\r\n     Deenote 0.5.3 (12-10-2017)\r\n          Added toggle
     for VSync.\r\n          Now editor settings are saved as well. \r\n     Deenote

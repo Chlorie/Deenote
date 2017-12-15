@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.UI;
+using NAudio.Wave;
 
 public class ProjectController : MonoBehaviour
 {
@@ -114,7 +115,7 @@ public class ProjectController : MonoBehaviour
     }
     public void SelectSong() //Project - New - Select Song
     {
-        string[] acceptedExtension = { ".wav", ".ogg" }; //By now only .wav and .ogg music files are accepted
+        string[] acceptedExtension = { ".wav", ".ogg", ".mp3" }; //Testing mp3 loading
         directorySelectorController.ActivateSelection(acceptedExtension, "SelectSong");
     }
     public void SelectFile() //Project - New - Select Folder
@@ -163,12 +164,25 @@ public class ProjectController : MonoBehaviour
     }
     public void ConfirmButtonPressed() //Project - New - Confirm
     {
-        WWW www;
         project = new Project();
-        www = new WWW("file:///" + songFile.FullName);
-        while (!www.isDone) ; //Wait until the song is fully downloaded
-        songAudioClip = www.GetAudioClip(true);
-        songAudioClip.LoadAudioData();
+        if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
+        {
+            WWW www;
+            www = new WWW("file:///" + songFile.FullName);
+            while (!www.isDone) ; //Wait until the song is fully downloaded
+            songAudioClip = www.GetAudioClip(true);
+            songAudioClip.LoadAudioData();
+        }
+        else if (songFile.Extension == ".mp3")
+        {
+            AudioFileReader reader = new AudioFileReader(songFile.FullName);
+            float[] data = new float[reader.Length / 4];
+            reader.Read(data, 0, (int)reader.Length / 4);
+            AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+            newClip.SetData(data, 0);
+            songAudioClip = newClip;
+            songAudioClip.LoadAudioData();
+        }
         project.songName = songFile.Name;
         project.charts = new Chart[4];
         for (int i = 0; i < 4; i++)
