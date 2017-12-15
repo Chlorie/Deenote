@@ -232,5 +232,8 @@
 	Finished
 		N0061 用LineRenderer重写UILine, 黄条连线
 2017-12-15
+	Planned
+		N0063 * 加入拖拽文件到窗口打开文件功能
 	Finished
 		N0059 加入对压缩音乐格式的支持(mp3)
+		N0063 加入拖拽文件到窗口打开文件功能

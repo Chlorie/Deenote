@@ -2487,7 +2487,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 264479491}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.16090453
+  m_Size: 0.10360682
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -9778,7 +9778,7 @@ RectTransform:
   m_Father: {fileID: 340978873}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.8390955}
+  m_AnchorMin: {x: 0, y: 0.8963932}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -11676,6 +11676,139 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 345254627}
+--- !u!1 &346086911
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 346086912}
+  - component: {fileID: 346086915}
+  - component: {fileID: 346086914}
+  - component: {fileID: 346086913}
+  m_Layer: 5
+  m_Name: TextPart2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &346086912
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 346086911}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1395209340}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 227.091, y: -1534}
+  m_SizeDelta: {x: 434.182, y: 1656}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &346086913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 346086911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1741964061, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &346086914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 346086911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 7f462b86a1c6f99478de44a4ae83a4c6, type: 3}
+    m_FontSize: 16
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 1
+    m_LineSpacing: 1
+  m_Text: "     So you know who to blame and what to do if that specific thing goes
+    wrong. XD\r\n     [Anything else?]\r\n     Just enjoy yourself making some fun
+    charts with this app. Hope you love it.\r\n\r\n-Update History-\r\n     Planned
+    in upcoming versions\r\n          Automatic note filling (interpolating).\r\n
+    \         Other features.\r\n          Built-in user manual.\r\n     Deenote 0.5.6
+    (12-15-2017)\r\n          Added drag-and-drop file opener. (Thanks to Schwarzer!)\r\n
+    \    Deenote 0.5.5 (12-15-2017)\r\n          Added support for mp3 music files.\r\n
+    \    Deenote 0.5.4 (12-14-2017)\r\n          Completely reworked on the code of
+    line displaying.\r\n     Deenote 0.5.3 (12-10-2017)\r\n          Added toggle
+    for VSync.\r\n          Now editor settings are saved as well. \r\n     Deenote
+    0.5.2 (12-10-2017)\r\n          Changed default volume of piano sounds from 127
+    to 0.\r\n          Now you can import ogg music files.\r\n     Deenote 0.5.1 (12-08-2017)\r\n
+    \         Fixed the bug when deleting slide notes the remaining slide notes are
+    incorrectly linked.\r\n     Deenote 0.5 (12-08-2017)\r\n          Copy/Paste functions.\r\n
+    \         Quantize notes.\r\n     Deenote 0.4 (11-27-2017)\r\n          Full edit
+    function of note properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File
+    extension association.\r\n     Deenote 0.3 build 2 (11-16-2017)\r\n          Minor
+    changes to beat line saving.\r\n          Edit panel UI redesigned.\r\n     Deenote
+    0.3 build 1 (11-13-2017)\r\n          Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n
+    \         Add new notes.\r\n          Link/Unlink selected notes.\r\n          Note
+    placement indicator.\r\n     Deenote 0.2 (10-03-2017)\r\n          Added color
+    tint for selected notes.\r\n          Remove notes.\r\n          Beat line filling
+    field auto-fill.\r\n     Deenote 0.1 (09-30-2017)\r\n          Added all visual
+    effects for chart viewing function.\r\n          Added a manual BPM calculator.\r\n
+    \         Volume control for the sounds.\r\n          Beat line filling and displaying.\r\n
+    \         Link lines between slide notes.\r\n          Undo/Redo functions.\r\n
+    \         Fixed a few bugs.\r\n          Select notes.\r\n          (Hidden feature:
+    Convert Cytus v2 charts into Deemo charts. In my opinion no one would like to
+    use this or even care about this.)\r\n     Deemo Chart Editor 0.2 (05-06-2017)\r\n
+    \         Added some shortcuts.\r\n          JSON file exporting.\r\n          \"Save
+    as\" feature.\r\n          Added some visual effects (Lowered alpha values for
+    the notes that are far away, added frame-by-frame disappearing animation and shock
+    wave/circle animation for notes that hit the judge line).\r\n          Fixed a
+    few bugs.\r\n     Deemo Chart Editor 0.1 (04-27-2017)\r\n          Chart viewing
+    function finished. No effects yet.\r\n\r\n-Known bugs-\r\n     Many bugs about
+    UI and shortcut keys (for example if you try to open another project while you're
+    still in the piano sound editing screen, the piano would probably stay there and
+    it may cause some problems). It's not that I don't know how to fix but it's really
+    a tedious job and it will take much time... Please give me enough time...\r\n
+    \    Some buttons may not work cause the functions are not yet implemented. Please
+    wait...\r\n\r\n-If you've found more bugs or want to suggest some new features-\r\n
+    \    Feel free to contact me if so. QQ: 1357008522 / Twitter: @Hydrochlorie /
+    E-mail (plz don\u2019t spam...): myosotis@mail.ustc.edu.cn\r\n     \r\n-Special
+    thanks-\r\n     Thanks to the developers of Cytunity and Deemo Note Memory for
+    inspiration.\r\n     Thanks to Schwarzer for the DragAndDrop dll he made!\r\n
+    \    Millions of thanks to rkevin and \u3086\u3086 for technical support!\r"
+--- !u!222 &346086915
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 346086911}
 --- !u!1 &351825310
 GameObject:
   m_ObjectHideFlags: 0
@@ -15027,6 +15160,74 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 456220832}
+--- !u!1 &456649187
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 456649188}
+  - component: {fileID: 456649190}
+  - component: {fileID: 456649189}
+  m_Layer: 5
+  m_Name: SchwarzerQuote
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &456649188
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 456649187}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1395209340}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 227.091, y: -664}
+  m_SizeDelta: {x: 434.182, y: 80}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &456649189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 456649187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 21300000, guid: 560a47af5f38fb9489c130a4818a6095, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &456649190
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 456649187}
 --- !u!1 &457609169
 GameObject:
   m_ObjectHideFlags: 0
@@ -15626,6 +15827,7 @@ MonoBehaviour:
   songSelectButtonText: {fileID: 1886921743}
   fileSelectButtonText: {fileID: 499061835}
   songSelectConfirmButton: {fileID: 2076501096}
+  dragAndDropFileName: 
   infoProjectNameInputField: {fileID: 98447693}
   charterNameInputField: {fileID: 1631615581}
   songNameInputField: {fileID: 1356714589}
@@ -42652,7 +42854,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1395209340}
-  - component: {fileID: 1395209342}
   - component: {fileID: 1395209341}
   m_Layer: 5
   m_Name: Content
@@ -42672,28 +42873,17 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1946390856}
+  - {fileID: 456649188}
+  - {fileID: 346086912}
   m_Father: {fileID: 1105221296}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1320}
+  m_SizeDelta: {x: 0, y: 2050}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1395209341
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1395209339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1741964061, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
---- !u!114 &1395209342
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -42710,8 +42900,8 @@ MonoBehaviour:
     m_Top: 10
     m_Bottom: 10
   m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
+  m_Spacing: 2
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 0
@@ -58545,8 +58735,9 @@ GameObject:
   - component: {fileID: 1946390856}
   - component: {fileID: 1946390858}
   - component: {fileID: 1946390857}
+  - component: {fileID: 1946390859}
   m_Layer: 5
-  m_Name: Text
+  m_Name: TextPart1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58567,9 +58758,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 227.091, y: -660}
-  m_SizeDelta: {x: 434.182, y: 1820}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 227.091, y: -10}
+  m_SizeDelta: {x: 434.182, y: 612}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1946390857
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58598,11 +58789,11 @@ MonoBehaviour:
     m_MaxSize: 30
     m_Alignment: 0
     m_AlignByGeometry: 0
-    m_RichText: 0
+    m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Deenote by HCl \u2013 Version 0.5.5\r\n\r\n*Bad English Alert*\r\n\r\n-Things
+  m_Text: "Deenote by HCl \u2013 Version 0.5.6\r\n\r\n*Bad English Alert*\r\n\r\n-Things
     that must be mentioned-\r\n     Thank you for using my app!\r\n     Something
     I must mention in the beginning: This application can only be used to make fan
     made charts of Deemo, and it is strictly prohibited to use this app for any commercial
@@ -58616,56 +58807,31 @@ MonoBehaviour:
     app just for fun. Still a C#/Unity3D newbie so there may be tons of bugs in my
     code, but who cares? (No, everyone cares.) Since I'm still a student, and as you
     all know everyone is pretty busy in the third year in university, so I don't have
-    much time to develop this thing. Don't push me please.\r\n     [Anything else?]\r\n
-    \    Just enjoy yourself making some fun charts with this app. Hope you love it.\r\n\r\n-Update
-    History-\r\n     Planned in upcoming versions\r\n          Automatic note filling
-    (interpolating).\r\n          Other features.\r\n          Built-in user manual.\r\n
-    \    Deenote 0.5.5 (12-15-2017)\r\n          Added support for mp3 music files.\r\n
-    \    Deenote 0.5.4 (12-14-2017)\r\n          Completely reworked on the code of
-    line displaying.\r\n     Deenote 0.5.3 (12-10-2017)\r\n          Added toggle
-    for VSync.\r\n          Now editor settings are saved as well. \r\n     Deenote
-    0.5.2 (12-10-2017)\r\n          Changed default volume of piano sounds from 127
-    to 0.\r\n          Now you can import ogg music files.\r\n     Deenote 0.5.1 (12-08-2017)\r\n
-    \         Fixed the bug when deleting slide notes the remaining slide notes are
-    incorrectly linked.\r\n     Deenote 0.5 (12-08-2017)\r\n          Copy/Paste functions.\r\n
-    \         Quantize notes.\r\n     Deenote 0.4 (11-27-2017)\r\n          Full edit
-    function of note properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File
-    extension association.\r\n     Deenote 0.3 build 2 (11-16-2017)\r\n          Minor
-    changes to beat line saving.\r\n          Edit panel UI redesigned.\r\n     Deenote
-    0.3 build 1 (11-13-2017)\r\n          Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n
-    \         Add new notes.\r\n          Link/Unlink selected notes.\r\n          Note
-    placement indicator.\r\n     Deenote 0.2 (10-03-2017)\r\n          Added color
-    tint for selected notes.\r\n          Remove notes.\r\n          Beat line filling
-    field auto-fill.\r\n     Deenote 0.1 (09-30-2017)\r\n          Added all visual
-    effects for chart viewing function.\r\n          Added a manual BPM calculator.\r\n
-    \         Volume control for the sounds.\r\n          Beat line filling and displaying.\r\n
-    \         Link lines between slide notes.\r\n          Undo/Redo functions.\r\n
-    \         Fixed a few bugs.\r\n          Select notes.\r\n          (Hidden feature:
-    Convert Cytus v2 charts into Deemo charts. In my opinion no one would like to
-    use this or even care about this.)\r\n     Deemo Chart Editor 0.2 (05-06-2017)\r\n
-    \         Added some shortcuts.\r\n          JSON file exporting.\r\n          \"Save
-    as\" feature.\r\n          Added some visual effects (Lowered alpha values for
-    the notes that are far away, added frame-by-frame disappearing animation and shock
-    wave/circle animation for notes that hit the judge line).\r\n          Fixed a
-    few bugs.\r\n     Deemo Chart Editor 0.1 (04-27-2017)\r\n          Chart viewing
-    function finished. No effects yet.\r\n\r\n-Known bugs-\r\n     Many bugs about
-    UI and shortcut keys (for example if you try to open another project while you're
-    still in the piano sound editing screen, the piano would probably stay there and
-    it may cause some problems). It's not that I don't know how to fix but it's really
-    a tedious job and it will take much time... Please give me enough time...\r\n
-    \    Some buttons may not work cause the functions are not yet implemented. Please
-    wait...\r\n\r\n-If you've found more bugs or want to suggest some new features-\r\n
-    \    Feel free to contact me if so. QQ: 1357008522 / Twitter: @Hydrochlorie /
-    E-mail (plz don\u2019t spam...): myosotis@mail.ustc.edu.cn\r\n     \r\n-Special
-    thanks-\r\n     Thanks to the developers of Cytunity and Deemo Note Memory for
-    inspiration.\r\n     Millions of thanks to rkevin and \u3086\u3086 for technical
-    support!\r"
+    much time to develop this thing. Don't push me please.\r\n     About the drag-and-drop
+    file opener added in 0.5.6, I\u2019m using a dll coded and compiled by my friend
+    Schwarzer (The one working on Lanotalium, an easy-to-use Lanota chart editor.
+    That guy does awesome works, you really should check him out.) And here\u2019s
+    his words about this:\r\n     F*** me if anything goes wrong. \u2013Schwarzer
+    2017.\r"
 --- !u!222 &1946390858
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1946390855}
+--- !u!114 &1946390859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1946390855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1741964061, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &1948497611
 GameObject:
   m_ObjectHideFlags: 0

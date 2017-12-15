@@ -31,6 +31,7 @@ public class ProjectController : MonoBehaviour
     public Text songSelectButtonText;
     public Text fileSelectButtonText;
     public Button songSelectConfirmButton;
+    public string dragAndDropFileName = null;
     //-Info Panel-
     public InputField infoProjectNameInputField;
     public InputField charterNameInputField;
@@ -160,6 +161,7 @@ public class ProjectController : MonoBehaviour
     }
     public void CancelClearStageCreateProject() //Close the notice screen
     {
+        dragAndDropFileName = null;
         newProjectConfirmScreen.SetActive(false);
     }
     public void ConfirmButtonPressed() //Project - New - Confirm
@@ -231,7 +233,6 @@ public class ProjectController : MonoBehaviour
     }
     public void LoadProject() //Project - Open
     {
-        string[] extensions = { ".dsproj" };
         if (project != null)
         {
             stage.StopPlaying();
@@ -239,11 +240,18 @@ public class ProjectController : MonoBehaviour
             clearStageNewProjectMode = false;
             return;
         }
-        directorySelectorController.ActivateSelection(extensions, "LoadProject");
+        if (dragAndDropFileName == null)
+        {
+            string[] extensions = { ".dsproj" };
+            directorySelectorController.ActivateSelection(extensions, "LoadProject");
+        }
+        else
+            ProjectToLoadSelected(dragAndDropFileName);
     }
     public void ProjectToLoadSelected(string projectFullDir)
     {
         FileInfo projectFile;
+        dragAndDropFileName = null;
         projectSL.LoadProjectFromFile(out project, out songAudioClip, projectFullDir);
         infoPanelButton.SetActive(true);
         chartsPanelButton.SetActive(true);
@@ -268,6 +276,24 @@ public class ProjectController : MonoBehaviour
         leftBackgroundImage.SetActive(true);
         stage.editor.activated = false;
         PanelSelectionInit();
+    }
+    public void DragAndDropFileAccept(List<string> paths)
+    {
+        try
+        {
+            if (paths.Count != 1) return;
+            FileInfo file = new FileInfo(paths[0]);
+            string extension = file.Extension;
+            if (extension == ".dsproj")
+            {
+                dragAndDropFileName = paths[0];
+                LoadProject();
+            }
+        }
+        catch
+        {
+            return;
+        }
     }
     //-Info Panel-
     private void InfoInitialization() //After creating a project, initialize info panel
@@ -443,6 +469,7 @@ public class ProjectController : MonoBehaviour
     }
     private void Start()
     {
+        DragAndDropUnity.Enable(DragAndDropFileAccept);
         LoadPlayerPrefs();
         Utility.debugText = debugText;
         project = null;
