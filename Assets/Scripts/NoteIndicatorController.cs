@@ -39,13 +39,14 @@ public class NoteIndicatorController : MonoBehaviour
     }
     public void Initialize(EditorController controller, Note cur, Note next, float length)
     {
+        editor = controller;
         if (linkLine == null)
         {
             linkLine = Utility.DrawLineInWorldSpace(Vector3.zero, Vector3.up, Parameters.linkLineColor, 0.035f, 0.4f);
+            linkLine.transform.SetParent(editor.stage.linkLineParent);
         }
         linkLine.SetActive(false);
         gameObject.SetActive(true);
-        editor = controller;
         note = cur;
         nextLink = next;
         musicLength = length;

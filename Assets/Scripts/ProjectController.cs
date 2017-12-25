@@ -240,7 +240,7 @@ public class ProjectController : MonoBehaviour
             clearStageNewProjectMode = false;
             return;
         }
-        if (dragAndDropFileName == null)
+        if (dragAndDropFileName == null || dragAndDropFileName == "")
         {
             string[] extensions = { ".dsproj" };
             directorySelectorController.ActivateSelection(extensions, "LoadProject");

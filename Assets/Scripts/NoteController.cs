@@ -189,15 +189,16 @@ public class NoteController : MonoBehaviour
     public void Activate(int noteID, Note note, StageController stageController, PianoSoundsLoader pianoSoundsLoader)
     {
         piano = pianoSoundsLoader;
+        stage = stageController;
         if (linkLine == null)
         {
             linkLine = Utility.DrawLineInWorldSpace(Vector3.zero, Vector3.up, Parameters.linkLineColor, 0.035f);
+            linkLine.transform.SetParent(stage.linkLineParent);
             linkLine.SetActive(false);
         }
         id = noteID;
         soundPlayed = true;
         curNote = note;
-        stage = stageController;
         if (curNote.isLink)
         {
             noteSprite.sprite = slideNoteSprite;
