@@ -1255,7 +1255,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &44467070
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1271,14 +1271,14 @@ RectTransform:
   - {fileID: 1773008839}
   - {fileID: 1214947173}
   - {fileID: 1965086650}
-  - {fileID: 1853579973}
+  - {fileID: 1790031713}
   m_Father: {fileID: 1032904075}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 61.5, y: -109.5}
-  m_SizeDelta: {x: 119, y: 215}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 215}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &44467071
 MonoBehaviour:
@@ -5764,10 +5764,10 @@ RectTransform:
   m_Father: {fileID: 1087230161}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 35}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 83.875, y: -52.5}
+  m_SizeDelta: {x: 167.75, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &150018096
 GameObject:
@@ -11759,50 +11759,53 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "-Update History-\r\n     Planned in upcoming versions\r\n          Automatic
     note filling (interpolating).\r\n          Other features.\r\n          Built-in
-    user manual.\r\r\n     Deenote 0.5.7 (12-25-2017)\r\n          Bug fix: File cannot
-    be opened.\r\n          Bug fix: Link lines cannot be toggled off.\r\r\n          Deleted
-    Schwarzer\u2019s famous words because I don\u2019t want to die. XD\r\n     Deenote
-    0.5.6 (12-15-2017)\r\n          Added drag-and-drop file opener. (Thanks to Schwarzer!)\r\n
-    \    Deenote 0.5.5 (12-15-2017)\r\n          Added support for mp3 music files.\r\n
-    \    Deenote 0.5.4 (12-14-2017)\r\n          Completely reworked on the code of
-    line displaying.\r\n     Deenote 0.5.3 (12-10-2017)\r\n          Added toggle
-    for VSync.\r\n          Now editor settings are saved as well. \r\n     Deenote
-    0.5.2 (12-10-2017)\r\n          Changed default volume of piano sounds from 127
-    to 0.\r\n          Now you can import ogg music files.\r\n     Deenote 0.5.1 (12-08-2017)\r\n
-    \         Fixed the bug when deleting slide notes the remaining slide notes are
-    incorrectly linked.\r\n     Deenote 0.5 (12-08-2017)\r\n          Copy/Paste functions.\r\n
-    \         Quantize notes.\r\n     Deenote 0.4 (11-27-2017)\r\n          Full edit
-    function of note properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File
-    extension association.\r\n     Deenote 0.3 build 2 (11-16-2017)\r\n          Minor
-    changes to beat line saving.\r\n          Edit panel UI redesigned.\r\n     Deenote
-    0.3 build 1 (11-13-2017)\r\n          Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n
-    \         Add new notes.\r\n          Link/Unlink selected notes.\r\n          Note
-    placement indicator.\r\n     Deenote 0.2 (10-03-2017)\r\n          Added color
-    tint for selected notes.\r\n          Remove notes.\r\n          Beat line filling
-    field auto-fill.\r\n     Deenote 0.1 (09-30-2017)\r\n          Added all visual
-    effects for chart viewing function.\r\n          Added a manual BPM calculator.\r\n
-    \         Volume control for the sounds.\r\n          Beat line filling and displaying.\r\n
-    \         Link lines between slide notes.\r\n          Undo/Redo functions.\r\n
-    \         Fixed a few bugs.\r\n          Select notes.\r\n          (Hidden feature:
-    Convert Cytus v2 charts into Deemo charts. In my opinion no one would like to
-    use this or even care about this.)\r\n     Deemo Chart Editor 0.2 (05-06-2017)\r\n
-    \         Added some shortcuts.\r\n          JSON file exporting.\r\n          \"Save
-    as\" feature.\r\n          Added some visual effects (Lowered alpha values for
-    the notes that are far away, added frame-by-frame disappearing animation and shock
-    wave/circle animation for notes that hit the judge line).\r\n          Fixed a
-    few bugs.\r\n     Deemo Chart Editor 0.1 (04-27-2017)\r\n          Chart viewing
-    function finished. No effects yet.\r\n\r\n-Known bugs-\r\n     Many bugs about
-    UI and shortcut keys (for example if you try to open another project while you're
-    still in the piano sound editing screen, the piano would probably stay there and
-    it may cause some problems). It's not that I don't know how to fix but it's really
-    a tedious job and it will take much time... Please give me enough time...\r\n
-    \    Some buttons may not work cause the functions are not yet implemented. Please
-    wait...\r\n\r\n-If you've found more bugs or want to suggest some new features-\r\n
-    \    Feel free to contact me if so. QQ: 1357008522 / Twitter: @Hydrochlorie /
-    E-mail (plz don\u2019t spam...): myosotis@mail.ustc.edu.cn\r\n     \r\n-Special
-    thanks-\r\n     Thanks to the developers of Cytunity and Deemo Note Memory for
-    inspiration.\r\n     Thanks to Schwarzer for the DragAndDrop dll he made!\r\n
-    \    Millions of thanks to rkevin and \u3086\u3086 for technical support!\r"
+    user manual.\r\n     Deenote 0.5.8 (12-26-2017)\r\n          Now you can change
+    the music file used in the project.\r\n          When creating a new file in the
+    file selector, files with the target extension will appear.\r\n     Deenote 0.5.7
+    (12-25-2017)\r\n          Bug fix: File cannot be opened.\r\n          Bug fix:
+    Link lines cannot be toggled off.\r\n          Deleted Schwarzer\u2019s famous
+    words because I don\u2019t want to die. XD\r\n     Deenote 0.5.6 (12-15-2017)\r\n
+    \         Added drag-and-drop file opener. (Thanks to Schwarzer!)\r\n     Deenote
+    0.5.5 (12-15-2017)\r\n          Added support for mp3 music files.\r\n     Deenote
+    0.5.4 (12-14-2017)\r\n          Completely reworked on the code of line displaying.\r\n
+    \    Deenote 0.5.3 (12-10-2017)\r\n          Added toggle for VSync.\r\n          Now
+    editor settings are saved as well. \r\n     Deenote 0.5.2 (12-10-2017)\r\n          Changed
+    default volume of piano sounds from 127 to 0.\r\n          Now you can import
+    ogg music files.\r\n     Deenote 0.5.1 (12-08-2017)\r\n          Fixed the bug
+    when deleting slide notes the remaining slide notes are incorrectly linked.\r\n
+    \    Deenote 0.5 (12-08-2017)\r\n          Copy/Paste functions.\r\n          Quantize
+    notes.\r\n     Deenote 0.4 (11-27-2017)\r\n          Full edit function of note
+    properties.\r\n     Deenote 0.3.1 (11-25-2017)\r\n          File extension association.\r\n
+    \    Deenote 0.3 build 2 (11-16-2017)\r\n          Minor changes to beat line
+    saving.\r\n          Edit panel UI redesigned.\r\n     Deenote 0.3 build 1 (11-13-2017)\r\n
+    \         Bug fixes.\r\n     Deenote 0.2.1 (10-03-2017)\r\n          Add new notes.\r\n
+    \         Link/Unlink selected notes.\r\n          Note placement indicator.\r\n
+    \    Deenote 0.2 (10-03-2017)\r\n          Added color tint for selected notes.\r\n
+    \         Remove notes.\r\n          Beat line filling field auto-fill.\r\n     Deenote
+    0.1 (09-30-2017)\r\n          Added all visual effects for chart viewing function.\r\n
+    \         Added a manual BPM calculator.\r\n          Volume control for the sounds.\r\n
+    \         Beat line filling and displaying.\r\n          Link lines between slide
+    notes.\r\n          Undo/Redo functions.\r\n          Fixed a few bugs.\r\n          Select
+    notes.\r\n          (Hidden feature: Convert Cytus v2 charts into Deemo charts.
+    In my opinion no one would like to use this or even care about this.)\r\n     Deemo
+    Chart Editor 0.2 (05-06-2017)\r\n          Added some shortcuts.\r\n          JSON
+    file exporting.\r\n          \"Save as\" feature.\r\n          Added some visual
+    effects (Lowered alpha values for the notes that are far away, added frame-by-frame
+    disappearing animation and shock wave/circle animation for notes that hit the
+    judge line).\r\n          Fixed a few bugs.\r\n     Deemo Chart Editor 0.1 (04-27-2017)\r\n
+    \         Chart viewing function finished. No effects yet.\r\n\r\n-Known bugs-\r\n
+    \    Many bugs about UI and shortcut keys (for example if you try to open another
+    project while you're still in the piano sound editing screen, the piano would
+    probably stay there and it may cause some problems). It's not that I don't know
+    how to fix but it's really a tedious job and it will take much time... Please
+    give me enough time...\r\n     Some buttons may not work cause the functions are
+    not yet implemented. Please wait...\r\n\r\n-If you've found more bugs or want
+    to suggest some new features-\r\n     Feel free to contact me if so. QQ: 1357008522
+    / Twitter: @Hydrochlorie / E-mail (plz don\u2019t spam...): myosotis@mail.ustc.edu.cn\r\n
+    \    \r\n-Special thanks-\r\n     Thanks to the developers of Cytunity and Deemo
+    Note Memory for inspiration.\r\n     Thanks to Schwarzer for the drag-and-drop
+    library he made!\r\n     Millions of thanks to rkevin and \u3086\u3086 for technical
+    support! \r"
 --- !u!222 &346086915
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -12246,6 +12249,80 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 365331498}
+--- !u!1 &371256925
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 371256926}
+  - component: {fileID: 371256928}
+  - component: {fileID: 371256927}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &371256926
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 371256925}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1790031713}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -0.5}
+  m_SizeDelta: {x: -20, y: -13}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &371256927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 371256925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 7f462b86a1c6f99478de44a4ae83a4c6, type: 3}
+    m_FontSize: 15
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 3
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Song file name
+--- !u!222 &371256928
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 371256925}
 --- !u!1 &371642605
 GameObject:
   m_ObjectHideFlags: 0
@@ -15762,7 +15839,7 @@ MonoBehaviour:
   dragAndDropFileName: 
   infoProjectNameInputField: {fileID: 98447693}
   charterNameInputField: {fileID: 1631615581}
-  songNameInputField: {fileID: 1356714589}
+  songNameText: {fileID: 371256927}
   lvlInputFields:
   - {fileID: 1101482619}
   - {fileID: 779887448}
@@ -23538,9 +23615,9 @@ MonoBehaviour:
   scrollView: {fileID: 2053822439}
   directorySeletorWindow: {fileID: 876378351}
   scrollViewContent: {fileID: 1622406566}
-  fileButtonPrefab: {fileID: 1980457510478770, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+  fileButtonPrefab: {fileID: 114574786292711158, guid: 08ffe87269a43cc44a01940a8ccbfaad,
     type: 2}
-  subDirectoryButtonPrefab: {fileID: 1183309732694130, guid: 7ad39562efaa4fe49a9438f44906853c,
+  subDirectoryButtonPrefab: {fileID: 114100634078958522, guid: 7ad39562efaa4fe49a9438f44906853c,
     type: 2}
   confirmButton: {fileID: 982316247}
   selectedItemFullName: 
@@ -29716,7 +29793,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &937485683
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29731,10 +29808,10 @@ RectTransform:
   m_Father: {fileID: 1032904075}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 61.5, y: -22}
-  m_SizeDelta: {x: 119, y: 40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &937485684
 MonoBehaviour:
@@ -34730,7 +34807,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1087230161
 RectTransform:
   m_ObjectHideFlags: 0
@@ -34754,10 +34831,10 @@ RectTransform:
   m_Father: {fileID: 1032904075}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 185}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 85.875, y: -174.5}
+  m_SizeDelta: {x: 167.75, y: 185}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1087230162
 MonoBehaviour:
@@ -35420,10 +35497,10 @@ RectTransform:
   m_Father: {fileID: 1087230161}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 35}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 83.875, y: -17.5}
+  m_SizeDelta: {x: 167.75, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1111494624
 GameObject:
@@ -42252,12 +42329,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1356168200}
---- !u!114 &1356714589 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114272033581320066, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-    type: 2}
-  m_PrefabInternal: {fileID: 1853579972}
-  m_Script: {fileID: 575553740, guid: f70555f144d8491a825f0804e09c671c, type: 3}
 --- !u!1 &1365015172
 GameObject:
   m_ObjectHideFlags: 0
@@ -44850,10 +44921,10 @@ RectTransform:
   m_Father: {fileID: 1087230161}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 35}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 83.875, y: -87.5}
+  m_SizeDelta: {x: 167.75, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1498598659
 GameObject:
@@ -54374,10 +54445,10 @@ RectTransform:
   m_Father: {fileID: 1087230161}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 35}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 83.875, y: -122.5}
+  m_SizeDelta: {x: 167.75, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1783266441
 GameObject:
@@ -54598,6 +54669,128 @@ Transform:
   m_Father: {fileID: 172429379}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1790031712
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1790031713}
+  - component: {fileID: 1790031716}
+  - component: {fileID: 1790031715}
+  - component: {fileID: 1790031714}
+  m_Layer: 5
+  m_Name: SongNameButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1790031713
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1790031712}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 371256926}
+  m_Father: {fileID: 44467070}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -180}
+  m_SizeDelta: {x: -20, y: 30}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &1790031714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1790031712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1392445389, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 0, g: 0, b: 0, a: 0.13725491}
+    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0.19607843}
+    m_PressedColor: {r: 0, g: 0, b: 0, a: 0.13725491}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.13725491}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1790031715}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 477390342}
+        m_MethodName: ChangeMusicFile
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+--- !u!114 &1790031715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1790031712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &1790031716
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1790031712}
 --- !u!1 &1791036724
 GameObject:
   m_ObjectHideFlags: 0
@@ -55471,10 +55664,10 @@ RectTransform:
   m_Father: {fileID: 1087230161}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 35}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 83.875, y: -157.5}
+  m_SizeDelta: {x: 167.75, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1821019103
 GameObject:
@@ -56366,145 +56559,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1844365974}
---- !u!1001 &1853579972
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 44467070}
-    m_Modifications:
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_RootOrder
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_AnchoredPosition.y
-      value: -180
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_SizeDelta.x
-      value: -20
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_SizeDelta.y
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_AnchorMin.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_Pivot.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_Pivot.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1683862520875672, guid: 4a5d7ff6a6912f14f86f796a6a378a44, type: 2}
-      propertyPath: m_Name
-      value: SongNameInputField
-      objectReference: {fileID: 0}
-    - target: {fileID: 114562081415970320, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_Text
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 114272033581320066, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_Interactable
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114272033581320066, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_Colors.m_DisabledColor.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114272033581320066, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_Colors.m_DisabledColor.g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114272033581320066, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_Colors.m_DisabledColor.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114272033581320066, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 2}
-      propertyPath: m_Colors.m_DisabledColor.a
-      value: 0.13725491
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 4a5d7ff6a6912f14f86f796a6a378a44, type: 2}
-  m_IsPrefabParent: 0
---- !u!224 &1853579973 stripped
-RectTransform:
-  m_PrefabParentObject: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-    type: 2}
-  m_PrefabInternal: {fileID: 1853579972}
 --- !u!1 &1857063588
 GameObject:
   m_ObjectHideFlags: 0
@@ -58738,7 +58792,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Deenote by HCl \u2013 Version 0.5.7\n\n*Bad English Alert*\r\n\n-Things
+  m_Text: "Deenote by HCl \u2013 Version 0.5.8\n\n*Bad English Alert*\r\n\n-Things
     that must be mentioned-\r\n     Thank you for using my app!\r\n     Something
     I must mention in the beginning: This application can only be used to make fan
     made charts of Deemo, and it is strictly prohibited to use this app for any commercial

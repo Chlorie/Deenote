@@ -35,7 +35,7 @@ public class ProjectController : MonoBehaviour
     //-Info Panel-
     public InputField infoProjectNameInputField;
     public InputField charterNameInputField;
-    public InputField songNameInputField;
+    public Text songNameText;
     //-Charts Panel-
     public InputField[] lvlInputFields;
     //-Settings Panel-
@@ -65,7 +65,7 @@ public class ProjectController : MonoBehaviour
     public Text stageUIScore;
     public TextMesh stageStaveProjectName;
     public Image stageUIDiff;
-    private string[] diffNames = { "Easy","Normal","Hard","Extra" };
+    private string[] diffNames = { "Easy", "Normal", "Hard", "Extra" };
     public Color[] textColors = new Color[4];
     public Image timeSliderImage;
     //-Data from assets-
@@ -116,12 +116,12 @@ public class ProjectController : MonoBehaviour
     }
     public void SelectSong() //Project - New - Select Song
     {
-        string[] acceptedExtension = { ".wav", ".ogg", ".mp3" }; //Testing mp3 loading
+        string[] acceptedExtension = { ".wav", ".ogg", ".mp3" };
         directorySelectorController.ActivateSelection(acceptedExtension, "SelectSong");
     }
     public void SelectFile() //Project - New - Select Folder
     {
-        string[] acceptedExtension = { };
+        string[] acceptedExtension = { ".dsproj" };
         directorySelectorController.ActivateSelection(acceptedExtension, "NewProjectSelectFile", true);
     }
     public void SongSelected() //Called by directory selector controller when song selected
@@ -214,7 +214,7 @@ public class ProjectController : MonoBehaviour
     }
     public void SaveAs() //Project - Save As
     {
-        string[] acceptedExtension = { };
+        string[] acceptedExtension = { ".dsproj" };
         if (project != null)
             directorySelectorController.ActivateSelection(acceptedExtension, "SaveAs", true);
     }
@@ -299,7 +299,7 @@ public class ProjectController : MonoBehaviour
     private void InfoInitialization() //After creating a project, initialize info panel
     {
         infoProjectNameInputField.text = project.name;
-        songNameInputField.text = project.songName;
+        songNameText.text = project.songName;
         charterNameInputField.text = project.chartMaker;
     }
     public void InfoProjectNameFinishedEditing()
@@ -311,6 +311,40 @@ public class ProjectController : MonoBehaviour
     public void CharterNameFinishedEditing()
     {
         project.chartMaker = charterNameInputField.text;
+    }
+    public void ChangeMusicFile()
+    {
+        string[] acceptedExtension = { ".wav", ".ogg", ".mp3" };
+        directorySelectorController.ActivateSelection(acceptedExtension, "ChangeSong");
+    }
+    public void NewSongSelected()
+    {
+        songFile = new FileInfo(directorySelectorController.selectedItemFullName);
+        songNameText.text = songFile.Name;
+        project.songName = songNameText.text;
+        directorySelectorController.DeactivateSelection();
+        if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
+        {
+            WWW www;
+            www = new WWW("file:///" + songFile.FullName);
+            while (!www.isDone) ; //Wait until the song is fully downloaded
+            songAudioClip = www.GetAudioClip(true);
+            songAudioClip.LoadAudioData();
+        }
+        else if (songFile.Extension == ".mp3")
+        {
+            AudioFileReader reader = new AudioFileReader(songFile.FullName);
+            float[] data = new float[reader.Length / 4];
+            reader.Read(data, 0, (int)reader.Length / 4);
+            AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+            newClip.SetData(data, 0);
+            songAudioClip = newClip;
+            songAudioClip.LoadAudioData();
+        }
+        stage.musicSource.clip = songAudioClip;
+        stage.timeSlider.value = 0.0f;
+        stage.timeSlider.maxValue = songAudioClip.length;
+        stage.OnSliderValueChanged();
     }
     //-Chart Panel-
     private void LvlInputFieldInit()
@@ -324,7 +358,7 @@ public class ProjectController : MonoBehaviour
     }
     public void JSONFileSelect(int diff)
     {
-        string[] allowedExtension = { ".json",".txt",".cytus" };
+        string[] allowedExtension = { ".json", ".txt", ".cytus" };
         directorySelectorController.ActivateSelection(allowedExtension, "ImportJSONChart" + diff);
     }
     public void ImportChartFromJSONFile(int diff)
@@ -360,7 +394,7 @@ public class ProjectController : MonoBehaviour
     }
     public void JSONExportDirectorySelect(int diff)
     {
-        string[] allowedExtension = { };
+        string[] allowedExtension = { ".json" };
         string[] difficultyStrings = { "easy", "normal", "hard", "extra" };
         if (project.charts[diff % 4].notes.Count > 0)
         {
