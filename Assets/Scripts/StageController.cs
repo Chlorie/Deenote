@@ -68,7 +68,6 @@ public class StageController : MonoBehaviour
     public Camera stageCamera;
     public Slider timeSlider;
     public Text fpsText;
-    public bool ignoreAllInput = false;
     public GameObject emptyImage;
     public RectTransform cameraUICanvas;
     public RectTransform xGridParent;
@@ -367,7 +366,7 @@ public class StageController : MonoBehaviour
     }
     private void Shortcuts()
     {
-        if (stageActivated && !ignoreAllInput)
+        if (stageActivated && !CurrentState.ignoreAllInput)
         {
             if (Utility.DetectKeys(KeyCode.Return)) //Enter
                 ToggleMusicPlayState();
@@ -421,7 +420,7 @@ public class StageController : MonoBehaviour
                 { timeSlider.value += Time.deltaTime * Parameters.fastScrollSpeed; OnSliderValueChanged(); }
             float mWheel = Input.GetAxis("Mouse ScrollWheel");
             float difTime = mWheel * mouseSens * 0.1f;
-            if (difTime != 0 && Input.mousePosition.x < Utility.stageWidth)
+            if (difTime != 0 && Input.mousePosition.x < Utility.stageWidth && !CurrentState.ignoreScroll)
             {
                 timeSlider.value = Mathf.Clamp(timeSlider.value - difTime, 0, musicLength);
                 OnSliderValueChanged();

@@ -116,10 +116,8 @@ public class DirectorySelectorController : MonoBehaviour
     }
     public void ActivateSelection(string[] allowedExtensions, string caller, bool needFileName = false)
     {
-        EditorController editor = FindObjectOfType<EditorController>();
-        StageController stage = FindObjectOfType<StageController>();
-        if (stage != null) stage.ignoreAllInput = true;
-        if (editor != null) editor.ignoreAllInput = true;
+        CurrentState.ignoreScroll = true;
+        CurrentState.ignoreAllInput = true;
         extensions = allowedExtensions;
         fileName = "";
         directorySeletorWindow.SetActive(true);
@@ -152,10 +150,8 @@ public class DirectorySelectorController : MonoBehaviour
     }
     public void DeactivateSelection()
     {
-        EditorController editor = FindObjectOfType<EditorController>();
-        StageController stage = FindObjectOfType<StageController>();
-        if (stage != null) stage.ignoreAllInput = false;
-        if (editor != null) editor.ignoreAllInput = false;
+        CurrentState.ignoreScroll = false;
+        CurrentState.ignoreAllInput = false;
         directorySeletorWindow.SetActive(false);
     }
     public void ConfirmButtonPressed()

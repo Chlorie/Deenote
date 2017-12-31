@@ -442,25 +442,25 @@ public class ProjectController : MonoBehaviour
     }
     public void OpenAbout()
     {
+        CurrentState.ignoreAllInput = true;
+        CurrentState.ignoreScroll = true;
         aboutWindow.SetActive(true);
         stage.StopPlaying();
-        stage.editor.ignoreAllInput = true;
     }
     public void CloseAbout()
     {
+        CurrentState.ignoreAllInput = false;
+        CurrentState.ignoreScroll = false;
         aboutWindow.SetActive(false);
-        stage.editor.ignoreAllInput = false;
     }
     public void OpenHelp()
     {
-        stage.ignoreAllInput = true;
-        stage.editor.ignoreAllInput = true;
+        CurrentState.ignoreAllInput = true;
 
     }
     public void CloseHelp()
     {
-        stage.ignoreAllInput = false;
-        stage.editor.ignoreAllInput = false;
+        CurrentState.ignoreAllInput = false;
 
     }
     //-Other-

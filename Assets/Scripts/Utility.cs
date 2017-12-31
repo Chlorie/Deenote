@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Utility: MonoBehaviour
+public class Utility
 {
     public const int NONE = 0;
     public const int CTRL = 1;
@@ -170,7 +170,7 @@ public class Utility: MonoBehaviour
         int inumber = 0;
         while (i < str.Length && (!IsNumberChar(str[i]) || str[i] == 'e' || str[i] == 'E')) i++;
         if (i == str.Length) return -2147483648;
-        while (i < str.Length && IsNumberChar(str[i]))
+        while (i < str.Length && IsNumberChar(str[i]) && str[i] != '.')
         {
             if (str[i] == '-') { sign = -1; i++; continue; }
             inumber *= 10;

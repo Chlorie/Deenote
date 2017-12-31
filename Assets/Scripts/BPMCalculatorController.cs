@@ -11,7 +11,7 @@ public class BPMCalculatorController : MonoBehaviour
     public Text bpmText, offsetText, nrText;
     public Slider slider;
     public AudioSource source;
-    private float x, x2, xy, y, y2, lxx, lxy, lyy, r, r2, m, bpm, b, time;
+    private float x, x2, xy, y, y2, lxx, lxy, lyy, r, r2, m, bpm, time;
     //private float offset;
     //private int intOffset;
     private int n;
@@ -25,8 +25,7 @@ public class BPMCalculatorController : MonoBehaviour
     //r = lxy/sqrt(lxx*lyy)
     public void Activate()
     {
-        stage.editor.ignoreAllInput = true;
-        stage.ignoreAllInput = true;
+        CurrentState.ignoreAllInput = true;
         stage.StopPlaying();
         panel.SetActive(true);
         ResetValues();
@@ -40,7 +39,7 @@ public class BPMCalculatorController : MonoBehaviour
         bpmText.text = "Tap Space";
         offsetText.text = nrText.text = "";
         n = 0;
-        x = x2 = xy = y = y2 = lxx = lxy = lyy = r = bpm /*= offset*/ = m = b = 0.0f;
+        x = x2 = xy = y = y2 = lxx = lxy = lyy = r = bpm /*= offset*/ = m = 0.0f;
     }
     public void AddValue()
     {
@@ -57,7 +56,7 @@ public class BPMCalculatorController : MonoBehaviour
         if (n > 1)
         {
             m = lxy / lxx;
-            b = (y - m * x) / n;
+            //b = (y - m * x) / n;
             bpm = 60.0f / m;
             //offset = b - Mathf.Floor(b / m) * m;
             //intOffset = (int)(offset * 1000);
@@ -83,8 +82,7 @@ public class BPMCalculatorController : MonoBehaviour
     }
     public void Deactive()
     {
-        stage.ignoreAllInput = false;
-        stage.editor.ignoreAllInput = false;
+        CurrentState.ignoreAllInput = false;
         source.Stop();
         panel.SetActive(false);
     }

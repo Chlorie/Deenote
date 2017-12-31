@@ -54,7 +54,6 @@ public class EditorController : MonoBehaviour
     //Mouse Actions
     public Vector2 dragStartPoint = new Vector2();
     public Vector2 dragEndPoint = new Vector2();
-    public bool ignoreAllInput = false;
     private bool dropCurrentDrag = false;
     //Other scripts
     public BPMCalculatorController bpmCalc;
@@ -636,7 +635,7 @@ public class EditorController : MonoBehaviour
         for (int i = 0; i < chart.notes.Count; i++) index.Add(i);
         NoteIndexQuickSort(index, 0, chart.notes.Count - 1);
         for (int i = 0; i < chart.notes.Count; i++) inv[index[i]] = i;
-        foreach(Note note in chart.notes)
+        foreach (Note note in chart.notes)
         {
             if (note.prevLink != -1) note.prevLink = inv[note.prevLink];
             if (note.nextLink != -1) note.nextLink = inv[note.nextLink];
@@ -1002,7 +1001,7 @@ public class EditorController : MonoBehaviour
     private void MouseActions()
     {
         //Select button
-        if (Input.GetMouseButtonDown(Parameters.selectButton) && !ignoreAllInput && !dropCurrentDrag && activated) //Select button pressed
+        if (Input.GetMouseButtonDown(Parameters.selectButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && activated) //Select button pressed
         {
             //If the mouse is out of range when pressed, ignoreCurrentDrag
             dragStartPoint = SetDragPosition(dragStartPoint);
@@ -1027,7 +1026,7 @@ public class EditorController : MonoBehaviour
                 CloseDragIndicator();
             }
         }
-        else if (Input.GetMouseButton(Parameters.selectButton) && !ignoreAllInput && !dropCurrentDrag && activated) //Select button being held
+        else if (Input.GetMouseButton(Parameters.selectButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && activated) //Select button being held
         {
             foreach (NoteIndicatorController indicator in noteIndicators) indicator.NoColor();
             dragEndPoint = SetDragPosition(dragEndPoint);
@@ -1035,7 +1034,7 @@ public class EditorController : MonoBehaviour
             UpdateDragIndicator();
         }
         //Place button
-        if (Input.GetMouseButtonDown(Parameters.placeButton) && !ignoreAllInput && !dropCurrentDrag && !Input.GetMouseButton(Parameters.selectButton))
+        if (Input.GetMouseButtonDown(Parameters.placeButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && !Input.GetMouseButton(Parameters.selectButton))
             if (!(Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth))
             {
                 DeselectAll();
@@ -1044,7 +1043,7 @@ public class EditorController : MonoBehaviour
     }
     private void Shortcuts()
     {
-        if (activated && !stage.ignoreAllInput && !ignoreAllInput)
+        if (activated && !CurrentState.ignoreAllInput)
         {
             if (Utility.DetectKeys(KeyCode.Z, Utility.CTRL)) //Ctrl+Z
                 Undo();
