@@ -30,7 +30,7 @@ public class NoteController : MonoBehaviour
     public PianoSoundsLoader piano;
     public AudioClip clickClip;
     private Color waveColor;
-    private LinkLine linkLine;
+    private Line linkLine;
     private void CheckForReturn()
     {
         if (time > curNote.time + Parameters.noteReturnTime)
@@ -111,7 +111,8 @@ public class NoteController : MonoBehaviour
         z2 = Parameters.maximumNoteRange / Parameters.NoteFallTime(stage.chartPlaySpeed) * (curNote.time - time);
         x1 = Parameters.maximumNoteWidth * nextNote.position;
         z1 = Parameters.maximumNoteRange / Parameters.NoteFallTime(stage.chartPlaySpeed) * (nextNote.time - time);
-        linkLine.MoveTo(new Vector3(x1, 0, z1), new Vector3(x2, 0, z2));
+        linkLine.MoveTo(new Vector3(x1, 0, z1 + 32.0f), new Vector3(x2, 0, z2 + 32.0f));
+        linkLine.Layer = 1;
     }
     private void EffectFrameUpdate()
     {
@@ -188,15 +189,16 @@ public class NoteController : MonoBehaviour
     public void Activate(int noteID, Note note, StageController stageController, PianoSoundsLoader pianoSoundsLoader)
     {
         piano = pianoSoundsLoader;
+        stage = stageController;
         if (linkLine == null)
         {
-            linkLine = new LinkLine();
+            linkLine = Utility.DrawLineInWorldSpace(Vector3.zero, Vector3.up, Parameters.linkLineColor, 0.035f);
+            linkLine.transform.SetParent(stage.linkLineParent);
             linkLine.SetActive(false);
         }
         id = noteID;
         soundPlayed = true;
         curNote = note;
-        stage = stageController;
         if (curNote.isLink)
         {
             noteSprite.sprite = slideNoteSprite;

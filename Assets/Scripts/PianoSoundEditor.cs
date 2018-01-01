@@ -19,8 +19,7 @@ public class PianoSoundEditor : MonoBehaviour
     public void Activate(EditorController edit, List<PianoSound> sounds)
     {
         editor = edit;
-        editor.ignoreAllInput = true;
-        editor.stage.ignoreAllInput = true;
+        CurrentState.ignoreAllInput = true;
         foreach (PianoSound sound in sounds)
         {
             PianoSoundItem item = itemPool.GetObject();
@@ -34,8 +33,7 @@ public class PianoSoundEditor : MonoBehaviour
     }
     public void Deactivate(bool save)
     {
-        editor.ignoreAllInput = false;
-        editor.stage.ignoreAllInput = false;
+        CurrentState.ignoreAllInput = false;
         if (save)
         {
             List<PianoSound> pianoSounds = new List<PianoSound>();

@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.UI;
+using NAudio.Wave;
 
 public class ProjectController : MonoBehaviour
 {
@@ -30,17 +31,20 @@ public class ProjectController : MonoBehaviour
     public Text songSelectButtonText;
     public Text fileSelectButtonText;
     public Button songSelectConfirmButton;
+    public string dragAndDropFileName = null;
     //-Info Panel-
     public InputField infoProjectNameInputField;
     public InputField charterNameInputField;
-    public InputField songNameInputField;
+    public Text songNameText;
     //-Charts Panel-
     public InputField[] lvlInputFields;
     //-Settings Panel-
     private float lastAutoSaveTime = 0.0f;
     private float autoSaveTime = 300.0f;
     public Toggle autoSaveToggle;
+    public Toggle vSyncToggle;
     private bool autoSaveState = true;
+    private bool vSync = true;
     //-About the project-
     private AudioClip songAudioClip; //Audio clip of the song
     private string projectFileName; //Name of the project file
@@ -61,7 +65,7 @@ public class ProjectController : MonoBehaviour
     public Text stageUIScore;
     public TextMesh stageStaveProjectName;
     public Image stageUIDiff;
-    private string[] diffNames = { "Easy","Normal","Hard","Extra" };
+    private string[] diffNames = { "Easy", "Normal", "Hard", "Extra" };
     public Color[] textColors = new Color[4];
     public Image timeSliderImage;
     //-Data from assets-
@@ -112,12 +116,12 @@ public class ProjectController : MonoBehaviour
     }
     public void SelectSong() //Project - New - Select Song
     {
-        string[] acceptedExtension = { ".wav", ".ogg" }; //By now only .wav and .ogg music files are accepted
+        string[] acceptedExtension = { ".wav", ".ogg", ".mp3" };
         directorySelectorController.ActivateSelection(acceptedExtension, "SelectSong");
     }
     public void SelectFile() //Project - New - Select Folder
     {
-        string[] acceptedExtension = { };
+        string[] acceptedExtension = { ".dsproj" };
         directorySelectorController.ActivateSelection(acceptedExtension, "NewProjectSelectFile", true);
     }
     public void SongSelected() //Called by directory selector controller when song selected
@@ -157,24 +161,38 @@ public class ProjectController : MonoBehaviour
     }
     public void CancelClearStageCreateProject() //Close the notice screen
     {
+        dragAndDropFileName = null;
         newProjectConfirmScreen.SetActive(false);
     }
     public void ConfirmButtonPressed() //Project - New - Confirm
     {
-        WWW www;
         project = new Project();
-        www = new WWW("file:///" + songFile.FullName);
-        while (!www.isDone) ; //Wait until the song is fully downloaded
-        songAudioClip = www.GetAudioClip(true);
-        songAudioClip.LoadAudioData();
+        if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
+        {
+            WWW www;
+            www = new WWW("file:///" + songFile.FullName);
+            while (!www.isDone) ; //Wait until the song is fully downloaded
+            songAudioClip = www.GetAudioClip(true);
+            songAudioClip.LoadAudioData();
+        }
+        else if (songFile.Extension == ".mp3")
+        {
+            AudioFileReader reader = new AudioFileReader(songFile.FullName);
+            float[] data = new float[reader.Length / 4];
+            reader.Read(data, 0, (int)reader.Length / 4);
+            AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+            newClip.SetData(data, 0);
+            songAudioClip = newClip;
+            songAudioClip.LoadAudioData();
+        }
         project.songName = songFile.Name;
         project.charts = new Chart[4];
         for (int i = 0; i < 4; i++)
-        {
-            project.charts[i] = new Chart();
-            project.charts[i].difficulty = i;
-            project.charts[i].level = "1";
-        }
+            project.charts[i] = new Chart
+            {
+                difficulty = i,
+                level = "1"
+            };
         stage.musicSource.clip = songAudioClip;
         infoPanelButton.SetActive(true);
         chartsPanelButton.SetActive(true);
@@ -186,6 +204,7 @@ public class ProjectController : MonoBehaviour
     }
     public void SaveProject() //Project - Save
     {
+        SavePlayerPrefs();
         if (project != null)
         {
             if (currentInStage != -1)
@@ -195,7 +214,7 @@ public class ProjectController : MonoBehaviour
     }
     public void SaveAs() //Project - Save As
     {
-        string[] acceptedExtension = { };
+        string[] acceptedExtension = { ".dsproj" };
         if (project != null)
             directorySelectorController.ActivateSelection(acceptedExtension, "SaveAs", true);
     }
@@ -214,7 +233,6 @@ public class ProjectController : MonoBehaviour
     }
     public void LoadProject() //Project - Open
     {
-        string[] extensions = { ".dsproj" };
         if (project != null)
         {
             stage.StopPlaying();
@@ -222,11 +240,18 @@ public class ProjectController : MonoBehaviour
             clearStageNewProjectMode = false;
             return;
         }
-        directorySelectorController.ActivateSelection(extensions, "LoadProject");
+        if (dragAndDropFileName == null || dragAndDropFileName == "")
+        {
+            string[] extensions = { ".dsproj" };
+            directorySelectorController.ActivateSelection(extensions, "LoadProject");
+        }
+        else
+            ProjectToLoadSelected(dragAndDropFileName);
     }
     public void ProjectToLoadSelected(string projectFullDir)
     {
         FileInfo projectFile;
+        dragAndDropFileName = null;
         projectSL.LoadProjectFromFile(out project, out songAudioClip, projectFullDir);
         infoPanelButton.SetActive(true);
         chartsPanelButton.SetActive(true);
@@ -252,11 +277,29 @@ public class ProjectController : MonoBehaviour
         stage.editor.activated = false;
         PanelSelectionInit();
     }
+    public void DragAndDropFileAccept(List<string> paths)
+    {
+        try
+        {
+            if (paths.Count != 1) return;
+            FileInfo file = new FileInfo(paths[0]);
+            string extension = file.Extension;
+            if (extension == ".dsproj")
+            {
+                dragAndDropFileName = paths[0];
+                LoadProject();
+            }
+        }
+        catch
+        {
+            return;
+        }
+    }
     //-Info Panel-
     private void InfoInitialization() //After creating a project, initialize info panel
     {
         infoProjectNameInputField.text = project.name;
-        songNameInputField.text = project.songName;
+        songNameText.text = project.songName;
         charterNameInputField.text = project.chartMaker;
     }
     public void InfoProjectNameFinishedEditing()
@@ -268,6 +311,40 @@ public class ProjectController : MonoBehaviour
     public void CharterNameFinishedEditing()
     {
         project.chartMaker = charterNameInputField.text;
+    }
+    public void ChangeMusicFile()
+    {
+        string[] acceptedExtension = { ".wav", ".ogg", ".mp3" };
+        directorySelectorController.ActivateSelection(acceptedExtension, "ChangeSong");
+    }
+    public void NewSongSelected()
+    {
+        songFile = new FileInfo(directorySelectorController.selectedItemFullName);
+        songNameText.text = songFile.Name;
+        project.songName = songNameText.text;
+        directorySelectorController.DeactivateSelection();
+        if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
+        {
+            WWW www;
+            www = new WWW("file:///" + songFile.FullName);
+            while (!www.isDone) ; //Wait until the song is fully downloaded
+            songAudioClip = www.GetAudioClip(true);
+            songAudioClip.LoadAudioData();
+        }
+        else if (songFile.Extension == ".mp3")
+        {
+            AudioFileReader reader = new AudioFileReader(songFile.FullName);
+            float[] data = new float[reader.Length / 4];
+            reader.Read(data, 0, (int)reader.Length / 4);
+            AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+            newClip.SetData(data, 0);
+            songAudioClip = newClip;
+            songAudioClip.LoadAudioData();
+        }
+        stage.musicSource.clip = songAudioClip;
+        stage.timeSlider.value = 0.0f;
+        stage.timeSlider.maxValue = songAudioClip.length;
+        stage.OnSliderValueChanged();
     }
     //-Chart Panel-
     private void LvlInputFieldInit()
@@ -281,7 +358,7 @@ public class ProjectController : MonoBehaviour
     }
     public void JSONFileSelect(int diff)
     {
-        string[] allowedExtension = { ".json",".txt",".cytus" };
+        string[] allowedExtension = { ".json", ".txt", ".cytus" };
         directorySelectorController.ActivateSelection(allowedExtension, "ImportJSONChart" + diff);
     }
     public void ImportChartFromJSONFile(int diff)
@@ -317,7 +394,7 @@ public class ProjectController : MonoBehaviour
     }
     public void JSONExportDirectorySelect(int diff)
     {
-        string[] allowedExtension = { };
+        string[] allowedExtension = { ".json" };
         string[] difficultyStrings = { "easy", "normal", "hard", "extra" };
         if (project.charts[diff % 4].notes.Count > 0)
         {
@@ -358,27 +435,32 @@ public class ProjectController : MonoBehaviour
         autoSaveState = autoSaveToggle.isOn;
         if (autoSaveState) lastAutoSaveTime = Time.time;
     }
+    public void ToggleVSync(bool on)
+    {
+        vSync = on;
+        QualitySettings.vSyncCount = on ? 1 : 0;
+    }
     public void OpenAbout()
     {
+        CurrentState.ignoreAllInput = true;
+        CurrentState.ignoreScroll = true;
         aboutWindow.SetActive(true);
         stage.StopPlaying();
-        stage.editor.ignoreAllInput = true;
     }
     public void CloseAbout()
     {
+        CurrentState.ignoreAllInput = false;
+        CurrentState.ignoreScroll = false;
         aboutWindow.SetActive(false);
-        stage.editor.ignoreAllInput = false;
     }
     public void OpenHelp()
     {
-        stage.ignoreAllInput = true;
-        stage.editor.ignoreAllInput = true;
+        CurrentState.ignoreAllInput = true;
 
     }
     public void CloseHelp()
     {
-        stage.ignoreAllInput = false;
-        stage.editor.ignoreAllInput = false;
+        CurrentState.ignoreAllInput = false;
 
     }
     //-Other-
@@ -392,8 +474,37 @@ public class ProjectController : MonoBehaviour
         aboutCanvas.SetActive(false);
         aboutCanvas.SetActive(true);
     }
+    private void LoadPlayerPrefs()
+    {
+        autoSaveToggle.isOn = Utility.PlayerPrefsGetBool("Autosave", autoSaveToggle.isOn);
+        ToggleAutoSave();
+        vSyncToggle.isOn = Utility.PlayerPrefsGetBool("VSync On", vSyncToggle.isOn);
+        ToggleVSync(vSyncToggle.isOn);
+    }
+    public void SavePlayerPrefs()
+    {
+        Utility.PlayerPrefsSetBool("Autosave", autoSaveState);
+        Utility.PlayerPrefsSetBool("Light Effect", stage.lightEffectState);
+        Utility.PlayerPrefsSetBool("Show FPS", stage.showFPS);
+        Utility.PlayerPrefsSetBool("VSync On", vSync);
+        PlayerPrefs.SetInt("Mouse Wheel Sensitivity", stage.mouseSens);
+        PlayerPrefs.SetInt("Note Speed", stage.chartPlaySpeed);
+        PlayerPrefs.SetInt("Music Speed", stage.musicPlaySpeed);
+        PlayerPrefs.SetInt("Effect Volume", stage.effectVolume);
+        PlayerPrefs.SetInt("Music Volume", stage.musicVolume);
+        PlayerPrefs.SetInt("Piano Volume", stage.pianoVolume);
+        Utility.PlayerPrefsSetBool("Show Link Line", stage.linkLineParent.gameObject.activeSelf);
+        PlayerPrefs.SetInt("XGrid Count", stage.editor.xGrid);
+        PlayerPrefs.SetFloat("XGrid Offset", stage.editor.xGridOffset);
+        PlayerPrefs.SetInt("TGrid Count", stage.editor.tGrid);
+        Utility.PlayerPrefsSetBool("Snap To Grid", stage.editor.snapToGrid);
+        Utility.PlayerPrefsSetBool("Show Indicator", stage.editor.noteIndicatorsToggler.activeSelf);
+        Utility.PlayerPrefsSetBool("Show Border", stage.editor.border.activeSelf);
+    }
     private void Start()
     {
+        DragAndDropUnity.Enable(DragAndDropFileAccept);
+        LoadPlayerPrefs();
         Utility.debugText = debugText;
         project = null;
         PanelSelectionInit();

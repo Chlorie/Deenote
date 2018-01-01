@@ -15,8 +15,8 @@ public class DirectorySelectorController : MonoBehaviour
     public GameObject scrollView;
     public GameObject directorySeletorWindow;
     public Transform scrollViewContent;
-    public GameObject fileButtonPrefab;
-    public GameObject subDirectoryButtonPrefab;
+    public Button fileButtonPrefab;
+    public Button subDirectoryButtonPrefab;
     public Button confirmButton;
     public string selectedItemFullName;
     public bool selectedItemType; // true for directory - false for file
@@ -24,8 +24,8 @@ public class DirectorySelectorController : MonoBehaviour
     public string fileName;
     private string selectorCaller;
     private string[] extensions = { };
-    private List<GameObject> fileButtonObjects = new List<GameObject>();
-    private List<GameObject> subDirectoryButtonObjects = new List<GameObject>();
+    private List<Button> fileButtons = new List<Button>();
+    private List<Button> subDirectoryButtons = new List<Button>();
     private ProjectController projectController;
     public void BackToParentDirectory()
     {
@@ -116,10 +116,8 @@ public class DirectorySelectorController : MonoBehaviour
     }
     public void ActivateSelection(string[] allowedExtensions, string caller, bool needFileName = false)
     {
-        EditorController editor = FindObjectOfType<EditorController>();
-        StageController stage = FindObjectOfType<StageController>();
-        if (stage != null) stage.ignoreAllInput = true;
-        if (editor != null) editor.ignoreAllInput = true;
+        CurrentState.ignoreScroll = true;
+        CurrentState.ignoreAllInput = true;
         extensions = allowedExtensions;
         fileName = "";
         directorySeletorWindow.SetActive(true);
@@ -152,10 +150,8 @@ public class DirectorySelectorController : MonoBehaviour
     }
     public void DeactivateSelection()
     {
-        EditorController editor = FindObjectOfType<EditorController>();
-        StageController stage = FindObjectOfType<StageController>();
-        if (stage != null) stage.ignoreAllInput = false;
-        if (editor != null) editor.ignoreAllInput = false;
+        CurrentState.ignoreScroll = false;
+        CurrentState.ignoreAllInput = false;
         directorySeletorWindow.SetActive(false);
     }
     public void ConfirmButtonPressed()
@@ -182,45 +178,48 @@ public class DirectorySelectorController : MonoBehaviour
             projectController.ExportChartToJSONChart(selectorCaller[selectorCaller.Length - 1] - '0');
         else if (selectorCaller == "SaveAs")
             projectController.SaveAsFileSelected();
+        else if (selectorCaller == "ChangeSong")
+            projectController.NewSongSelected();
     }
     private void RemoveAndGenerateButtons()
     {
         //Remove all the buttons in the scroll view first
-        while (fileButtonObjects.Count > 0)
+        while (fileButtons.Count > 0)
         {
-            Destroy(fileButtonObjects[0]);
-            fileButtonObjects.RemoveAt(0);
+            Destroy(fileButtons[0].gameObject);
+            fileButtons.RemoveAt(0);
         }
-        while (subDirectoryButtonObjects.Count > 0)
+        while (subDirectoryButtons.Count > 0)
         {
-            Destroy(subDirectoryButtonObjects[0]);
-            subDirectoryButtonObjects.RemoveAt(0);
+            Destroy(subDirectoryButtons[0].gameObject);
+            subDirectoryButtons.RemoveAt(0);
         }
         //Generate new buttons
-        GameObject newButton;
+        Button newButton;
         DirectoryInfo[] subDirectories = currentDirectory.GetDirectories();
         foreach (DirectoryInfo i in subDirectories)
         {
             newButton = Instantiate(subDirectoryButtonPrefab);
             newButton.transform.SetParent(scrollViewContent);
-            subDirectoryButtonObjects.Add(newButton);
+            subDirectoryButtons.Add(newButton);
             newButton.GetComponentInChildren<Text>().text = i.Name;
         }
         FileInfo[] files = currentDirectory.GetFiles();
         foreach (FileInfo i in files)
         {
-            int flag = 1;
+            bool flag = true;
             foreach (string j in extensions)
                 if (i.Extension == j)
                 {
-                    flag = 0;
+                    flag = false;
                     break;
                 }
-            if (flag == 1) continue; //Extension of file i isn't in the preferred extensions
+            if (flag) continue; //Extension of file i isn't in the preferred extensions
             newButton = Instantiate(fileButtonPrefab);
             newButton.transform.SetParent(scrollViewContent);
-            fileButtonObjects.Add(newButton);
+            fileButtons.Add(newButton);
             newButton.GetComponentInChildren<Text>().text = i.Name;
+            newButton.interactable = !fileNameNeeded;
         }
     }
     private void Awake()

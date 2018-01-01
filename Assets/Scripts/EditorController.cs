@@ -15,6 +15,7 @@ public class EditorController : MonoBehaviour
     public InputField tGridInputField;
     public InputField xGridOffsetInputField;
     public Slider xGridOffsetSlider;
+    public Toggle borderToggle;
     //Beat lines
     private float fillFrom, fillTo, fillWithBPM;
     public InputField fillFromInputField;
@@ -39,13 +40,13 @@ public class EditorController : MonoBehaviour
     public Button pianoSoundsButton;
     public RectTransform dragIndicator;
     //Note Placement
-    private bool snapToGrid = false;
+    public bool snapToGrid = false;
     public Toggle snapToGridToggle;
     private List<Note> clipBoard = new List<Note>();
     public GameObject noteIndicatorsToggler;
-    public SpriteRenderer noteIndicatorSprite;
     private List<NoteIndicatorController> noteIndicators = new List<NoteIndicatorController>();
     public Transform noteIndicatorParent;
+    public Toggle noteIndicatorToggle;
     public NoteIndicatorPool noteIndicatorPool;
     private bool pasteMode = false;
     //Interpolate
@@ -53,7 +54,6 @@ public class EditorController : MonoBehaviour
     //Mouse Actions
     public Vector2 dragStartPoint = new Vector2();
     public Vector2 dragEndPoint = new Vector2();
-    public bool ignoreAllInput = false;
     private bool dropCurrentDrag = false;
     //Other scripts
     public BPMCalculatorController bpmCalc;
@@ -635,7 +635,7 @@ public class EditorController : MonoBehaviour
         for (int i = 0; i < chart.notes.Count; i++) index.Add(i);
         NoteIndexQuickSort(index, 0, chart.notes.Count - 1);
         for (int i = 0; i < chart.notes.Count; i++) inv[index[i]] = i;
-        foreach(Note note in chart.notes)
+        foreach (Note note in chart.notes)
         {
             if (note.prevLink != -1) note.prevLink = inv[note.prevLink];
             if (note.nextLink != -1) note.nextLink = inv[note.nextLink];
@@ -1001,7 +1001,7 @@ public class EditorController : MonoBehaviour
     private void MouseActions()
     {
         //Select button
-        if (Input.GetMouseButtonDown(Parameters.selectButton) && !ignoreAllInput && !dropCurrentDrag && activated) //Select button pressed
+        if (Input.GetMouseButtonDown(Parameters.selectButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && activated) //Select button pressed
         {
             //If the mouse is out of range when pressed, ignoreCurrentDrag
             dragStartPoint = SetDragPosition(dragStartPoint);
@@ -1026,7 +1026,7 @@ public class EditorController : MonoBehaviour
                 CloseDragIndicator();
             }
         }
-        else if (Input.GetMouseButton(Parameters.selectButton) && !ignoreAllInput && !dropCurrentDrag && activated) //Select button being held
+        else if (Input.GetMouseButton(Parameters.selectButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && activated) //Select button being held
         {
             foreach (NoteIndicatorController indicator in noteIndicators) indicator.NoColor();
             dragEndPoint = SetDragPosition(dragEndPoint);
@@ -1034,7 +1034,7 @@ public class EditorController : MonoBehaviour
             UpdateDragIndicator();
         }
         //Place button
-        if (Input.GetMouseButtonDown(Parameters.placeButton) && !ignoreAllInput && !dropCurrentDrag && !Input.GetMouseButton(Parameters.selectButton))
+        if (Input.GetMouseButtonDown(Parameters.placeButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && !Input.GetMouseButton(Parameters.selectButton))
             if (!(Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth))
             {
                 DeselectAll();
@@ -1043,7 +1043,7 @@ public class EditorController : MonoBehaviour
     }
     private void Shortcuts()
     {
-        if (activated && !stage.ignoreAllInput && !ignoreAllInput)
+        if (activated && !CurrentState.ignoreAllInput)
         {
             if (Utility.DetectKeys(KeyCode.Z, Utility.CTRL)) //Ctrl+Z
                 Undo();
@@ -1099,6 +1099,21 @@ public class EditorController : MonoBehaviour
                 PasteNotes();
         }
     }
+    private void LoadPlayerPrefs()
+    {
+        xGridInputField.text = PlayerPrefs.GetInt("XGrid Count", xGrid).ToString();
+        XGridNumber(xGridInputField.text);
+        tGridInputField.text = PlayerPrefs.GetInt("TGrid Count", tGrid).ToString();
+        TGridNumber(tGridInputField.text);
+        xGridOffsetInputField.text = PlayerPrefs.GetFloat("XGrid Offset", xGridOffset).ToString();
+        XGridOffsetInput(xGridOffsetInputField.text);
+        snapToGridToggle.isOn = Utility.PlayerPrefsGetBool("Snap To Grid", snapToGrid);
+        ToggleSnapToGrid(snapToGridToggle.isOn);
+        noteIndicatorToggle.isOn = Utility.PlayerPrefsGetBool("Show Indicator", noteIndicatorsToggler.activeSelf);
+        ToggleNoteIndicator(noteIndicatorToggle.isOn);
+        borderToggle.isOn = Utility.PlayerPrefsGetBool("Show Border", border.activeSelf);
+        ToggleBorder(borderToggle.isOn);
+    }
     private void Start()
     {
         fillFromInputField.text = fillToInputField.text = fillWithBPMInputField.text = "0.000";
@@ -1107,6 +1122,7 @@ public class EditorController : MonoBehaviour
     public void Initialize()
     {
         for (int i = 0; i < 25; i++) xGrids.Add(new XGrid());
+        LoadPlayerPrefs();
     }
     private void Update()
     {

@@ -17,7 +17,7 @@ public class NoteIndicatorController : MonoBehaviour
     private float slideNoteScale = 4.5f;
     private float musicLength;
     private float time;
-    public LinkLine linkLine;
+    public Line linkLine;
     public float placeTime;
     public float placePos;
     public Note Note
@@ -39,10 +39,14 @@ public class NoteIndicatorController : MonoBehaviour
     }
     public void Initialize(EditorController controller, Note cur, Note next, float length)
     {
-        if (linkLine == null) linkLine = new LinkLine();
+        editor = controller;
+        if (linkLine == null)
+        {
+            linkLine = Utility.DrawLineInWorldSpace(Vector3.zero, Vector3.up, Parameters.linkLineColor, 0.035f, 0.4f);
+            linkLine.transform.SetParent(editor.stage.linkLineParent);
+        }
         linkLine.SetActive(false);
         gameObject.SetActive(true);
-        editor = controller;
         note = cur;
         nextLink = next;
         musicLength = length;
@@ -95,8 +99,9 @@ public class NoteIndicatorController : MonoBehaviour
         if (note.isLink)
         {
             linkLine.SetActive(true);
-            linkLine.MoveTo(new Vector3(x, 0.0f, z), new Vector3(x2, 0.0f, z2));
-            linkLine.AlphaMultiply(0.4f);
+            linkLine.MoveTo(new Vector3(x, 0.0f, z + 32.0f), new Vector3(x2, 0.0f, z2 + 32.0f));
+            linkLine.Layer = 1;
+            linkLine.AlphaMultiplier = 0.4f;
         }
         else
             linkLine.SetActive(false);

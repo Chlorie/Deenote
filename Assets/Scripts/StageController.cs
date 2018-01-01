@@ -11,8 +11,6 @@ public class StageController : MonoBehaviour
     //-Sounds-
     public AudioSource musicSource;
     public AudioSource clickSoundSource;
-    public AudioClip linkSound;
-    public AudioClip noteSound;
     //-Stage lights-
     public Light stageLight;
     public Toggle lightEffectToggle;
@@ -39,7 +37,7 @@ public class StageController : MonoBehaviour
     //-Editor settings-
     public int musicPlaySpeed = 10; //Actually it is "pitch" value...
     public int chartPlaySpeed = 10; //Twice the speed of that in the game
-    private int musicVolume = 100;
+    public int musicVolume = 100;
     public int effectVolume = 100;
     public int pianoVolume = 100;
     public int mouseSens = 10;
@@ -64,21 +62,21 @@ public class StageController : MonoBehaviour
     //-FPS calculating-
     private float timeCount = 0.0f, frameCount = 0;
     private float fps = 0.0f;
-    private bool showFPS = false;
+    public bool showFPS = true;
     public Toggle fpsToggle;
     //-Other things-
     public Camera stageCamera;
     public Slider timeSlider;
     public Text fpsText;
-    public bool ignoreAllInput = false;
     public GameObject emptyImage;
-    public Sprite cylinder;
-    public Sprite cylinderAlpha;
     public RectTransform cameraUICanvas;
     public RectTransform xGridParent;
     public RectTransform linkLineParent;
     public Collider mouseDetector;
     public ProjectController projectController;
+    public Toggle linkLineToggle;
+    public LinePool linePool;
+    public Transform lineCanvas;
     //-About sounds playing-
     public PianoSoundsLoader pianoSoundsLoader;
     public float musicLength = 0.0f; //In seconds
@@ -368,7 +366,7 @@ public class StageController : MonoBehaviour
     }
     private void Shortcuts()
     {
-        if (stageActivated && !ignoreAllInput)
+        if (stageActivated && !CurrentState.ignoreAllInput)
         {
             if (Utility.DetectKeys(KeyCode.Return)) //Enter
                 ToggleMusicPlayState();
@@ -422,12 +420,33 @@ public class StageController : MonoBehaviour
                 { timeSlider.value += Time.deltaTime * Parameters.fastScrollSpeed; OnSliderValueChanged(); }
             float mWheel = Input.GetAxis("Mouse ScrollWheel");
             float difTime = mWheel * mouseSens * 0.1f;
-            if (difTime != 0 && Input.mousePosition.x < Utility.stageWidth)
+            if (difTime != 0 && Input.mousePosition.x < Utility.stageWidth && !CurrentState.ignoreScroll)
             {
                 timeSlider.value = Mathf.Clamp(timeSlider.value - difTime, 0, musicLength);
                 OnSliderValueChanged();
             }
         }
+    }
+    private void LoadPlayerPrefs()
+    {
+        lightEffectToggle.isOn = Utility.PlayerPrefsGetBool("Light Effect", lightEffectState);
+        ToggleLightEffect();
+        fpsToggle.isOn = Utility.PlayerPrefsGetBool("Show FPS", showFPS);
+        ToggleFPS();
+        mouseSensInputField.text = PlayerPrefs.GetInt("Mouse Wheel Sensitivity", mouseSens).ToString();
+        MouseSensInput();
+        chartPlaySpeed = PlayerPrefs.GetInt("Note Speed", chartPlaySpeed) - 1;
+        NoteSpeedChange(true);
+        musicPlaySpeed = PlayerPrefs.GetInt("Music Speed", musicPlaySpeed) - 1;
+        MusicSpeedChange(true);
+        effectVolInputField.text = PlayerPrefs.GetInt("Effect Volume", effectVolume).ToString();
+        EffectVolInput();
+        musicVolInputField.text = PlayerPrefs.GetInt("Music Volume", musicVolume).ToString();
+        MusicVolInput();
+        pianoVolInputField.text = PlayerPrefs.GetInt("Piano Volume", pianoVolume).ToString();
+        PianoVolInput();
+        linkLineToggle.isOn = Utility.PlayerPrefsGetBool("Show Link Line", linkLineParent.gameObject.activeSelf);
+        ToggleLinkLine(linkLineToggle.isOn);
     }
     private void Start()
     {
@@ -436,22 +455,33 @@ public class StageController : MonoBehaviour
         Utility.stageHeight = cameraUICanvas.rect.height;
         Utility.stageWidth = stageCamera.pixelWidth;
         Utility.emptyImage = emptyImage;
-        Utility.cylinder = cylinder;
-        Utility.cylinderAlpha = cylinderAlpha;
         Utility.cameraUICanvas = cameraUICanvas;
         Utility.xGridParent = xGridParent;
         Utility.linkLineParent = linkLineParent;
         Utility.mouseHitDetector = mouseDetector;
+        Utility.linePool = linePool;
+        Utility.lineCanvas = lineCanvas;
+        linePool.Initialize();
+        //Load player prefs
+        LoadPlayerPrefs();
         //Draw border
-        UILine line;
-        line = Utility.DrawLineInWorldSpace(new Vector3(-15, 0, 32 + Parameters.alpha1NoteRange), new Vector3(-15, 0, 32), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinder, 4);
-        line.rectTransform.SetParent(editor.border.transform);
-        line = Utility.DrawLineInWorldSpace(new Vector3(15, 0, 32 + Parameters.alpha1NoteRange), new Vector3(15, 0, 32), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinder, 4);
-        line.rectTransform.SetParent(editor.border.transform);
-        line = Utility.DrawLineInWorldSpace(new Vector3(-15, 0, 32 + Parameters.maximumNoteRange), new Vector3(-15, 0, 32 + Parameters.alpha1NoteRange), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinderAlpha, 4);
-        line.rectTransform.SetParent(editor.border.transform);
-        line = Utility.DrawLineInWorldSpace(new Vector3(15, 0, 32 + Parameters.maximumNoteRange), new Vector3(15, 0, 32 + Parameters.alpha1NoteRange), new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f), cylinderAlpha, 4);
-        line.rectTransform.SetParent(editor.border.transform);
+        Line line;
+        line = Utility.DrawLineInWorldSpace
+        (
+            new Vector3(-15.0f, 0.0f, 32.0f + Parameters.maximumNoteRange),
+            new Vector3(-15.0f, 0.0f, 32.0f),
+            new Color(42.0f / 255, 42.0f / 255, 42.0f / 255),
+            0.06f
+        );
+        line.transform.SetParent(editor.border.transform);
+        line = Utility.DrawLineInWorldSpace
+        (
+            new Vector3(15.0f, 0.0f, 32.0f + Parameters.maximumNoteRange),
+            new Vector3(15.0f, 0.0f, 32.0f),
+            new Color(42.0f / 255, 42.0f / 255, 42.0f / 255),
+            0.06f
+        );
+        line.transform.SetParent(editor.border.transform);
         editor.Initialize();
     }
     private void Update()

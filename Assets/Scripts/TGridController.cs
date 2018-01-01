@@ -8,7 +8,7 @@ public class TGridController: MonoBehaviour
     private float time;
     private float curTime;
     public StageController stage;
-    public UILine grid;
+    public Line grid;
     private void CheckForReturn()
     {
         if (time > curTime)
@@ -26,20 +26,22 @@ public class TGridController: MonoBehaviour
     }
     private void PositionUpdate()
     {
-        Color color = grid.image.color;
-        float z, alpha;
-        z = Parameters.maximumNoteRange / Parameters.NoteFallTime(stage.chartPlaySpeed) * (curTime - time);
-        if (z <= Parameters.maximumNoteRange && z >= Parameters.alpha1NoteRange)
-            alpha = (Parameters.maximumNoteRange - z) / (Parameters.maximumNoteRange - Parameters.alpha1NoteRange);
-        else if (z <= Parameters.alpha1NoteRange)
-            alpha = 1.0f;
-        else
-            alpha = 0.0f;
+        float z = Parameters.maximumNoteRange / Parameters.NoteFallTime(stage.chartPlaySpeed) * (curTime - time);
+        grid.MoveTo
+        (
+            new Vector3(-Parameters.maximumNoteWidth * 2, 0, z + 32),
+            new Vector3(Parameters.maximumNoteWidth * 2, 0, z + 32)
+        );
         if (id.sub == 0)
-            grid.image.color = new Color(0.5f, 0.0f, 0.0f, alpha);
+        {
+            grid.Color = new Color(0.5f, 0.0f, 0.0f);
+            grid.AlphaMultiplier = 1.0f;
+        }
         else
-            grid.image.color = new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f, 0.75f * alpha);
-        Utility.MoveLineInWorldSpace(grid, new Vector3(-Parameters.maximumNoteWidth * 2, 0, z + 32), new Vector3(Parameters.maximumNoteWidth * 2, 0, z + 32));
+        {
+            grid.Color = new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f);
+            grid.AlphaMultiplier = 0.75f;
+        }
     }
     public void Activate(TGridID lineID, float lineTime, StageController stageController)
     {
@@ -47,9 +49,15 @@ public class TGridController: MonoBehaviour
         curTime = lineTime;
         stage = stageController;
         if (id.sub == 0)
-            grid.image.color = new Color(0.5f, 0.0f, 0.0f, 1.0f);
+        {
+            grid.Color = new Color(0.5f, 0.0f, 0.0f);
+            grid.AlphaMultiplier = 1.0f;
+        }
         else
-            grid.image.color = new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f, 0.75f);
+        {
+            grid.Color = new Color(42 / 255.0f, 42 / 255.0f, 42 / 255.0f);
+            grid.AlphaMultiplier = 0.75f;
+        }
         Update();
     }
     private void Update()

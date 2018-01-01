@@ -217,9 +217,44 @@
 	Planned
 		N0057 在note附近显示note编号(并且加入开关)
 		N0058 选中note信息栏加入ID项, 可以输入ID来选中note
-		N0059 (Optional)加入对压缩音乐格式的支持
+		N0059 * 加入对压缩音乐格式的支持
 2017-12-10
 	Planned
 		F0016 修复UI逻辑带来的各种bug
-		N0060 将编辑器设置存到userpref中
+		N0060 * 将编辑器设置存到PlayerPrefs中
+		N0061 * 用LineRenderer重写UILine, 黄条连线
+		N0062 * 增加垂直同步的开关
+2017-12-11
+	Finished
+		N0060 将编辑器设置存到PlayerPrefs中
+		N0062 增加垂直同步的开关
+2017-12-14
+	Finished
 		N0061 用LineRenderer重写UILine, 黄条连线
+2017-12-15
+	Planned
+		N0063 * 加入拖拽文件到窗口打开文件功能
+	Finished
+		N0059 加入对压缩音乐格式的支持(mp3)
+		N0063 加入拖拽文件到窗口打开文件功能
+2017-12-25
+	Planned
+		F0017 * 修复文件打开的bug
+		F0018 * 修复黄条连线不能关掉的bug
+	Finished
+		F0017 修复文件打开的bug
+		F0018 修复黄条连线不能关掉的bug
+2017-12-26
+	Planned
+		N0064 * 可替换歌曲文件
+		N0065 * 创建新文件时显示文件夹下同后缀名文件
+	Finished
+		N0064 可替换歌曲文件
+		N0065 创建新文件时显示文件夹下同后缀名文件
+2017-12-31
+	Planned
+		N0066 * 将更新历史与关于分离
+		N0067 * 更新检查
+	Finished
+		N0066 将更新历史与关于分离
+		N0067 更新检查
