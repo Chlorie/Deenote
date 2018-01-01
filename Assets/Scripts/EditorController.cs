@@ -836,6 +836,8 @@ public class EditorController : MonoBehaviour
                 for (int j = 0; j < xGrid; j++)
                 {
                     float position = (j + 0.5f) / xGrid * 4 - 2 + xGridOffset;
+                    if (position > 2.0f) position -= 4.0f;
+                    if (position < -2.0f) position += 4.0f;
                     diff = amount * (position - chart.notes[i].position);
                     if (diff > 1e-4f && diff < minDistance) { minDistance = diff; adjusted = position; }
                 }

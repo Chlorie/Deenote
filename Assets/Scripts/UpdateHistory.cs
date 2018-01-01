@@ -10,9 +10,33 @@ public class UpdateHistory : MonoBehaviour
     public Text title;
     public Text checkUpdateText;
     public VersionChecker versionChecker;
-    public List<string> versions;
+    private List<string> versions = new List<string>
+    {
+        "Deenote 0.5.10",
+        "Deenote 0.5.9",
+        "Deenote 0.5.8",
+        "Deenote 0.5.7",
+        "Deenote 0.5.6",
+        "Deenote 0.5.5",
+        "Deenote 0.5.4",
+        "Deenote 0.5.3",
+        "Deenote 0.5.2",
+        "Deenote 0.5.1",
+        "Deenote 0.5",
+        "Deenote 0.4",
+        "Deenote 0.3.1",
+        "Deenote 0.3 build 2",
+        "Deenote 0.3 build 1",
+        "Deenote 0.2.1",
+        "Deenote 0.2",
+        "Deenote 0.1",
+        "Deemo Chart Editor 0.2",
+        "Deemo Chart Editor 0.1"
+    };
     private List<string> updateInfo = new List<string>
     {
+        @"Now saving and loading files won't block the main thread.
+Fixed the serious bug about music playback repositioning.",
         @"Separated update history from about.
 Added update checker.
 Minor bug fixes about UI.",

@@ -110,6 +110,7 @@ public class VersionChecker : MonoBehaviour
         latestVersion = redirectedUrl.Substring(position + 2);
         List<int> latest = GetVersion(latestVersion);
         if (UpToDate(GetVersion(currentVersion), latest)) { updateHistoryText.text = "The program is up to date."; return; }
+        updateHistoryText.text = "New version detected";
         FindObjectOfType<UpdateHistory>().Deactivate();
         updateNoticeCanvas.SetActive(true);
         updateNoticeText.text = "Current version: " + currentVersion + " | Latest version: " + latestVersion;

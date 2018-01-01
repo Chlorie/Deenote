@@ -223,7 +223,7 @@ public class StageController : MonoBehaviour
             else
                 prev = returnNoteID;
             for (cur = prev + 1; cur < chart.notes.Count; cur++)
-                if (chart.notes[cur].time > musicSource.time + Parameters.NoteFallTime(chartPlaySpeed))
+                if (chart.notes[cur].time > timeSlider.value + Parameters.NoteFallTime(chartPlaySpeed))
                     break;
             for (i = prev + 1; i < cur; i++) InitNoteObject(i);
         }
@@ -233,7 +233,7 @@ public class StageController : MonoBehaviour
             else prev = prevLineID;
             cur = prev; cur++;
             for (; cur <= new TGridID(chart.beats.Count - 1, 0, editor.tGrid); cur++)
-                if (TGridTime(cur) > musicSource.time + Parameters.NoteFallTime(chartPlaySpeed))
+                if (TGridTime(cur) > timeSlider.value + Parameters.NoteFallTime(chartPlaySpeed))
                     break;
             i = prev; i++;
             for (; i < cur; i++) InitTGridObject(i);
@@ -244,14 +244,14 @@ public class StageController : MonoBehaviour
     {
         ClearStage();
         for (prevNoteID = 0; prevNoteID < chart.notes.Count; prevNoteID++)
-            if (chart.notes[prevNoteID].time > musicSource.time)
+            if (chart.notes[prevNoteID].time > timeSlider.value)
                 break;
         prevNoteID--;
         for (returnNoteID = prevNoteID; returnNoteID >= 0; returnNoteID--)
-            if (chart.notes[returnNoteID].time + Parameters.noteReturnTime <= musicSource.time)
+            if (chart.notes[returnNoteID].time + Parameters.noteReturnTime <= timeSlider.value)
                 break;
         for (prevLineID = new TGridID(0, 0, editor.tGrid); prevLineID <= new TGridID(chart.beats.Count - 1, 0, editor.tGrid); prevLineID++)
-            if (TGridTime(prevLineID) > musicSource.time)
+            if (TGridTime(prevLineID) > timeSlider.value)
                 break;
         prevLineID--;
         PlaceNewObjects();
@@ -372,10 +372,10 @@ public class StageController : MonoBehaviour
                 ToggleMusicPlayState();
             if (Utility.DetectKeys(KeyCode.Space)) //Space
             {
-                if (musicSource.time >= musicLength)
+                if (timeSlider.value >= musicLength)
                     antiZureTime = 0.0f;
                 else
-                    antiZureTime = musicSource.time;
+                    antiZureTime = timeSlider.value;
                 if (!musicPlayState) ToggleMusicPlayState();
             }
             if (Utility.ReleaseKeys(KeyCode.Space)) //Space(Release)
@@ -407,16 +407,16 @@ public class StageController : MonoBehaviour
                 if (musicSpeedLeftButton.IsInteractable())
                     MusicSpeedChange(false);
             if (Utility.HeldKeys(KeyCode.UpArrow)) //Up(Hold)
-                if (musicSource.time > Time.deltaTime * Parameters.slowScrollSpeed)
+                if (timeSlider.value > Time.deltaTime * Parameters.slowScrollSpeed)
                 { timeSlider.value -= Time.deltaTime * Parameters.slowScrollSpeed; OnSliderValueChanged(); }
             if (Utility.HeldKeys(KeyCode.DownArrow)) //Down(Hold)
-                if (musicSource.time < musicLength - Time.deltaTime * Parameters.slowScrollSpeed)
+                if (timeSlider.value < musicLength - Time.deltaTime * Parameters.slowScrollSpeed)
                 { timeSlider.value += Time.deltaTime * Parameters.slowScrollSpeed; OnSliderValueChanged(); }
             if (Utility.HeldKeys(KeyCode.UpArrow, Utility.SHIFT)) //Shift+Up(Hold)
-                if (musicSource.time > Time.deltaTime * Parameters.fastScrollSpeed)
+                if (timeSlider.value > Time.deltaTime * Parameters.fastScrollSpeed)
                 { timeSlider.value -= Time.deltaTime * Parameters.fastScrollSpeed; OnSliderValueChanged(); }
             if (Utility.HeldKeys(KeyCode.DownArrow, Utility.SHIFT)) //Shift+Down(Hold)
-                if (musicSource.time < musicLength - Time.deltaTime * Parameters.fastScrollSpeed)
+                if (timeSlider.value < musicLength - Time.deltaTime * Parameters.fastScrollSpeed)
                 { timeSlider.value += Time.deltaTime * Parameters.fastScrollSpeed; OnSliderValueChanged(); }
             float mWheel = Input.GetAxis("Mouse ScrollWheel");
             float difTime = mWheel * mouseSens * 0.1f;

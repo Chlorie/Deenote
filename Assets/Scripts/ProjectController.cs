@@ -209,7 +209,7 @@ public class ProjectController : MonoBehaviour
         {
             if (currentInStage != -1)
                 foreach (Chart chart in project.charts) chart.beats = project.charts[currentInStage].beats;
-            projectSL.SaveProjectIntoFile(project, songAudioClip, projectFolder + projectFileName + ".dsproj");
+            StartCoroutine(projectSL.SaveProjectIntoFile(project, songAudioClip, projectFolder + projectFileName + ".dsproj"));
         }
     }
     public void SaveAs() //Project - Save As
@@ -246,13 +246,14 @@ public class ProjectController : MonoBehaviour
             directorySelectorController.ActivateSelection(extensions, "LoadProject");
         }
         else
-            ProjectToLoadSelected(dragAndDropFileName);
+            StartCoroutine(ProjectToLoadSelected(dragAndDropFileName));
     }
-    public void ProjectToLoadSelected(string projectFullDir)
+    public IEnumerator ProjectToLoadSelected(string projectFullDir)
     {
         FileInfo projectFile;
+        directorySelectorController.DeactivateSelection();
         dragAndDropFileName = null;
-        projectSL.LoadProjectFromFile(out project, out songAudioClip, projectFullDir);
+        yield return StartCoroutine(projectSL.LoadProjectFromFile(res => project = res, res => songAudioClip = res, projectFullDir));
         infoPanelButton.SetActive(true);
         chartsPanelButton.SetActive(true);
         songAudioClip.LoadAudioData();
@@ -261,11 +262,12 @@ public class ProjectController : MonoBehaviour
         projectFile = new FileInfo(projectFullDir);
         projectFileName = projectFile.Name.Remove(projectFile.Name.Length - 7, 7);
         projectFolder = projectFile.FullName.Remove(projectFile.FullName.Length - projectFile.Name.Length, projectFile.Name.Length);
-        directorySelectorController.DeactivateSelection();
         filePanel.SetActive(false);
         currentInStage = -1;
         InfoInitialization();
         LvlInputFieldInit();
+        yield return new WaitForSeconds(3.0f);
+        projectSL.loadCompleteText.SetActive(false);
     }
     public void CloseProject()
     {

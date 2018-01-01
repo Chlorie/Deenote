@@ -168,7 +168,7 @@ public class DirectorySelectorController : MonoBehaviour
         else if (selectorCaller == "NewProjectSelectFile") //New project song select
             projectController.FileSelected();
         else if (selectorCaller == "LoadProject") //Load project
-            projectController.ProjectToLoadSelected(selectedItemFullName);
+            StartCoroutine(projectController.ProjectToLoadSelected(selectedItemFullName));
         else if (selectorCaller.StartsWith("ImportJSONChart")) //Import chart from official-format-chart
             if (selectedItemFullName.EndsWith(".cytus"))
                 projectController.ImportChartFromCytusChart(selectorCaller[selectorCaller.Length - 1] - '0');
