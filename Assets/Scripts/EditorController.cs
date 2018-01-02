@@ -50,7 +50,12 @@ public class EditorController : MonoBehaviour
     public NoteIndicatorPool noteIndicatorPool;
     private bool pasteMode = false;
     //Interpolate
-    private List<float> lagrangeInterpolation = new List<float>();
+    private Spline positionSpline;
+    private Spline sizeSpline;
+    public Line curve = null;
+    public bool interpolateMode = false;
+    public InputField fillAmountField;
+    private int fillAmount;
     //Mouse Actions
     public Vector2 dragStartPoint = new Vector2();
     public Vector2 dragEndPoint = new Vector2();
@@ -557,21 +562,7 @@ public class EditorController : MonoBehaviour
         if (pos.x > 2.0f || pos.x < -2.0f) return pos;
         float position;
         float minDistance = 4.0f, snapX = pos.x, snapT = pos.y;
-        //Snap to X grid
-        if (Mathf.Abs(pos.x + 2.0f) < minDistance) { minDistance = Mathf.Abs(pos.x + 2.0f); snapX = -2.0f; }
-        if (Mathf.Abs(pos.x - 2.0f) < minDistance) { minDistance = Mathf.Abs(pos.x - 2.0f); snapX = 2.0f; }
-        for (int i = 0; i < xGrid; i++)
-        {
-            position = (i + 0.5f) / xGrid * 4 - 2 + xGridOffset;
-            if (position < -2.0f) position += 4.0f;
-            if (position > 2.0f) position -= 4.0f;
-            if (Mathf.Abs(pos.x - position) < minDistance)
-            {
-                minDistance = Mathf.Abs(pos.x - position);
-                snapX = position;
-            }
-        }
-        if (xGrid == 0) snapX = pos.x;
+        bool interpolated = false;
         //Snap to T grid
         if (tGrid != 0 && chart.beats.Count > 0 && pos.y >= chart.beats[0] && pos.y <= chart.beats[chart.beats.Count - 1])
         {
@@ -594,6 +585,33 @@ public class EditorController : MonoBehaviour
                 else
                     snapT = min;
             }
+        }
+        //Snap to the curve if interpolating
+        if (interpolateMode)
+            if (snapT < positionSpline.Max && snapT > positionSpline.Min)
+            {
+                interpolated = true;
+                snapX = positionSpline.Value(snapT);
+                if (snapX > 2.0f) snapX = 2.0f;
+                if (snapX < -2.0f) snapX = -2.0f;
+            }
+        //Snap to X grid if not interpolating
+        if (!interpolated)
+        {
+            if (Mathf.Abs(pos.x + 2.0f) < minDistance) { minDistance = Mathf.Abs(pos.x + 2.0f); snapX = -2.0f; }
+            if (Mathf.Abs(pos.x - 2.0f) < minDistance) { minDistance = Mathf.Abs(pos.x - 2.0f); snapX = 2.0f; }
+            for (int i = 0; i < xGrid; i++)
+            {
+                position = (i + 0.5f) / xGrid * 4 - 2 + xGridOffset;
+                if (position < -2.0f) position += 4.0f;
+                if (position > 2.0f) position -= 4.0f;
+                if (Mathf.Abs(pos.x - position) < minDistance)
+                {
+                    minDistance = Mathf.Abs(pos.x - position);
+                    snapX = position;
+                }
+            }
+            if (xGrid == 0) snapX = pos.x;
         }
         return new Vector2(snapX, snapT);
     }
@@ -922,6 +940,111 @@ public class EditorController : MonoBehaviour
         }
         pasteMode = false;
     }
+    //Interpolate
+    public void InitSpline(bool linear)
+    {
+        int firstIndex = -1, lastIndex = -1;
+        List<float> size = new List<float>();
+        List<float> position = new List<float>();
+        List<float> time = new List<float>();
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].selected != noteSelect[i].prevSelected)
+            {
+                float p = chart.notes[i].position;
+                if (p > 2.01f || p < -2.01f) continue;
+                if (firstIndex == -1) firstIndex = i;
+                lastIndex = i;
+                float t = chart.notes[i].time;
+                float s = chart.notes[i].size;
+                size.Add(s);
+                position.Add(p);
+                time.Add(t);
+            }
+        if (time.Count < 2) return;
+        noteSelect[firstIndex].selected = !noteSelect[firstIndex].selected;
+        noteSelect[lastIndex].selected = !noteSelect[lastIndex].selected;
+        DeleteSelectedNotes();
+        positionSpline = new Spline(time, position, linear);
+        sizeSpline = new Spline(time, size, linear);
+        if (curve == null)
+        {
+            curve = Utility.DrawLineInWorldSpace(Vector3.zero, Vector3.up, Parameters.linkLineColor, 0.035f);
+            curve.transform.SetParent(stage.linkLineParent);
+        }
+        curve.SetActive(true);
+        curve.Color = new Color(85.0f / 255, 192.0f / 255, 1.0f);
+        interpolateMode = true;
+        fillAmountField.interactable = true;
+    }
+    public void UpdateCurve()
+    {
+        List<Vector3> worldPoints = new List<Vector3>();
+        float time = stage.timeSlider.value, fallTime = Parameters.NoteFallTime(stage.chartPlaySpeed);
+        float min = Mathf.Max(positionSpline.Min, time), max = Mathf.Min(positionSpline.Max, time + fallTime);
+        if (min > time + fallTime || max < time) { curve.CurveMoveTo(worldPoints); return; }
+        for (int i = 0; i < 400; i++)
+        {
+            float t = min + i * (max - min) / 400, p = positionSpline.Value(t);
+            float x = Parameters.maximumNoteWidth * p;
+            float z = Parameters.maximumNoteRange / fallTime * (t - time);
+            worldPoints.Add(new Vector3(x, 0, z + 32.0f));
+        }
+        curve.CurveMoveTo(worldPoints);
+        curve.Layer = 1;
+    }
+    public void ExitInterpolation()
+    {
+        curve.SetActive(false);
+        interpolateMode = false;
+        fillAmountField.interactable = false;
+    }
+    public void FillAmountFieldChanged()
+    {
+        int amount = Utility.GetInt(fillAmountField.text);
+        if (amount < 0) amount = 0;
+        fillAmountField.text = amount.ToString();
+        fillAmount = amount;
+    }
+    public void FillNotesOnCurve()
+    {
+        if (interpolateMode)
+        {
+            RegisterUndoStep();
+            float min = positionSpline.Min, max = positionSpline.Max;
+            for (int i = 0; i < fillAmount; i++)
+            {
+                float time = min + (max - min) / (fillAmount + 1) * (i + 1);
+                float pos = positionSpline.Value(time), size = sizeSpline.Value(time);
+                if (pos > 2.0f) pos = 2.0f;
+                if (pos < -2.0f) pos = -2.0f;
+                if (size > 5.0f) size = 5.0f;
+                if (size < 0.1f) size = 0.1f;
+                Note note = new Note
+                {
+                    isLink = false,
+                    prevLink = -1,
+                    nextLink = -1,
+                    position = pos,
+                    size = size,
+                    time = time,
+                    shift = 0.0f,
+                    sounds = new List<PianoSound>()
+                };
+                NoteSelect noteSelect = new NoteSelect
+                {
+                    editor = this,
+                    note = note,
+                    prevSelected = true,
+                    selected = false
+                };
+                chart.notes.Add(note);
+                this.noteSelect.Add(noteSelect);
+            }
+            SortNotes();
+            UpdateSelectedAmount(0, true);
+            SyncStage();
+        }
+    }
     //Note indicators
     public void UpdateNoteIndicators()
     {
@@ -1099,6 +1222,14 @@ public class EditorController : MonoBehaviour
                 CutSelectedNotes();
             if (Utility.DetectKeys(KeyCode.V, Utility.CTRL)) //Ctrl+V
                 PasteNotes();
+            if (Utility.DetectKeys(KeyCode.I)) //I
+                InitSpline(false);
+            if (Utility.DetectKeys(KeyCode.I, Utility.SHIFT)) //Shift+I
+                InitSpline(true);
+            if (Utility.DetectKeys(KeyCode.I, Utility.CTRL)) //Ctrl+I
+                ExitInterpolation();
+            if (Utility.DetectKeys(KeyCode.F)) //F
+                FillNotesOnCurve();
         }
     }
     private void LoadPlayerPrefs()
@@ -1132,6 +1263,7 @@ public class EditorController : MonoBehaviour
         {
             Shortcuts();
             UpdateNoteIndicators();
+            if (interpolateMode) UpdateCurve();
             MouseActions();
         }
     }

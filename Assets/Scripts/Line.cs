@@ -128,4 +128,50 @@ public class Line : MonoBehaviour
         }
         line.sortingOrder = 0;
     }
+    private float CalculateAlpha(Vector3 v)
+    {
+        float z = v.z - 32.0f;
+        if (z < Parameters.alpha1NoteRange) return 1.0f;
+        else return (Parameters.maximumNoteRange - z) / (Parameters.maximumNoteRange - Parameters.alpha1NoteRange);
+    }
+    public void CurveMoveTo(List<Vector3> points) // The coordinates are in world space
+    {
+        // Assume that the points are all in stage
+        int n = points.Count;
+        if (n < 2) { MoveTo(Vector3.zero, Vector3.zero); return; }
+        Vector3[] screenPoints = new Vector3[n];
+        float[] sums = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            screenPoints[i] = Utility.WorldToScreenPoint(points[i]);
+            if (i == 0) sums[i] = 0.0f;
+            else sums[i] = sums[i - 1] + (screenPoints[i] - screenPoints[i - 1]).magnitude;
+        }
+        Gradient gradient = line.colorGradient;
+        GradientAlphaKey[] alphaKeys = null;
+        bool outOfAlpha1 = false;
+        for (int i = 0; i < n; i++)
+            if (points[i].z > Parameters.alpha1NoteRange + 32.0f)
+            {
+                outOfAlpha1 = true;
+                alphaKeys = new GradientAlphaKey[]
+                    {
+                        new GradientAlphaKey { alpha = CalculateAlpha(points[0]), time = 0.0f },
+                        new GradientAlphaKey { alpha = CalculateAlpha(points[i]), time = sums[i] / sums[n - 1] },
+                        new GradientAlphaKey { alpha = CalculateAlpha(points[n - 1]), time = 1.0f }
+                    };
+                break;
+            }
+        if (!outOfAlpha1)
+            alphaKeys = new GradientAlphaKey[]
+                {
+                    new GradientAlphaKey { alpha = 1.0f, time = 0.0f },
+                    new GradientAlphaKey { alpha = 1.0f, time = 1.0f }
+                };
+        gradient.alphaKeys = alphaKeys;
+        line.colorGradient = gradient;
+        line.positionCount = n;
+        line.SetPositions(screenPoints);
+        line.sortingOrder = 0;
+    }
 }

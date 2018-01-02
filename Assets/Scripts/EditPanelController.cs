@@ -10,11 +10,13 @@ public class EditPanelController : MonoBehaviour
     public RectTransform playerSettings;
     public RectTransform basicCommands;
     public RectTransform noteAndGrid;
+    public RectTransform curveForming;
     public RectTransform beatLine;
     public Text selectionButtonText;
     public Text playerSettingsButtonText;
     public Text basicCommandsButtonText;
     public Text noteAndGridButtonText;
+    public Text curveFormingText;
     public Text beatLineButtonText;
     public void ToggleSelectionPanel()
     {
@@ -31,6 +33,10 @@ public class EditPanelController : MonoBehaviour
     public void ToggleNoteAndGridPanel()
     {
         ExpandCollapse(noteAndGrid, noteAndGridButtonText);
+    }
+    public void ToggleCurveFormingPanel()
+    {
+        ExpandCollapse(curveForming, curveFormingText);
     }
     public void ToggleBeatLinePanel()
     {
