@@ -1174,6 +1174,8 @@ public class EditorController : MonoBehaviour
                 Undo();
             if (Utility.DetectKeys(KeyCode.Z, Utility.CTRL + Utility.SHIFT)) //Ctrl+Shift+Z
                 Redo();
+            if (Utility.DetectKeys(KeyCode.Y, Utility.CTRL)) //Ctrl+Y
+                Redo();
             if (Utility.DetectKeys(KeyCode.Delete)) //Delete
                 DeleteSelectedNotes();
             if (Utility.DetectKeys(KeyCode.G)) //G

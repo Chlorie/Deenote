@@ -13,6 +13,7 @@ public class DirectorySelectorController : MonoBehaviour
     public InputField fileNameInputField;
     public DirectoryInfo currentDirectory;
     public GameObject scrollView;
+    public GameObject directorySelectorCanvas;
     public GameObject directorySeletorWindow;
     public Transform scrollViewContent;
     public Button fileButtonPrefab;
@@ -22,11 +23,14 @@ public class DirectorySelectorController : MonoBehaviour
     public bool selectedItemType; // true for directory - false for file
     public bool fileNameNeeded;
     public string fileName;
-    private string selectorCaller;
     private string[] extensions = { };
     private List<Button> fileButtons = new List<Button>();
     private List<Button> subDirectoryButtons = new List<Button>();
     private ProjectController projectController;
+    public delegate void CallBack();
+    private bool callRoutine = false;
+    private CallBack callBack = null;
+    private IEnumerator callBackRoutine = null;
     public void BackToParentDirectory()
     {
         if (currentDirectory.Parent != null)
@@ -114,8 +118,10 @@ public class DirectorySelectorController : MonoBehaviour
         if (fileName != "") confirmButton.interactable = true;
         else confirmButton.interactable = false;
     }
-    public void ActivateSelection(string[] allowedExtensions, string caller, bool needFileName = false)
+    private void InitializeSelection(string[] allowedExtensions, bool needFileName)
     {
+        directorySelectorCanvas.SetActive(false);
+        directorySelectorCanvas.SetActive(true);
         CurrentState.ignoreScroll = true;
         CurrentState.ignoreAllInput = true;
         extensions = allowedExtensions;
@@ -131,7 +137,6 @@ public class DirectorySelectorController : MonoBehaviour
             titleText.text = "Select the file";
             selectedItemType = false;
         }
-        selectorCaller = caller;
         confirmButton.interactable = false;
         if (extensions.GetLength(0) == 0 && !needFileName)
         {
@@ -142,6 +147,18 @@ public class DirectorySelectorController : MonoBehaviour
         fileNameInputField.text = "";
         fileNameNeeded = needFileName;
         RemoveAndGenerateButtons();
+    }
+    public void ActivateSelection(string[] allowedExtensions, CallBack callback, bool needFileName = false)
+    {
+        callRoutine = false;
+        InitializeSelection(allowedExtensions, needFileName);
+        callBack = callback;
+    }
+    public void ActivateSelection(string[] allowedExtensions, IEnumerator callback, bool needFileName = false)
+    {
+        callRoutine = true;
+        InitializeSelection(allowedExtensions, needFileName);
+        callBackRoutine = callback;
     }
     public void SetInitialFileName(string initFileName)
     {
@@ -163,23 +180,10 @@ public class DirectorySelectorController : MonoBehaviour
             selectedItemFullName = currentDirectory.FullName + '\\';
         if (selectedItemType == false) //File selected
             selectedItemFullName += selectedItemText.text; //Add the file name after the directory
-        if (selectorCaller == "SelectSong") //New project song select
-            projectController.SongSelected();
-        else if (selectorCaller == "NewProjectSelectFile") //New project song select
-            projectController.FileSelected();
-        else if (selectorCaller == "LoadProject") //Load project
-            StartCoroutine(projectController.ProjectToLoadSelected(selectedItemFullName));
-        else if (selectorCaller.StartsWith("ImportJSONChart")) //Import chart from official-format-chart
-            if (selectedItemFullName.EndsWith(".cytus"))
-                projectController.ImportChartFromCytusChart(selectorCaller[selectorCaller.Length - 1] - '0');
-            else
-                projectController.ImportChartFromJSONFile(selectorCaller[selectorCaller.Length - 1] - '0');
-        else if (selectorCaller.StartsWith("ExportJSONChart")) //Export chart to official-format-chart
-            projectController.ExportChartToJSONChart(selectorCaller[selectorCaller.Length - 1] - '0');
-        else if (selectorCaller == "SaveAs")
-            projectController.SaveAsFileSelected();
-        else if (selectorCaller == "ChangeSong")
-            projectController.NewSongSelected();
+        if (callRoutine && callBackRoutine != null)
+            StartCoroutine(callBackRoutine);
+        else if (!callRoutine && callBack != null)
+            callBack();
     }
     private void RemoveAndGenerateButtons()
     {

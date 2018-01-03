@@ -38,7 +38,7 @@ public class FileOpener : MonoBehaviour
         if (args.Length > 1)
         {
             string fileName = System.Environment.GetCommandLineArgs()[1];
-            if ((fileName ?? "") != "") controller.ProjectToLoadSelected(fileName);
+            if ((fileName ?? "") != "") StartCoroutine(controller.ProjectToLoadSelected(fileName));
         }
 #endif
     }

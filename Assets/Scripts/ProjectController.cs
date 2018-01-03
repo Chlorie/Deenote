@@ -117,14 +117,14 @@ public class ProjectController : MonoBehaviour
     public void SelectSong() //Project - New - Select Song
     {
         string[] acceptedExtension = { ".wav", ".ogg", ".mp3" };
-        directorySelectorController.ActivateSelection(acceptedExtension, "SelectSong");
+        directorySelectorController.ActivateSelection(acceptedExtension, SongSelected);
     }
     public void SelectFile() //Project - New - Select Folder
     {
         string[] acceptedExtension = { ".dsproj" };
-        directorySelectorController.ActivateSelection(acceptedExtension, "NewProjectSelectFile", true);
+        directorySelectorController.ActivateSelection(acceptedExtension, FileSelected, true);
     }
-    public void SongSelected() //Called by directory selector controller when song selected
+    private void SongSelected() //Called by directory selector controller when song selected
     {
         songFile = new FileInfo(directorySelectorController.selectedItemFullName);
         songSelectButtonText.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
@@ -132,7 +132,7 @@ public class ProjectController : MonoBehaviour
         directorySelectorController.DeactivateSelection();
         CheckConfirmButton();
     }
-    public void FileSelected() //Called by directory selector controller when song selected
+    private void FileSelected() //Called by directory selector controller when song selected
     {
         projectFolder = directorySelectorController.selectedItemFullName;
         projectFileName = directorySelectorController.fileName;
@@ -216,9 +216,9 @@ public class ProjectController : MonoBehaviour
     {
         string[] acceptedExtension = { ".dsproj" };
         if (project != null)
-            directorySelectorController.ActivateSelection(acceptedExtension, "SaveAs", true);
+            directorySelectorController.ActivateSelection(acceptedExtension, SaveAsFileSelected, true);
     }
-    public void SaveAsFileSelected()
+    private void SaveAsFileSelected()
     {
         string asFolder = directorySelectorController.selectedItemFullName;
         string asFile = directorySelectorController.fileName;
@@ -243,13 +243,14 @@ public class ProjectController : MonoBehaviour
         if (dragAndDropFileName == null || dragAndDropFileName == "")
         {
             string[] extensions = { ".dsproj" };
-            directorySelectorController.ActivateSelection(extensions, "LoadProject");
+            directorySelectorController.ActivateSelection(extensions, ProjectToLoadSelected());
         }
         else
             StartCoroutine(ProjectToLoadSelected(dragAndDropFileName));
     }
-    public IEnumerator ProjectToLoadSelected(string projectFullDir)
+    public IEnumerator ProjectToLoadSelected(string fileName = null)
     {
+        string projectFullDir = fileName ?? directorySelectorController.selectedItemFullName;
         FileInfo projectFile;
         directorySelectorController.DeactivateSelection();
         dragAndDropFileName = null;
@@ -317,9 +318,9 @@ public class ProjectController : MonoBehaviour
     public void ChangeMusicFile()
     {
         string[] acceptedExtension = { ".wav", ".ogg", ".mp3" };
-        directorySelectorController.ActivateSelection(acceptedExtension, "ChangeSong");
+        directorySelectorController.ActivateSelection(acceptedExtension, NewSongSelected);
     }
-    public void NewSongSelected()
+    private void NewSongSelected()
     {
         songFile = new FileInfo(directorySelectorController.selectedItemFullName);
         songNameText.text = songFile.Name;
@@ -361,7 +362,14 @@ public class ProjectController : MonoBehaviour
     public void JSONFileSelect(int diff)
     {
         string[] allowedExtension = { ".json", ".txt", ".cytus" };
-        directorySelectorController.ActivateSelection(allowedExtension, "ImportJSONChart" + diff);
+        directorySelectorController.ActivateSelection(allowedExtension, delegate { ImportChart(diff); });
+    }
+    public void ImportChart(int diff)
+    {
+        if (directorySelectorController.selectedItemFullName.EndsWith(".cytus"))
+            ImportChartFromCytusChart(diff);
+        else
+            ImportChartFromJSONFile(diff);
     }
     public void ImportChartFromJSONFile(int diff)
     {
@@ -400,7 +408,7 @@ public class ProjectController : MonoBehaviour
         string[] difficultyStrings = { "easy", "normal", "hard", "extra" };
         if (project.charts[diff % 4].notes.Count > 0)
         {
-            directorySelectorController.ActivateSelection(allowedExtension, "ExportJSONChart" + diff, true);
+            directorySelectorController.ActivateSelection(allowedExtension, delegate { ExportChartToJSONChart(diff); }, true);
             directorySelectorController.SetInitialFileName(projectFileName + "." + difficultyStrings[diff % 4]);
         }
     }
@@ -454,16 +462,6 @@ public class ProjectController : MonoBehaviour
         CurrentState.ignoreAllInput = false;
         CurrentState.ignoreScroll = false;
         aboutWindow.SetActive(false);
-    }
-    public void OpenHelp()
-    {
-        CurrentState.ignoreAllInput = true;
-
-    }
-    public void CloseHelp()
-    {
-        CurrentState.ignoreAllInput = false;
-
     }
     //-Other-
     private void UpdateDirectorySelectorCanvas() //Update the stupid canvas so the user can actually see the window
