@@ -173,7 +173,7 @@ public class Tutorial : MonoBehaviour
     }
     public void CloseTutorial()
     {
-        CurrentState.ignoreAllInput = CurrentState.ignoreScroll = true;
+        CurrentState.ignoreAllInput = CurrentState.ignoreScroll = false;
         leftPic.SetActive(!stage.stageActivated);
         rightPanel.SetActive(true);
         tutorialPanel.SetActive(false);

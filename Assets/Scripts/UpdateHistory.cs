@@ -12,6 +12,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private List<string> versions = new List<string>
     {
+        "Deenote 0.6.2",
         "Deenote 0.6.1",
         "Deenote 0.6",
         "Deenote 0.5.10",
@@ -37,6 +38,7 @@ public class UpdateHistory : MonoBehaviour
     };
     private List<string> updateInfo = new List<string>
     {
+        @"Bug fix: After openning the tutorial all the inputs are ignored.",
         @"Added Chinese tutorial to this app. English tutorial coming soon.",
         @"Added curve forming function.",
         @"Now saving and loading files won't block the main thread.
