@@ -203,8 +203,7 @@ public class DirectorySelectorController : MonoBehaviour
         DirectoryInfo[] subDirectories = currentDirectory.GetDirectories();
         foreach (DirectoryInfo i in subDirectories)
         {
-            newButton = Instantiate(subDirectoryButtonPrefab);
-            newButton.transform.SetParent(scrollViewContent);
+            newButton = Instantiate(subDirectoryButtonPrefab, scrollViewContent);
             subDirectoryButtons.Add(newButton);
             newButton.GetComponentInChildren<Text>().text = i.Name;
         }
@@ -219,8 +218,7 @@ public class DirectorySelectorController : MonoBehaviour
                     break;
                 }
             if (flag) continue; //Extension of file i isn't in the preferred extensions
-            newButton = Instantiate(fileButtonPrefab);
-            newButton.transform.SetParent(scrollViewContent);
+            newButton = Instantiate(fileButtonPrefab, scrollViewContent);
             fileButtons.Add(newButton);
             newButton.GetComponentInChildren<Text>().text = i.Name;
             newButton.interactable = !fileNameNeeded;

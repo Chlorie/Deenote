@@ -40,11 +40,13 @@ public class ProjectSaveLoad : MonoBehaviour
         else
             savingText.GetComponent<Text>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
         savingText.SetActive(true);
-        projectData = new SerializableProjectData();
-        projectData.project = project;
-        projectData.length = clip.samples;
-        projectData.frequency = clip.frequency;
-        projectData.channel = clip.channels;
+        projectData = new SerializableProjectData
+        {
+            project = project,
+            length = clip.samples,
+            frequency = clip.frequency,
+            channel = clip.channels
+        };
         projectData.sampleData = new float[projectData.length * projectData.channel];
         clip.GetData(projectData.sampleData, 0);
         Thread saveThread = new Thread(() => Save(projectData, fileFullName));

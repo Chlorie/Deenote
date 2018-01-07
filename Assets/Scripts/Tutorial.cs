@@ -154,7 +154,8 @@ public class Tutorial : MonoBehaviour
             "程序时程序也会自动做版本检查，若有新版本发布，会弹出窗口提示，此时点击[Go to release page]转到发布页面，点击[Go to download page]转到" +
             "下载页面，点击[Update later]暂时忽略更新；[Tutorial]即为这个教程；Autosave为自动保存，选中此项后每隔五分钟程序会自动保存项目文件；" +
             "Light effect为编辑区域背景的光效开关；Show FPS为帧率显示开关；VSync On为垂直同步开关；Mouse Wheel Sensitivity为鼠标滚轮灵敏度，" +
-            "默认值为10，可以在1（十分之一灵敏度）到100（十倍灵敏度）间调整。\n\n\n",
+            "默认值为10，可以在1（十分之一灵敏度）到100（十倍灵敏度）间调整；Resolution可选择不同的窗口大小，推荐1280x720，更小窗口可能会使得文字" +
+            "较小，造成阅读上的困难。\n\n\n",
             "<color=#800000ff>这个教程到这里就结束了，希望您可以用Deenote制作出令您满意的优秀谱面！</color>"
         }
     };

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Line : MonoBehaviour
 {
+    private List<Vector3> worldPoints;
     public LineRenderer line;
     public void SetActive(bool state) { gameObject.SetActive(state); }
     public int Layer
@@ -51,6 +52,7 @@ public class Line : MonoBehaviour
     }
     public void MoveTo(Vector3 point1, Vector3 point2) // The coordinates are in world space
     {
+        worldPoints = new List<Vector3>() { point1, point2 };
         Color color = Color;
         if (point1.z - point2.z <= (Parameters.maximumNoteRange - Parameters.alpha1NoteRange) * Parameters.minAlphaDif)
         {
@@ -136,6 +138,7 @@ public class Line : MonoBehaviour
     }
     public void CurveMoveTo(List<Vector3> points) // The coordinates are in world space
     {
+        worldPoints = points;
         // Assume that the points are all in stage
         int n = points.Count;
         if (n < 2) { MoveTo(Vector3.zero, Vector3.zero); return; }
@@ -173,5 +176,13 @@ public class Line : MonoBehaviour
         line.positionCount = n;
         line.SetPositions(screenPoints);
         line.sortingOrder = 0;
+    }
+    public void ResolutionReset()
+    {
+        if (gameObject.activeSelf)
+        {
+            if (worldPoints.Count == 2) MoveTo(worldPoints[0], worldPoints[1]);
+            else CurveMoveTo(worldPoints);
+        }
     }
 }

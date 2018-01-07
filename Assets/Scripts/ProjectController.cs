@@ -6,6 +6,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.UI;
 using NAudio.Wave;
+using System.Diagnostics;
+using UnityEngine.Events;
 
 public class ProjectController : MonoBehaviour
 {
@@ -74,6 +76,9 @@ public class ProjectController : MonoBehaviour
     public GameObject leftBackgroundImage;
     public GameObject aboutWindow;
     public Text debugText;
+    public UnityEvent resolutionChange;
+    public int screenWidth = 1280;
+    public int screenHeight = 720;
     //-Functions-
     //-Initialization-
     public void PanelSelectionInit()
@@ -501,9 +506,33 @@ public class ProjectController : MonoBehaviour
         Utility.PlayerPrefsSetBool("Show Indicator", stage.editor.noteIndicatorsToggler.activeSelf);
         Utility.PlayerPrefsSetBool("Show Border", stage.editor.border.activeSelf);
     }
+    public void SetScreenResolution(int selection)
+    {
+        int width = 0, height = 0;
+        switch (selection)
+        {
+            case 0: width = 960; height = 540; break;
+            case 1: width = 1280; height = 720; break;
+            case 2: width = 1920; height = 1080; break;
+        }
+        Screen.SetResolution(width, height, false);
+    }
+    private void CheckResolutionChange()
+    {
+        int width = Screen.width, height = Screen.height;
+        if (width != screenWidth)
+        {
+            screenWidth = width;
+            screenHeight = height;
+            Utility.stageWidth = screenWidth * 3 / 4;
+            Utility.stageHeight = screenHeight;
+            resolutionChange.Invoke();
+        }
+    }
     private void Start()
     {
         DragAndDropUnity.Enable(DragAndDropFileAccept);
+        SetScreenResolution(1);
         LoadPlayerPrefs();
         Utility.debugText = debugText;
         project = null;
@@ -541,6 +570,14 @@ public class ProjectController : MonoBehaviour
             lastAutoSaveTime -= autoSaveTime;
             SaveProject();
         }
+        CheckResolutionChange();
         Shortcuts();
+    }
+    private void OnApplicationQuit()
+    {
+#if UNITY_EDITOR
+#elif UNITY_STANDALONE_WIN
+        Process.GetCurrentProcess().Kill();
+#endif
     }
 }

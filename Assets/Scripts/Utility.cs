@@ -14,8 +14,8 @@ public class Utility
     public static Text debugText;
     public static Camera stageCamera;
     public static GameObject emptyImage;
-    public static float stageHeight;
-    public static float stageWidth;
+    public static float stageHeight = 720.0f;
+    public static float stageWidth = 960.0f;
     public static Transform cameraUICanvas;
     public static RectTransform xGridParent;
     public static RectTransform linkLineParent;
@@ -210,23 +210,29 @@ public class Utility
     }
     public static Chart JCharttoChart(JSONChart jchart)
     {
-        Chart chart = new Chart();
-        chart.speed = jchart.speed;
+        Chart chart = new Chart
+        {
+            speed = jchart.speed
+        };
         while (chart.notes.Count > 0) chart.notes.RemoveAt(0);
         foreach (JSONChart.note jnote in jchart.notes)
         {
-            Note note = new Note();
-            note.position = jnote.pos;
-            note.size = jnote.size;
-            note.time = jnote.time;
-            note.shift = jnote.shift;
+            Note note = new Note
+            {
+                position = jnote.pos,
+                size = jnote.size,
+                time = jnote.time,
+                shift = jnote.shift
+            };
             foreach (JSONChart.sound jsound in jnote.sounds)
             {
-                PianoSound sound = new PianoSound();
-                sound.delay = jsound.w;
-                sound.duration = jsound.d;
-                sound.pitch = jsound.p;
-                sound.volume = jsound.v;
+                PianoSound sound = new PianoSound
+                {
+                    delay = jsound.w,
+                    duration = jsound.d,
+                    pitch = jsound.p,
+                    volume = jsound.v
+                };
                 note.sounds.Add(sound);
             }
             chart.notes.Add(note);
@@ -257,8 +263,10 @@ public class Utility
             if (cytusChart[i][0] == 'N')
             {
                 ivalue = GetInt(cytusChart[i], ref j);
-                JSONChart.note note = new JSONChart.note();
-                note.id = ivalue - 3;
+                JSONChart.note note = new JSONChart.note
+                {
+                    id = ivalue - 3
+                };
                 fvalue = GetFloat(cytusChart[i], ref j);
                 //note.time = fvalue - 0.08f;
                 note.time = fvalue;
@@ -345,20 +353,24 @@ public class Utility
         copy.level = chart.level;
         foreach (Note note in chart.notes)
         {
-            Note newNote = new Note();
-            newNote.position = note.position;
-            newNote.isLink = note.isLink;
-            newNote.nextLink = note.nextLink;
-            newNote.prevLink = note.prevLink;
-            newNote.shift = note.shift;
-            newNote.size = note.size;
-            foreach(PianoSound sound in note.sounds)
+            Note newNote = new Note
             {
-                PianoSound newSound = new PianoSound();
-                newSound.delay = sound.delay;
-                newSound.duration = sound.duration;
-                newSound.pitch = sound.pitch;
-                newSound.volume = sound.volume;
+                position = note.position,
+                isLink = note.isLink,
+                nextLink = note.nextLink,
+                prevLink = note.prevLink,
+                shift = note.shift,
+                size = note.size
+            };
+            foreach (PianoSound sound in note.sounds)
+            {
+                PianoSound newSound = new PianoSound
+                {
+                    delay = sound.delay,
+                    duration = sound.duration,
+                    pitch = sound.pitch,
+                    volume = sound.volume
+                };
                 newNote.sounds.Add(newSound);
             }
             newNote.time = note.time;
@@ -386,9 +398,10 @@ public class Utility
         else
             return new Vector3(0, -10, 0);
     }
-    public static Vector3 WorldToScreenPoint(Vector3 worldPos)
+    public static Vector3 WorldToScreenPoint(Vector3 worldPos) // Result in 1280x720 resolution (same to the canvas)
     {
         Vector3 res = stageCamera.WorldToScreenPoint(worldPos);
+        res *= (720.0f / stageHeight);
         res.z = 0.0f;
         return res;
     }

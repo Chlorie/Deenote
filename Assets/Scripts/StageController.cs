@@ -452,8 +452,6 @@ public class StageController : MonoBehaviour
     {
         //Utility changes
         Utility.stageCamera = stageCamera;
-        Utility.stageHeight = cameraUICanvas.rect.height;
-        Utility.stageWidth = stageCamera.pixelWidth;
         Utility.emptyImage = emptyImage;
         Utility.cameraUICanvas = cameraUICanvas;
         Utility.xGridParent = xGridParent;
