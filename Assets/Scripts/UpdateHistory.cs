@@ -12,6 +12,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private List<string> versions = new List<string>
     {
+        "Deenote 0.6.4",
         "Deenote 0.6.3",
         "Deenote 0.6.2",
         "Deenote 0.6.1",
@@ -39,6 +40,9 @@ public class UpdateHistory : MonoBehaviour
     };
     private List<string> updateInfo = new List<string>
     {
+        @"Added ""Note ID"" field in selected note info panel.
+Bug fix: Slide notes not exported correctly.
+Bug fix: Export file name is not correct.",
         @"Now the app should not have problem closing itself.
 Added options for resizing the window.",
         @"Bug fix: After opening the tutorial all the inputs are ignored.",

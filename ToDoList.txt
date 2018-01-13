@@ -286,4 +286,18 @@
 	Finished
 		N0069 可调窗口分辨率
 		N0070 暴力解决退出程序时崩溃和卡死的问题
+2018-01-10
+	Planned
+		F0022 * 直接点叉退出程序时也会显示"是否退出"的对话框
+		F0023 * 点击Open会导致NullReferenceException的问题
+	Finished
+		F0022 直接点叉退出程序时也会显示"是否退出"的对话框
+		F0023 点击Open会导致NullReferenceException的问题
+2018-01-12
+	Planned
+		F0024 * 修复与黄条有关的各种bug
+		F0025 * 修复导出JSON时文件名错误的bug
+	Finished
+		F0024 修复与黄条有关的各种bug
+		F0025 修复导出JSON时文件名错误的bug
 		

@@ -31,6 +31,7 @@ public class EditorController : MonoBehaviour
     private List<List<NoteSelect>> undoNoteSelect = new List<List<NoteSelect>>();
     private int amountSelected = 0;
     public Text amountSel;
+    public InputField noteIdSel;
     public InputField positionSel;
     public InputField timeSel;
     public InputField sizeSel;
@@ -313,13 +314,17 @@ public class EditorController : MonoBehaviour
             positionSel.interactable = sizeSel.interactable = shiftSel.interactable = true;
             timeSel.interactable = pianoSoundsButton.interactable = true;
             flag = false;
+            int id = -1;
             for (i = 0; i < noteSelect.Count; i++)
                 if (noteSelect[i].prevSelected != noteSelect[i].selected) //note i is selected
                 {
+                    id = i + 1;
                     pos = chart.notes[i].position;
                     flag = true;
                     break;
                 }
+            if (id != -1 && amountSelected == 1) noteIdSel.text = id.ToString();
+            else if (amountSelected > 1) noteIdSel.text = "Several Values";
             while (flag && i < noteSelect.Count)
             {
                 if (pos != chart.notes[i].position && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
@@ -413,9 +418,23 @@ public class EditorController : MonoBehaviour
         {
             positionSel.interactable = sizeSel.interactable = shiftSel.interactable = false;
             timeSel.interactable = pianoSoundsButton.interactable = false;
-            positionSel.text = sizeSel.text = shiftSel.text = "Not Available";
+            noteIdSel.text = positionSel.text = sizeSel.text = shiftSel.text = "Not Available";
             isLinkSel.text = timeSel.text = pianoSoundsSel.text = "Not Available";
         }
+    }
+    public void ChangeSelectedNote()
+    {
+        int id = Utility.GetInt(noteIdSel.text);
+        DeselectAll();
+        if (id < 1 || id > noteSelect.Count)
+        {
+            ChangeSelectionPanelValues();
+            return;
+        }
+        noteIdSel.text = id.ToString();
+        id--;
+        noteSelect[id].prevSelected = true; noteSelect[id].selected = false;
+        ChangeSelectionPanelValues();
     }
     public void ChangeSelectedNoteSize()
     {
@@ -661,11 +680,12 @@ public class EditorController : MonoBehaviour
         List<Note> notes = new List<Note>(new Note[chart.notes.Count]);
         for (int i = 0; i < chart.notes.Count; i++) notes[i] = chart.notes[index[i]];
         List<bool> selected = new List<bool>(new bool[chart.notes.Count]);
-        for (int i = 0; i < chart.notes.Count; i++) selected[i] = noteSelect[i].prevSelected;
+        for (int i = 0; i < chart.notes.Count; i++) selected[i] = noteSelect[i].prevSelected != noteSelect[i].selected;
         for (int i = 0; i < chart.notes.Count; i++)
         {
             noteSelect[i].note = notes[i];
             noteSelect[i].prevSelected = selected[index[i]];
+            noteSelect[i].selected = false;
         }
         chart.notes = notes;
         int swapCount;
@@ -681,6 +701,14 @@ public class EditorController : MonoBehaviour
                     chart.notes[next].nextLink = i;
                     chart.notes[next].prevLink = chart.notes[i].prevLink;
                     chart.notes[i].prevLink = next;
+                    next = chart.notes[i].nextLink;
+                    int prev = chart.notes[i].prevLink;
+                    if (next != -1) chart.notes[next].prevLink = i;
+                    if (prev != -1 && chart.notes[prev].prevLink != -1)
+                    {
+                        int prev2 = chart.notes[prev].prevLink;
+                        chart.notes[prev2].nextLink = prev;
+                    }
                 }
         } while (swapCount > 0);
     }
@@ -739,7 +767,7 @@ public class EditorController : MonoBehaviour
                 chart.notes[i].isLink = true;
                 prev = i;
             }
-        chart.notes[prev].nextLink = -1;
+        if (prev != -1) chart.notes[prev].nextLink = -1;
         stage.ResetStage();
         ChangeSelectionPanelValues();
     }
@@ -833,6 +861,7 @@ public class EditorController : MonoBehaviour
                 chart.notes[i].time = adjusted;
             }
         }
+        SortNotes();
         SyncStage();
         ChangeSelectionPanelValues();
     }

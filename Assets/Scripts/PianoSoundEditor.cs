@@ -56,7 +56,7 @@ public class PianoSoundEditor : MonoBehaviour
         {
             foreach (PianoSoundItem item in items) itemPool.ReturnObject(item);
             while (items.Count > 0) items.RemoveAt(0);
-            editor.PianoSoundFinishedEdit(null);
+            if (editor != null) editor.PianoSoundFinishedEdit(null);
         }
     }
     public void PlaySound()

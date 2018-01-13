@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +17,10 @@ public class RightScrollViewController : MonoBehaviour
     {
         FindObjectOfType<ProjectController>().SavePlayerPrefs();
         DragAndDropUnity.Disable();
-        Application.Quit();
+#if UNITY_EDITOR
+#elif UNITY_STANDALONE_WIN
+        Process.GetCurrentProcess().Kill();
+#endif
     }
     public void QuitScreenNo() //The *take me back to my project* thing
     {

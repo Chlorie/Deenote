@@ -6,7 +6,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.UI;
 using NAudio.Wave;
-using System.Diagnostics;
 using UnityEngine.Events;
 
 public class ProjectController : MonoBehaviour
@@ -99,6 +98,7 @@ public class ProjectController : MonoBehaviour
         if (project != null)
         {
             stage.StopPlaying();
+            stage.editor.pianoSoundEditor.Deactivate(false);
             newProjectConfirmScreen.SetActive(true);
             clearStageNewProjectMode = true;
             return;
@@ -241,6 +241,7 @@ public class ProjectController : MonoBehaviour
         if (project != null)
         {
             stage.StopPlaying();
+            stage.editor.pianoSoundEditor.Deactivate(false);
             newProjectConfirmScreen.SetActive(true);
             clearStageNewProjectMode = false;
             return;
@@ -555,11 +556,23 @@ public class ProjectController : MonoBehaviour
             LoadProject();
         if (Utility.DetectKeys(KeyCode.Q, Utility.CTRL)) //Ctrl+Q
         {
+            if (stage.stageActivated)
+            {
+                stage.StopPlaying();
+                stage.editor.pianoSoundEditor.Deactivate(false);
+            }
             RightScrollViewController controller = FindObjectOfType<RightScrollViewController>();
             controller.OpenQuitScreen();
         }
         if (Utility.DetectKeys(KeyCode.E, Utility.CTRL)) //Ctrl+E
+        {
+            if (stage.stageActivated)
+            {
+                stage.StopPlaying();
+                stage.editor.pianoSoundEditor.Deactivate(false);
+            }
             ExportAllJSONCharts(0);
+        }
     }
     private void Update()
     {
@@ -575,9 +588,7 @@ public class ProjectController : MonoBehaviour
     }
     private void OnApplicationQuit()
     {
-#if UNITY_EDITOR
-#elif UNITY_STANDALONE_WIN
-        Process.GetCurrentProcess().Kill();
-#endif
+        Application.CancelQuit();
+        FindObjectOfType<RightScrollViewController>().OpenQuitScreen();
     }
 }

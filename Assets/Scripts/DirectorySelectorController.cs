@@ -122,6 +122,8 @@ public class DirectorySelectorController : MonoBehaviour
     {
         directorySelectorCanvas.SetActive(false);
         directorySelectorCanvas.SetActive(true);
+        selectedItemFullName = currentDirectory.FullName;
+        if (!selectedItemFullName.EndsWith("\\")) selectedItemFullName += "\\";
         CurrentState.ignoreScroll = true;
         CurrentState.ignoreAllInput = true;
         extensions = allowedExtensions;
@@ -178,7 +180,7 @@ public class DirectorySelectorController : MonoBehaviour
             selectedItemFullName = currentDirectory.FullName;
         else
             selectedItemFullName = currentDirectory.FullName + '\\';
-        if (selectedItemType == false) //File selected
+        if (selectedItemType == false && !fileNameNeeded) //The item to select is a file
             selectedItemFullName += selectedItemText.text; //Add the file name after the directory
         if (callRoutine && callBackRoutine != null)
             StartCoroutine(callBackRoutine);
