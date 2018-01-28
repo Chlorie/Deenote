@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -799,6 +798,18 @@ public class EditorController : MonoBehaviour
         SyncStage();
         ChangeSelectionPanelValues();
     }
+    public void MirrorSelectedNotes()
+    {
+        RegisterUndoStep();
+        for (int i = 0; i < chart.notes.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                if (chart.notes[i].position < -2.0f || chart.notes[i].position > 2.0f) continue;
+                chart.notes[i].position = -chart.notes[i].position;
+            }
+        SyncStage();
+        ChangeSelectionPanelValues();
+    }
     private void AdjustSelectedNoteTime(float time)
     {
         RegisterUndoStep();
@@ -889,6 +900,20 @@ public class EditorController : MonoBehaviour
                     if (diff > 1e-4f && diff < minDistance) { minDistance = diff; adjusted = position; }
                 }
                 chart.notes[i].position = adjusted;
+            }
+        SyncStage();
+        ChangeSelectionPanelValues();
+    }
+    private void AdjustSelectedNoteSize(float amount)
+    {
+        RegisterUndoStep();
+        for (int i = 0; i < noteSelect.Count; i++)
+            if (noteSelect[i].prevSelected != noteSelect[i].selected)
+            {
+                float newSize = chart.notes[i].size + amount;
+                if (newSize > 5.0f) newSize = 5.0f;
+                if (newSize < 0.1f) newSize = 0.1f;
+                chart.notes[i].size = newSize;
             }
         SyncStage();
         ChangeSelectionPanelValues();
@@ -1122,7 +1147,11 @@ public class EditorController : MonoBehaviour
             foreach (NoteIndicatorController indicator in noteIndicators)
             {
                 float offset = pos.x;
-                if (pasteMode) offset -= clipBoard[0].position;
+                if (pasteMode)
+                    if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) // Shift held
+                        offset = 0.0f;
+                    else
+                        offset -= clipBoard[0].position;
                 indicator.Move(pos.y, offset, stageTime);
             }
             // Reminder: what if the first note is out of stage
@@ -1247,6 +1276,16 @@ public class EditorController : MonoBehaviour
                 AdjustSelectedNotePositionByGrid(-1);
             if (Utility.DetectKeys(KeyCode.D, Utility.SHIFT)) //Shift+D
                 AdjustSelectedNotePositionByGrid(1);
+            if (Utility.DetectKeys(KeyCode.Z)) //Z
+                AdjustSelectedNoteSize(-0.01f);
+            if (Utility.DetectKeys(KeyCode.X)) //X
+                AdjustSelectedNoteSize(0.01f);
+            if (Utility.DetectKeys(KeyCode.Z, Utility.SHIFT)) //Shift+Z
+                AdjustSelectedNoteSize(-0.1f);
+            if (Utility.DetectKeys(KeyCode.X, Utility.SHIFT)) //Shift+X
+                AdjustSelectedNoteSize(0.1f);
+            if (Utility.DetectKeys(KeyCode.M)) //M
+                MirrorSelectedNotes();
             if (Utility.DetectKeys(KeyCode.C, Utility.CTRL)) //Ctrl+C
                 CopySelectedNotes();
             if (Utility.DetectKeys(KeyCode.X, Utility.CTRL)) //Ctrl+X

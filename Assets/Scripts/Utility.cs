@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,7 +18,6 @@ public class Utility
     public static Transform cameraUICanvas;
     public static RectTransform xGridParent;
     public static RectTransform linkLineParent;
-    public static Collider mouseHitDetector;
     public static LinePool linePool;
     public static Transform lineCanvas;
     public static void GetInGameNoteIDs(Chart chart, ref List<int> noteIDs)

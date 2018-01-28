@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +11,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private List<string> versions = new List<string>
     {
+        "Deenote 0.6.5",
         "Deenote 0.6.4",
         "Deenote 0.6.3",
         "Deenote 0.6.2",
@@ -40,6 +40,9 @@ public class UpdateHistory : MonoBehaviour
     };
     private List<string> updateInfo = new List<string>
     {
+        @"Added ""mirror"" function.
+Added shortcut for adjusting note size.
+Now when you paste while Shift key is held, the notes will stay in the exact horizontal position as the copied notes.",
         @"Added ""Note ID"" field in selected note info panel.
 Bug fix: Slide notes not exported correctly.
 Bug fix: Export file name is not correct.",

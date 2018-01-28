@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 [System.Serializable]
 public class Chart //Saves info of a single chart

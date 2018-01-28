@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using UnityEngine;
 
 public class FileOpener : MonoBehaviour

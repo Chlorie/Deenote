@@ -1,11 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine;
-
-[System.Serializable]
+﻿[System.Serializable]
 public class Project //Saves the project info and settings, audio clip not included
 {
     //Project info

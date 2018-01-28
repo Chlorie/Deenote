@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,6 +45,9 @@ public class Tutorial : MonoBehaviour
 [A/D] Adjust selected notes' position values left/right by 0.01
 [W/S] Adjust selected notes' time values up/down by 1ms
 [Shift+W/A/S/D] Adjust selected notes' position/time by 0.1/10ms
+[Z/X] Adjust selected notes' size values by -0.01/0.01
+[Shift+Z/X] Adjust selected notes' size values by -0.1/0.1
+[M] Reflect selected notes across the middle line (position = 0 line)
 [Ctrl+X] Cut selected notes
 [Ctrl+C] Copy selected notes
 [Ctrl+V] Paste notes from the clipboard
@@ -104,8 +106,10 @@ public class Tutorial : MonoBehaviour
             "下面对这些小板块中的操作进行讲解。\n\n" +
             "4.2.1 基本操作(Basic Commands)\n" +
             "无论是什么文件的编辑器，基本的操作总是少不了的。这个板块中的操作分别是：[Cut]剪切，快捷键Ctrl+X；[Copy]复制，快捷键Ctrl+C；[Paste]" +
-            "粘贴，快捷键Ctrl+V；[Undo]撤销，快捷键Ctrl+Z，现在的最大撤销次数是100次；[Redo]重做，快捷键Ctrl+Shift+Z或Ctrl+Y；[Link]将选中的" +
-            "音符连成一串滑键（黄条），快捷键L；[Unlink]将选中的音符分离成普通的点击键，快捷键U；[Quantize]将选中的音符量化到格线上，快捷键Q。\n\n" +
+            "粘贴，快捷键Ctrl+V，另外在粘贴模式下按住Shift键可以固定粘贴的横向位置；[Undo]撤销，快捷键Ctrl+Z，现在的最大撤销次数是100次；[Redo]" +
+            "重做，快捷键Ctrl+Shift+Z或Ctrl+Y；[Link]将选中的" +
+            "音符连成一串滑键（黄条），快捷键L；[Unlink]将选中的音符分离成普通的点击键，快捷键U；[Quantize]将选中的音符量化到格线上，快捷键Q；" +
+            "[Mirror]将选中的音符以中线(position=0)为对称轴做镜像翻转，快捷键M。\n\n" +
             "4.2.2 选中音符信息(Selected ... note(s))\n" +
             "这一部分显示被选中的音符的基本信息，分别是：Note ID，音符编号，修改此项可选中指定的单个音符；" +
             "Position，音符横向位置，显示在界面上的音符横向位置都在-2到2之间，包含两端，另外有只播放钢琴音" +

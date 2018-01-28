@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class StageController : MonoBehaviour
 {
@@ -72,7 +70,6 @@ public class StageController : MonoBehaviour
     public RectTransform cameraUICanvas;
     public RectTransform xGridParent;
     public RectTransform linkLineParent;
-    public Collider mouseDetector;
     public ProjectController projectController;
     public Toggle linkLineToggle;
     public LinePool linePool;
@@ -456,7 +453,6 @@ public class StageController : MonoBehaviour
         Utility.cameraUICanvas = cameraUICanvas;
         Utility.xGridParent = xGridParent;
         Utility.linkLineParent = linkLineParent;
-        Utility.mouseHitDetector = mouseDetector;
         Utility.linePool = linePool;
         Utility.lineCanvas = lineCanvas;
         linePool.Initialize();
