@@ -14,8 +14,8 @@ public class ProjectSaveLoad : MonoBehaviour
     public GameObject savingText;
     public GameObject loadingText;
     public StageController stage;
-    private SerializableProjectData projectData = null;
-    private void Save(SerializableProjectData projectData, string fileFullName)
+    private FullProjectDataV2 projectData = null;
+    private void Save(FullProjectDataV2 projectData, string fileFullName)
     {
         BinaryFormatter binaryFormatter = new BinaryFormatter();
         FileStream fileStream = new FileStream(fileFullName, FileMode.Create);
@@ -27,10 +27,14 @@ public class ProjectSaveLoad : MonoBehaviour
         projectData = null;
         BinaryFormatter binaryFormatter = new BinaryFormatter();
         FileStream fileStream = new FileStream(fileFullName, FileMode.Open);
-        projectData = (SerializableProjectData)binaryFormatter.Deserialize(fileStream);
+        object deserializedData = binaryFormatter.Deserialize(fileStream);
+        if (deserializedData is SerializableProjectData)
+            projectData = ProjectVersionConversion.Version1To2((SerializableProjectData)deserializedData);
+        else if (deserializedData is FullProjectDataV2)
+            projectData = (FullProjectDataV2)deserializedData;
         fileStream.Close();
     }
-    public IEnumerator SaveProjectIntoFile(Project project, AudioClip clip, string fileFullName) //Save the project in file fileFullName
+    public IEnumerator SaveProjectIntoFile(Project project, byte[] audio, string fileFullName) //Save the project in file fileFullName
     {
         stage.forceToPlaceNotes = true;
         if (backGroundImageLeft.activeInHierarchy == true)
@@ -38,15 +42,12 @@ public class ProjectSaveLoad : MonoBehaviour
         else
             savingText.GetComponent<Text>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
         savingText.SetActive(true);
-        projectData = new SerializableProjectData
+        projectData = new FullProjectDataV2
         {
             project = project,
-            length = clip.samples,
-            frequency = clip.frequency,
-            channel = clip.channels
+            audio = audio,
+            audioType = Path.GetExtension(project.songName)
         };
-        projectData.sampleData = new float[projectData.length * projectData.channel];
-        clip.GetData(projectData.sampleData, 0);
         Thread saveThread = new Thread(() => Save(projectData, fileFullName));
         saveThread.Start();
         while (saveThread.IsAlive) yield return null;
@@ -60,7 +61,8 @@ public class ProjectSaveLoad : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
         saveCompleteText.SetActive(false);
     }
-    public IEnumerator LoadProjectFromFile(Action<Project> project, Action<AudioClip> clip, string fileFullName) //Load a project from a project file
+    public IEnumerator LoadProjectFromFile(Action<Project> project, Action<byte[]> audio,
+        Action<string> audioType, string fileFullName) //Load a project from a project file
     {
         stage.forceToPlaceNotes = true;
         if (backGroundImageLeft.activeInHierarchy == true)
@@ -68,13 +70,10 @@ public class ProjectSaveLoad : MonoBehaviour
         else
             loadingText.GetComponent<Text>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
         loadingText.SetActive(true);
-        AudioClip newClip = null;
         Thread loadThread = new Thread(() => Load(fileFullName));
         loadThread.Start();
         while (loadThread.IsAlive) yield return null;
-        newClip = AudioClip.Create("SongAudioClip", projectData.length, projectData.channel, projectData.frequency, false);
-        newClip.SetData(projectData.sampleData, 0);
-        project(projectData.project); clip(newClip);
+        project(projectData.project); audio(projectData.audio); audioType(projectData.audioType);
         loadingText.SetActive(false);
         if (backGroundImageLeft.activeInHierarchy == true)
             loadCompleteText.GetComponent<Text>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f);

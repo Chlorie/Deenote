@@ -11,6 +11,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private List<string> versions = new List<string>
     {
+        "Deenote 0.6.6",
         "Deenote 0.6.5",
         "Deenote 0.6.4",
         "Deenote 0.6.3",
@@ -40,6 +41,7 @@ public class UpdateHistory : MonoBehaviour
     };
     private List<string> updateInfo = new List<string>
     {
+        @"Optimized the file format so that the project file won't take much space.",
         @"Added ""mirror"" function.
 Added shortcut for adjusting note size.
 Now when you paste while Shift key is held, the notes will stay in the exact horizontal position as the copied notes.",

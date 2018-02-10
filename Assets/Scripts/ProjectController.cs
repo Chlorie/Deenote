@@ -45,11 +45,12 @@ public class ProjectController : MonoBehaviour
     private bool autoSaveState = true;
     private bool vSync = true;
     //-About the project-
-    private AudioClip songAudioClip; //Audio clip of the song
-    private string projectFileName; //Name of the project file
-    private string projectFolder; //Where the project file is at
-    private FileInfo songFile; //Where the song is saved, only used when loading song for the 1st time
-    public Project project = null; //The project itself
+    private AudioClip songAudioClip; // Audio clip of the song
+    private byte[] audioFileBytes; // All bytes of the audio file
+    private string projectFileName; // Name of the project file
+    private string projectFolder; // Where the project file is at
+    private FileInfo songFile; // Where the song is saved, only used when loading song for the 1st time
+    public Project project = null; // The project itself
     //-Other scripts-
     public StageController stage;
     public ProjectSaveLoad projectSL;
@@ -170,24 +171,26 @@ public class ProjectController : MonoBehaviour
     public void ConfirmButtonPressed() //Project - New - Confirm
     {
         project = new Project();
-        if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
-        {
-            WWW www;
-            www = new WWW("file:///" + songFile.FullName);
-            while (!www.isDone) ; //Wait until the song is fully downloaded
-            songAudioClip = www.GetAudioClip(true);
-            songAudioClip.LoadAudioData();
-        }
-        else if (songFile.Extension == ".mp3")
-        {
-            AudioFileReader reader = new AudioFileReader(songFile.FullName);
-            float[] data = new float[reader.Length / 4];
-            reader.Read(data, 0, (int)reader.Length / 4);
-            AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
-            newClip.SetData(data, 0);
-            songAudioClip = newClip;
-            songAudioClip.LoadAudioData();
-        }
+        audioFileBytes = File.ReadAllBytes(songFile.FullName);
+        songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, songFile.Extension);
+        //if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
+        //{
+        //    WWW www;
+        //    www = new WWW("file:///" + songFile.FullName);
+        //    while (!www.isDone) ; //Wait until the song is fully downloaded
+        //    songAudioClip = www.GetAudioClip(true);
+        //    songAudioClip.LoadAudioData();
+        //}
+        //else if (songFile.Extension == ".mp3")
+        //{
+        //    AudioFileReader reader = new AudioFileReader(songFile.FullName);
+        //    float[] data = new float[reader.Length / 4];
+        //    reader.Read(data, 0, (int)reader.Length / 4);
+        //    AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+        //    newClip.SetData(data, 0);
+        //    songAudioClip = newClip;
+        //    songAudioClip.LoadAudioData();
+        //}
         project.songName = songFile.Name;
         project.charts = new Chart[4];
         for (int i = 0; i < 4; i++)
@@ -212,7 +215,7 @@ public class ProjectController : MonoBehaviour
         {
             if (currentInStage != -1)
                 foreach (Chart chart in project.charts) chart.beats = project.charts[currentInStage].beats;
-            StartCoroutine(projectSL.SaveProjectIntoFile(project, songAudioClip, projectFolder + projectFileName + ".dsproj"));
+            StartCoroutine(projectSL.SaveProjectIntoFile(project, audioFileBytes, projectFolder + projectFileName + ".dsproj"));
         }
     }
     public void SaveAs() //Project - Save As
@@ -231,7 +234,7 @@ public class ProjectController : MonoBehaviour
         {
             if (currentInStage != -1)
                 foreach (Chart chart in project.charts) chart.beats = project.charts[currentInStage].beats;
-            projectSL.SaveProjectIntoFile(project, songAudioClip, asFileFullName);
+            projectSL.SaveProjectIntoFile(project, audioFileBytes, asFileFullName);
         }
     }
     public void LoadProject() //Project - Open
@@ -255,10 +258,13 @@ public class ProjectController : MonoBehaviour
     public IEnumerator ProjectToLoadSelected(string fileName = null)
     {
         string projectFullDir = fileName ?? directorySelectorController.selectedItemFullName;
+        string audioType = null;
         FileInfo projectFile;
         directorySelectorController.DeactivateSelection();
         dragAndDropFileName = null;
-        yield return StartCoroutine(projectSL.LoadProjectFromFile(res => project = res, res => songAudioClip = res, projectFullDir));
+        yield return StartCoroutine(projectSL.LoadProjectFromFile(res => project = res,
+            res => audioFileBytes = res, res => audioType = res, projectFullDir));
+        songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, audioType);
         infoPanelButton.SetActive(true);
         chartsPanelButton.SetActive(true);
         songAudioClip.LoadAudioData();
@@ -330,24 +336,26 @@ public class ProjectController : MonoBehaviour
         songNameText.text = songFile.Name;
         project.songName = songNameText.text;
         directorySelectorController.DeactivateSelection();
-        if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
-        {
-            WWW www;
-            www = new WWW("file:///" + songFile.FullName);
-            while (!www.isDone) ; //Wait until the song is fully downloaded
-            songAudioClip = www.GetAudioClip(true);
-            songAudioClip.LoadAudioData();
-        }
-        else if (songFile.Extension == ".mp3")
-        {
-            AudioFileReader reader = new AudioFileReader(songFile.FullName);
-            float[] data = new float[reader.Length / 4];
-            reader.Read(data, 0, (int)reader.Length / 4);
-            AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
-            newClip.SetData(data, 0);
-            songAudioClip = newClip;
-            songAudioClip.LoadAudioData();
-        }
+        audioFileBytes = File.ReadAllBytes(songFile.FullName);
+        songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, songFile.Extension);
+        //if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
+        //{
+        //    WWW www;
+        //    www = new WWW("file:///" + songFile.FullName);
+        //    while (!www.isDone) ; //Wait until the song is fully downloaded
+        //    songAudioClip = www.GetAudioClip(true);
+        //    songAudioClip.LoadAudioData();
+        //}
+        //else if (songFile.Extension == ".mp3")
+        //{
+        //    AudioFileReader reader = new AudioFileReader(songFile.FullName);
+        //    float[] data = new float[reader.Length / 4];
+        //    reader.Read(data, 0, (int)reader.Length / 4);
+        //    AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+        //    newClip.SetData(data, 0);
+        //    songAudioClip = newClip;
+        //    songAudioClip.LoadAudioData();
+        //}
         stage.musicSource.clip = songAudioClip;
         stage.timeSlider.value = 0.0f;
         stage.timeSlider.maxValue = songAudioClip.length;

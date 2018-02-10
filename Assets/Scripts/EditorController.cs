@@ -1324,7 +1324,7 @@ public class EditorController : MonoBehaviour
     }
     public void Initialize()
     {
-        for (int i = 0; i < 25; i++) xGrids.Add(new XGrid());
+        for (int i = 0; i < 40; i++) xGrids.Add(new XGrid());
         LoadPlayerPrefs();
     }
     private void Update()

@@ -32780,7 +32780,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   updateHistoryText: {fileID: 296563026}
-  currentVersion: 0.6.5
+  currentVersion: 0.6.6
   updateNoticeCanvas: {fileID: 1927923368}
   updateNoticeText: {fileID: 308879855}
 --- !u!4 &907389519
