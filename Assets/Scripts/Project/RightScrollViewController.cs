@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class RightScrollViewController : MonoBehaviour
 {
-    public DirectorySelectorController directorySelectorController;
-    public GameObject quitScreen; //The quit screen to be activated
     public GameObject scrollView;
     public void OpenQuitScreen()
     {
-        quitScreen.SetActive(true);
+        MessageScreen.Activate(
+            new string[] { "Are you sure that you want to quit?", "真的要退出吗?" },
+            new string[] { "<color=#ff5555>Make sure that you have SAVED your project!</color>", "<color=#ff5555>请确认你已经保存当前的项目文件!</color>" },
+            new string[] { "Yes, I'm quite sure! Quit now!", "是的, 我很确定(理直气壮)" }, QuitScreenYes,
+            new string[] { "No, take me back to my project...", "不是, 回到刚才的项目..." });
     }
     public void QuitScreenYes() //The *I'm sure! Quit now!* thing
     {
@@ -19,17 +21,12 @@ public class RightScrollViewController : MonoBehaviour
         Process.GetCurrentProcess().Kill();
 #endif
     }
-    public void QuitScreenNo() //The *take me back to my project* thing
-    {
-        quitScreen.SetActive(false);
-    }
     public void OnButtonClick(GameObject subPanel) //Just a simple function to toggle the state of the panel
     {
         subPanel.SetActive(!(subPanel.activeSelf));
     }
     private void Start()
     {
-        directorySelectorController = FindObjectOfType<DirectorySelectorController>();
         scrollView.SetActive(false);
         scrollView.SetActive(true);
     }

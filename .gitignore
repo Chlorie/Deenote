@@ -38,7 +38,6 @@ sysinfo.txt
 *.unitypackage
 
 # Various Things
+*.txt
 About Text.docx
-About.txt
 Days & Weeks Count.exe
-Old About Text.txt

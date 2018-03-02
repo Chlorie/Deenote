@@ -20,18 +20,6 @@ public class Utility
     public static RectTransform linkLineParent;
     public static LinePool linePool;
     public static Transform lineCanvas;
-    public static void GetInGameNoteIDs(Chart chart, ref List<int> noteIDs)
-    {
-        int id = -1;
-        while (noteIDs.Count > 0) noteIDs.RemoveAt(0);
-        for (int i = 0; i < chart.notes.Count; i++)
-        {
-            Note note = chart.notes[i];
-            float pos = note.position;
-            if (pos <= 2.0f && pos >= -2.0f) id++;
-            noteIDs.Add(id);
-        }
-    }
     public static bool DetectKeys(KeyCode key, int holdKeys = NONE)
     {
         GameObject obj = EventSystem.current.currentSelectedGameObject;

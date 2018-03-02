@@ -29,14 +29,14 @@ public class EditorController : MonoBehaviour
     public List<NoteSelect> noteSelect = new List<NoteSelect>();
     private List<List<NoteSelect>> undoNoteSelect = new List<List<NoteSelect>>();
     private int amountSelected = 0;
-    public Text amountSel;
+    public LocalizedText amountSel;
     public InputField noteIdSel;
     public InputField positionSel;
     public InputField timeSel;
     public InputField sizeSel;
     public InputField shiftSel;
-    public Text isLinkSel;
-    public Text pianoSoundsSel;
+    public LocalizedText isLinkSel;
+    public LocalizedText pianoSoundsSel;
     public Button pianoSoundsButton;
     public RectTransform dragIndicator;
     //Note Placement
@@ -306,7 +306,8 @@ public class EditorController : MonoBehaviour
         int i, j;
         amountSelected = 0;
         for (i = 0; i < chart.notes.Count; i++) if (noteSelect[i].prevSelected != noteSelect[i].selected) amountSelected++;
-        amountSel.text = "Selected " + amountSelected + " note" + (amountSelected < 2 ? "" : "s");
+        amountSel.SetStrings("Selected " + amountSelected + " note" + (amountSelected < 2 ? "" : "s"),
+            "已选中" + amountSelected + "个note");
         bool selectedAny = amountSelected > 0;
         if (selectedAny)
         {
@@ -323,13 +324,13 @@ public class EditorController : MonoBehaviour
                     break;
                 }
             if (id != -1 && amountSelected == 1) noteIdSel.text = id.ToString();
-            else if (amountSelected > 1) noteIdSel.text = "Several Values";
+            else if (amountSelected > 1) noteIdSel.text = "-";
             while (flag && i < noteSelect.Count)
             {
                 if (pos != chart.notes[i].position && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
                 i++;
             }
-            positionSel.text = flag ? pos.ToString("F3") : "Several values";
+            positionSel.text = flag ? pos.ToString("F3") : "-";
             flag = false;
             for (i = 0; i < noteSelect.Count; i++)
                 if (noteSelect[i].prevSelected != noteSelect[i].selected)
@@ -343,7 +344,7 @@ public class EditorController : MonoBehaviour
                 if (time != chart.notes[i].time && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
                 i++;
             }
-            timeSel.text = flag ? time.ToString("F3") : "Several values";
+            timeSel.text = flag ? time.ToString("F3") : "-";
             flag = false;
             for (i = 0; i < noteSelect.Count; i++)
                 if (noteSelect[i].prevSelected != noteSelect[i].selected)
@@ -357,7 +358,7 @@ public class EditorController : MonoBehaviour
                 if (size != chart.notes[i].size && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
                 i++;
             }
-            sizeSel.text = flag ? size.ToString("F3") : "Several values";
+            sizeSel.text = flag ? size.ToString("F3") : "-";
             flag = false;
             for (i = 0; i < noteSelect.Count; i++)
                 if (noteSelect[i].prevSelected != noteSelect[i].selected)
@@ -371,7 +372,7 @@ public class EditorController : MonoBehaviour
                 if (shift != chart.notes[i].shift && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
                 i++;
             }
-            shiftSel.text = flag ? shift.ToString("F3") : "Several values";
+            shiftSel.text = flag ? shift.ToString("F3") : "-";
             flag = false;
             for (i = 0; i < noteSelect.Count; i++)
                 if (noteSelect[i].prevSelected != noteSelect[i].selected)
@@ -385,7 +386,8 @@ public class EditorController : MonoBehaviour
                 if (isLink != chart.notes[i].isLink && noteSelect[i].prevSelected != noteSelect[i].selected) flag = false;
                 i++;
             }
-            isLinkSel.text = flag ? (isLink ? "True" : "False") : "Several values";
+            isLinkSel.SetStrings(flag ? (isLink ? "True" : "False") : "-",
+                flag ? (isLink ? "是" : "否") : "-");
             flag = false;
             for (i = 0; i < noteSelect.Count; i++)
                 if (noteSelect[i].prevSelected != noteSelect[i].selected)
@@ -411,14 +413,15 @@ public class EditorController : MonoBehaviour
                         }
                 i++;
             }
-            pianoSoundsSel.text = flag ? "Click to view" : "Several values";
+            pianoSoundsSel.SetStrings(flag ? "Click to view" : "-", flag ? "点击查看" : "-");
         }
         else
         {
             positionSel.interactable = sizeSel.interactable = shiftSel.interactable = false;
             timeSel.interactable = pianoSoundsButton.interactable = false;
-            noteIdSel.text = positionSel.text = sizeSel.text = shiftSel.text = "Not Available";
-            isLinkSel.text = timeSel.text = pianoSoundsSel.text = "Not Available";
+            noteIdSel.text = positionSel.text = sizeSel.text = shiftSel.text = timeSel.text = "-";
+            isLinkSel.SetStrings("-");
+            pianoSoundsSel.SetStrings("-");
         }
     }
     public void ChangeSelectedNote()
@@ -717,7 +720,8 @@ public class EditorController : MonoBehaviour
     }
     private void SyncStage()
     {
-        Utility.GetInGameNoteIDs(chart, ref stage.inGameNoteIDs);
+        ChartProperties.GetInGameNoteIds(chart, out stage.inGameNoteIDs);
+        ChartProperties.GetCollidedNotes(chart, out stage.collided);
         stage.ResetStage();
     }
     private void DeleteSelectedNotes()
@@ -1180,49 +1184,59 @@ public class EditorController : MonoBehaviour
         noteIndicatorPool.ReturnObject(noteIndicators[id]);
         noteIndicators.RemoveAt(id);
     }
+    private void LeftMouseButtonPressed()
+    {
+        //If the mouse is out of range when pressed, ignoreCurrentDrag
+        dragStartPoint = SetDragPosition(dragStartPoint);
+        if (Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth)
+            dropCurrentDrag = true;
+        else
+        {
+            if (!Utility.FunctionalKeysHeld(Utility.CTRL))
+                DeselectAll();
+            dragEndPoint = SetDragPosition(dragEndPoint);
+            SendDragUpdate();
+            UpdateDragIndicator();
+        }
+    }
+    private void LeftMouseButtonHeld()
+    {
+        foreach (NoteIndicatorController indicator in noteIndicators) indicator.NoColor();
+        dragEndPoint = SetDragPosition(dragEndPoint);
+        SendDragUpdate();
+        UpdateDragIndicator();
+    }
+    private void LeftMouseButtonReleased()
+    {
+        if (dropCurrentDrag)
+            dropCurrentDrag = false;
+        else
+        {
+            SendDragEnd();
+            CloseDragIndicator();
+        }
+    }
+    private void RightMouseButtonReleased()
+    {
+        if (!(Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth))
+        {
+            DeselectAll();
+            PlaceNotes();
+        }
+    }
     //Updated Every Frame
     private void MouseActions()
     {
         //Select button
         if (Input.GetMouseButtonDown(Parameters.selectButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && activated) //Select button pressed
-        {
-            //If the mouse is out of range when pressed, ignoreCurrentDrag
-            dragStartPoint = SetDragPosition(dragStartPoint);
-            if (Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth)
-                dropCurrentDrag = true;
-            else
-            {
-                if (!Utility.FunctionalKeysHeld(Utility.CTRL))
-                    DeselectAll();
-                dragEndPoint = SetDragPosition(dragEndPoint);
-                SendDragUpdate();
-                UpdateDragIndicator();
-            }
-        }
+            LeftMouseButtonPressed();
         else if (Input.GetMouseButtonUp(Parameters.selectButton) && activated) //Select button released
-        {
-            if (dropCurrentDrag)
-                dropCurrentDrag = false;
-            else
-            {
-                SendDragEnd();
-                CloseDragIndicator();
-            }
-        }
+            LeftMouseButtonReleased();
         else if (Input.GetMouseButton(Parameters.selectButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && activated) //Select button being held
-        {
-            foreach (NoteIndicatorController indicator in noteIndicators) indicator.NoColor();
-            dragEndPoint = SetDragPosition(dragEndPoint);
-            SendDragUpdate();
-            UpdateDragIndicator();
-        }
+            LeftMouseButtonHeld();
         //Place button
-        if (Input.GetMouseButtonDown(Parameters.placeButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && !Input.GetMouseButton(Parameters.selectButton))
-            if (!(Utility.GetMouseWorldPos().y < -1.0f || Input.mousePosition.x > Utility.stageWidth))
-            {
-                DeselectAll();
-                PlaceNotes();
-            }
+        if (Input.GetMouseButtonUp(Parameters.placeButton) && !CurrentState.ignoreAllInput && !dropCurrentDrag && !Input.GetMouseButton(Parameters.selectButton))
+            RightMouseButtonReleased();
     }
     private void Shortcuts()
     {

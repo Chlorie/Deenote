@@ -6,7 +6,8 @@ public class BPMCalculatorController : MonoBehaviour
     public GameObject canvas;
     public GameObject panel;
     public StageController stage;
-    public Text bpmText, offsetText, nrText;
+    public Text nrText;
+    public LocalizedText bpmText, offsetText;
     public Slider slider;
     public AudioSource source;
     private float x, x2, xy, y, y2, lxx, lxy, lyy, r, r2, m, bpm, time;
@@ -34,8 +35,9 @@ public class BPMCalculatorController : MonoBehaviour
         slider.minValue = 0.0f;
         slider.maxValue = source.clip.length;
         slider.value = 0.0f;
-        bpmText.text = "Tap Space";
-        offsetText.text = nrText.text = "";
+        bpmText.SetStrings("Tap Space", "按空格键");
+        offsetText.SetStrings("");
+        nrText.text = "";
         n = 0;
         x = x2 = xy = y = y2 = lxx = lxy = lyy = r = bpm /*= offset*/ = m = 0.0f;
     }
@@ -61,9 +63,9 @@ public class BPMCalculatorController : MonoBehaviour
             r2 = lxy * lxy / lxx / lyy;
             r = Mathf.Sqrt(r2);
             r = (r > 1.0f) ? 1.0f : r;
-            bpmText.text = bpm.ToString();
+            bpmText.SetStrings(bpm.ToString());
             //offsetText.text = "Offset: " + intOffset + "ms"; //The offset is like crap, forget about this
-            offsetText.text = "";
+            offsetText.SetStrings("");
             nrText.text = "n = " + n + " | r = " + r;
         }
     }

@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class ProjectVersionConversion
+﻿public class ProjectVersionConversion
 {
     public static FullProjectDataV2 Version1To2(SerializableProjectData dataV1)
     {

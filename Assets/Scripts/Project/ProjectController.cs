@@ -26,9 +26,8 @@ public class ProjectController : MonoBehaviour
     public GameObject directorySelectorCanvas;
     public GameObject aboutCanvas;
     //-File Panel-
-    public GameObject newProjectConfirmScreen;
-    public Text songSelectButtonText;
-    public Text fileSelectButtonText;
+    public LocalizedText songSelectButtonText;
+    public LocalizedText fileSelectButtonText;
     public Button songSelectConfirmButton;
     public string dragAndDropFileName = null;
     //-Info Panel-
@@ -77,6 +76,7 @@ public class ProjectController : MonoBehaviour
     public UnityEvent resolutionChange;
     public int screenWidth = 1280;
     public int screenHeight = 720;
+    public Dropdown languageDropdown;
     //-Functions-
     //-Initialization-
     public void PanelSelectionInit()
@@ -98,7 +98,11 @@ public class ProjectController : MonoBehaviour
         {
             stage.StopPlaying();
             stage.editor.pianoSoundEditor.Deactivate(false);
-            newProjectConfirmScreen.SetActive(true);
+            MessageScreen.Activate(
+                new string[] { "Current project will be closed when you start a new project", "启动新项目时当前的项目会被关闭" },
+                new string[] { "<color=#ff5555>Make sure that you have SAVED your project!</color>", "<color=#ff5555>请确认你已经保存当前的项目文件!</color>" },
+                new string[] { "Start a new project now!", "启动新项目!" }, ClearStageStartNewProject,
+                new string[] { "Take me back to my project", "返回到当前项目" }, delegate { dragAndDropFileName = null; });
             clearStageNewProjectMode = true;
             return;
         }
@@ -107,8 +111,8 @@ public class ProjectController : MonoBehaviour
         projectFolder = null;
         songSelectButtonText.color = new Color(25.0f / 64, 25.0f / 64, 25.0f / 64, 0.5f);
         fileSelectButtonText.color = new Color(25.0f / 64, 25.0f / 64, 25.0f / 64, 0.5f);
-        songSelectButtonText.text = "Select the song file";
-        fileSelectButtonText.text = "Create a new project file";
+        songSelectButtonText.SetStrings("Select the song file", "选择音乐文件");
+        fileSelectButtonText.SetStrings("Create a new project file", "创建新工程文件");
         newProjectPanel.SetActive(true);
         filePanel.SetActive(false);
         CheckConfirmButton();
@@ -132,7 +136,7 @@ public class ProjectController : MonoBehaviour
     {
         songFile = new FileInfo(directorySelectorController.selectedItemFullName);
         songSelectButtonText.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        songSelectButtonText.text = songFile.Name;
+        songSelectButtonText.SetStrings(songFile.Name);
         directorySelectorController.DeactivateSelection();
         CheckConfirmButton();
     }
@@ -141,7 +145,7 @@ public class ProjectController : MonoBehaviour
         projectFolder = directorySelectorController.selectedItemFullName;
         projectFileName = directorySelectorController.fileName;
         fileSelectButtonText.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        fileSelectButtonText.text = projectFileName + ".dsproj";
+        fileSelectButtonText.SetStrings(projectFileName + ".dsproj");
         directorySelectorController.DeactivateSelection();
         CheckConfirmButton();
     }
@@ -158,39 +162,17 @@ public class ProjectController : MonoBehaviour
     }
     public void ClearStageStartNewProject() //Create/open a new project when a project in currently opened
     {
-        newProjectConfirmScreen.SetActive(false);
         CloseProject();
-        if (clearStageNewProjectMode) NewProject();
-        else LoadProject();
-    }
-    public void CancelClearStageCreateProject() //Close the notice screen
-    {
-        dragAndDropFileName = null;
-        newProjectConfirmScreen.SetActive(false);
+        if (clearStageNewProjectMode)
+            NewProject();
+        else
+            LoadProject();
     }
     public void ConfirmButtonPressed() //Project - New - Confirm
     {
         project = new Project();
         audioFileBytes = File.ReadAllBytes(songFile.FullName);
         songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, songFile.Extension);
-        //if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
-        //{
-        //    WWW www;
-        //    www = new WWW("file:///" + songFile.FullName);
-        //    while (!www.isDone) ; //Wait until the song is fully downloaded
-        //    songAudioClip = www.GetAudioClip(true);
-        //    songAudioClip.LoadAudioData();
-        //}
-        //else if (songFile.Extension == ".mp3")
-        //{
-        //    AudioFileReader reader = new AudioFileReader(songFile.FullName);
-        //    float[] data = new float[reader.Length / 4];
-        //    reader.Read(data, 0, (int)reader.Length / 4);
-        //    AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
-        //    newClip.SetData(data, 0);
-        //    songAudioClip = newClip;
-        //    songAudioClip.LoadAudioData();
-        //}
         project.songName = songFile.Name;
         project.charts = new Chart[4];
         for (int i = 0; i < 4; i++)
@@ -243,7 +225,11 @@ public class ProjectController : MonoBehaviour
         {
             stage.StopPlaying();
             stage.editor.pianoSoundEditor.Deactivate(false);
-            newProjectConfirmScreen.SetActive(true);
+            MessageScreen.Activate(
+                new string[] { "Current project will be closed when you start a new project", "启动新项目时当前的项目会被关闭" },
+                new string[] { "<color=#ff5555>Make sure that you have SAVED your project!</color>", "<color=#ff5555>请确认你已经保存当前的项目文件!</color>" },
+                new string[] { "Start a new project now!", "启动新项目!" }, ClearStageStartNewProject,
+                new string[] { "Take me back to my project", "返回到当前项目" }, delegate { dragAndDropFileName = null; });
             clearStageNewProjectMode = false;
             return;
         }
@@ -338,24 +324,6 @@ public class ProjectController : MonoBehaviour
         directorySelectorController.DeactivateSelection();
         audioFileBytes = File.ReadAllBytes(songFile.FullName);
         songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, songFile.Extension);
-        //if (songFile.Extension == ".wav" || songFile.Extension == ".ogg")
-        //{
-        //    WWW www;
-        //    www = new WWW("file:///" + songFile.FullName);
-        //    while (!www.isDone) ; //Wait until the song is fully downloaded
-        //    songAudioClip = www.GetAudioClip(true);
-        //    songAudioClip.LoadAudioData();
-        //}
-        //else if (songFile.Extension == ".mp3")
-        //{
-        //    AudioFileReader reader = new AudioFileReader(songFile.FullName);
-        //    float[] data = new float[reader.Length / 4];
-        //    reader.Read(data, 0, (int)reader.Length / 4);
-        //    AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
-        //    newClip.SetData(data, 0);
-        //    songAudioClip = newClip;
-        //    songAudioClip.LoadAudioData();
-        //}
         stage.musicSource.clip = songAudioClip;
         stage.timeSlider.value = 0.0f;
         stage.timeSlider.maxValue = songAudioClip.length;
@@ -412,7 +380,13 @@ public class ProjectController : MonoBehaviour
     }
     public void ExportAllJSONCharts(int diff)
     {
-        JSONExportDirectorySelect(diff + 4);
+        if (project != null)
+            JSONExportDirectorySelect(diff + 4);
+        else
+            MessageScreen.Activate(new string[] { "No project file is opened!", "目前没有已经打开的项目文件!" },
+                new string[] { "<color=ff7f7f>What are you expecting to be exported???</color>",
+                    "<color=ff7f7f>你认为这样能导出什么东西呢???</color>" },
+                new string[] { "Back", "返回" }, delegate { });
     }
     public void JSONExportDirectorySelect(int diff)
     {
@@ -492,6 +466,7 @@ public class ProjectController : MonoBehaviour
         ToggleAutoSave();
         vSyncToggle.isOn = Utility.PlayerPrefsGetBool("VSync On", vSyncToggle.isOn);
         ToggleVSync(vSyncToggle.isOn);
+        languageDropdown.value = PlayerPrefs.GetInt("Language", 0);
     }
     public void SavePlayerPrefs()
     {
@@ -509,6 +484,7 @@ public class ProjectController : MonoBehaviour
         PlayerPrefs.SetInt("XGrid Count", stage.editor.xGrid);
         PlayerPrefs.SetFloat("XGrid Offset", stage.editor.xGridOffset);
         PlayerPrefs.SetInt("TGrid Count", stage.editor.tGrid);
+        PlayerPrefs.SetInt("Language", LanguageSelector.Language);
         Utility.PlayerPrefsSetBool("Snap To Grid", stage.editor.snapToGrid);
         Utility.PlayerPrefsSetBool("Show Indicator", stage.editor.noteIndicatorsToggler.activeSelf);
         Utility.PlayerPrefsSetBool("Show Border", stage.editor.border.activeSelf);
@@ -535,6 +511,10 @@ public class ProjectController : MonoBehaviour
             Utility.stageHeight = screenHeight;
             resolutionChange.Invoke();
         }
+    }
+    public void SetLanguage(int language)
+    {
+        LanguageSelector.Language = language;
     }
     private void Start()
     {

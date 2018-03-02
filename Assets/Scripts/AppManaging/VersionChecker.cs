@@ -10,11 +10,9 @@ using UnityEngine.UI;
 
 public class VersionChecker : MonoBehaviour
 {
-    public Text updateHistoryText;
+    public LocalizedText updateHistoryText;
     public string currentVersion;
     private string latestVersion;
-    public GameObject updateNoticeCanvas;
-    public Text updateNoticeText;
     private bool finished = false;
     private string redirectedUrl = null;
     private List<int> GetVersion(string str)
@@ -109,34 +107,30 @@ public class VersionChecker : MonoBehaviour
         while (position >= 0 && redirectedUrl[position] != '/') position--;
         latestVersion = redirectedUrl.Substring(position + 2);
         List<int> latest = GetVersion(latestVersion);
-        if (UpToDate(GetVersion(currentVersion), latest)) { updateHistoryText.text = "The program is up to date."; return; }
-        updateHistoryText.text = "New version detected";
+        if (UpToDate(GetVersion(currentVersion), latest))
+        {
+            updateHistoryText.SetStrings("The program is up to date.", "程序已是最新版本");
+            return;
+        }
+        updateHistoryText.SetStrings("New version detected", "检测到新版本");
         FindObjectOfType<UpdateHistory>().Deactivate();
-        updateNoticeCanvas.SetActive(true);
-        updateNoticeText.text = "Current version: " + currentVersion + " | Latest version: " + latestVersion;
-        CurrentState.ignoreAllInput = true;
-    }
-    public void GoToReleasePage()
-    {
-        updateNoticeCanvas.SetActive(false);
-        CurrentState.ignoreAllInput = false;
-        Process.Start(redirectedUrl);
+        MessageScreen.Activate(
+            new string[] { "New version of Deenote detected", "检测到新版本" },
+            new string[]
+            {"Current version: " + currentVersion + " | Latest version: " + latestVersion,
+            "当前版本: " + currentVersion + " | 最新版本: " + latestVersion},
+            new string[] { "Go to release page", "转到发布页面" }, delegate { Process.Start(redirectedUrl); },
+            new string[] { "Go to download page", "转到下载页面" }, GoToDownloadPage,
+            new string[] { "Update later", "稍后更新" });
     }
     public void GoToDownloadPage()
     {
-        updateNoticeCanvas.SetActive(false);
-        CurrentState.ignoreAllInput = false;
         string downloadUrl = "https://github.com/Chlorie/Deenote/releases/download/v" + latestVersion + "/Deenote-" + latestVersion;
         if (IntPtr.Size == 8) // 64-bit
             downloadUrl += ".zip";
         else // 32-bit
             downloadUrl += "-32bit.zip";
         Process.Start(downloadUrl);
-    }
-    public void UpdateLater()
-    {
-        updateNoticeCanvas.SetActive(false);
-        CurrentState.ignoreAllInput = false;
     }
     private void Start()
     {

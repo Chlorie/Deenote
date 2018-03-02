@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class DirectorySelectorController : MonoBehaviour
 {
-    public Text titleText;
+    public LocalizedText titleText;
     public Text directoryText;
     public Text selectedItemText;
     public InputField directoryInputField;
@@ -131,12 +131,12 @@ public class DirectorySelectorController : MonoBehaviour
         directorySeletorWindow.SetActive(true);
         if (extensions.GetLength(0) == 0)
         {
-            titleText.text = "Select the folder";
+            titleText.SetStrings("Select the folder", "选择文件夹");
             selectedItemType = true;
         }
         else
         {
-            titleText.text = "Select the file";
+            titleText.SetStrings("Select the file", "选择文件");
             selectedItemType = false;
         }
         confirmButton.interactable = false;
@@ -231,7 +231,7 @@ public class DirectorySelectorController : MonoBehaviour
         string currentDirectoryString = Directory.GetCurrentDirectory();
         currentDirectory = new DirectoryInfo(currentDirectoryString);
         projectController = FindObjectOfType<ProjectController>();
-        titleText.text = "Select the folder";
+        titleText.SetStrings("Select the folder", "选择文件夹");
         directoryInputField.text = currentDirectory.FullName;
         selectedItemText.text = "";
         scrollView.SetActive(false);

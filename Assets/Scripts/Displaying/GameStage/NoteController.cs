@@ -65,6 +65,11 @@ public class NoteController : MonoBehaviour
             alpha = noteSprite.color.a;
             noteSprite.color = new Color(85.0f / 255, 192.0f / 255, 1.0f, alpha);
         }
+        else if (stage.collided[id] && !curNote.isLink)
+        {
+            alpha = noteSprite.color.a;
+            noteSprite.color = new Color(1.0f, 85.0f / 255, 85.0f / 255, alpha);
+        }
         if (z <= 0.0f)
         {
             z = 0.0f;

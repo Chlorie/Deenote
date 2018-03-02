@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class Tutorial : MonoBehaviour
 {
     private StageController stage;
-    private List<string>[] text =
+    private string[][] text = new string[][]
     {
-        new List<string> // Language 0 (English)
+        new string[] // Language 0 (English)
         {
             @"All the shortcuts:
 
@@ -59,16 +59,16 @@ public class Tutorial : MonoBehaviour
 <color=#800000ff>Full English tutorial coming soon</color>
 "
         },
-        new List<string> // Language 1 (Chinese)
+        new string[] // Language 1 (Chinese)
         {
-            "感谢您使用Deemo谱面编辑器Deenote！我因为种种原因不想对整个程序做本地化，但是好多人表示英语没有四级水平就用不了这个软件，所以这个教程部" +
-            "分我会写得尽量详细并且简单易懂。另外，欢迎各位提供好的想法来进一步优化写谱体验。谢谢大家！\n在下面的教程中我会为您详细介绍使用本软件写谱" +
+            "感谢您使用Deemo谱面编辑器Deenote！我输了，最后还是做了汉化。不过这个教程部" +
+            "分我还是会写得尽量详细并且简单易懂。另外，欢迎各位提供好的想法来进一步优化写谱体验。谢谢大家！\n在下面的教程中我会为您详细介绍使用本软件写谱" +
             "的方法。信息量可能会很大，所以这篇教程会比较长。请大家准备好<color=#00000040>零食和饮料(划掉)</color>笔和纸，教程就要开始了！\n\n\n",
             "1. 项目文件板块\n" +
             "打开程序以后，可以看到右边的操作区中有两个按钮(Project/Settings)，点击按钮可以展开/关闭对应的板块。我们首先来讲项目文件板块，可以" +
             "通过点击[Project]按钮打开此板块。在该板块下可以看到六个按钮，下面为您一一介绍这些按钮的功能。\n\n",
             "1.1 创建新的项目文件\n" +
-            "要使用Deenote制作谱面，您需要先创建一个项目文件(.dsproj)。点击[New]按钮（或者使用快捷键Ctrl+N（可以创建新的工程文件。创建新项目" +
+            "要使用Deenote制作谱面，您需要先创建一个项目文件(.dsproj)。点击[New]按钮（或者使用快捷键Ctrl+N）可以创建新的工程文件。创建新项目" +
             "时，点击[File Name]下的按钮来选择保存位置并且输入新项目的文件名，点击[Song]下面的按钮来选择要使用的音乐文件，Deenote目前支持MP3" +
             "，WAV，以及OGG格式的音乐文件。选择好以后，点击[Confirm]确定创建项目。或者，按[Cancel]可以取消创建新项目。\n\n",
             "1.2 打开已有的项目文件\n" +
@@ -168,7 +168,7 @@ public class Tutorial : MonoBehaviour
     public GameObject rightPanel;
     public GameObject tutorialPanel;
     public GameObject viewport;
-    public Text tutorialText;
+    public LocalizedText tutorialText;
     public void OpenTutorial()
     {
         CurrentState.ignoreAllInput = CurrentState.ignoreScroll = true;
@@ -184,18 +184,22 @@ public class Tutorial : MonoBehaviour
         rightPanel.SetActive(true);
         tutorialPanel.SetActive(false);
     }
-    public void UpdateTutorialLanguage(int language)
+    public void InitializeTutorialLanguage()
     {
-        StringBuilder finalText = new StringBuilder();
-        foreach (string str in text[language]) finalText.Append(str);
-        string textStr = finalText.ToString().Replace(" ", "\u00A0");
-        tutorialText.text = textStr;
+        string[] localizedTexts = new string[text.Length];
+        for (int i = 0; i < text.Length; i++)
+        {
+            StringBuilder finalText = new StringBuilder();
+            foreach (string str in text[i]) finalText.Append(str);
+            localizedTexts[i] = finalText.ToString();
+        }
+        tutorialText.SetStrings(localizedTexts);
         viewport.SetActive(false);
         viewport.SetActive(true);
     }
     private void Start()
     {
         stage = FindObjectOfType<StageController>();
-        UpdateTutorialLanguage(0);
+        InitializeTutorialLanguage();
     }
 }

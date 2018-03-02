@@ -10,12 +10,12 @@ public class EditPanelController : MonoBehaviour
     public RectTransform noteAndGrid;
     public RectTransform curveForming;
     public RectTransform beatLine;
-    public Text selectionButtonText;
-    public Text playerSettingsButtonText;
-    public Text basicCommandsButtonText;
-    public Text noteAndGridButtonText;
-    public Text curveFormingText;
-    public Text beatLineButtonText;
+    public LocalizedText selectionButtonText;
+    public LocalizedText playerSettingsButtonText;
+    public LocalizedText basicCommandsButtonText;
+    public LocalizedText noteAndGridButtonText;
+    public LocalizedText curveFormingText;
+    public LocalizedText beatLineButtonText;
     public void ToggleSelectionPanel()
     {
         ExpandCollapse(selection, selectionButtonText);
@@ -40,12 +40,12 @@ public class EditPanelController : MonoBehaviour
     {
         ExpandCollapse(beatLine, beatLineButtonText);
     }
-    private void ExpandCollapse(RectTransform tabTransform, Text buttonText)
+    private void ExpandCollapse(RectTransform tabTransform, LocalizedText buttonText)
     {
         bool expanded = tabTransform.gameObject.activeSelf;
         expanded = !expanded;
         tabTransform.gameObject.SetActive(expanded);
-        buttonText.text = expanded ? "Collapse" : "Expand";
+        buttonText.SetStrings(expanded ? "Collapse" : "Expand", expanded ? "收起" : "展开");
         float size = tabTransform.sizeDelta.y;
         Vector2 sizeDelta = editPanel.sizeDelta;
         sizeDelta.y += size * (expanded ? 1 : -1);

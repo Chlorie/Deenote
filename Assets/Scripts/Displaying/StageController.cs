@@ -17,6 +17,7 @@ public class StageController : MonoBehaviour
     public Chart chart;
     public int diff;
     private List<NoteController> notes = new List<NoteController>();
+    public List<bool> collided = new List<bool>();
     public NoteObjectPool notePool;
     public int prevNoteID;
     public int returnNoteID;
@@ -142,7 +143,8 @@ public class StageController : MonoBehaviour
         diff = difficulty;
         editor.chart = chart;
         editor.ActivateEditor();
-        Utility.GetInGameNoteIDs(initProj.charts[difficulty], ref inGameNoteIDs);
+        ChartProperties.GetInGameNoteIds(initProj.charts[difficulty], out inGameNoteIDs);
+        ChartProperties.GetCollidedNotes(initProj.charts[difficulty], out collided);
         musicLength = musicSource.clip.length;
         timeSlider.minValue = 0.0f;
         timeSlider.maxValue = musicLength;

@@ -27,11 +27,18 @@ public class ProjectSaveLoad : MonoBehaviour
         projectData = null;
         BinaryFormatter binaryFormatter = new BinaryFormatter();
         FileStream fileStream = new FileStream(fileFullName, FileMode.Open);
-        object deserializedData = binaryFormatter.Deserialize(fileStream);
-        if (deserializedData is SerializableProjectData)
-            projectData = ProjectVersionConversion.Version1To2((SerializableProjectData)deserializedData);
-        else if (deserializedData is FullProjectDataV2)
-            projectData = (FullProjectDataV2)deserializedData;
+        try
+        {
+            object deserializedData = binaryFormatter.Deserialize(fileStream);
+            if (deserializedData is SerializableProjectData)
+                projectData = ProjectVersionConversion.Version1To2((SerializableProjectData)deserializedData);
+            else if (deserializedData is FullProjectDataV2)
+                projectData = (FullProjectDataV2)deserializedData;
+        }
+        catch (Exception exc)
+        {
+            Debug.LogError(exc.Message);
+        }
         fileStream.Close();
     }
     public IEnumerator SaveProjectIntoFile(Project project, byte[] audio, string fileFullName) //Save the project in file fileFullName
