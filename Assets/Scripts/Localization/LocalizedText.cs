@@ -5,11 +5,11 @@ using UnityEngine.UI;
 public class LocalizedText : MonoBehaviour
 {
     private Text text;
-    private Text textProperty { get { if (text == null) text = GetComponent<Text>(); return text; } }
+    private Text TextProperty { get { if (text == null) text = GetComponent<Text>(); return text; } }
     [SerializeField][TextArea] private string[] strings;
     public string[] Strings { get { return strings; } }
-    [HideInInspector] public Color color { set { textProperty.color = value; } }
-    public string CurrentText { get { return textProperty.text; } }
+    [HideInInspector] public Color color { set { TextProperty.color = value; } }
+    public string CurrentText { get { return TextProperty.text; } }
     public void SetStrings(params string[] newStrings)
     {
         strings = newStrings;
@@ -20,9 +20,9 @@ public class LocalizedText : MonoBehaviour
         if (strings == null || strings.Length == 0)
             Debug.Log("No localization text assigned for a certain LocalizationText component");
         else if (language < strings.Length)
-            textProperty.text = LineBreakConversion(strings[language], LanguageSelector.noLineBreak[language]);
+            TextProperty.text = LineBreakConversion(strings[language], LanguageSelector.noLineBreak[language]);
         else
-            textProperty.text = LineBreakConversion(strings[0], LanguageSelector.noLineBreak[0]);
+            TextProperty.text = LineBreakConversion(strings[0], LanguageSelector.noLineBreak[0]);
     }
     private string LineBreakConversion(string original, bool noLineBreak)
     {

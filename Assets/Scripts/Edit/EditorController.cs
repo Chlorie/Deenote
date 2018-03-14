@@ -21,9 +21,9 @@ public class EditorController : MonoBehaviour
     public InputField fillToInputField;
     public InputField fillWithBPMInputField;
     //Chart
-    public Chart chart;
+    public ChartOld chart;
     public int maxUndoStep = 100;
-    private List<Chart> undoCharts = new List<Chart>();
+    private List<ChartOld> undoCharts = new List<ChartOld>();
     private int currentStep = 0;
     //Note Selection
     public List<NoteSelect> noteSelect = new List<NoteSelect>();
