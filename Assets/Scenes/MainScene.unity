@@ -165,6 +165,12 @@ MonoBehaviour:
   uiParameters: {fileID: 11400000, guid: c0c6586721dc2b34986ca4ccc7475617, type: 2}
   textTransform: {fileID: 237447484}
   button: {fileID: 116369580}
+  shortcut:
+    hold: 0
+    ctrl: 0
+    alt: 0
+    shift: 0
+    key: 115
 --- !u!114 &116369580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,6 +912,12 @@ MonoBehaviour:
   uiParameters: {fileID: 11400000, guid: c0c6586721dc2b34986ca4ccc7475617, type: 2}
   textTransform: {fileID: 1936815061}
   button: {fileID: 695518584}
+  shortcut:
+    hold: 0
+    ctrl: 0
+    alt: 1
+    shift: 0
+    key: 112
 --- !u!114 &695518584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1038,8 +1050,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frontWindows: []
-  windows:
-  - {fileID: 0}
+  focusedWindow: {fileID: 0}
 --- !u!1 &866909645
 GameObject:
   m_ObjectHideFlags: 0
@@ -1292,6 +1303,52 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1213419335}
+--- !u!1 &1252379148
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1252379149}
+  - component: {fileID: 1252379150}
+  m_Layer: 5
+  m_Name: Shortcut
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1252379149
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1252379148}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1649198309}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1252379150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1252379148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 883cc57d919f6b448ae22f7782616b88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toolbarSelectables: []
 --- !u!1 &1317943609
 GameObject:
   m_ObjectHideFlags: 0
@@ -1490,6 +1547,12 @@ MonoBehaviour:
   uiParameters: {fileID: 11400000, guid: c0c6586721dc2b34986ca4ccc7475617, type: 2}
   textTransform: {fileID: 2099586533}
   button: {fileID: 1527104247}
+  shortcut:
+    hold: 0
+    ctrl: 0
+    alt: 1
+    shift: 0
+    key: 101
 --- !u!114 &1527104247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1606,6 +1669,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1317943610}
+  - {fileID: 1252379149}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

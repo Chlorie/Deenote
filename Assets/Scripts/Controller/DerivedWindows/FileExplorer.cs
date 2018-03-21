@@ -19,7 +19,7 @@ public class FileExplorer : Window
     }
     public void Open(Mode mode, Callback callback, params string[] extensions)
     {
-
+        Open();
     }
     private void Awake()
     {

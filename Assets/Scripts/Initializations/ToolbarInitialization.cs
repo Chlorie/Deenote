@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ToolbarInitialization : MonoBehaviour
 {
@@ -9,48 +7,61 @@ public class ToolbarInitialization : MonoBehaviour
     public ToolbarSelectable settingsSelectable;
     private void InitializeProjectSelectable()
     {
-        projectSelectable.items.Add(new ButtonInfo
+        projectSelectable.operations.Add(new ToolbarOperation
         {
             strings = new string[] { "Test window" },
-            shortcut = "",
-            callback = delegate
+            operation = new Operation
             {
-                FileExplorer.instance.Open(FileExplorer.Mode.SelectFile, delegate { });
-            }
+                callback = delegate { FileExplorer.instance.Open(FileExplorer.Mode.SelectFile, delegate { }); },
+                shortcut = new Shortcut { key = KeyCode.O }
+            },
+            globalShortcut = new Shortcut { ctrl = true, key = KeyCode.O }
         });
-        projectSelectable.items.Add(new ButtonInfo
+        projectSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new string[] { "Quit(Q)", "退出(Q)" },
-            shortcut = "Alt+F4",
-            callback = delegate { }
+            strings = new string[] { "Quit", "退出" },
+            operation = new Operation
+            {
+                callback = delegate { }, // Add this later
+                shortcut = new Shortcut { key = KeyCode.Q }
+            },
+            globalShortcut = new Shortcut { alt = true, key = KeyCode.F4 }
         });
     }
     private void InitializeEditSelectable()
     {
         //editSelectable.items.Add(new ButtonInfo
         //{
-        //    strings = new string[] { "Undo(U)", "撤销(U)" },
+        //    strings = new string[] { "Undo", "撤销" },
         //    shortcut = "Ctrl+Z",
         //    callback = delegate { }
         //});
         //editSelectable.items.Add(new ButtonInfo
         //{
-        //    strings = new string[] { "Redo(R)", "重做(R)" },
+        //    strings = new string[] { "Redo", "重做" },
         //    shortcut = "Ctrl+Y",
         //    callback = delegate { }
         //});
     }
     private void InitializeSettingsSelectable()
     {
-        settingsSelectable.items.Add(new ButtonInfo
+        settingsSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new string[] { "Set Language to English(E)", "将语言设置为英文(E)" },
-            callback = delegate { LanguageController.Language = 0; }
+            strings = new string[] { "Set Language to English", "将语言设置为英文" },
+            operation = new Operation
+            {
+                callback = delegate { LanguageController.Language = 0; },
+                shortcut = new Shortcut { key = KeyCode.E }
+            }
         });
-        settingsSelectable.items.Add(new ButtonInfo
+        settingsSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new string[] { "Set Language to Chinese(C)", "将语言设置为中文(C)" },
-            callback = delegate { LanguageController.Language = 1; }
+            strings = new string[] { "Set Language to Chinese", "将语言设置为中文" },
+            operation = new Operation
+            {
+                callback = delegate { LanguageController.Language = 1; },
+                shortcut = new Shortcut { key = KeyCode.C }
+            }
         });
     }
     private void Start()

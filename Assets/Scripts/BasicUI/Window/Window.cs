@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -19,6 +20,8 @@ public class Window : MonoBehaviour, IPointerDownHandler
     private GameObject contents;
     [HideInInspector] public LocalizedText tagContent;
     private RectTransform tagContentTransform;
+    // Actions
+    [HideInInspector] public List<Operation> operations = new List<Operation>();
     // Properties
     private float TagWidth
     {
@@ -97,6 +100,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
         if (front) WindowsController.instance.frontWindows.Remove(this);
         contents.SetActive(false);
         Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
+        WindowsController.instance.UpdateFocusedWindowRef();
     }
     public void SetFocus()
     {
@@ -112,7 +116,6 @@ public class Window : MonoBehaviour, IPointerDownHandler
     }
     private void Start()
     {
-        WindowsController.instance.windows.Add(this);
         contents = transform.Find("Contents").gameObject;
         tagContent = tagTransform.GetComponentInChildren<LocalizedText>();
         tagContentTransform = tagContent.GetComponent<RectTransform>();

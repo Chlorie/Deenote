@@ -9,8 +9,9 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     public RectTransform textTransform;
     private RectTransform buttonTransform;
     public Button button;
-    public List<ButtonInfo> items = new List<ButtonInfo>();
+    public List<ToolbarOperation> operations = new List<ToolbarOperation>();
     private ToolbarController controller;
+    public Shortcut shortcut;
     private void UpdateMainButtonSize()
     {
         Vector2 sizeDelta = buttonTransform.sizeDelta;
@@ -19,29 +20,36 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     }
     public void OnClick()
     {
-        if (!controller.hoverDetect)
-        {
-            controller.currentSelected = this;
-            SetSelectedColor();
-            InitializeDropdown();
-        }
-        else
-        {
-            controller.CloseDropdown();
-            controller.currentSelected = null;
-            SetDefaultColor();
-        }
+        if (WindowsController.instance.frontWindows.Count == 0)
+            if (!controller.hoverDetect)
+            {
+                controller.currentSelected = this;
+                SetSelectedColor();
+                InitializeDropdown();
+            }
+            else
+            {
+                controller.CloseDropdown();
+                controller.currentSelected = null;
+                SetDefaultColor();
+            }
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
         controller.onObjectCount++;
-        if (controller.hoverDetect)
+        if (WindowsController.instance.frontWindows.Count == 0)
         {
-            InitializeDropdown();
-            controller.currentSelected?.SetDefaultColor();
-            controller.currentSelected = this;
-            SetSelectedColor();
+            SetDefaultColor();
+            if (controller.hoverDetect)
+            {
+                InitializeDropdown();
+                controller.currentSelected?.SetDefaultColor();
+                controller.currentSelected = this;
+                SetSelectedColor();
+            }
         }
+        else
+            SetDeactivatedColor();
     }
     public void OnPointerExit(PointerEventData eventData)
     {
@@ -67,10 +75,20 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
             colorMultiplier = 1.0f
         };
     }
+    public void SetDeactivatedColor()
+    {
+        button.colors = new ColorBlock
+        {
+            normalColor = uiParameters.toolbarSelectableDefaultColor,
+            highlightedColor = uiParameters.toolbarSelectableDefaultColor,
+            pressedColor = uiParameters.toolbarSelectableDefaultColor,
+            colorMultiplier = 1.0f
+        };
+    }
     private void InitializeDropdown()
     {
         controller.ReturnAllDropdownItems();
-        controller.InitializeDropdownItems(items, buttonTransform.offsetMin.x);
+        controller.InitializeDropdownItems(operations, buttonTransform.offsetMin.x);
         controller.hoverDetect = true;
     }
     private void Awake()
@@ -82,5 +100,6 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     {
         UpdateMainButtonSize();
         controller = ToolbarController.instance;
+        ShortcutController.instance.toolbarSelectables.Add(this);
     }
 }

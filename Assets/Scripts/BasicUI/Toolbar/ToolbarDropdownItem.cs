@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public class ToolbarDropdownItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public Callback Callback;
+    public Callback callback;
     public LocalizedText description;
     public Text shortcut;
     public RectTransform shortcutTransform;
@@ -14,12 +14,8 @@ public class ToolbarDropdownItem : MonoBehaviour, IPointerEnterHandler, IPointer
     public RectTransform buttonTransform;
     public void OnClick()
     {
-        ToolbarController instance = ToolbarController.instance;
-        instance.CloseDropdown();
-        instance.currentSelected.SetDefaultColor();
-        instance.currentSelected = null;
-        instance.onObjectCount = 0;
-        Callback?.Invoke();
+        ToolbarController.instance.DeselectAll();
+        callback?.Invoke();
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
