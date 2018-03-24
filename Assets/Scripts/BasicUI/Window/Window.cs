@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Window : MonoBehaviour, IPointerDownHandler
 {
     public UIParameters uiParameters;
-    private RectTransform windowTransform;
+    private RectTransform _windowTransform;
     // Window Attributes
     public bool horizontalResizable;
     public bool verticalResizable;
@@ -17,9 +17,9 @@ public class Window : MonoBehaviour, IPointerDownHandler
     public Vector2Int aspectRatio;
     // Child components
     public RectTransform tagTransform;
-    private GameObject contents;
-    [HideInInspector] public LocalizedText tagContent;
-    private RectTransform tagContentTransform;
+    private GameObject _contents;
+    protected LocalizedText _tagContent;
+    private RectTransform _tagContentTransform;
     // Actions
     [HideInInspector] public List<Operation> operations = new List<Operation>();
     // Properties
@@ -27,7 +27,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
     {
         get
         {
-            return Mathf.Max(LayoutUtility.GetPreferredWidth(tagContentTransform) + uiParameters.tagRightSpace
+            return Mathf.Max(LayoutUtility.GetPreferredWidth(_tagContentTransform) + uiParameters.tagRightSpace
                 + uiParameters.tagLeftSpace, uiParameters.minTagWidth);
         }
     }
@@ -51,8 +51,8 @@ public class Window : MonoBehaviour, IPointerDownHandler
     {
         get
         {
-            Vector2 size = windowTransform.offsetMax - windowTransform.offsetMin;
-            Vector2 position = windowTransform.offsetMin;
+            Vector2 size = _windowTransform.offsetMax - _windowTransform.offsetMin;
+            Vector2 position = _windowTransform.offsetMin;
             Rect result = new Rect(position, size);
             return result;
         }
@@ -69,11 +69,16 @@ public class Window : MonoBehaviour, IPointerDownHandler
             Vector2 minimumSize = MinSize;
             if (value.size.x < minimumSize.x) offsetMax.x += minimumSize.x - value.size.x;
             if (value.size.y < minimumSize.y) offsetMin.y -= minimumSize.y - value.size.y;
-            windowTransform.offsetMin = offsetMin;
-            windowTransform.offsetMax = offsetMax;
+            _windowTransform.offsetMin = offsetMin;
+            _windowTransform.offsetMax = offsetMax;
         }
     }
     // Methods
+    public void SetTagContent(params string[] texts)
+    {
+        if (_tagContent != null) _tagContent.Strings = texts;
+        AdjustTagWidth();
+    }
     public void MoveToCenter()
     {
         Rect currentRect = rect;
@@ -93,18 +98,18 @@ public class Window : MonoBehaviour, IPointerDownHandler
     protected virtual void Open()
     {
         if (front) WindowsController.instance.frontWindows.Add(this);
-        contents.SetActive(true);
+        _contents.SetActive(true);
     }
     public virtual void Close()
     {
         if (front) WindowsController.instance.frontWindows.Remove(this);
-        contents.SetActive(false);
+        _contents.SetActive(false);
         Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
         WindowsController.instance.UpdateFocusedWindowRef();
     }
     public void SetFocus()
     {
-        if (contents.activeSelf) WindowsController.instance.SetFocusToWindow(this);
+        if (_contents.activeSelf) WindowsController.instance.SetFocusToWindow(this);
     }
     public virtual void OnPointerDown(PointerEventData eventData)
     {
@@ -116,10 +121,10 @@ public class Window : MonoBehaviour, IPointerDownHandler
     }
     private void Start()
     {
-        contents = transform.Find("Contents").gameObject;
-        tagContent = tagTransform.GetComponentInChildren<LocalizedText>();
-        tagContentTransform = tagContent.GetComponent<RectTransform>();
-        windowTransform = GetComponent<RectTransform>();
+        _contents = transform.Find("Contents").gameObject;
+        _tagContent = tagTransform.GetComponentInChildren<LocalizedText>();
+        _tagContentTransform = _tagContent.GetComponent<RectTransform>();
+        _windowTransform = GetComponent<RectTransform>();
         AdjustTagWidth();
     }
 }

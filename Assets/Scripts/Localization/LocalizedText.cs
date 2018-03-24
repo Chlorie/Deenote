@@ -6,15 +6,15 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
 public class LocalizedText : MonoBehaviour
 {
-    [SerializeField] [TextArea] private string[] strings;
-    private Text text;
-    private Text TextProperty { get { return text ?? (text = gameObject.GetComponent<Text>()); } }
-    [HideInInspector] public Color color { set { text.color = value; } }
+    [SerializeField] [TextArea] private string[] _strings;
+    private Text _text;
+    private Text TextProperty { get { return _text ?? (_text = gameObject.GetComponent<Text>()); } }
+    [HideInInspector] public Color color { set { _text.color = value; } }
     public string[] Strings
     {
         get
         {
-            return strings;
+            return _strings;
         }
         set
         {
@@ -23,7 +23,7 @@ public class LocalizedText : MonoBehaviour
                 Debug.LogError("Error: Too many languages in a LocalizedText");
                 return;
             }
-            strings = value;
+            _strings = value;
             SetLanguage(LanguageController.Language);
         }
     }
@@ -33,12 +33,12 @@ public class LocalizedText : MonoBehaviour
     }
     public void SetLanguage(int language)
     {
-        if (strings == null || strings.Length == 0) // Empty strings
+        if (_strings == null || _strings.Length == 0) // Empty strings
             Debug.Log("An instance of LocalizedText is not initialized when SetLanguage");
         else
         {
-            if (language >= strings.Length) language = 0;
-            TextProperty.text = SpaceConverter(strings[language], LanguageController.noLineBreak[language]);
+            if (language >= _strings.Length) language = 0;
+            TextProperty.text = SpaceConverter(_strings[language], LanguageController.noLineBreak[language]);
         }
     }
     public void ForceUpdate()

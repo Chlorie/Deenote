@@ -389,9 +389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b69cf06de188048a793ed599738686, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strings:
-  - Select a file
-  - "\u9009\u62E9\u6587\u4EF6"
+  _strings: []
 --- !u!114 &114199963997120958
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -737,7 +735,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []

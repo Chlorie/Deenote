@@ -7,7 +7,7 @@ public class ShortcutController : MonoBehaviour
 {
     public static ShortcutController instance;
     [HideInInspector] public List<ToolbarSelectable> toolbarSelectables;
-    private bool focusingOnToolbar = false;
+    private bool _focusingOnToolbar = false;
     private void CheckShortcuts()
     {
         GameObject obj = EventSystem.current.currentSelectedGameObject;
@@ -16,7 +16,7 @@ public class ShortcutController : MonoBehaviour
         // and it has a GetComponent in it, which is very costly.
         // (Deenote 0.6.7 still does this in the following way)
         // Should change this to something more efficient later.
-        if (obj != null && obj.GetComponent<InputField>() != null)
+        if (obj == null || obj.GetComponent<InputField>() == null)
         {
             if (WindowsController.instance.frontWindows.Count == 0) // No front windows obstructing
             {

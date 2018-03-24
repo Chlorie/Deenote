@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class ObjectPool<T> where T : Object
 {
-    private T prefab;
-    private List<T> objects = new List<T>();
-    private List<bool> available = new List<bool>();
-    private Transform parent = null;
+    private T _prefab;
+    private List<T> _objects = new List<T>();
+    private List<bool> _available = new List<bool>();
+    private Transform _parent = null;
     // Initialization (Constructor)
     public ObjectPool(T prefab, int startAmount = 20, Transform parent = null)
     {
-        this.prefab = prefab;
-        this.parent = parent;
+        this._prefab = prefab;
+        this._parent = parent;
         for (int i = 0; i < startAmount; i++)
         {
             T newObject;
@@ -19,33 +19,33 @@ public class ObjectPool<T> where T : Object
                 newObject = Object.Instantiate(prefab, parent);
             else
                 newObject = Object.Instantiate(prefab);
-            objects.Add(newObject);
-            available.Add(true);
+            _objects.Add(newObject);
+            _available.Add(true);
         }
     }
     public T GetObject()
     {
-        for (int i = 0; i < available.Count; i++)
-            if (available[i])
+        for (int i = 0; i < _available.Count; i++)
+            if (_available[i])
             {
-                available[i] = false;
-                return objects[i];
+                _available[i] = false;
+                return _objects[i];
             }
         T newObject;
-        if (parent != null)
-            newObject = Object.Instantiate(prefab, parent);
+        if (_parent != null)
+            newObject = Object.Instantiate(_prefab, _parent);
         else
-            newObject = Object.Instantiate(prefab);
-        objects.Add(newObject);
-        available.Add(false);
+            newObject = Object.Instantiate(_prefab);
+        _objects.Add(newObject);
+        _available.Add(false);
         return newObject;
     }
     public void ReturnObject(T returnedObject)
     {
-        for (int i = 0; i < objects.Count; i++)
-            if (objects[i] == returnedObject)
+        for (int i = 0; i < _objects.Count; i++)
+            if (_objects[i] == returnedObject)
             {
-                available[i] = true;
+                _available[i] = true;
                 return;
             }
         Object.Destroy(returnedObject);

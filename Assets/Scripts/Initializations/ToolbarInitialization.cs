@@ -12,7 +12,24 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new string[] { "Test window" },
             operation = new Operation
             {
-                callback = delegate { FileExplorer.instance.Open(FileExplorer.Mode.SelectFile, delegate { }); },
+                callback = () =>
+                {
+                    MessageBox.Activate(new string[] { "A random message box", "对话框测试" },
+                        new string[]
+                        {
+                            "This is the content",
+                            "啥内容都没有"
+                        },
+                        new MessageBox.ButtonInfo
+                        {
+                            callback = () => { },
+                            texts = new string[]
+                            {
+                                "Back",
+                                "这个是返回键"
+                            }
+                        });
+                },
                 shortcut = new Shortcut { key = KeyCode.O }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.O }
@@ -22,7 +39,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new string[] { "Quit", "退出" },
             operation = new Operation
             {
-                callback = delegate { }, // Add this later
+                callback = () => { }, // Add this later
                 shortcut = new Shortcut { key = KeyCode.Q }
             },
             globalShortcut = new Shortcut { alt = true, key = KeyCode.F4 }
@@ -50,7 +67,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new string[] { "Set Language to English", "将语言设置为英文" },
             operation = new Operation
             {
-                callback = delegate { LanguageController.Language = 0; },
+                callback = () => { LanguageController.Language = 0; },
                 shortcut = new Shortcut { key = KeyCode.E }
             }
         });
@@ -59,7 +76,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new string[] { "Set Language to Chinese", "将语言设置为中文" },
             operation = new Operation
             {
-                callback = delegate { LanguageController.Language = 1; },
+                callback = () => { LanguageController.Language = 1; },
                 shortcut = new Shortcut { key = KeyCode.C }
             }
         });

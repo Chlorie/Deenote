@@ -14,7 +14,7 @@ public class FileExplorer : Window
     protected override void Open()
     {
         base.Open();
-        tagContent.ForceUpdate();
+        _tagContent.ForceUpdate();
         MoveToCenter();
     }
     public void Open(Mode mode, Callback callback, params string[] extensions)
