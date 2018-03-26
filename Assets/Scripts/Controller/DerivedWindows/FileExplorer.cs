@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FileExplorer : Window
 {
@@ -14,7 +12,7 @@ public class FileExplorer : Window
     protected override void Open()
     {
         base.Open();
-        _tagContent.ForceUpdate();
+        tagContent.ForceUpdate();
         MoveToCenter();
     }
     public void Open(Mode mode, Callback callback, params string[] extensions)
@@ -28,7 +26,7 @@ public class FileExplorer : Window
         else
         {
             Destroy(this);
-            Debug.LogError("Error: Unexpected multiple instance of FileExplorer");
+            Debug.LogError("Error: Unexpected multiple instances of FileExplorer");
         }
     }
 }

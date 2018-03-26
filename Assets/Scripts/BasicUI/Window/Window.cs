@@ -18,21 +18,15 @@ public class Window : MonoBehaviour, IPointerDownHandler
     // Child components
     public RectTransform tagTransform;
     private GameObject _contents;
-    protected LocalizedText _tagContent;
+    protected LocalizedText tagContent;
     private RectTransform _tagContentTransform;
     // Actions
     [HideInInspector] public List<Operation> operations = new List<Operation>();
     // Properties
-    private float TagWidth
-    {
-        get
-        {
-            return Mathf.Max(LayoutUtility.GetPreferredWidth(_tagContentTransform) + uiParameters.tagRightSpace
-                + uiParameters.tagLeftSpace, uiParameters.minTagWidth);
-        }
-    }
-    private Vector2 MinPosition { get { return new Vector2(0.0f, 45.0f - Screen.height); } }
-    private Vector2 MaxPosition { get { return new Vector2(Screen.width - TagWidth + 1, -25.0f); } }
+    private float TagWidth => Mathf.Max(LayoutUtility.GetPreferredWidth(_tagContentTransform) + uiParameters.tagRightSpace
+      + uiParameters.tagLeftSpace, uiParameters.minTagWidth);
+    private Vector2 MinPosition => new Vector2(0.0f, 45.0f - Screen.height);
+    private Vector2 MaxPosition => new Vector2(Screen.width - TagWidth + 1, -25.0f);
     private Vector2 MinSize
     {
         get
@@ -76,7 +70,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
     // Methods
     public void SetTagContent(params string[] texts)
     {
-        if (_tagContent != null) _tagContent.Strings = texts;
+        if (tagContent != null) tagContent.Strings = texts;
         AdjustTagWidth();
     }
     public void MoveToCenter()
@@ -122,8 +116,8 @@ public class Window : MonoBehaviour, IPointerDownHandler
     private void Start()
     {
         _contents = transform.Find("Contents").gameObject;
-        _tagContent = tagTransform.GetComponentInChildren<LocalizedText>();
-        _tagContentTransform = _tagContent.GetComponent<RectTransform>();
+        tagContent = tagTransform.GetComponentInChildren<LocalizedText>();
+        _tagContentTransform = tagContent.GetComponent<RectTransform>();
         _windowTransform = GetComponent<RectTransform>();
         AdjustTagWidth();
     }

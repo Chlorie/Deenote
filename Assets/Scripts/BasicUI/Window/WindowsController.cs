@@ -5,7 +5,7 @@ public class WindowsController : MonoBehaviour
 {
     public static WindowsController instance;
     [HideInInspector] public List<Window> frontWindows = new List<Window>(); // Windows like message boxes that cannot lose focus
-    [HideInInspector] public Window focusedWindow = null;
+    [HideInInspector] public Window focusedWindow;
     public bool SetFocusToWindow(Window window)
     {
         if (frontWindows.Count == 0)
@@ -26,7 +26,7 @@ public class WindowsController : MonoBehaviour
         else
         {
             Destroy(this);
-            Debug.LogError("Error: Unexpected multiple instance of WindowsController");
+            Debug.LogError("Error: Unexpected multiple instances of WindowsController");
         }
     }
 }

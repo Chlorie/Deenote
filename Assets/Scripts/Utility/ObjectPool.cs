@@ -6,19 +6,15 @@ public class ObjectPool<T> where T : Object
     private T _prefab;
     private List<T> _objects = new List<T>();
     private List<bool> _available = new List<bool>();
-    private Transform _parent = null;
+    private Transform _parent;
     // Initialization (Constructor)
     public ObjectPool(T prefab, int startAmount = 20, Transform parent = null)
     {
-        this._prefab = prefab;
-        this._parent = parent;
+        _prefab = prefab;
+        _parent = parent;
         for (int i = 0; i < startAmount; i++)
         {
-            T newObject;
-            if (parent != null)
-                newObject = Object.Instantiate(prefab, parent);
-            else
-                newObject = Object.Instantiate(prefab);
+            T newObject = parent != null ? Object.Instantiate(prefab, parent) : Object.Instantiate(prefab);
             _objects.Add(newObject);
             _available.Add(true);
         }
@@ -31,11 +27,7 @@ public class ObjectPool<T> where T : Object
                 _available[i] = false;
                 return _objects[i];
             }
-        T newObject;
-        if (_parent != null)
-            newObject = Object.Instantiate(_prefab, _parent);
-        else
-            newObject = Object.Instantiate(_prefab);
+        T newObject = _parent != null ? Object.Instantiate(_prefab, _parent) : Object.Instantiate(_prefab);
         _objects.Add(newObject);
         _available.Add(false);
         return newObject;

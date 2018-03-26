@@ -7,7 +7,6 @@ public class ShortcutController : MonoBehaviour
 {
     public static ShortcutController instance;
     [HideInInspector] public List<ToolbarSelectable> toolbarSelectables;
-    private bool _focusingOnToolbar = false;
     private void CheckShortcuts()
     {
         GameObject obj = EventSystem.current.currentSelectedGameObject;
@@ -63,7 +62,7 @@ public class ShortcutController : MonoBehaviour
         else
         {
             Destroy(this);
-            Debug.LogError("Error: Unexpected multiple instance of ShortcutController");
+            Debug.LogError("Error: Unexpected multiple instances of ShortcutController");
         }
     }
     private void Update()

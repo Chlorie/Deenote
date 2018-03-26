@@ -4,13 +4,13 @@ using UnityEngine.UI;
 
 public class ToolbarController : MonoBehaviour
 {
-    public static ToolbarController instance = null;
-    [HideInInspector] public bool hoverDetect = false; // Once a selectable is selected, hover actions over other selectables should be detected
+    public static ToolbarController instance;
+    [HideInInspector] public bool hoverDetect; // Once a selectable is selected, hover actions over other selectables should be detected
     public RectTransform dropdownTransform;
     public ToolbarDropdownItem dropdownItemPrefab;
     private ObjectPool<ToolbarDropdownItem> _dropdownItemPool;
     private List<ToolbarDropdownItem> _dropdownItems = new List<ToolbarDropdownItem>();
-    [HideInInspector] public ToolbarSelectable currentSelected = null;
+    [HideInInspector] public ToolbarSelectable currentSelected;
     public UIParameters uiParameters;
     [HideInInspector] public int onObjectCount = 0;
     private void Awake()
@@ -20,7 +20,7 @@ public class ToolbarController : MonoBehaviour
         else
         {
             Destroy(this);
-            Debug.LogError("Error: Unexpected multiple instance of ToolbarController");
+            Debug.LogError("Error: Unexpected multiple instances of ToolbarController");
         }
         _dropdownItemPool = new ObjectPool<ToolbarDropdownItem>(dropdownItemPrefab, 10, dropdownTransform);
     }
@@ -36,7 +36,7 @@ public class ToolbarController : MonoBehaviour
             string[] strings = infos[i].strings.Clone() as string[];
             if (infos[i].operation.shortcut != null)
                 for (int j = 0; j < strings.Length; j++)
-                    strings[j] += "(" + infos[i].operation.shortcut.ToString() + ")";
+                    strings[j] += "(" + infos[i].operation.shortcut + ")";
             item.description.Strings = strings;
             item.shortcut.text = infos[i].globalShortcut?.ToString();
             item.callback = infos[i].operation.callback;

@@ -16,7 +16,7 @@ public class MoveAndResizeHandler : MonoBehaviour
         ResizeLeft,
         Move
     }
-    private bool _dragging = false;
+    private bool _dragging;
     private Rect _beginDragRect;
     private Vector2 _beginDragPoint;
     private Window _window;
@@ -105,104 +105,49 @@ public class MoveAndResizeHandler : MonoBehaviour
         switch (position)
         {
             case MoveAndResizeDetector.ResizeAndMoveType.Move:
-                if (_window.movable)
-                    action = Action.Move;
-                else
-                    action = Action.None;
+                action = _window.movable ? Action.Move : Action.None;
                 break;
             case MoveAndResizeDetector.ResizeAndMoveType.UpperLeft:
                 if (_window.horizontalResizable)
-                {
-                    if (_window.verticalResizable)
-                        action = Action.ResizeTopLeft;
-                    else
-                        action = Action.ResizeLeft;
-                }
+                    action = _window.verticalResizable ? Action.ResizeTopLeft : Action.ResizeLeft;
                 else
-                {
-                    if (_window.verticalResizable)
-                        action = Action.ResizeTop;
-                    else
-                        action = Action.None;
-                }
+                    action = _window.verticalResizable ? Action.ResizeTop : Action.None;
                 break;
             case MoveAndResizeDetector.ResizeAndMoveType.UpperRight:
                 if (_window.horizontalResizable)
-                {
-                    if (_window.verticalResizable)
-                        action = Action.ResizeTopRight;
-                    else
-                        action = Action.ResizeRight;
-                }
+                    action = _window.verticalResizable ? Action.ResizeTopRight : Action.ResizeRight;
                 else
-                {
-                    if (_window.verticalResizable)
-                        action = Action.ResizeTop;
-                    else
-                        action = Action.None;
-                }
+                    action = _window.verticalResizable ? Action.ResizeTop : Action.None;
                 break;
             case MoveAndResizeDetector.ResizeAndMoveType.LowerRight:
                 if (_window.horizontalResizable)
-                {
-                    if (_window.verticalResizable)
-                        action = Action.ResizeBottomRight;
-                    else
-                        action = Action.ResizeRight;
-                }
+                    action = _window.verticalResizable ? Action.ResizeBottomRight : Action.ResizeRight;
                 else
-                {
-                    if (_window.verticalResizable)
-                        action = Action.ResizeBottom;
-                    else
-                        action = Action.None;
-                }
+                    action = _window.verticalResizable ? Action.ResizeBottom : Action.None;
                 break;
             case MoveAndResizeDetector.ResizeAndMoveType.LowerLeft:
                 if (_window.horizontalResizable)
-                {
-                    if (_window.verticalResizable)
-                        action = Action.ResizeBottomLeft;
-                    else
-                        action = Action.ResizeLeft;
-                }
+                    action = _window.verticalResizable ? Action.ResizeBottomLeft : Action.ResizeLeft;
                 else
-                {
-                    if (_window.verticalResizable)
-                        action = Action.ResizeBottom;
-                    else
-                        action = Action.None;
-                }
+                    action = _window.verticalResizable ? Action.ResizeBottom : Action.None;
                 break;
             case MoveAndResizeDetector.ResizeAndMoveType.Left:
-                if (_window.horizontalResizable)
-                    action = Action.ResizeLeft;
-                else
-                    action = Action.None;
+                action = _window.horizontalResizable ? Action.ResizeLeft : Action.None;
                 break;
             case MoveAndResizeDetector.ResizeAndMoveType.Right:
-                if (_window.horizontalResizable)
-                    action = Action.ResizeRight;
-                else
-                    action = Action.None;
+                action = _window.horizontalResizable ? Action.ResizeRight : Action.None;
                 break;
             case MoveAndResizeDetector.ResizeAndMoveType.Up:
-                if (_window.verticalResizable)
-                    action = Action.ResizeTop;
-                else
-                    action = Action.None;
+                action = _window.verticalResizable ? Action.ResizeTop : Action.None;
                 break;
             case MoveAndResizeDetector.ResizeAndMoveType.Down:
-                if (_window.verticalResizable)
-                    action = Action.ResizeBottom;
-                else
-                    action = Action.None;
+                action = _window.verticalResizable ? Action.ResizeBottom : Action.None;
                 break;
         }
         float x = data.position.x - _beginDragPoint.x, y = data.position.y - _beginDragPoint.y;
         Vector2 dx, dy;
         Vector2Int aspectRatio = _window.aspectRatio;
-        int ratioCheck = 0;
+        int ratioCheck;
         switch (action)
         {
             case Action.Move:

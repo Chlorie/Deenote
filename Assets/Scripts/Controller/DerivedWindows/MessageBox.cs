@@ -27,7 +27,7 @@ public class MessageBox : Window
     {
         Open();
         int length = buttonInfos.Length;
-        if (buttonInfos == null || length == 0 || length > 4)
+        if (length == 0 || length > 4)
             Debug.LogError("Error: Too many or no selections for a MessageBox");
         _content.Strings = content;
         SetTagContent(title);
@@ -37,10 +37,10 @@ public class MessageBox : Window
                 _buttons[i].gameObject.SetActive(true);
                 _buttons[i].onClick.RemoveAllListeners();
                 int temp = i;
-                _buttons[i].onClick.AddListener(() => 
+                _buttons[i].onClick.AddListener(() =>
                 {
-                    buttonInfos[temp].callback?.Invoke();
                     Close();
+                    buttonInfos[temp].callback?.Invoke();
                 });
                 _buttonTexts[i].Strings = buttonInfos[i].texts;
                 Vector2 sizeDelta = _buttonTransforms[i].sizeDelta;
@@ -57,7 +57,7 @@ public class MessageBox : Window
         else
         {
             Destroy(this);
-            Debug.LogError("Error: Unexpected multiple instance of MessageBox");
+            Debug.LogError("Error: Unexpected multiple instances of MessageBox");
         }
     }
 }

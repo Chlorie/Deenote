@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Text))]
@@ -8,7 +6,7 @@ public class LocalizedText : MonoBehaviour
 {
     [SerializeField] [TextArea] private string[] _strings;
     private Text _text;
-    private Text TextProperty { get { return _text ?? (_text = gameObject.GetComponent<Text>()); } }
+    private Text TextProperty => _text ?? (_text = gameObject.GetComponent<Text>());
     [HideInInspector] public Color color { set { _text.color = value; } }
     public string[] Strings
     {
@@ -47,10 +45,7 @@ public class LocalizedText : MonoBehaviour
     }
     private string SpaceConverter(string original, bool noLineBreak)
     {
-        if (noLineBreak)
-            return original.Replace(' ', '\u00a0');
-        else
-            return original;
+        return noLineBreak ? original.Replace(' ', '\u00a0') : original;
     }
     private void Awake()
     {

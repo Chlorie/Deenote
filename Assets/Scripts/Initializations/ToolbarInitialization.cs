@@ -9,13 +9,13 @@ public class ToolbarInitialization : MonoBehaviour
     {
         projectSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new string[] { "Test window" },
+            strings = new[] { "Test window" },
             operation = new Operation
             {
                 callback = () =>
                 {
-                    MessageBox.Activate(new string[] { "A random message box", "对话框测试" },
-                        new string[]
+                    MessageBox.Activate(new[] { "A random message box", "对话框测试" },
+                        new[]
                         {
                             "This is the content",
                             "啥内容都没有"
@@ -23,7 +23,7 @@ public class ToolbarInitialization : MonoBehaviour
                         new MessageBox.ButtonInfo
                         {
                             callback = () => { },
-                            texts = new string[]
+                            texts = new[]
                             {
                                 "Back",
                                 "这个是返回键"
@@ -36,7 +36,7 @@ public class ToolbarInitialization : MonoBehaviour
         });
         projectSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new string[] { "Quit", "退出" },
+            strings = new[] { "Quit", "退出" },
             operation = new Operation
             {
                 callback = () => { }, // Add this later
@@ -64,7 +64,16 @@ public class ToolbarInitialization : MonoBehaviour
     {
         settingsSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new string[] { "Set Language to English", "将语言设置为英文" },
+            strings = new[] { "Check for updates", "更新检测" },
+            operation = new Operation
+            {
+                callback = () => { VersionChecker.CheckForUpdate(true); },
+                shortcut = new Shortcut { key = KeyCode.U }
+            }
+        });
+        settingsSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Set Language to English", "将语言设置为英文" },
             operation = new Operation
             {
                 callback = () => { LanguageController.Language = 0; },
@@ -73,7 +82,7 @@ public class ToolbarInitialization : MonoBehaviour
         });
         settingsSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new string[] { "Set Language to Chinese", "将语言设置为中文" },
+            strings = new[] { "Set Language to Chinese", "将语言设置为中文" },
             operation = new Operation
             {
                 callback = () => { LanguageController.Language = 1; },
@@ -86,7 +95,7 @@ public class ToolbarInitialization : MonoBehaviour
         InitializeProjectSelectable();
         InitializeEditSelectable();
         InitializeSettingsSelectable();
-        StatusBar.SetStrings(new string[]
+        StatusBar.SetStrings(new[]
         {
             "Initialized toolbar selectables",
             "工具栏选项初始化完成"

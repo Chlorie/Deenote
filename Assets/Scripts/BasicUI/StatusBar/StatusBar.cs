@@ -14,15 +14,12 @@ public class StatusBar : MonoBehaviour
         else
         {
             Destroy(this);
-            Debug.LogError("Error: Unexpected multiple instance of StatusBar");
+            Debug.LogError("Error: Unexpected multiple instances of StatusBar");
         }
     }
     public static void SetStrings(string[] strings, bool error = false)
     {
         instance.statusText.Strings = strings;
-        if (error)
-            instance.background.color = instance.uiParameters.statusBarErrorColor;
-        else
-            instance.background.color = instance.uiParameters.statusBarDefaultColor;
+        instance.background.color = error ? instance.uiParameters.statusBarErrorColor : instance.uiParameters.statusBarDefaultColor;
     }
 }

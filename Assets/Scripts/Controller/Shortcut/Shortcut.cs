@@ -16,7 +16,7 @@ public class Shortcut
         if (ctrl) result.Append("Ctrl+");
         if (alt) result.Append("Alt+");
         if (shift) result.Append("Shift+");
-        result.Append(key.ToString());
+        result.Append(key);
         return result.ToString();
     }
     public bool IsActive
