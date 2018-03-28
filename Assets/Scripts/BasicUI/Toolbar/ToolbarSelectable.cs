@@ -20,7 +20,7 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     }
     public void OnClick()
     {
-        if (WindowsController.instance.frontWindows.Count == 0)
+        if (!WindowsController.instance.Blocking)
             if (!_controller.hoverDetect)
             {
                 _controller.currentSelected = this;
@@ -37,7 +37,7 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     public void OnPointerEnter(PointerEventData eventData)
     {
         _controller.onObjectCount++;
-        if (WindowsController.instance.frontWindows.Count == 0)
+        if (!WindowsController.instance.Blocking)
         {
             SetDefaultColor();
             if (_controller.hoverDetect)

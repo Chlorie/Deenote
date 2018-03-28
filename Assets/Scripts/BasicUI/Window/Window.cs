@@ -11,7 +11,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
     public bool horizontalResizable;
     public bool verticalResizable;
     public bool movable;
-    public bool front;
+    public bool blocking;
     public Vector2 minSize;
     public bool flexibleTagWidth;
     public Vector2Int aspectRatio;
@@ -91,14 +91,16 @@ public class Window : MonoBehaviour, IPointerDownHandler
     }
     protected virtual void Open()
     {
-        if (front) WindowsController.instance.frontWindows.Add(this);
         _contents.SetActive(true);
+        SetFocus();
+        if (blocking) WindowsController.instance.AddBlockingWindow(this);
     }
     public virtual void Close()
     {
-        if (front) WindowsController.instance.frontWindows.Remove(this);
+        if (blocking) WindowsController.instance.RemoveBlockingWindow(this);
         _contents.SetActive(false);
         Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
+        WindowsController.instance.MoveWindowToBottom(this);
         WindowsController.instance.UpdateFocusedWindowRef();
     }
     public void SetFocus()

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toolbarMainButtonSideSpace: 12
   toolbarItemMiddleSpace: 25
-  toolbarSelectableDefaultColor: {r: 0.15686275, g: 0.15686275, b: 0.15686275, a: 1}
+  toolbarSelectableDefaultColor: {r: 0.15686275, g: 0.15686275, b: 0.15686275, a: 0}
   toolbarSelectableHighlightedColor: {r: 0.20392157, g: 0.20392157, b: 0.20392157,
     a: 1}
   toolbarSelectableSelectedColor: {r: 0.078431375, g: 0.078431375, b: 0.078431375,

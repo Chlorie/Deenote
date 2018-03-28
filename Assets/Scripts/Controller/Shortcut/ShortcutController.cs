@@ -1,23 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class ShortcutController : MonoBehaviour
 {
     public static ShortcutController instance;
     [HideInInspector] public List<ToolbarSelectable> toolbarSelectables;
+    public static int selectedInputField = 0;
     private void CheckShortcuts()
     {
-        GameObject obj = EventSystem.current.currentSelectedGameObject;
-        // - REMIND - 
-        // Remember the following if statement is executed per frame,
-        // and it has a GetComponent in it, which is very costly.
-        // (Deenote 0.6.7 still does this in the following way)
-        // Should change this to something more efficient later.
-        if (obj == null || obj.GetComponent<InputField>() == null)
+        if (selectedInputField == 0) // No input fields selected
         {
-            if (WindowsController.instance.frontWindows.Count == 0) // No front windows obstructing
+            if (!WindowsController.instance.Blocking) // No front windows obstructing
             {
                 // Check toolbar activating shortcut sequences
                 // Check global shortcut sequences in toolbar dropdowns

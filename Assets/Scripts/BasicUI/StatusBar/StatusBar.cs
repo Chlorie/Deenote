@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class StatusBar : MonoBehaviour
 {
     public static StatusBar instance;
-    public UIParameters uiParameters;
+    [SerializeField] private UIParameters uiParameters;
     public LocalizedText statusText;
     public Image background;
     private void Awake()

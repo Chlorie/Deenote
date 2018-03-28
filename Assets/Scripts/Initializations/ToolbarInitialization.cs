@@ -22,7 +22,6 @@ public class ToolbarInitialization : MonoBehaviour
                         },
                         new MessageBox.ButtonInfo
                         {
-                            callback = () => { },
                             texts = new[]
                             {
                                 "Back",
@@ -73,20 +72,25 @@ public class ToolbarInitialization : MonoBehaviour
         });
         settingsSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new[] { "Set Language to English", "将语言设置为英文" },
+            strings = new[] { "Language selection", "语言选择" },
             operation = new Operation
             {
-                callback = () => { LanguageController.Language = 0; },
-                shortcut = new Shortcut { key = KeyCode.E }
-            }
-        });
-        settingsSelectable.operations.Add(new ToolbarOperation
-        {
-            strings = new[] { "Set Language to Chinese", "将语言设置为中文" },
-            operation = new Operation
-            {
-                callback = () => { LanguageController.Language = 1; },
-                shortcut = new Shortcut { key = KeyCode.C }
+                callback = () =>
+                {
+                    MessageBox.Activate(new[] { "Select the language", "选择语言" },
+                        new[] { "" },
+                        new MessageBox.ButtonInfo
+                        {
+                            callback = () => { LanguageController.Language = 0; },
+                            texts = new[] { "English" }
+                        },
+                        new MessageBox.ButtonInfo
+                        {
+                            callback = () => { LanguageController.Language = 1; },
+                            texts = new[] { "中文" }
+                        });
+                },
+                shortcut = new Shortcut { key = KeyCode.L }
             }
         });
     }
