@@ -10,7 +10,7 @@ public class WindowsController : MonoBehaviour
     public bool Blocking => _blockingWindows.Count != 0;
     public bool SetFocusToWindow(Window window)
     {
-        if (_blockingWindows.Count == 0)
+        if (_blockingWindows.Count == 0 || window.blocking)
         {
             window.transform.SetAsLastSibling();
             focusedWindow = window;

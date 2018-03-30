@@ -51,4 +51,9 @@ public class LocalizedText : MonoBehaviour
     {
         LanguageController.localizedTexts.Add(this);
     }
+    // Called in editor, automatically updates the text component
+    private void OnValidate()
+    {
+        if (_strings.Length != 0) TextProperty.text = _strings[0];
+    }
 }

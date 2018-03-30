@@ -70,7 +70,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
     m_HighlightedColor: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
     m_PressedColor: {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.14509805, g: 0.14509805, b: 0.14509805, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0
   m_SpriteState:
@@ -121,7 +121,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: 
 --- !u!114 &114610801991387608
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 319ea4b9ade77c246a7a090ff3fcada3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _parentWindow: {fileID: 0}
+  parentWindow: {fileID: 0}
 --- !u!222 &222432987599175598
 CanvasRenderer:
   m_ObjectHideFlags: 1

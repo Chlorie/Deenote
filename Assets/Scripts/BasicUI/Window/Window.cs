@@ -91,16 +91,17 @@ public class Window : MonoBehaviour, IPointerDownHandler
     }
     protected virtual void Open()
     {
+        bool active = _contents.activeInHierarchy;
         _contents.SetActive(true);
         SetFocus();
-        if (blocking) WindowsController.instance.AddBlockingWindow(this);
+        if (blocking && !active) WindowsController.instance.AddBlockingWindow(this);
     }
     public virtual void Close()
     {
-        if (blocking) WindowsController.instance.RemoveBlockingWindow(this);
         _contents.SetActive(false);
         Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
         WindowsController.instance.MoveWindowToBottom(this);
+        if (blocking) WindowsController.instance.RemoveBlockingWindow(this);
         WindowsController.instance.UpdateFocusedWindowRef();
     }
     public void SetFocus()

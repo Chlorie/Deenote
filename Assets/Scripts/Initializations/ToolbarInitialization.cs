@@ -9,29 +9,20 @@ public class ToolbarInitialization : MonoBehaviour
     {
         projectSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new[] { "Test window" },
+            strings = new[] { "New project", "创建新项目" },
             operation = new Operation
             {
                 callback = () =>
                 {
-                    MessageBox.Activate(new[] { "A random message box", "对话框测试" },
-                        new[]
-                        {
-                            "This is the content",
-                            "啥内容都没有"
-                        },
-                        new MessageBox.ButtonInfo
-                        {
-                            texts = new[]
-                            {
-                                "Back",
-                                "这个是返回键"
-                            }
-                        });
+                    FileExplorer.instance.SetTagContent("New project", "新建项目");
+                    FileExplorer.instance.SetDefaultFileName("NewProject.dnt");
+                    FileExplorer.instance.Open(FileExplorer.Mode.InputFileName,
+                        () => { },
+                        ".dnt");
                 },
-                shortcut = new Shortcut { key = KeyCode.O }
+                shortcut = new Shortcut { key = KeyCode.N }
             },
-            globalShortcut = new Shortcut { ctrl = true, key = KeyCode.O }
+            globalShortcut = new Shortcut { ctrl = true, key = KeyCode.N }
         });
         projectSelectable.operations.Add(new ToolbarOperation
         {

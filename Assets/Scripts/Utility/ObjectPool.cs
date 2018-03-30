@@ -3,19 +3,32 @@ using UnityEngine;
 
 public class ObjectPool<T> where T : Object
 {
+    public delegate void ObjectCall(T item);
     private T _prefab;
     private List<T> _objects = new List<T>();
     private List<bool> _available = new List<bool>();
     private Transform _parent;
-    // Initialization (Constructor)
-    public ObjectPool(T prefab, int startAmount = 20, Transform parent = null)
+    private ObjectCall _initCall;
+    private ObjectCall _getCall;
+    private ObjectCall _returnCall;
+    private T InstantiateNew()
+    {
+        T newObject = _parent != null ? Object.Instantiate(_prefab, _parent) : Object.Instantiate(_prefab);
+        _initCall?.Invoke(newObject);
+        _objects.Add(newObject);
+        return newObject;
+    }
+    public ObjectPool(T prefab, int startAmount = 20, Transform parent = null,
+        ObjectCall initCall = null, ObjectCall getCall = null, ObjectCall returnCall = null)
     {
         _prefab = prefab;
         _parent = parent;
+        _initCall = initCall;
+        _getCall = getCall;
+        _returnCall = returnCall;
         for (int i = 0; i < startAmount; i++)
         {
-            T newObject = parent != null ? Object.Instantiate(prefab, parent) : Object.Instantiate(prefab);
-            _objects.Add(newObject);
+            InstantiateNew();
             _available.Add(true);
         }
     }
@@ -25,11 +38,12 @@ public class ObjectPool<T> where T : Object
             if (_available[i])
             {
                 _available[i] = false;
+                _getCall?.Invoke(_objects[i]);
                 return _objects[i];
             }
-        T newObject = _parent != null ? Object.Instantiate(_prefab, _parent) : Object.Instantiate(_prefab);
-        _objects.Add(newObject);
+        T newObject = InstantiateNew();
         _available.Add(false);
+        _getCall?.Invoke(newObject);
         return newObject;
     }
     public void ReturnObject(T returnedObject)
@@ -38,6 +52,7 @@ public class ObjectPool<T> where T : Object
             if (_objects[i] == returnedObject)
             {
                 _available[i] = true;
+                _returnCall?.Invoke(returnedObject);
                 return;
             }
         Object.Destroy(returnedObject);
