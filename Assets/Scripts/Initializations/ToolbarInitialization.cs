@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using Newtonsoft.Json;
 
 public class ToolbarInitialization : MonoBehaviour
 {
     public ToolbarSelectable projectSelectable;
     public ToolbarSelectable editSelectable;
     public ToolbarSelectable settingsSelectable;
+    public ToolbarSelectable testSelectable;
     private void InitializeProjectSelectable()
     {
         projectSelectable.operations.Add(new ToolbarOperation
@@ -14,9 +16,9 @@ public class ToolbarInitialization : MonoBehaviour
             {
                 callback = () =>
                 {
-                    FileExplorer.instance.SetTagContent("New project", "新建项目");
-                    FileExplorer.instance.SetDefaultFileName("NewProject.dnt");
-                    FileExplorer.instance.Open(FileExplorer.Mode.InputFileName,
+                    FileExplorer.SetTagContent("New project", "创建新项目");
+                    FileExplorer.SetDefaultFileName("NewProject.dnt");
+                    FileExplorer.Open(FileExplorer.Mode.InputFileName,
                         () => { },
                         ".dnt");
                 },
@@ -84,12 +86,52 @@ public class ToolbarInitialization : MonoBehaviour
                 shortcut = new Shortcut { key = KeyCode.L }
             }
         });
+        settingsSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Change background image", "更改背景图" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    FileExplorer.SetTagContent("Change background image", "更改背景图");
+                    FileExplorer.Open(FileExplorer.Mode.SelectFile,
+                          () => StartCoroutine(BackgroundImageSetter.instance.SetBackgroundImagePath(FileExplorer.Result)),
+                          ".png", ".jpg");
+                },
+                shortcut = new Shortcut { key = KeyCode.I }
+            }
+        });
+    }
+    private void InitializeTestSelectable()
+    {
+        testSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Test Json Chart Loading" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    FileExplorer.SetTagContent("Test json chart loading");
+                    FileExplorer.Open(FileExplorer.Mode.SelectFile,
+                        () =>
+                        {
+                            string json = System.IO.File.ReadAllText(FileExplorer.Result);
+                            Chart chart = new Chart { difficulty = 0, level = "1" };
+                            JsonChart jsonChart = JsonConvert.DeserializeObject<JsonChart>(json);
+                            chart.FromJsonChart(jsonChart);
+                            return;
+                        }, ".json", ".txt");
+                },
+                shortcut = new Shortcut { key = KeyCode.T }
+            }
+        });
     }
     private void Start()
     {
         InitializeProjectSelectable();
         InitializeEditSelectable();
         InitializeSettingsSelectable();
+        InitializeTestSelectable();
         StatusBar.SetStrings(new[]
         {
             "Initialized toolbar selectables",

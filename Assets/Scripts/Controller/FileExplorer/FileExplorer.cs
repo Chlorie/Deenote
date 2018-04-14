@@ -35,17 +35,22 @@ public class FileExplorer : Window
     }
     private ObjectPool<FileExplorerButton> _buttonPool;
     private List<FileExplorerButton> _buttons = new List<FileExplorerButton>();
-    public string Result { get; private set; }
+    public static string Result => instance.NonStaticResult;
+    private string NonStaticResult { get; set; }
+    public new static void SetTagContent(params string[] texts)
+    {
+        (instance as Window).SetTagContent(texts);
+    }
     protected override void Open()
     {
         base.Open();
         tagContent.ForceUpdate();
         MoveToCenter();
     }
-    public void Open(Mode mode, Callback callback, params string[] extensions)
+    public void OpenNonStatic(Mode mode, Callback callback, params string[] extensions)
     {
         Open();
-        Result = null;
+        NonStaticResult = null;
         _extensions = extensions;
         _mode = mode;
         if (callback == null)
@@ -77,14 +82,18 @@ public class FileExplorer : Window
         }
         Updates();
     }
+    public static void Open(Mode mode, Callback callback, params string[] extensions)
+    {
+        instance.OpenNonStatic(mode, callback, extensions);
+    }
     public override void Close()
     {
         base.Close();
         _fileNameInputField.text = "";
     }
-    public void SetDefaultFileName(string name)
+    public static void SetDefaultFileName(string name)
     {
-        _fileNameInputField.text = name;
+        instance._fileNameInputField.text = name;
     }
     private void Updates()
     {
@@ -111,7 +120,7 @@ public class FileExplorer : Window
         {
             FileInfo[] files = _currentDirectory.GetFiles();
             for (int i = 0; i < files.Length; i++)
-                if (Array.Exists(_extensions, extension => extension == files[i].Extension))
+                if (Array.Exists(_extensions, extension => extension.ToLower() == files[i].Extension.ToLower()))
                 {
                     FileExplorerButton button = _buttonPool.GetObject();
                     _buttons.Add(button);
@@ -189,18 +198,18 @@ public class FileExplorer : Window
         switch (_mode)
         {
             case Mode.SelectFolder:
-                Result = CurrentDirectory;
+                NonStaticResult = CurrentDirectory;
                 Close();
                 _callback();
                 break;
             case Mode.SelectFile:
-                Result = CurrentDirectory + _selectedItemText.text;
+                NonStaticResult = CurrentDirectory + _selectedItemText.text;
                 Close();
                 _callback();
                 break;
             case Mode.InputFileName:
-                Result = CurrentDirectory + _fileNameInputField.text;
-                FileInfo file = new FileInfo(Result);
+                NonStaticResult = CurrentDirectory + _fileNameInputField.text;
+                FileInfo file = new FileInfo(NonStaticResult);
                 if (file.Exists)
                     MessageBox.Activate(new[] { "Overwriting existing file", "覆盖已存在文件" },
                         new[]

@@ -17,10 +17,16 @@ public class ShortcutController : MonoBehaviour
                 for (int i = 0; i < toolbarSelectables.Count; i++)
                 {
                     if (toolbarSelectables[i].shortcut?.IsActive == true)
+                    {
                         toolbarSelectables[i].OnClick(); // Activate corresponding toolbar selectable
+                        return;
+                    }
                     for (int j = 0; j < toolbarSelectables[i].operations.Count; j++)
                         if (toolbarSelectables[i].operations[j].globalShortcut?.IsActive == true)
+                        {
                             toolbarSelectables[i].operations[j].operation.callback?.Invoke(); // Invoke corresponding method
+                            return;
+                        }
                 }
             }
             if (ToolbarController.instance.currentSelected == null) // No toolbar dropdowns obstructing
@@ -32,7 +38,10 @@ public class ShortcutController : MonoBehaviour
                     List<Operation> operations = window.operations;
                     for (int i = 0; i < operations.Count; i++)
                         if (operations[i].shortcut?.IsActive == true)
+                        {
                             operations[i].callback?.Invoke(); // Invoke corresponding method
+                            return;
+                        }
                 }
             }
             else
@@ -44,6 +53,7 @@ public class ShortcutController : MonoBehaviour
                     {
                         ToolbarController.instance.DeselectAll();
                         operations[i].operation.callback?.Invoke(); // Invoke corresponding method
+                        return;
                     }
             }
         }

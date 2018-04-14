@@ -18,6 +18,12 @@ public class MessageBox : Window
     {
         base.Open();
         MoveToCenter();
+        while (operations.Count > 0) operations.RemoveAt(0);
+        operations.Add(new Operation
+        {
+            shortcut = new Shortcut { key = KeyCode.Return },
+            callback = () => { _buttons[0].onClick.Invoke(); }
+        });
     }
     public static void Activate(string[] title, string[] content, params ButtonInfo[] buttonInfos)
     {
