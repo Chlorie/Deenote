@@ -7,7 +7,7 @@ using System;
 
 public class FileExplorer : Window
 {
-    public static FileExplorer instance;
+    public static FileExplorer Instance { get; private set; }
     public enum Mode
     {
         SelectFolder,
@@ -35,11 +35,11 @@ public class FileExplorer : Window
     }
     private ObjectPool<FileExplorerButton> _buttonPool;
     private List<FileExplorerButton> _buttons = new List<FileExplorerButton>();
-    public static string Result => instance.NonStaticResult;
+    public static string Result => Instance.NonStaticResult;
     private string NonStaticResult { get; set; }
     public new static void SetTagContent(params string[] texts)
     {
-        (instance as Window).SetTagContent(texts);
+        (Instance as Window).SetTagContent(texts);
     }
     protected override void Open()
     {
@@ -84,7 +84,7 @@ public class FileExplorer : Window
     }
     public static void Open(Mode mode, Callback callback, params string[] extensions)
     {
-        instance.OpenNonStatic(mode, callback, extensions);
+        Instance.OpenNonStatic(mode, callback, extensions);
     }
     public override void Close()
     {
@@ -93,7 +93,7 @@ public class FileExplorer : Window
     }
     public static void SetDefaultFileName(string name)
     {
-        instance._fileNameInputField.text = name;
+        Instance._fileNameInputField.text = name;
     }
     private void Updates()
     {
@@ -236,8 +236,8 @@ public class FileExplorer : Window
     }
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(this);

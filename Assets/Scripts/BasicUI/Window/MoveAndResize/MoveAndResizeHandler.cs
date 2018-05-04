@@ -241,8 +241,5 @@ public class MoveAndResizeHandler : MonoBehaviour
         float y = size.x * aspectRatio.y / aspectRatio.x - size.y;
         return new Vector2(0.0f, y);
     }
-    private void Start()
-    {
-        _window = GetComponent<Window>();
-    }
+    private void Start() => _window = GetComponent<Window>();
 }

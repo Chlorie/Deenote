@@ -94,19 +94,19 @@ public class Window : MonoBehaviour, IPointerDownHandler
         bool active = _contents.activeInHierarchy;
         _contents.SetActive(true);
         SetFocus();
-        if (blocking && !active) WindowsController.instance.AddBlockingWindow(this);
+        if (blocking && !active) WindowsController.Instance.AddBlockingWindow(this);
     }
     public virtual void Close()
     {
         _contents.SetActive(false);
         Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
-        WindowsController.instance.MoveWindowToBottom(this);
-        if (blocking) WindowsController.instance.RemoveBlockingWindow(this);
-        WindowsController.instance.UpdateFocusedWindowRef();
+        WindowsController.Instance.MoveWindowToBottom(this);
+        if (blocking) WindowsController.Instance.RemoveBlockingWindow(this);
+        WindowsController.Instance.UpdateFocusedWindowRef();
     }
     public void SetFocus()
     {
-        if (_contents.activeSelf) WindowsController.instance.SetFocusToWindow(this);
+        if (_contents.activeSelf) WindowsController.Instance.SetFocusToWindow(this);
     }
     public virtual void OnPointerDown(PointerEventData eventData)
     {

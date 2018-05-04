@@ -12,15 +12,15 @@ public class ToolbarDropdownItem : MonoBehaviour, IPointerEnterHandler, IPointer
     public RectTransform buttonTransform;
     public void OnClick()
     {
-        ToolbarController.instance.DeselectAll();
+        ToolbarController.Instance.DeselectAll();
         callback?.Invoke();
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        ToolbarController.instance.onObjectCount++;
+        ToolbarController.Instance.onObjectCount++;
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        ToolbarController.instance.onObjectCount--;
+        ToolbarController.Instance.onObjectCount--;
     }
 }

@@ -632,7 +632,7 @@ PlayerSettings:
   cloudServicesEnabled:
     UNet: 1
   facebookSdkVersion: 7.9.4
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 3
   cloudProjectId: a878e6b6-560d-471b-87e5-7d868843f0ec
   projectName: Deemo Chart Editor
   organizationId: hydrochloric_acid

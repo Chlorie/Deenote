@@ -3,23 +3,27 @@ using UnityEngine.UI;
 
 public class StatusBar : MonoBehaviour
 {
-    public static StatusBar instance;
+    public static StatusBar Instance { get; private set; }
     [SerializeField] private UIParameters uiParameters;
     public LocalizedText statusText;
     public Image background;
+    public static bool ErrorState
+    {
+        set
+        {
+            Instance.background.color = value ? Instance.uiParameters.statusBarErrorColor :
+                Instance.uiParameters.statusBarDefaultColor;
+        }
+    }
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(this);
             Debug.LogError("Error: Unexpected multiple instances of StatusBar");
         }
     }
-    public static void SetStrings(string[] strings, bool error = false)
-    {
-        instance.statusText.Strings = strings;
-        instance.background.color = error ? instance.uiParameters.statusBarErrorColor : instance.uiParameters.statusBarDefaultColor;
-    }
+    public static void SetStrings(params string[] strings) => Instance.statusText.Strings = strings;
 }

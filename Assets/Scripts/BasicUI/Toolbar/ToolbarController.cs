@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class ToolbarController : MonoBehaviour
 {
-    public static ToolbarController instance;
+    public static ToolbarController Instance { get; private set; }
     [HideInInspector] public bool hoverDetect; // Once a selectable is selected, hover actions over other selectables should be detected
     public RectTransform dropdownTransform;
     public ToolbarDropdownItem dropdownItemPrefab;
@@ -15,8 +15,8 @@ public class ToolbarController : MonoBehaviour
     [HideInInspector] public int onObjectCount = 0;
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(this);

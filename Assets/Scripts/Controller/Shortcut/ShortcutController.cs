@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class ShortcutController : MonoBehaviour
 {
-    public static ShortcutController instance;
+    public static ShortcutController Instance { get; private set; }
     [HideInInspector] public List<ToolbarSelectable> toolbarSelectables;
     public static int selectedInputField = 0;
     private void CheckShortcuts()
     {
         if (selectedInputField == 0) // No input fields selected
         {
-            if (!WindowsController.instance.Blocking) // No front windows obstructing
+            if (!WindowsController.Instance.Blocking) // No front windows obstructing
             {
                 // Check toolbar activating shortcut sequences
                 // Check global shortcut sequences in toolbar dropdowns
@@ -29,10 +29,10 @@ public class ShortcutController : MonoBehaviour
                         }
                 }
             }
-            if (ToolbarController.instance.currentSelected == null) // No toolbar dropdowns obstructing
+            if (ToolbarController.Instance.currentSelected == null) // No toolbar dropdowns obstructing
             {
                 // Check shortcut sequences of currently focusing window
-                Window window = WindowsController.instance.focusedWindow;
+                Window window = WindowsController.Instance.focusedWindow;
                 if (window != null)
                 {
                     List<Operation> operations = window.operations;
@@ -47,11 +47,11 @@ public class ShortcutController : MonoBehaviour
             else
             {
                 // Check shortcuts in currently opened toolbar dropdown
-                List<ToolbarOperation> operations = ToolbarController.instance.currentSelected.operations;
+                List<ToolbarOperation> operations = ToolbarController.Instance.currentSelected.operations;
                 for (int i = 0; i < operations.Count; i++)
                     if (operations[i].operation.shortcut?.IsActive == true)
                     {
-                        ToolbarController.instance.DeselectAll();
+                        ToolbarController.Instance.DeselectAll();
                         operations[i].operation.callback?.Invoke(); // Invoke corresponding method
                         return;
                     }
@@ -60,8 +60,8 @@ public class ShortcutController : MonoBehaviour
     }
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(this);

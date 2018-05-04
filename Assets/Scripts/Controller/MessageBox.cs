@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class MessageBox : Window
 {
-    private static MessageBox _instance;
+    public static MessageBox Instance { get; private set; }
     [SerializeField] private LocalizedText _content;
     [SerializeField] private Button[] _buttons;
     [SerializeField] private LocalizedText[] _buttonTexts;
@@ -27,7 +27,7 @@ public class MessageBox : Window
     }
     public static void Activate(string[] title, string[] content, params ButtonInfo[] buttonInfos)
     {
-        _instance.Open(title, content, buttonInfos);
+        Instance.Open(title, content, buttonInfos);
     }
     private void Open(string[] title, string[] content, ButtonInfo[] buttonInfos)
     {
@@ -58,8 +58,8 @@ public class MessageBox : Window
     }
     private void Awake()
     {
-        if (_instance == null)
-            _instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(this);

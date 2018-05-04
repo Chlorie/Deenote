@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class BackgroundImageSetter : MonoBehaviour
 {
-    public static BackgroundImageSetter instance;
+    public static BackgroundImageSetter Instance { get; private set; }
     [SerializeField] private Image _image;
     public IEnumerator SetBackgroundImagePath(string path)
     {
@@ -21,8 +21,8 @@ public class BackgroundImageSetter : MonoBehaviour
     }
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(this);

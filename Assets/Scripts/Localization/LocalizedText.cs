@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor;
 
 [RequireComponent(typeof(Text))]
 public class LocalizedText : MonoBehaviour
@@ -25,10 +26,7 @@ public class LocalizedText : MonoBehaviour
             SetLanguage(LanguageController.Language);
         }
     }
-    public void SetStrings(params string[] newStrings)
-    {
-        Strings = newStrings;
-    }
+    public void SetStrings(params string[] newStrings) => Strings = newStrings;
     public void SetLanguage(int language)
     {
         if (_strings == null || _strings.Length == 0) // Empty strings
@@ -39,21 +37,13 @@ public class LocalizedText : MonoBehaviour
             TextProperty.text = SpaceConverter(_strings[language], LanguageController.noLineBreak[language]);
         }
     }
-    public void ForceUpdate()
-    {
-        SetLanguage(LanguageController.Language);
-    }
-    private string SpaceConverter(string original, bool noLineBreak)
-    {
-        return noLineBreak ? original.Replace(' ', '\u00a0') : original;
-    }
-    private void Awake()
-    {
-        LanguageController.localizedTexts.Add(this);
-    }
+    public void ForceUpdate() => SetLanguage(LanguageController.Language);
+    private string SpaceConverter(string original, bool noLineBreak) => noLineBreak ? original.Replace(' ', '\u00a0') : original;
+    private void Awake() => LanguageController.localizedTexts.Add(this);
     // Called in editor, automatically updates the text component
     private void OnValidate()
     {
-        if (_strings.Length != 0) TextProperty.text = _strings[0];
+        if (_strings != null && _strings.Length != 0 && !EditorApplication.isPlaying)
+            TextProperty.text = _strings[0];
     }
 }

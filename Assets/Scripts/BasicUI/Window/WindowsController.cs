@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class WindowsController : MonoBehaviour
 {
-    public static WindowsController instance;
+    public static WindowsController Instance { get; private set; }
     private List<Window> _blockingWindows = new List<Window>(); // Windows like message boxes that cannot lose focus
     [HideInInspector] public Window focusedWindow;
     [SerializeField] private GameObject _actionBlocker;
@@ -39,8 +39,8 @@ public class WindowsController : MonoBehaviour
     }
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(this);

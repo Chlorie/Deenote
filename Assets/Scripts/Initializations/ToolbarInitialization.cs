@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using Newtonsoft.Json;
+using System;
 
 public class ToolbarInitialization : MonoBehaviour
 {
+    public ToolbarInitialization Instance { get; private set; }
     public ToolbarSelectable projectSelectable;
     public ToolbarSelectable editSelectable;
     public ToolbarSelectable settingsSelectable;
@@ -31,7 +33,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "Quit", "退出" },
             operation = new Operation
             {
-                callback = () => { }, // Add this later
+                callback = QuitApp.ShowConfirmQuitMessage,
                 shortcut = new Shortcut { key = KeyCode.Q }
             },
             globalShortcut = new Shortcut { alt = true, key = KeyCode.F4 }
@@ -39,18 +41,7 @@ public class ToolbarInitialization : MonoBehaviour
     }
     private void InitializeEditSelectable()
     {
-        //editSelectable.items.Add(new ButtonInfo
-        //{
-        //    strings = new string[] { "Undo", "撤销" },
-        //    shortcut = "Ctrl+Z",
-        //    callback = delegate { }
-        //});
-        //editSelectable.items.Add(new ButtonInfo
-        //{
-        //    strings = new string[] { "Redo", "重做" },
-        //    shortcut = "Ctrl+Y",
-        //    callback = delegate { }
-        //});
+        
     }
     private void InitializeSettingsSelectable()
     {
@@ -95,7 +86,7 @@ public class ToolbarInitialization : MonoBehaviour
                 {
                     FileExplorer.SetTagContent("Change background image", "更改背景图");
                     FileExplorer.Open(FileExplorer.Mode.SelectFile,
-                          () => StartCoroutine(BackgroundImageSetter.instance.SetBackgroundImagePath(FileExplorer.Result)),
+                          () => StartCoroutine(BackgroundImageSetter.Instance.SetBackgroundImagePath(FileExplorer.Result)),
                           ".png", ".jpg");
                 },
                 shortcut = new Shortcut { key = KeyCode.I }
@@ -125,6 +116,16 @@ public class ToolbarInitialization : MonoBehaviour
                 shortcut = new Shortcut { key = KeyCode.T }
             }
         });
+    }
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+        {
+            Destroy(this);
+            Debug.LogError("Error: Unexpected multiple instances of ToolbarInitialization");
+        }
     }
     private void Start()
     {

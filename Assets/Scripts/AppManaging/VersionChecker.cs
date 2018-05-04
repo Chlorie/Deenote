@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 public class VersionChecker : MonoBehaviour
 {
-    private static VersionChecker _instance;
+    public static VersionChecker Instance { get; private set; }
     [SerializeField] private string _currentVersion;
     private List<int> VersionStringToIntList(string version)
     {
@@ -30,7 +30,7 @@ public class VersionChecker : MonoBehaviour
     }
     public static void CheckForUpdate(bool noticeAnyway)
     {
-        Task task = _instance.CheckUpdate(noticeAnyway);
+        Task task = Instance.CheckUpdate(noticeAnyway);
     }
     private async Task CheckUpdate(bool noticeAnyway)
     {
@@ -108,8 +108,8 @@ public class VersionChecker : MonoBehaviour
     }
     private void Awake()
     {
-        if (_instance == null)
-            _instance = this;
+        if (Instance == null)
+            Instance = this;
         else
         {
             Destroy(this);

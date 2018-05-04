@@ -20,7 +20,7 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     }
     public void OnClick()
     {
-        if (!WindowsController.instance.Blocking)
+        if (!WindowsController.Instance.Blocking)
             if (!_controller.hoverDetect)
             {
                 _controller.currentSelected = this;
@@ -37,7 +37,7 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     public void OnPointerEnter(PointerEventData eventData)
     {
         _controller.onObjectCount++;
-        if (!WindowsController.instance.Blocking)
+        if (!WindowsController.Instance.Blocking)
         {
             SetDefaultColor();
             if (_controller.hoverDetect)
@@ -99,7 +99,7 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private void Start()
     {
         UpdateMainButtonSize();
-        _controller = ToolbarController.instance;
-        ShortcutController.instance.toolbarSelectables.Add(this);
+        _controller = ToolbarController.Instance;
+        ShortcutController.Instance.toolbarSelectables.Add(this);
     }
 }
