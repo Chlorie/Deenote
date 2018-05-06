@@ -7,7 +7,8 @@ public class LanguageController
     private static int _language;
     public static int LanguageCount => noLineBreak.Length;
     public delegate void LanguageChangeCall();
-    public static LanguageChangeCall call = null;
+    public static event LanguageChangeCall Call = null;
+    public static void Refresh() => Language = _language;
     public static int Language
     {
         get { return _language; }
@@ -15,7 +16,7 @@ public class LanguageController
         {
             _language = value;
             for (int i = 0; i < localizedTexts.Count; i++) localizedTexts[i].SetLanguage(value);
-            call?.Invoke();
+            Call?.Invoke();
         }
     }
 }

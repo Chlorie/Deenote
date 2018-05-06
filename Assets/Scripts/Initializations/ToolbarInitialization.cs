@@ -41,7 +41,7 @@ public class ToolbarInitialization : MonoBehaviour
     }
     private void InitializeEditSelectable()
     {
-        
+
     }
     private void InitializeSettingsSelectable()
     {
@@ -61,8 +61,8 @@ public class ToolbarInitialization : MonoBehaviour
             {
                 callback = () =>
                 {
-                    MessageBox.Activate(new[] { "Select the language", "选择语言" },
-                        new[] { "" },
+                    MessageBox.Activate(new[] { "Language", "语言" },
+                        new[] { "Change language to...", "语言修改为..." },
                         new MessageBox.ButtonInfo
                         {
                             callback = () => { LanguageController.Language = 0; },
@@ -82,13 +82,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "Change background image", "更改背景图" },
             operation = new Operation
             {
-                callback = () =>
-                {
-                    FileExplorer.SetTagContent("Change background image", "更改背景图");
-                    FileExplorer.Open(FileExplorer.Mode.SelectFile,
-                          () => StartCoroutine(BackgroundImageSetter.Instance.SetBackgroundImagePath(FileExplorer.Result)),
-                          ".png", ".jpg");
-                },
+                callback = BackgroundImageSetter.Open,
                 shortcut = new Shortcut { key = KeyCode.I }
             }
         });

@@ -94,7 +94,7 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private void Awake()
     {
         _buttonTransform = button.GetComponent<RectTransform>();
-        LanguageController.call += UpdateMainButtonSize;
+        LanguageController.Call += UpdateMainButtonSize;
     }
     private void Start()
     {

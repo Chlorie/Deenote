@@ -44,7 +44,6 @@ public class FileExplorer : Window
     protected override void Open()
     {
         base.Open();
-        tagContent.ForceUpdate();
         MoveToCenter();
     }
     public void OpenNonStatic(Mode mode, Callback callback, params string[] extensions)

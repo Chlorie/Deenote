@@ -1,7 +1,5 @@
-﻿using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-using Newtonsoft.Json;
 
 public class QuitApp : MonoBehaviour
 {
@@ -33,12 +31,7 @@ public class QuitApp : MonoBehaviour
     }
     private void QuitAppActions()
     {
-        JsonSerializer serializer = new JsonSerializer();
-        FileStream stream = new FileStream("config.json", FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
-        StreamWriter writer = new StreamWriter(stream);
-        serializer.Serialize(writer, AppConfig.config);
-        writer.Dispose();
-        stream.Dispose();
+        AppConfig.Write();
 #if UNITY_EDITOR
         EditorApplication.isPlaying = false;
 #else

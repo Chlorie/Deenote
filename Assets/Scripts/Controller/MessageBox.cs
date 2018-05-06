@@ -11,7 +11,7 @@ public class MessageBox : Window
     private float[] _buttonWidths = { 0.0f, 200.0f, 150.0f, 110.0f, 85.0f };
     public class ButtonInfo
     {
-        public Callback callback;
+        public Callback callback = null;
         public string[] texts;
     }
     protected override void Open()

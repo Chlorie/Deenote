@@ -95,6 +95,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
         _contents.SetActive(true);
         SetFocus();
         if (blocking && !active) WindowsController.Instance.AddBlockingWindow(this);
+        tagContent.ForceUpdate();
     }
     public virtual void Close()
     {
@@ -114,7 +115,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
     }
     private void Awake()
     {
-        LanguageController.call += AdjustTagWidth;
+        LanguageController.Call += AdjustTagWidth;
     }
     private void Start()
     {
