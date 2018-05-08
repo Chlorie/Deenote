@@ -16,7 +16,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
     public bool flexibleTagWidth;
     public Vector2Int aspectRatio;
     // Child components
-    public RectTransform tagTransform;
+    private RectTransform _tagTransform;
     private GameObject _contents;
     protected LocalizedText tagContent;
     private RectTransform _tagContentTransform;
@@ -84,9 +84,9 @@ public class Window : MonoBehaviour, IPointerDownHandler
     {
         if (flexibleTagWidth)
         {
-            Vector2 sizeDelta = tagTransform.sizeDelta;
+            Vector2 sizeDelta = _tagTransform.sizeDelta;
             sizeDelta.x = TagWidth;
-            tagTransform.sizeDelta = sizeDelta;
+            _tagTransform.sizeDelta = sizeDelta;
         }
     }
     protected virtual void Open()
@@ -117,10 +117,12 @@ public class Window : MonoBehaviour, IPointerDownHandler
     {
         LanguageController.Call += AdjustTagWidth;
     }
-    private void Start()
+    protected virtual void Start()
     {
-        _contents = transform.Find("Contents").gameObject;
-        tagContent = tagTransform.GetComponentInChildren<LocalizedText>();
+        Transform contentsTransform = transform.Find("Contents");
+        _contents = contentsTransform.gameObject;
+        _tagTransform = contentsTransform.Find("Tag").GetComponent<RectTransform>();
+        tagContent = _tagTransform.GetComponentInChildren<LocalizedText>();
         _tagContentTransform = tagContent.GetComponent<RectTransform>();
         _windowTransform = GetComponent<RectTransform>();
         AdjustTagWidth();

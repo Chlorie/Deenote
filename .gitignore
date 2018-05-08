@@ -40,3 +40,4 @@ sysinfo.txt
 *.docx
 *.exe
 config.json
+exceptions.log

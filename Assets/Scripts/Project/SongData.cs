@@ -9,8 +9,6 @@ public class SongData
     public Chart[] charts;
     public int coverHeight;
     public int coverXOffset = 0;
-    public float musicVolume = 1.0f;
-    public float pianoVolume = 1.0f;
     public List<TempoEvent> tempos = new List<TempoEvent>(); // All the tempo events
     public byte[] music; // In .mp3 format
     public byte[] preview; // In .mp3 format

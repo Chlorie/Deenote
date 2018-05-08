@@ -106,40 +106,48 @@ public class FileExplorer : Window
             button.ButtonText = "..";
             button.callback = () => { GoToDirectory(_currentDirectory.Parent); };
         }
-        DirectoryInfo[] directories = _currentDirectory.GetDirectories();
-        for (int i = 0; i < directories.Length; i++)
+        try
         {
-            FileExplorerButton button = _buttonPool.GetObject();
-            _buttons.Add(button);
-            button.ButtonText = directories[i].Name;
-            int temp = i;
-            button.callback = () => { GoToDirectory(directories[temp]); };
+            DirectoryInfo[] directories = _currentDirectory.GetDirectories();
+            for (int i = 0; i < directories.Length; i++)
+            {
+                FileExplorerButton button = _buttonPool.GetObject();
+                _buttons.Add(button);
+                button.ButtonText = directories[i].Name;
+                int temp = i;
+                button.callback = () => { GoToDirectory(directories[temp]); };
+            }
+            if (_mode != Mode.SelectFolder)
+            {
+                FileInfo[] files = _currentDirectory.GetFiles();
+                for (int i = 0; i < files.Length; i++)
+                    if (Array.Exists(_extensions, extension => extension.ToLower() == files[i].Extension.ToLower()))
+                    {
+                        FileExplorerButton button = _buttonPool.GetObject();
+                        _buttons.Add(button);
+                        button.ButtonText = files[i].Name;
+                        int temp = i;
+                        if (_mode == Mode.SelectFile)
+                            button.callback = () =>
+                            {
+                                _selectedItemText.text = files[temp].Name;
+                                _confirmButton.interactable = true;
+                            };
+                        else
+                            button.callback = () =>
+                            {
+                                _fileNameInputField.text = files[temp].Name;
+                                FileNameInputCallback();
+                            };
+                    }
+            }
+            _scrollView.verticalNormalizedPosition = 1.0f;
         }
-        if (_mode != Mode.SelectFolder)
+        catch (UnauthorizedAccessException)
         {
-            FileInfo[] files = _currentDirectory.GetFiles();
-            for (int i = 0; i < files.Length; i++)
-                if (Array.Exists(_extensions, extension => extension.ToLower() == files[i].Extension.ToLower()))
-                {
-                    FileExplorerButton button = _buttonPool.GetObject();
-                    _buttons.Add(button);
-                    button.ButtonText = files[i].Name;
-                    int temp = i;
-                    if (_mode == Mode.SelectFile)
-                        button.callback = () =>
-                        {
-                            _selectedItemText.text = files[temp].Name;
-                            _confirmButton.interactable = true;
-                        };
-                    else
-                        button.callback = () =>
-                        {
-                            _fileNameInputField.text = files[temp].Name;
-                            FileNameInputCallback();
-                        };
-                }
+            MessageBox.Activate(new[] { "Error", "错误" }, new[] { "Access to the current path is denied", "拒绝访问当前路径" },
+                new MessageBox.ButtonInfo { texts = new[] { "Back", "返回" } });
         }
-        _scrollView.verticalNormalizedPosition = 1.0f;
     }
     public void DirectoryInputCallback()
     {

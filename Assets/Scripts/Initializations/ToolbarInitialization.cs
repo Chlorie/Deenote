@@ -79,11 +79,11 @@ public class ToolbarInitialization : MonoBehaviour
         });
         settingsSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new[] { "Change background image", "更改背景图" },
+            strings = new[] { "Background image settings", "背景图设置" },
             operation = new Operation
             {
                 callback = BackgroundImageSetter.Open,
-                shortcut = new Shortcut { key = KeyCode.I }
+                shortcut = new Shortcut { key = KeyCode.B }
             }
         });
     }
@@ -127,10 +127,5 @@ public class ToolbarInitialization : MonoBehaviour
         InitializeEditSelectable();
         InitializeSettingsSelectable();
         InitializeTestSelectable();
-        StatusBar.SetStrings(new[]
-        {
-            "Initialized toolbar selectables",
-            "工具栏选项初始化完成"
-        });
     }
 }

@@ -69,6 +69,12 @@ public class BackgroundImageSetter : Window
         _height = texture.height;
         _displayWidth = Screen.width;
         _displayHeight = Screen.height - 20;
+        if (sprite == null)
+        {
+            _transform.anchorMin = _transform.anchorMax = new Vector2(0.5f, 0.5f);
+            _transform.offsetMax = new Vector2((float)_displayWidth / 2, (float)_displayHeight / 2);
+            _transform.offsetMin = -_transform.offsetMax;
+        }
         SetStretchMode((int)_stretch);
         AppConfig.config.backgroundImage = path;
     }
@@ -138,8 +144,9 @@ public class BackgroundImageSetter : Window
         AppConfig.config.backgroundStretch = (int)stretch;
         SetPosition((int)_position);
     }
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         ResolutionController.OnResolutionChange += () => SetStretchMode((int)_stretch);
     }
     private void Awake()
