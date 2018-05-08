@@ -653,6 +653,8 @@ public class EditorController : MonoBehaviour
     }
     private void NoteIndexQuickSort(List<int> index, int low, int high)
     {
+        int mid = (low + high) / 2;
+        int t = index[low]; index[low] = index[mid]; index[mid] = t;
         int pivot = index[low];
         int i = low, j = high;
         float pivotKey = chart.notes[pivot].time;

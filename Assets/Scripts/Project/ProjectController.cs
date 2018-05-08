@@ -356,16 +356,17 @@ public class ProjectController : MonoBehaviour
         byte[] bytes = File.ReadAllBytes(directorySelectorController.selectedItemFullName); //JSON file bytes
         char[] bytechars = new char[bytes.Length + 1];
         string str; //JSON string
-        string level;
         int length = bytes.Length, i = 0, offset = 0;
         while (bytes[i] != 0x7B) i++;
         offset = i;
         for (; i < length && bytes[i] != 0x00; i++) bytechars[i - offset] = (char)bytes[i];
         str = new string(bytechars);
         JSONChart jchart = Utility.JSONtoJChart(str);
-        level = project.charts[diff].level;
+        string level = project.charts[diff].level;
+        List<float> beats = project.charts[diff].beats;
         project.charts[diff] = Utility.JCharttoChart(jchart);
         project.charts[diff].level = level;
+        project.charts[diff].beats = beats;
         directorySelectorController.DeactivateSelection();
     }
     public void ImportChartFromCytusChart(int diff)

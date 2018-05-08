@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UpdateHistory : MonoBehaviour
 {
@@ -11,6 +10,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private List<string> versions = new List<string>
     {
+        "Deenote 0.6.8",
         "Deenote 0.6.7",
         "Deenote 0.6.6",
         "Deenote 0.6.5",
@@ -42,6 +42,9 @@ public class UpdateHistory : MonoBehaviour
     };
     private List<string[]> updateInfo = new List<string[]>
     {
+        new []{ "Fixed the problem of beat lines disappearing when importing charts from JSON files.\n" +
+            "Fixed the problem where inserting notes in a large project may cause stack overflow.",
+            "解决了导入JSON谱面会导致拍线消失的问题。\n解决了谱面中note很多时插入新note导致栈溢出的问题。" },
         new string[]{ "Added localization support for Chinese.\nFixed some minor bugs.\nCollided notes are tinted red now.",
             "增加了中文的本地化支持。\n修复了一些小漏洞。\n重叠note现在会显示红色。" },
         new string[]{ "Optimized the file format so that the project file won't take much space.",
