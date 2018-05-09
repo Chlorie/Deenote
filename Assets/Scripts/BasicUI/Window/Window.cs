@@ -41,7 +41,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
                 return minSize;
         }
     }
-    public Rect rect
+    public Rect Rect
     {
         get
         {
@@ -52,6 +52,11 @@ public class Window : MonoBehaviour, IPointerDownHandler
         }
         set
         {
+            if (value == Rect.zero)
+            {
+                MoveToCenter();
+                return;
+            }
             Vector2 position = value.position + new Vector2(0.0f, value.size.y);
             if (position.x < MinPosition.x) position.x = MinPosition.x;
             if (position.y < MinPosition.y) position.y = MinPosition.y;
@@ -75,10 +80,10 @@ public class Window : MonoBehaviour, IPointerDownHandler
     }
     public void MoveToCenter()
     {
-        Rect currentRect = rect;
-        currentRect.position = new Vector2(Screen.width / 2 - currentRect.size.x / 2,
-            -Screen.height / 2 - currentRect.size.y / 2);
-        rect = currentRect;
+        Rect currentRect = Rect;
+        currentRect.position = new Vector2((int)(Screen.width / 2 - currentRect.size.x / 2),
+            (int)(-Screen.height / 2 - currentRect.size.y / 2));
+        Rect = currentRect;
     }
     private void AdjustTagWidth()
     {

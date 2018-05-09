@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Newtonsoft.Json;
-using System;
 
 public class ToolbarInitialization : MonoBehaviour
 {
@@ -27,6 +26,36 @@ public class ToolbarInitialization : MonoBehaviour
                 shortcut = new Shortcut { key = KeyCode.N }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.N }
+        });
+        projectSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Open project", "打开项目" },
+            operation = new Operation
+            {
+                callback = () => { throw new System.NotImplementedException(); },
+                shortcut = new Shortcut { key = KeyCode.O }
+            },
+            globalShortcut = new Shortcut { ctrl = true, key = KeyCode.O }
+        });
+        projectSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Save project", "保存项目" },
+            operation = new Operation
+            {
+                callback = () => { throw new System.NotImplementedException(); },
+                shortcut = new Shortcut { key = KeyCode.S }
+            },
+            globalShortcut = new Shortcut { ctrl = true, key = KeyCode.S }
+        });
+        projectSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Save as...", "另存为..." },
+            operation = new Operation
+            {
+                callback = () => { throw new System.NotImplementedException(); },
+                shortcut = new Shortcut { shift = true, key = KeyCode.S }
+            },
+            globalShortcut = new Shortcut { ctrl = true, shift = true, key = KeyCode.S }
         });
         projectSelectable.operations.Add(new ToolbarOperation
         {

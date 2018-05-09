@@ -10,6 +10,10 @@ public class AppConfig
     public int language = 0;
     public int backgroundPosition = (int)BackgroundImageSetter.Position.Center;
     public int backgroundStretch = (int)BackgroundImageSetter.StretchMode.FitHeight;
+    public RectData fileExplorerRect;
+    public RectData messageBoxRect;
+    public RectData backgroundImageSetterRect;
+    public RectData projectPropertiesRect;
     public static void Read()
     {
         if (new FileInfo("config.json").Exists)
@@ -33,10 +37,18 @@ public class AppConfig
         BackgroundImageSetter.Instance.SetBackgroundImage(backgroundImage);
         BackgroundImageSetter.Instance.SetPosition(backgroundPosition);
         BackgroundImageSetter.Instance.SetStretchMode(backgroundStretch);
+        FileExplorer.Instance.Rect = fileExplorerRect.ToRect();
+        MessageBox.Instance.Rect = messageBoxRect.ToRect();
+        BackgroundImageSetter.Instance.Rect = backgroundImageSetterRect.ToRect();
+        ProjectProperties.Instance.Rect = projectPropertiesRect.ToRect();
     }
     private void UpdateConfig()
     {
         language = LanguageController.Language;
         firstLaunch = false;
+        fileExplorerRect = new RectData(FileExplorer.Instance.Rect);
+        messageBoxRect = new RectData(MessageBox.Instance.Rect);
+        backgroundImageSetterRect = new RectData(BackgroundImageSetter.Instance.Rect);
+        projectPropertiesRect = new RectData(ProjectProperties.Instance.Rect);
     }
 }

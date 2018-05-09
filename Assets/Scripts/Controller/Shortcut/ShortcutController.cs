@@ -14,17 +14,17 @@ public class ShortcutController : MonoBehaviour
             {
                 // Check toolbar activating shortcut sequences
                 // Check global shortcut sequences in toolbar dropdowns
-                for (int i = 0; i < toolbarSelectables.Count; i++)
+                foreach (ToolbarSelectable toolbarSelectable in toolbarSelectables)
                 {
-                    if (toolbarSelectables[i].shortcut?.IsActive == true)
+                    if (toolbarSelectable.shortcut?.IsActive == true)
                     {
-                        toolbarSelectables[i].OnClick(); // Activate corresponding toolbar selectable
+                        toolbarSelectable.OnClick(); // Activate corresponding toolbar selectable
                         return;
                     }
-                    for (int j = 0; j < toolbarSelectables[i].operations.Count; j++)
-                        if (toolbarSelectables[i].operations[j].globalShortcut?.IsActive == true)
+                    foreach (ToolbarOperation operation in toolbarSelectable.operations)
+                        if (operation.globalShortcut?.IsActive == true)
                         {
-                            toolbarSelectables[i].operations[j].operation.callback?.Invoke(); // Invoke corresponding method
+                            operation.operation.callback?.Invoke(); // Invoke corresponding method
                             return;
                         }
                 }
@@ -34,25 +34,21 @@ public class ShortcutController : MonoBehaviour
                 // Check shortcut sequences of currently focusing window
                 Window window = WindowsController.Instance.focusedWindow;
                 if (window != null)
-                {
-                    List<Operation> operations = window.operations;
-                    for (int i = 0; i < operations.Count; i++)
-                        if (operations[i].shortcut?.IsActive == true)
+                    foreach (Operation operation in window.operations)
+                        if (operation.shortcut?.IsActive == true)
                         {
-                            operations[i].callback?.Invoke(); // Invoke corresponding method
+                            operation.callback?.Invoke(); // Invoke corresponding method
                             return;
                         }
-                }
             }
             else
             {
                 // Check shortcuts in currently opened toolbar dropdown
-                List<ToolbarOperation> operations = ToolbarController.Instance.currentSelected.operations;
-                for (int i = 0; i < operations.Count; i++)
-                    if (operations[i].operation.shortcut?.IsActive == true)
+                foreach (ToolbarOperation operation in ToolbarController.Instance.currentSelected.operations)
+                    if (operation.operation.shortcut?.IsActive == true)
                     {
                         ToolbarController.Instance.DeselectAll();
-                        operations[i].operation.callback?.Invoke(); // Invoke corresponding method
+                        operation.operation.callback?.Invoke(); // Invoke corresponding method
                         return;
                     }
             }
@@ -68,8 +64,5 @@ public class ShortcutController : MonoBehaviour
             Debug.LogError("Error: Unexpected multiple instances of ShortcutController");
         }
     }
-    private void Update()
-    {
-        CheckShortcuts();
-    }
+    private void Update() => CheckShortcuts();
 }

@@ -90,7 +90,7 @@ public class MoveAndResizeHandler : MonoBehaviour
     {
         ChangeCursorSprite(position);
         _dragging = true;
-        _beginDragRect = _window.rect;
+        _beginDragRect = _window.Rect;
         _beginDragPoint = data.position;
     }
     public void EndDrag(MoveAndResizeDetector.ResizeAndMoveType position, PointerEventData data)
@@ -223,7 +223,7 @@ public class MoveAndResizeHandler : MonoBehaviour
                 if (ratioCheck != 0) rect.size += AdjustY(rect.size, aspectRatio);
                 break;
         }
-        _window.rect = rect;
+        _window.Rect = rect;
     }
     // 0: Correct ratio, >0: x too large, <0: y too large
     private int RatioCheck(Vector2 size, Vector2Int aspectRatio)
