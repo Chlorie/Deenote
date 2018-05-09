@@ -14,7 +14,7 @@ public class StageController : MonoBehaviour
     public Toggle lightEffectToggle;
     public bool lightEffectState = true;
     //-Note controlling-
-    public ChartOld chart;
+    public Chart chart;
     public int diff;
     private List<NoteController> notes = new List<NoteController>();
     public List<bool> collided = new List<bool>();

@@ -174,9 +174,9 @@ public class ProjectController : MonoBehaviour
         audioFileBytes = File.ReadAllBytes(songFile.FullName);
         songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, songFile.Extension);
         project.songName = songFile.Name;
-        project.charts = new ChartOld[4];
+        project.charts = new Chart[4];
         for (int i = 0; i < 4; i++)
-            project.charts[i] = new ChartOld
+            project.charts[i] = new Chart
             {
                 difficulty = i,
                 level = "1"
@@ -196,7 +196,7 @@ public class ProjectController : MonoBehaviour
         if (project != null)
         {
             if (currentInStage != -1)
-                foreach (ChartOld chart in project.charts) chart.beats = project.charts[currentInStage].beats;
+                foreach (Chart chart in project.charts) chart.beats = project.charts[currentInStage].beats;
             StartCoroutine(projectSL.SaveProjectIntoFile(project, audioFileBytes, projectFolder + projectFileName + ".dsproj"));
         }
     }
@@ -215,7 +215,7 @@ public class ProjectController : MonoBehaviour
         if (project != null)
         {
             if (currentInStage != -1)
-                foreach (ChartOld chart in project.charts) chart.beats = project.charts[currentInStage].beats;
+                foreach (Chart chart in project.charts) chart.beats = project.charts[currentInStage].beats;
             projectSL.SaveProjectIntoFile(project, audioFileBytes, asFileFullName);
         }
     }
@@ -423,7 +423,7 @@ public class ProjectController : MonoBehaviour
         stage.ClearStage();
         stage.InitializeStage(project, diff, this);
         if (currentInStage != -1)
-            foreach (ChartOld chart in project.charts) chart.beats = project.charts[currentInStage].beats;
+            foreach (Chart chart in project.charts) chart.beats = project.charts[currentInStage].beats;
         currentInStage = diff;
     }
     //-Settings Panel-

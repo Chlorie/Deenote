@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using System.Linq;
+using LibGit2Sharp;
 using UnityEngine;
-using UnityEngine.UI;
+using System.Diagnostics;
 
 public class VersionChecker : MonoBehaviour
 {
@@ -14,17 +12,11 @@ public class VersionChecker : MonoBehaviour
     public string currentVersion;
     private string latestVersion;
     private bool finished = false;
-    private string redirectedUrl = null;
     private List<int> GetVersion(string str)
     {
+        string[] strings = str.Split('.');
         List<int> result = new List<int>();
-        while (str.Length > 0)
-        {
-            while (str.Length > 0 && (str[0] > '9' || str[0] < '0')) str = str.Remove(0, 1);
-            int num = Utility.GetInt(str);
-            result.Add(num);
-            while (str.Length > 0 && str[0] <= '9' && str[0] >= '0') str = str.Remove(0, 1);
-        }
+        for (int i = 0; i < strings.Length; i++) result.Add(int.Parse(strings[i]));
         return result;
     }
     private bool UpToDate(List<int> current, List<int> latest)
@@ -48,64 +40,34 @@ public class VersionChecker : MonoBehaviour
         }
         return result;
     }
-    public bool RemoteCertificateValidationCallback(System.Object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    private void GetLatestVersion()
     {
-        bool isOk = true;
-        // If there are errors in the certificate chain, look at each error to determine the cause.
-        if (sslPolicyErrors != SslPolicyErrors.None)
+        IEnumerable<Reference> references = Repository.ListRemoteReferences("https://github.com/Chlorie/Deenote");
+        IEnumerable<string> versions = from reference in references
+                                       where reference.IsTag
+                                       select reference.CanonicalName.Remove(0, 11); // Remove "refs/tags/v"
+        List<int> current = GetVersion(currentVersion);
+        List<int> latest = new List<int>();
+        foreach (string versionString in versions)
         {
-            for (int i = 0; i < chain.ChainStatus.Length; i++)
+            List<int> version = GetVersion(versionString);
+            if (UpToDate(version, latest))
             {
-                if (chain.ChainStatus[i].Status != X509ChainStatusFlags.RevocationStatusUnknown)
-                {
-                    chain.ChainPolicy.RevocationFlag = X509RevocationFlag.EntireChain;
-                    chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;
-                    chain.ChainPolicy.UrlRetrievalTimeout = new TimeSpan(0, 1, 0);
-                    chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllFlags;
-                    bool chainIsValid = chain.Build((X509Certificate2)certificate);
-                    if (!chainIsValid)
-                    {
-                        isOk = false;
-                    }
-                }
+                latest = version;
+                latestVersion = versionString;
             }
         }
-        return isOk;
-    }
-    private void GetRedirectedUrl()
-    {
-        ServicePointManager.ServerCertificateValidationCallback = RemoteCertificateValidationCallback;
-        string finalUrl = "https://github.com/Chlorie/Deenote/releases/latest";
-        Uri uri = new Uri(finalUrl);
-        while (true)
-        {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.Method = "HEAD";
-            request.AllowAutoRedirect = false;
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            if (response.StatusCode == HttpStatusCode.Redirect)
-            {
-                finalUrl = response.GetResponseHeader("Location");
-                uri = new Uri(finalUrl);
-            }
-            else
-                break;
-        }
-        redirectedUrl = finalUrl;
         finished = true;
     }
     public void CheckForUpdate()
     {
         if (Application.internetReachability == NetworkReachability.NotReachable) return; // No Internet access
-        Thread getUrlThread = new Thread(GetRedirectedUrl);
-        getUrlThread.Start();
+        Thread thread = new Thread(GetLatestVersion);
+        thread.Start();
     }
     private void CheckVersion()
     {
         finished = false;
-        int position = redirectedUrl.Length - 1;
-        while (position >= 0 && redirectedUrl[position] != '/') position--;
-        latestVersion = redirectedUrl.Substring(position + 2);
         List<int> latest = GetVersion(latestVersion);
         if (UpToDate(GetVersion(currentVersion), latest))
         {
@@ -119,7 +81,7 @@ public class VersionChecker : MonoBehaviour
             new string[]
             {"Current version: " + currentVersion + " | Latest version: " + latestVersion,
             "当前版本: " + currentVersion + " | 最新版本: " + latestVersion},
-            new string[] { "Go to release page", "转到发布页面" }, delegate { Process.Start(redirectedUrl); },
+            new string[] { "Go to release page", "转到发布页面" }, delegate { Process.Start("https://github.com/Chlorie/Deenote/releases/latest"); },
             new string[] { "Go to download page", "转到下载页面" }, GoToDownloadPage,
             new string[] { "Update later", "稍后更新" });
     }

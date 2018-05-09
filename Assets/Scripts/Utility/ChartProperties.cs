@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChartProperties
 {
-    public static void GetInGameNoteIds(ChartOld chart, out List<int> noteIDs)
+    public static void GetInGameNoteIds(Chart chart, out List<int> noteIDs)
     {
         int id = -1;
         noteIDs = new List<int>();
@@ -16,7 +16,7 @@ public class ChartProperties
             noteIDs.Add(id);
         }
     }
-    public static void GetCollidedNotes(ChartOld chart, out List<bool> collided)
+    public static void GetCollidedNotes(Chart chart, out List<bool> collided)
     {
         int noteCount = chart.notes.Count;
         collided = new List<bool>(new bool[noteCount]);

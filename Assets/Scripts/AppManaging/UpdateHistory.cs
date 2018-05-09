@@ -10,6 +10,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private List<string> versions = new List<string>
     {
+        "Deenote 0.6.9",
         "Deenote 0.6.8",
         "Deenote 0.6.7",
         "Deenote 0.6.6",
@@ -42,6 +43,10 @@ public class UpdateHistory : MonoBehaviour
     };
     private List<string[]> updateInfo = new List<string[]>
     {
+        new []{ "Fixed the issue that projects cannot be loaded.\n" +
+            "Fixed update checker.",
+            "修复了不能打开文件的问题。\n" +
+            "修复了更新检查。" },
         new []{ "Fixed the problem of beat lines disappearing when importing charts from JSON files.\n" +
             "Fixed the problem where inserting notes in a large project may cause stack overflow.",
             "解决了导入JSON谱面会导致拍线消失的问题。\n解决了谱面中note很多时插入新note导致栈溢出的问题。" },

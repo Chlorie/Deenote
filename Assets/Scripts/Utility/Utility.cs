@@ -194,9 +194,9 @@ public class Utility
         i = j + 1;
         return result;
     }
-    public static ChartOld JCharttoChart(JSONChart jchart)
+    public static Chart JCharttoChart(JSONChart jchart)
     {
-        ChartOld chart = new ChartOld
+        Chart chart = new Chart
         {
             speed = jchart.speed
         };
@@ -277,7 +277,7 @@ public class Utility
         }
         return jchart;
     }
-    public static void WriteCharttoJSON(ChartOld chart, FileStream fs)
+    public static void WriteCharttoJSON(Chart chart, FileStream fs)
     {
         //Write the file under Deemo 3.0 standard
         StreamWriter sw = new StreamWriter(fs);
@@ -331,9 +331,9 @@ public class Utility
         sw.Flush();
         sw.Close();
     }
-    public static ChartOld CopyChart(ChartOld chart)
+    public static Chart CopyChart(Chart chart)
     {
-        ChartOld copy = new ChartOld();
+        Chart copy = new Chart();
         foreach (float time in chart.beats) copy.beats.Add(time);
         copy.difficulty = chart.difficulty;
         copy.level = chart.level;
