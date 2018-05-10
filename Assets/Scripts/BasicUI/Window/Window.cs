@@ -23,6 +23,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
     // Actions
     [HideInInspector] public List<Operation> operations = new List<Operation>();
     // Properties
+    public bool Opened => _contents.activeInHierarchy;
     private float TagWidth => Mathf.Max(LayoutUtility.GetPreferredWidth(_tagContentTransform) + uiParameters.tagRightSpace
       + uiParameters.tagLeftSpace, uiParameters.minTagWidth);
     private Vector2 MinPosition => new Vector2(0.0f, 45.0f - Screen.height);

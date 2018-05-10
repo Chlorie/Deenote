@@ -6,6 +6,7 @@ public class ToolbarInitialization : MonoBehaviour
     public ToolbarInitialization Instance { get; private set; }
     public ToolbarSelectable projectSelectable;
     public ToolbarSelectable editSelectable;
+    public ToolbarSelectable windowsSelectable;
     public ToolbarSelectable settingsSelectable;
     public ToolbarSelectable testSelectable;
     private void InitializeProjectSelectable()
@@ -32,7 +33,11 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "Open project", "打开项目" },
             operation = new Operation
             {
-                callback = () => { throw new System.NotImplementedException(); },
+                callback = () =>
+                {
+                    ProjectManagement.LoadFrom(FileExplorer.Result);
+                    ProjectProperties.Instance.Open();
+                },
                 shortcut = new Shortcut { key = KeyCode.O }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.O }
@@ -71,6 +76,24 @@ public class ToolbarInitialization : MonoBehaviour
     private void InitializeEditSelectable()
     {
 
+    }
+    private void InitializeWindowsSelectable()
+    {
+        windowsSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Project properties window", "项目属性窗口" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    if (ProjectProperties.Instance.Opened)
+                        ProjectProperties.Instance.Close();
+                    else
+                        ProjectProperties.Instance.Open();
+                },
+                shortcut = new Shortcut { key = KeyCode.P }
+            }
+        });
     }
     private void InitializeSettingsSelectable()
     {
@@ -154,6 +177,7 @@ public class ToolbarInitialization : MonoBehaviour
     {
         InitializeProjectSelectable();
         InitializeEditSelectable();
+        InitializeWindowsSelectable();
         InitializeSettingsSelectable();
         InitializeTestSelectable();
     }
