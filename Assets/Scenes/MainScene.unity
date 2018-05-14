@@ -34003,7 +34003,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   updateHistoryText: {fileID: 296563028}
-  currentVersion: 0.6.9
+  currentVersion: 0.6.11
 --- !u!4 &907389519
 Transform:
   m_ObjectHideFlags: 0

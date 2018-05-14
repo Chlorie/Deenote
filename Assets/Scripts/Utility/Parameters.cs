@@ -44,7 +44,7 @@ public static class Parameters
     public static float circleTime = 0.5f;
     public static float waveSize = 4.0f;
     public static float waveHeight = 6.0f;
-    public static float lightSize = 30.0f;
+    public static float lightSize = 25.0f;
     public static float lightHeight = 40.0f;
     public static float waveIncTime = 0.05f;
     public static float waveDecTime = 0.5f;
