@@ -10,6 +10,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private List<string> versions = new List<string>
     {
+        "Deenote 0.6.10",
         "Deenote 0.6.9",
         "Deenote 0.6.8",
         "Deenote 0.6.7",
@@ -43,6 +44,9 @@ public class UpdateHistory : MonoBehaviour
     };
     private List<string[]> updateInfo = new List<string[]>
     {
+        new []{ "Now the lost frame of mp3 audio is partially \"fixed\" by adding an empty frame before the samples. " +
+            "There won't be a weird 26ms offset between Deenote and the correct value(from Audition).",
+            "部分地\"修复\"了mp3文件丢失第一帧的问题 (在所有采样前面增加一个空帧), 现在Deenote不会有奇怪的26毫秒offset了。" },
         new []{ "Fixed the issue that projects cannot be loaded.\n" +
             "Fixed update checker.",
             "修复了不能打开文件的问题。\n" +
