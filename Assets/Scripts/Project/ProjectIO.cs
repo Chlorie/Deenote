@@ -13,8 +13,8 @@ public static class ProjectIO
             level = reader.ReadString()
         };
         int noteCount = reader.ReadInt32();
-        chart.notes = new List<Note>();
-        for (int i = 0; i < noteCount; i++) chart.notes.Add(reader.ReadNote());
+        chart.notes = new List<Note>(); for (int i = 0; i < noteCount; i++)
+            chart.notes.Add(reader.ReadNote());
         return chart;
     }
     public static Note ReadNote(this BinaryReader reader)
@@ -24,7 +24,8 @@ public static class ProjectIO
             position = reader.ReadSingle(),
             size = reader.ReadSingle(),
             time = reader.ReadSingle(),
-            shift = reader.ReadSingle()
+            shift = reader.ReadSingle(),
+            type = reader.ReadInt32()
         };
         int soundCount = reader.ReadInt32();
         note.sounds = new List<PianoSound>();

@@ -2,5 +2,5 @@
 
 public class JsonLink
 {
-    public List<JsonNote> notes;
+    public List<JsonNote> notes = new List<JsonNote>();
 }

@@ -13,11 +13,16 @@ public static class ProjectManagement
             project = reader.ReadSongData();
             filePath = path;
         }
+        if (project.music != null)
+            using (MemoryStream stream = new MemoryStream(project.music))
+                AudioPlayer.Instance.LoadAudioFromStream(stream);
     }
-    public static void SaveTo(string path)
+    public static void SaveAs(string path)
     {
+        if (string.IsNullOrWhiteSpace(filePath)) return;
         using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write))
         using (BinaryWriter writer = new BinaryWriter(stream))
             writer.Write(project);
     }
+    public static void Save() => SaveAs(filePath);
 }

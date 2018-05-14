@@ -37,10 +37,7 @@ public class FileExplorer : Window
     private List<FileExplorerButton> _buttons = new List<FileExplorerButton>();
     public static string Result => Instance.NonStaticResult;
     private string NonStaticResult { get; set; }
-    public new static void SetTagContent(params string[] texts)
-    {
-        (Instance as Window).SetTagContent(texts);
-    }
+    public new static void SetTagContent(params string[] texts) => (Instance as Window).SetTagContent(texts);
     protected override void Open()
     {
         base.Open();
@@ -81,19 +78,14 @@ public class FileExplorer : Window
         }
         Updates();
     }
-    public static void Open(Mode mode, Callback callback, params string[] extensions)
-    {
+    public static void Open(Mode mode, Callback callback, params string[] extensions) =>
         Instance.OpenNonStatic(mode, callback, extensions);
-    }
     public override void Close()
     {
         base.Close();
         _fileNameInputField.text = "";
     }
-    public static void SetDefaultFileName(string name)
-    {
-        Instance._fileNameInputField.text = name;
-    }
+    public static void SetDefaultFileName(string name) => Instance._fileNameInputField.text = name;
     private void Updates()
     {
         _directoryInputField.text = CurrentDirectory;

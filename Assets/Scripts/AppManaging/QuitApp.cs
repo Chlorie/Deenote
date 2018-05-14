@@ -11,16 +11,14 @@ public class QuitApp : MonoBehaviour
             {
                 callback = () =>
                 {
+                    ProjectManagement.Save();
                     Instance.QuitAppActions();
                 },
                 texts = new[] { "Quit and save", "退出并保存" }
             },
             new MessageBox.ButtonInfo
             {
-                callback = () =>
-                {
-                    Instance.QuitAppActions();
-                },
+                callback = () => Instance.QuitAppActions(),
                 texts = new[] { "Quit but not save", "退出但不保存" }
             },
             new MessageBox.ButtonInfo

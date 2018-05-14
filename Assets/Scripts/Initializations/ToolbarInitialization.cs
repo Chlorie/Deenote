@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Newtonsoft.Json;
 
 public class ToolbarInitialization : MonoBehaviour
 {
@@ -20,9 +19,11 @@ public class ToolbarInitialization : MonoBehaviour
                 {
                     FileExplorer.SetTagContent("New project", "创建新项目");
                     FileExplorer.SetDefaultFileName("NewProject.dnt");
-                    FileExplorer.Open(FileExplorer.Mode.InputFileName,
-                        () => { },
-                        ".dnt");
+                    FileExplorer.Open(FileExplorer.Mode.InputFileName, () =>
+                    {
+                        ProjectManagement.filePath = FileExplorer.Result;
+                        ProjectProperties.Instance.Open();
+                    }, ".dnt");
                 },
                 shortcut = new Shortcut { key = KeyCode.N }
             },
@@ -35,8 +36,13 @@ public class ToolbarInitialization : MonoBehaviour
             {
                 callback = () =>
                 {
-                    ProjectManagement.LoadFrom(FileExplorer.Result);
-                    ProjectProperties.Instance.Open();
+                    FileExplorer.SetTagContent("Open project", "打开项目");
+                    FileExplorer.Open(FileExplorer.Mode.SelectFile, () =>
+                    {
+                        ProjectManagement.LoadFrom(FileExplorer.Result);
+                        ProjectProperties.Instance.UpdateProperties();
+                        ProjectProperties.Instance.Open();
+                    }, ".dnt");
                 },
                 shortcut = new Shortcut { key = KeyCode.O }
             },
@@ -47,7 +53,8 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "Save project", "保存项目" },
             operation = new Operation
             {
-                callback = () => { throw new System.NotImplementedException(); },
+                callback = ProjectManagement.Save,
+#warning Path validness check missing
                 shortcut = new Shortcut { key = KeyCode.S }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.S }
@@ -57,7 +64,12 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "Save as...", "另存为..." },
             operation = new Operation
             {
-                callback = () => { throw new System.NotImplementedException(); },
+                callback = () =>
+                {
+                    FileExplorer.SetTagContent("Save as...", "另存为...");
+                    FileExplorer.SetDefaultFileName("NewProject.dnt");
+                    FileExplorer.Open(FileExplorer.Mode.InputFileName, () => ProjectManagement.SaveAs(FileExplorer.Result), ".dnt");
+                },
                 shortcut = new Shortcut { shift = true, key = KeyCode.S }
             },
             globalShortcut = new Shortcut { ctrl = true, shift = true, key = KeyCode.S }
@@ -141,27 +153,15 @@ public class ToolbarInitialization : MonoBehaviour
     }
     private void InitializeTestSelectable()
     {
-        testSelectable.operations.Add(new ToolbarOperation
-        {
-            strings = new[] { "Test Json Chart Loading" },
-            operation = new Operation
-            {
-                callback = () =>
-                {
-                    FileExplorer.SetTagContent("Test json chart loading");
-                    FileExplorer.Open(FileExplorer.Mode.SelectFile,
-                        () =>
-                        {
-                            string json = System.IO.File.ReadAllText(FileExplorer.Result);
-                            Chart chart = new Chart { difficulty = 0, level = "1" };
-                            JsonChart jsonChart = JsonConvert.DeserializeObject<JsonChart>(json);
-                            chart.FromJsonChart(jsonChart);
-                            return;
-                        }, ".json", ".txt");
-                },
-                shortcut = new Shortcut { key = KeyCode.T }
-            }
-        });
+        //testSelectable.operations.Add(new ToolbarOperation
+        //{
+        //    strings = new[] { "Test Json Chart Loading" },
+        //    operation = new Operation
+        //    {
+        //        callback = null,
+        //        shortcut = new Shortcut { key = KeyCode.T }
+        //    }
+        //});
     }
     private void Awake()
     {
