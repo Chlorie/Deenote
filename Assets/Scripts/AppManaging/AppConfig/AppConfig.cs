@@ -14,6 +14,7 @@ public class AppConfig
     public RectData messageBoxRect;
     public RectData backgroundImageSetterRect;
     public RectData projectPropertiesRect;
+    public RectData perspectiveViewRect;
     public static void Read()
     {
         if (new FileInfo("config.json").Exists)
@@ -41,6 +42,7 @@ public class AppConfig
         MessageBox.Instance.Rect = messageBoxRect.ToRect();
         BackgroundImageSetter.Instance.Rect = backgroundImageSetterRect.ToRect();
         ProjectProperties.Instance.Rect = projectPropertiesRect.ToRect();
+        PerspectiveView.Instance.Rect = perspectiveViewRect.ToRect();
     }
     private void UpdateConfig()
     {
@@ -50,5 +52,6 @@ public class AppConfig
         messageBoxRect = new RectData(MessageBox.Instance.Rect);
         backgroundImageSetterRect = new RectData(BackgroundImageSetter.Instance.Rect);
         projectPropertiesRect = new RectData(ProjectProperties.Instance.Rect);
+        perspectiveViewRect = new RectData(PerspectiveView.Instance.Rect);
     }
 }

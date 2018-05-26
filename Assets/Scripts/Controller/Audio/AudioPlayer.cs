@@ -1,12 +1,23 @@
 ﻿using System.IO;
 using UnityEngine;
 using NAudio.Wave;
-//using NAudio.Vorbis;
 
 public class AudioPlayer : MonoBehaviour
 {
     public static AudioPlayer Instance { get; private set; }
-    public AudioSource source;
+    [SerializeField] private AudioSource _source;
+    public delegate void AudioTimeChangeHandler(float time);
+    public event AudioTimeChangeHandler AudioTimeChangeEvent = null;
+    private float _time = 0.0f;
+    public float Time
+    {
+        get { return _time; }
+        set
+        {
+            _time = value;
+            AudioTimeChangeEvent.Invoke(_time);
+        }
+    }
     public void LoadAudioFromStream(Stream stream)
     {
         WaveStream wave;
@@ -23,9 +34,22 @@ public class AudioPlayer : MonoBehaviour
         rawSamples.CopyTo(extendedSamples, initialSampleCount);
         AudioClip clip = AudioClip.Create("AudioClip", extendedSamples.Length / wave.WaveFormat.Channels, wave.WaveFormat.Channels, wave.WaveFormat.SampleRate, false);
         clip.SetData(extendedSamples, 0);
-        source.clip = clip;
-        source.Play();
+        _source.clip = clip;
+        Time = 0;
     }
+    private void ChangeAudioPlaybackPosition(float time) => _source.time = time;
+    public void Play()
+    {
+        _source.Play();
+        _source.time = _time;
+    }
+    public void Stop() => _source.Stop();
+    public float Volume
+    {
+        get { return _source.volume; }
+        set { _source.volume = value; }
+    }
+    public bool IsPlaying => _source.isPlaying;
     private void Awake()
     {
         if (Instance == null)
@@ -35,5 +59,10 @@ public class AudioPlayer : MonoBehaviour
             Destroy(this);
             Debug.LogError("Error: Unexpected multiple instances of AudioPlayer");
         }
+        AudioTimeChangeEvent += ChangeAudioPlaybackPosition;
+    }
+    private void Update()
+    {
+        if (_source.isPlaying) Time = _source.time;
     }
 }

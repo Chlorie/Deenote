@@ -35,3 +35,8 @@ MonoBehaviour:
   cursorDiagonalHotspot: {x: 33, y: 33}
   cursorAntiDiagonal: {fileID: 2800000, guid: 842853d4c89d04347859b3bce9e110e1, type: 3}
   cursorAntiDiagonalHotspot: {x: 33, y: 33}
+  difficultyColors:
+  - {r: 0.54509807, g: 0.72156864, b: 0.32941177, a: 1}
+  - {r: 0.42352942, g: 0.69803923, b: 0.95686275, a: 1}
+  - {r: 1, g: 0.9411765, b: 0.54901963, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}

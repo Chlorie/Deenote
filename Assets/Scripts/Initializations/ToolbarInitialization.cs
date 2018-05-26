@@ -153,15 +153,21 @@ public class ToolbarInitialization : MonoBehaviour
     }
     private void InitializeTestSelectable()
     {
-        //testSelectable.operations.Add(new ToolbarOperation
-        //{
-        //    strings = new[] { "Test Json Chart Loading" },
-        //    operation = new Operation
-        //    {
-        //        callback = null,
-        //        shortcut = new Shortcut { key = KeyCode.T }
-        //    }
-        //});
+        testSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Test Audio Playing" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    if (AudioPlayer.Instance.IsPlaying)
+                        AudioPlayer.Instance.Stop();
+                    else
+                        AudioPlayer.Instance.Play();
+                },
+                shortcut = new Shortcut { key = KeyCode.T }
+            }
+        });
     }
     private void Awake()
     {

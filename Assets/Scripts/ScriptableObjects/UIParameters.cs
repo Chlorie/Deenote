@@ -29,4 +29,6 @@ public class UIParameters : ScriptableObject
     public Vector2 cursorDiagonalHotspot;
     public Texture2D cursorAntiDiagonal;
     public Vector2 cursorAntiDiagonalHotspot;
+    // Colors
+    public Color[] difficultyColors;
 }
