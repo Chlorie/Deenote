@@ -8,8 +8,9 @@ public class UpdateHistory : MonoBehaviour
     public LocalizedText title;
     public LocalizedText checkUpdateText;
     public VersionChecker versionChecker;
-    private List<string> versions = new List<string>
+    private readonly List<string> versions = new List<string>
     {
+        "Deenote 0.6.12",
         "Deenote 0.6.11",
         "Deenote 0.6.10",
         "Deenote 0.6.9",
@@ -43,18 +44,26 @@ public class UpdateHistory : MonoBehaviour
         "Deemo Chart Editor 0.2",
         "Deemo Chart Editor 0.1"
     };
-    private List<string[]> updateInfo = new List<string[]>
+    private readonly List<string[]> updateInfo = new List<string[]>
     {
-        new []{ "Final changed the shader used for charming glow effects. Now the glows should be much prettier than before.",
+        new[]{ "Changed the color of the charming glow effects. Now it is more of an orange color instead of yellow.\n" +
+            "Now exception messages are shown and saved to file whenever an unhandled exception is caught. Bug reporting should be simpler.\n" +
+            "Removed support for .ogg audio files.\n" +
+            "If exception is caught during audio file loading, the user is forced to select another audio file.\n",
+            "修改了charming光效的颜色。现在光效应该更偏橙色而不是黄色。\n" +
+            "现在若发现未经处理的异常则会弹出对话框提醒并保存到文件, 反馈bug会更容易一些。\n" +
+            "取消了对.ogg文件的支持。\n" +
+            "若在读取音频时捕获到异常, 用户会被强制重新选择音频文件。" },
+        new[]{ "Final changed the shader used for charming glow effects. Now the glows should be much prettier than before.",
             "终于修改了charming光效的着色器。现在光效要比以前好看多了。" },
-        new []{ "Now the lost frame of mp3 audio is partially \"fixed\" by adding an empty frame before the samples. " +
+        new[]{ "Now the lost frame of mp3 audio is partially \"fixed\" by adding an empty frame before the samples. " +
             "There won't be a weird 26ms offset between Deenote and the correct value(from Audition).",
             "部分地\"修复\"了mp3文件丢失第一帧的问题 (在所有采样前面增加一个空帧), 现在Deenote不会有奇怪的26毫秒offset了。" },
-        new []{ "Fixed the issue that projects cannot be loaded.\n" +
+        new[]{ "Fixed the issue that projects cannot be loaded.\n" +
             "Fixed update checker.",
             "修复了不能打开文件的问题。\n" +
             "修复了更新检查。" },
-        new []{ "Fixed the problem of beat lines disappearing when importing charts from JSON files.\n" +
+        new[]{ "Fixed the problem of beat lines disappearing when importing charts from JSON files.\n" +
             "Fixed the problem where inserting notes in a large project may cause stack overflow.",
             "解决了导入JSON谱面会导致拍线消失的问题。\n解决了谱面中note很多时插入新note导致栈溢出的问题。" },
         new string[]{ "Added localization support for Chinese.\nFixed some minor bugs.\nCollided notes are tinted red now.",

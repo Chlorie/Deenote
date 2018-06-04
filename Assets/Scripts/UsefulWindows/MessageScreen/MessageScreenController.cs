@@ -47,7 +47,7 @@ public class MessageScreenController : MonoBehaviour
     {
         messageScreen.SetActive(false);
         buttonGroups[activatedButtonGroup].SetActive(false);
-        if (callbacks[index] != null) callbacks[index]();
+        callbacks[index]?.Invoke();
         CurrentState.ignoreAllInput = false;
     }
     private void Awake()

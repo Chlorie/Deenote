@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using NAudio.Wave;
 using UnityEngine.Events;
 
 public class ProjectController : MonoBehaviour
@@ -23,7 +22,6 @@ public class ProjectController : MonoBehaviour
     public GameObject editPanel;
     public GameObject settingsPanel;
     //-Canvas-
-    public GameObject directorySelectorCanvas;
     public GameObject aboutCanvas;
     //-File Panel-
     public LocalizedText songSelectButtonText;
@@ -64,7 +62,7 @@ public class ProjectController : MonoBehaviour
     public Text stageUIScore;
     public TextMesh stageStaveProjectName;
     public Image stageUIDiff;
-    private string[] diffNames = { "Easy", "Normal", "Hard", "Extra" };
+    private readonly string[] diffNames = { "Easy", "Normal", "Hard", "Extra" };
     public Color[] textColors = new Color[4];
     public Image timeSliderImage;
     //-Data from assets-
@@ -124,7 +122,7 @@ public class ProjectController : MonoBehaviour
     }
     public void SelectSong() //Project - New - Select Song
     {
-        string[] acceptedExtension = { ".wav", ".ogg", ".mp3" };
+        string[] acceptedExtension = { ".wav", ".mp3" };
         directorySelectorController.ActivateSelection(acceptedExtension, SongSelected);
     }
     public void SelectFile() //Project - New - Select Folder
@@ -189,6 +187,12 @@ public class ProjectController : MonoBehaviour
         currentInStage = -1;
         InfoInitialization();
         LvlInputFieldInit();
+        if (songAudioClip == null)
+            MessageScreen.Activate(
+                new[] { "Failed to load audio", "读取音频失败" },
+                new[] { "Please select another audio file", "请选择其他的音频文件" },
+                new[] { "Load another audio file", "读取其他的音频文件" },
+                ChangeMusicFile);
     }
     public void SaveProject() //Project - Save
     {
@@ -253,7 +257,7 @@ public class ProjectController : MonoBehaviour
         songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, audioType);
         infoPanelButton.SetActive(true);
         chartsPanelButton.SetActive(true);
-        songAudioClip.LoadAudioData();
+        songAudioClip?.LoadAudioData();
         stage.musicSource.clip = songAudioClip;
         editPanelButton.SetActive(false);
         projectFile = new FileInfo(projectFullDir);
@@ -263,6 +267,12 @@ public class ProjectController : MonoBehaviour
         currentInStage = -1;
         InfoInitialization();
         LvlInputFieldInit();
+        if (songAudioClip == null)
+            MessageScreen.Activate(
+                new[] { "Failed to load audio", "读取音频失败" },
+                new[] { "Please select another audio file", "请选择其他的音频文件" },
+                new[] { "Load another audio file", "读取其他的音频文件" },
+                ChangeMusicFile);
         yield return new WaitForSeconds(3.0f);
         projectSL.loadCompleteText.SetActive(false);
     }
@@ -307,13 +317,10 @@ public class ProjectController : MonoBehaviour
         stageUIProjectName.text = project.name;
         stageStaveProjectName.text = project.name;
     }
-    public void CharterNameFinishedEditing()
-    {
-        project.chartMaker = charterNameInputField.text;
-    }
+    public void CharterNameFinishedEditing() => project.chartMaker = charterNameInputField.text;
     public void ChangeMusicFile()
     {
-        string[] acceptedExtension = { ".wav", ".ogg", ".mp3" };
+        string[] acceptedExtension = { ".wav", ".mp3" };
         directorySelectorController.ActivateSelection(acceptedExtension, NewSongSelected);
     }
     private void NewSongSelected()
@@ -324,6 +331,15 @@ public class ProjectController : MonoBehaviour
         directorySelectorController.DeactivateSelection();
         audioFileBytes = File.ReadAllBytes(songFile.FullName);
         songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, songFile.Extension);
+        if (songAudioClip == null)
+        {
+            MessageScreen.Activate(
+                new[] { "Failed to load audio", "读取音频失败" },
+                new[] { "Please select another audio file", "请选择其他的音频文件" },
+                new[] { "Load another audio file", "读取其他的音频文件" },
+                ChangeMusicFile);
+            return;
+        }
         stage.musicSource.clip = songAudioClip;
         stage.timeSlider.value = 0.0f;
         stage.timeSlider.maxValue = songAudioClip.length;
@@ -451,11 +467,6 @@ public class ProjectController : MonoBehaviour
         aboutWindow.SetActive(false);
     }
     //-Other-
-    private void UpdateDirectorySelectorCanvas() //Update the stupid canvas so the user can actually see the window
-    {
-        directorySelectorCanvas.SetActive(false);
-        directorySelectorCanvas.SetActive(true);
-    }
     private void UpdateAboutCanvas()
     {
         aboutCanvas.SetActive(false);
@@ -525,7 +536,6 @@ public class ProjectController : MonoBehaviour
         Utility.debugText = debugText;
         project = null;
         PanelSelectionInit();
-        UpdateDirectorySelectorCanvas();
         UpdateAboutCanvas();
         Application.runInBackground = true;
         fileOpener.CheckRegistry();

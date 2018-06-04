@@ -13,7 +13,6 @@ public class DirectorySelectorController : MonoBehaviour
     public InputField fileNameInputField;
     public DirectoryInfo currentDirectory;
     public GameObject scrollView;
-    public GameObject directorySelectorCanvas;
     public GameObject directorySeletorWindow;
     public Transform scrollViewContent;
     public Button fileButtonPrefab;
@@ -120,8 +119,6 @@ public class DirectorySelectorController : MonoBehaviour
     }
     private void InitializeSelection(string[] allowedExtensions, bool needFileName)
     {
-        directorySelectorCanvas.SetActive(false);
-        directorySelectorCanvas.SetActive(true);
         selectedItemFullName = currentDirectory.FullName;
         if (!selectedItemFullName.EndsWith("\\")) selectedItemFullName += "\\";
         CurrentState.ignoreScroll = true;
