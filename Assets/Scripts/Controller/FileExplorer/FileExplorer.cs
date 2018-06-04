@@ -90,7 +90,7 @@ public class FileExplorer : Window
     {
         _directoryInputField.text = CurrentDirectory;
         for (int i = 0; i < _buttons.Count; i++) _buttonPool.ReturnObject(_buttons[i]);
-        while (_buttons.Count > 0) _buttons.RemoveAt(0);
+        _buttons.Clear();
         if (_currentDirectory.Parent != null)
         {
             FileExplorerButton button = _buttonPool.GetObject();

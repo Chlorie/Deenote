@@ -1,6 +1,4 @@
 ﻿using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Newtonsoft.Json;
@@ -49,12 +47,16 @@ public class ProjectProperties : Window
     }
     public void LevelInputCallback(int difficulty)
     {
-        ProjectManagement.project.charts[difficulty].level = _levelInputFields[difficulty].text;
-#warning Needs to add method calls to change stage display
+        string level = _levelInputFields[difficulty].text;
+        ProjectManagement.project.charts[difficulty].level = level;
+        if (PerspectiveView.Instance.CurrentDifficulty == difficulty) PerspectiveView.Instance.SetDifficulty(difficulty, level);
     }
     public void LoadChartCallback(int difficulty)
     {
-        throw new System.NotImplementedException();
+        PerspectiveView.Instance.SetScore(0);
+        PerspectiveView.Instance.SetSongName(ProjectManagement.project.songName);
+        PerspectiveView.Instance.SetDifficulty(difficulty, ProjectManagement.project.charts[difficulty].level);
+        ChartDisplayController.Instance.LoadChartFromProject(difficulty);
     }
     public void ImportChartCallback(int difficulty)
     {
@@ -89,6 +91,19 @@ public class ProjectProperties : Window
             using (StreamWriter writer = new StreamWriter(FileExplorer.Result))
                 serializer.Serialize(writer, exportedChart);
         }, ".json");
+    }
+    private void InitializeOperations()
+    {
+        operations.Add(new Operation
+        {
+            callback = null,
+            shortcut = new Shortcut { key = KeyCode.Space }
+        });
+    }
+    protected override void Start()
+    {
+        base.Start();
+        InitializeOperations();
     }
     private void Awake()
     {

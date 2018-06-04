@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
-using UnityEditor;
 
 public class QuitApp : MonoBehaviour
 {
     public static QuitApp Instance { get; private set; }
-    public static void ShowConfirmQuitMessage()
-    {
+    public static void ShowConfirmQuitMessage() => 
         MessageBox.Activate(new[] { "Quit", "退出" }, new[] { "Are you sure to quit Deenote?", "你确认要退出Deenote吗？" },
             new MessageBox.ButtonInfo
             {
@@ -26,12 +24,11 @@ public class QuitApp : MonoBehaviour
                 callback = null,
                 texts = new[] { "Back", "返回" }
             });
-    }
     private void QuitAppActions()
     {
         AppConfig.Write();
 #if UNITY_EDITOR
-        EditorApplication.isPlaying = false;
+        UnityEditor.EditorApplication.isPlaying = false;
 #else
         System.Diagnostics.Process.GetCurrentProcess().Kill();
 #endif

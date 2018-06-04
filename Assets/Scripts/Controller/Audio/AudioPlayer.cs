@@ -7,7 +7,9 @@ public class AudioPlayer : MonoBehaviour
     public static AudioPlayer Instance { get; private set; }
     [SerializeField] private AudioSource _source;
     public delegate void AudioTimeChangeHandler(float time);
+    public delegate void AudioClipChangeHandler(float length);
     public event AudioTimeChangeHandler AudioTimeChangeEvent = null;
+    public event AudioClipChangeHandler AudioClipChangeEvent = null;
     private float _time = 0.0f;
     public float Time
     {
@@ -18,6 +20,7 @@ public class AudioPlayer : MonoBehaviour
             AudioTimeChangeEvent.Invoke(_time);
         }
     }
+    public float Length => _source.clip.length;
     public void LoadAudioFromStream(Stream stream)
     {
         WaveStream wave;
@@ -36,6 +39,7 @@ public class AudioPlayer : MonoBehaviour
         clip.SetData(extendedSamples, 0);
         _source.clip = clip;
         Time = 0;
+        AudioClipChangeEvent?.Invoke(clip.length);
     }
     private void ChangeAudioPlaybackPosition(float time) => _source.time = time;
     public void Play()
@@ -50,6 +54,13 @@ public class AudioPlayer : MonoBehaviour
         set { _source.volume = value; }
     }
     public bool IsPlaying => _source.isPlaying;
+    public void TogglePlayState()
+    {
+        if (IsPlaying)
+            Stop();
+        else
+            Play();
+    }
     private void Awake()
     {
         if (Instance == null)

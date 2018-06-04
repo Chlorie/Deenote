@@ -18,7 +18,7 @@ public class MessageBox : Window
     {
         base.Open();
         MoveToCenter();
-        while (operations.Count > 0) operations.RemoveAt(0);
+        operations.Clear();
         operations.Add(new Operation
         {
             shortcut = new Shortcut { key = KeyCode.Return },

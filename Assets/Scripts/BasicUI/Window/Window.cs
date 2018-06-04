@@ -20,6 +20,9 @@ public class Window : MonoBehaviour, IPointerDownHandler
     private GameObject _contents;
     protected LocalizedText tagContent;
     private RectTransform _tagContentTransform;
+    // Events
+    public delegate void WindowResizeHandler(Rect rect);
+    public event WindowResizeHandler OnWindowResize = null;
     // Actions
     [HideInInspector] public List<Operation> operations = new List<Operation>();
     // Properties
@@ -58,6 +61,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
                 MoveToCenter();
                 return;
             }
+            if (Rect.size != value.size) OnWindowResize?.Invoke(value);
             Vector2 position = value.position + new Vector2(0.0f, value.size.y);
             if (position.x < MinPosition.x) position.x = MinPosition.x;
             if (position.y < MinPosition.y) position.y = MinPosition.y;
@@ -115,14 +119,8 @@ public class Window : MonoBehaviour, IPointerDownHandler
     {
         if (_contents.activeSelf) WindowsController.Instance.SetFocusToWindow(this);
     }
-    public virtual void OnPointerDown(PointerEventData eventData)
-    {
-        SetFocus();
-    }
-    private void Awake()
-    {
-        LanguageController.Call += AdjustTagWidth;
-    }
+    public virtual void OnPointerDown(PointerEventData eventData) => SetFocus();
+    private void Awake() => LanguageController.Call += AdjustTagWidth;
     protected virtual void Start()
     {
         Transform contentsTransform = transform.Find("Contents");
@@ -132,5 +130,6 @@ public class Window : MonoBehaviour, IPointerDownHandler
         _tagContentTransform = tagContent.GetComponent<RectTransform>();
         _windowTransform = GetComponent<RectTransform>();
         AdjustTagWidth();
+        OnWindowResize?.Invoke(Rect);
     }
 }

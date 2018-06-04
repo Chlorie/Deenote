@@ -31,4 +31,6 @@ public class UIParameters : ScriptableObject
     public Vector2 cursorAntiDiagonalHotspot;
     // Colors
     public Color[] difficultyColors;
+    // Stage
+    public Sprite[] difficultySprites;
 }

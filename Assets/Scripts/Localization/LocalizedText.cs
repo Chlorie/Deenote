@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 
 [RequireComponent(typeof(Text))]
 public class LocalizedText : MonoBehaviour
@@ -8,7 +7,7 @@ public class LocalizedText : MonoBehaviour
     [SerializeField] [TextArea] private string[] _strings;
     private Text _text;
     private Text TextProperty => _text ?? (_text = gameObject.GetComponent<Text>());
-    [HideInInspector] public Color color { set { _text.color = value; } }
+    [HideInInspector] public Color Color { set { _text.color = value; } }
     public string[] Strings
     {
         get
@@ -41,9 +40,11 @@ public class LocalizedText : MonoBehaviour
     private string SpaceConverter(string original, bool noLineBreak) => noLineBreak ? original.Replace(' ', '\u00a0') : original;
     private void Awake() => LanguageController.localizedTexts.Add(this);
     // Called in editor, automatically updates the text component
+#if UNITY_EDITOR
     private void OnValidate()
     {
-        if (_strings != null && _strings.Length != 0 && !EditorApplication.isPlaying)
+        if (_strings != null && _strings.Length != 0 && !UnityEditor.EditorApplication.isPlaying)
             TextProperty.text = _strings[0];
     }
+#endif
 }

@@ -25,8 +25,11 @@ public class Shortcut
         {
             bool result = true;
             if (ctrl && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl)) result = false;
+            if (!ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))) result = false;
             if (alt && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.RightAlt)) result = false;
+            if (!alt && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt))) result = false;
             if (shift && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) result = false;
+            if (!shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))) result = false;
             if ((hold && !Input.GetKey(key)) || (!hold && !Input.GetKeyDown(key))) result = false;
             return result;
         }
