@@ -53,6 +53,11 @@ public class AudioPlayer : MonoBehaviour
         get { return _source.volume; }
         set { _source.volume = value; }
     }
+    public float Pitch
+    {
+        get { return _source.pitch; }
+        set { _source.pitch = value; }
+    }
     public bool IsPlaying => _source.isPlaying;
     public void TogglePlayState()
     {
@@ -74,6 +79,6 @@ public class AudioPlayer : MonoBehaviour
     }
     private void Update()
     {
-        if (_source.isPlaying) Time = _source.time;
+        if (_source.isPlaying) AudioTimeChangeEvent.Invoke(_source.time);
     }
 }

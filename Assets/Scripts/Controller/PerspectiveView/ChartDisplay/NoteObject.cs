@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class NoteObject : MonoBehaviour
 {
+    [SerializeField] private readonly static Sprite[] frames;
     private Note _note;
     public void SetNote(Note note)
     {

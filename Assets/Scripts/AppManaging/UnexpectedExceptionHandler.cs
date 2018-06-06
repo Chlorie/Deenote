@@ -5,7 +5,8 @@ using UnityEngine;
 public class UnexpectedExceptionHandler : MonoBehaviour
 {
     public static UnexpectedExceptionHandler Instance { get; private set; }
-    private int exceptionCount = 0;
+    private int _exceptionCount = 0;
+    private bool _waitUpdateStatus = false;
     private void Awake()
     {
         AppDomain.CurrentDomain.UnhandledException += OnUnexpectedException;
@@ -51,16 +52,16 @@ public class UnexpectedExceptionHandler : MonoBehaviour
                     OutputMessage($"未经处理的异常: \"{condition}\", 位于 {stackTrace}");
                     break;
             }
-            exceptionCount++;
-            UpdateStatusBar();
+            _exceptionCount++;
+            _waitUpdateStatus = true;
         }
     }
     private void OnUnexpectedException(object sender, UnhandledExceptionEventArgs e)
     {
         Exception exception = e.ExceptionObject as Exception;
         OutputMessage(ExceptionString(exception, LanguageController.Language));
-        exceptionCount++;
-        UpdateStatusBar();
+        _exceptionCount++;
+        _waitUpdateStatus = true;
     }
     private void OutputMessage(string message)
     {
@@ -71,8 +72,16 @@ public class UnexpectedExceptionHandler : MonoBehaviour
     {
         StatusBar.ErrorState = true;
         StatusBar.SetStrings(
-            ((exceptionCount == 1) ? "1 unhandled exception is" : (exceptionCount + " unhandled exceptions are")) +
+            ((_exceptionCount == 1) ? "1 unhandled exception is" : (_exceptionCount + " unhandled exceptions are")) +
             " detected, full information has been output to exceptions.log",
-            $"发现 {exceptionCount} 个未经处理的异常, 完整信息已输出至exceptions.log");
+            $"发现 {_exceptionCount} 个未经处理的异常, 完整信息已输出至exceptions.log");
+    }
+    private void Update()
+    {
+        if (_waitUpdateStatus)
+        {
+            UpdateStatusBar();
+            _waitUpdateStatus = false;
+        }
     }
 }

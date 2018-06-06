@@ -37,4 +37,8 @@ public class ChartDisplayController : MonoBehaviour
             Debug.LogError("Error: Unexpected multiple instances of ChartDisplayController");
         }
     }
+    private void Update()
+    {
+        
+    }
 }
