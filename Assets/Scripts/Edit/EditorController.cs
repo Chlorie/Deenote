@@ -678,19 +678,20 @@ public class EditorController : MonoBehaviour
     {
         List<int> index = new List<int>();
         List<int> inv = new List<int>(new int[chart.notes.Count]);
-        for (int i = 0; i < chart.notes.Count; i++) index.Add(i);
-        NoteIndexQuickSort(index, 0, chart.notes.Count - 1);
-        for (int i = 0; i < chart.notes.Count; i++) inv[index[i]] = i;
+        int count = chart.notes.Count;
+        for (int i = 0; i < count; i++) index.Add(i);
+        NoteIndexQuickSort(index, 0, index.Count - 1);
+        for (int i = 0; i < count; i++) inv[index[i]] = i;
         foreach (Note note in chart.notes)
         {
             if (note.prevLink != -1) note.prevLink = inv[note.prevLink];
             if (note.nextLink != -1) note.nextLink = inv[note.nextLink];
         }
         List<Note> notes = new List<Note>(new Note[chart.notes.Count]);
-        for (int i = 0; i < chart.notes.Count; i++) notes[i] = chart.notes[index[i]];
+        for (int i = 0; i < count; i++) notes[i] = chart.notes[index[i]];
         List<bool> selected = new List<bool>(new bool[chart.notes.Count]);
-        for (int i = 0; i < chart.notes.Count; i++) selected[i] = noteSelect[i].prevSelected != noteSelect[i].selected;
-        for (int i = 0; i < chart.notes.Count; i++)
+        for (int i = 0; i < count; i++) selected[i] = noteSelect[i].prevSelected != noteSelect[i].selected;
+        for (int i = 0; i < count; i++)
         {
             noteSelect[i].note = notes[i];
             noteSelect[i].prevSelected = selected[index[i]];
@@ -701,7 +702,7 @@ public class EditorController : MonoBehaviour
         do
         {
             swapCount = 0;
-            for (int i = 0; i < chart.notes.Count; i++)
+            for (int i = 0; i < count; i++)
                 if (chart.notes[i].nextLink != -1 && i > chart.notes[i].nextLink)
                 {
                     swapCount++;
@@ -1142,6 +1143,7 @@ public class EditorController : MonoBehaviour
         string level = chart.level;
         List<float> beats = chart.beats;
         Chart newChart = Utility.JCharttoChart(jchart);
+        int oldCount = chart.notes.Count;
         foreach (Note note in newChart.notes)
         {
             note.time = note.time / concatenateSpeed + concatenateOffset;
@@ -1151,6 +1153,8 @@ public class EditorController : MonoBehaviour
                     sound.delay /= concatenateSpeed;
                     sound.duration /= concatenateSpeed;
                 }
+            if (note.prevLink != -1) note.prevLink += oldCount;
+            if (note.nextLink != -1) note.nextLink += oldCount;
             chart.notes.Add(note);
             noteSelect.Add(new NoteSelect { note = note, editor = this, prevSelected = false, selected = false });
         }
