@@ -10,6 +10,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private readonly List<string> versions = new List<string>
     {
+        "Deenote 0.7",
         "Deenote 0.6.12",
         "Deenote 0.6.11",
         "Deenote 0.6.10",
@@ -46,6 +47,7 @@ public class UpdateHistory : MonoBehaviour
     };
     private readonly List<string[]> updateInfo = new List<string[]>
     {
+        new[]{ "Added chart concatenating function for medley making.", "为组曲制作添加了谱面连接功能。" },
         new[]{ "Changed the color of the charming glow effects. Now it is more of an orange color instead of yellow.\n" +
             "Now exception messages are shown and saved to file whenever an unhandled exception is caught. Bug reporting should be simpler.\n" +
             "Removed support for .ogg audio files.\n" +

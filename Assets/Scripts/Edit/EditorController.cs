@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -56,6 +57,11 @@ public class EditorController : MonoBehaviour
     public bool interpolateMode = false;
     public InputField fillAmountField;
     private int fillAmount;
+    //Chart concatenation
+    public InputField offsetField;
+    private float concatenateOffset = 0.0f;
+    public InputField speedField;
+    private float concatenateSpeed = 1.0f;
     //Mouse Actions
     public Vector2 dragStartPoint = new Vector2();
     public Vector2 dragEndPoint = new Vector2();
@@ -72,7 +78,6 @@ public class EditorController : MonoBehaviour
     public void ActivateEditor()
     {
         noteIndicatorPool.Initialize();
-
         while (undoCharts.Count > 0) undoCharts.RemoveAt(0);
         while (noteSelect.Count > 0) noteSelect.RemoveAt(0);
         while (undoNoteSelect.Count > 0) undoNoteSelect.RemoveAt(0);
@@ -1104,6 +1109,55 @@ public class EditorController : MonoBehaviour
             UpdateSelectedAmount(0, true);
             SyncStage();
         }
+    }
+    //Concatenation
+    public void ConcatenateOffsetCallback()
+    {
+        float value = Utility.GetFloat(offsetField.text);
+        if (value < 0.0f) value = 0.0f;
+        if (value > stage.musicLength) value = stage.musicLength;
+        concatenateOffset = value; offsetField.text = value.ToString("F3");
+    }
+    public void ConcatenateSpeedCallback()
+    {
+        float value = Utility.GetFloat(speedField.text);
+        if (value < 0.25f) value = 0.25f;
+        concatenateSpeed = value; speedField.text = value.ToString("F3");
+    }
+    public void ReadAnotherChartCallback() =>
+        stage.projectController.directorySelectorController.ActivateSelection(new[] { ".json", ".txt" }, ChartSelectedCallback);
+    private void ChartSelectedCallback()
+    {
+        RegisterUndoStep();
+        DirectorySelectorController controller = stage.projectController.directorySelectorController;
+        byte[] bytes = File.ReadAllBytes(controller.selectedItemFullName); //JSON file bytes
+        char[] bytechars = new char[bytes.Length + 1];
+        string str; //JSON string
+        int length = bytes.Length, i = 0, offset = 0;
+        while (bytes[i] != 0x7B) i++;
+        offset = i;
+        for (; i < length && bytes[i] != 0x00; i++) bytechars[i - offset] = (char)bytes[i];
+        str = new string(bytechars);
+        JSONChart jchart = Utility.JSONtoJChart(str);
+        string level = chart.level;
+        List<float> beats = chart.beats;
+        Chart newChart = Utility.JCharttoChart(jchart);
+        foreach (Note note in newChart.notes)
+        {
+            note.time = note.time / concatenateSpeed + concatenateOffset;
+            if (note.sounds != null)
+                foreach (PianoSound sound in note.sounds)
+                {
+                    sound.delay /= concatenateSpeed;
+                    sound.duration /= concatenateSpeed;
+                }
+            chart.notes.Add(note);
+            noteSelect.Add(new NoteSelect { note = note, editor = this, prevSelected = false, selected = false });
+        }
+        controller.DeactivateSelection();
+        SortNotes();
+        SyncStage();
+        ChangeSelectionPanelValues();
     }
     //Note indicators
     public void UpdateNoteIndicators()

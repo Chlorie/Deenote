@@ -10,36 +10,21 @@ public class EditPanelController : MonoBehaviour
     public RectTransform noteAndGrid;
     public RectTransform curveForming;
     public RectTransform beatLine;
+    public RectTransform concatenate;
     public LocalizedText selectionButtonText;
     public LocalizedText playerSettingsButtonText;
     public LocalizedText basicCommandsButtonText;
     public LocalizedText noteAndGridButtonText;
     public LocalizedText curveFormingText;
     public LocalizedText beatLineButtonText;
-    public void ToggleSelectionPanel()
-    {
-        ExpandCollapse(selection, selectionButtonText);
-    }
-    public void TogglePlayerSettingsPanel()
-    {
-        ExpandCollapse(playerSettings, playerSettingsButtonText);
-    }
-    public void ToggleBasicCommandsPanel()
-    {
-        ExpandCollapse(basicCommands, basicCommandsButtonText);
-    }
-    public void ToggleNoteAndGridPanel()
-    {
-        ExpandCollapse(noteAndGrid, noteAndGridButtonText);
-    }
-    public void ToggleCurveFormingPanel()
-    {
-        ExpandCollapse(curveForming, curveFormingText);
-    }
-    public void ToggleBeatLinePanel()
-    {
-        ExpandCollapse(beatLine, beatLineButtonText);
-    }
+    public LocalizedText concatenateText;
+    public void ToggleSelectionPanel() => ExpandCollapse(selection, selectionButtonText);
+    public void TogglePlayerSettingsPanel() => ExpandCollapse(playerSettings, playerSettingsButtonText);
+    public void ToggleBasicCommandsPanel() => ExpandCollapse(basicCommands, basicCommandsButtonText);
+    public void ToggleNoteAndGridPanel() => ExpandCollapse(noteAndGrid, noteAndGridButtonText);
+    public void ToggleCurveFormingPanel() => ExpandCollapse(curveForming, curveFormingText);
+    public void ToggleBeatLinePanel() => ExpandCollapse(beatLine, beatLineButtonText);
+    public void ToggleConcatenatePanel() => ExpandCollapse(concatenate, concatenateText);
     private void ExpandCollapse(RectTransform tabTransform, LocalizedText buttonText)
     {
         bool expanded = tabTransform.gameObject.activeSelf;
