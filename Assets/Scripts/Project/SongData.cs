@@ -12,6 +12,6 @@ public class SongData
     public byte[] music; // In .mp3 format
     public byte[] preview; // In .mp3 format
     public byte[] cover; // In .png format
-    public byte[] coverFC; // In .png format
+    public byte[] coverFc; // In .png format
     public SongData() { for (int i = 0; i < 4; i++) charts[i] = new Chart(); }
 }

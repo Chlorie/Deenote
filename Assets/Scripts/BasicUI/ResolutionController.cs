@@ -5,10 +5,10 @@ public class ResolutionController : MonoBehaviour
     public static ResolutionController Instance { get; private set; }
     public delegate void ResolutionChangeHandler();
     public static event ResolutionChangeHandler OnResolutionChange = null;
-    private int lastWidth = 0;
-    private int lastHeight = 0;
-    public static int Width => Instance.lastWidth;
-    public static int Height => Instance.lastHeight;
+    private int _lastWidth = 0;
+    private int _lastHeight = 0;
+    public static int Width => Instance._lastWidth;
+    public static int Height => Instance._lastHeight;
     private void Awake()
     {
         if (Instance == null)
@@ -21,7 +21,7 @@ public class ResolutionController : MonoBehaviour
     }
     private void Update()
     {
-        if (lastWidth != Screen.width || lastHeight != Screen.height) OnResolutionChange?.Invoke();
-        lastWidth = Screen.width; lastHeight = Screen.height;
+        if (_lastWidth != Screen.width || _lastHeight != Screen.height) OnResolutionChange?.Invoke();
+        _lastWidth = Screen.width; _lastHeight = Screen.height;
     }
 }

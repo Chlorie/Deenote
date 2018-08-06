@@ -15,16 +15,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "New project", "创建新项目" },
             operation = new Operation
             {
-                callback = () =>
-                {
-                    FileExplorer.SetTagContent("New project", "创建新项目");
-                    FileExplorer.SetDefaultFileName("NewProject.dnt");
-                    FileExplorer.Open(FileExplorer.Mode.InputFileName, () =>
-                    {
-                        ProjectManagement.filePath = FileExplorer.Result;
-                        ProjectProperties.Instance.Open();
-                    }, ".dnt");
-                },
+                callback = CreateNewProject,
                 shortcut = new Shortcut { key = KeyCode.N }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.N }
@@ -34,16 +25,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "Open project", "打开项目" },
             operation = new Operation
             {
-                callback = () =>
-                {
-                    FileExplorer.SetTagContent("Open project", "打开项目");
-                    FileExplorer.Open(FileExplorer.Mode.SelectFile, () =>
-                    {
-                        ProjectManagement.LoadFrom(FileExplorer.Result);
-                        ProjectProperties.Instance.UpdateProperties();
-                        ProjectProperties.Instance.Open();
-                    }, ".dnt");
-                },
+                callback = OpenExistingProject,
                 shortcut = new Shortcut { key = KeyCode.O }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.O }
@@ -54,7 +36,6 @@ public class ToolbarInitialization : MonoBehaviour
             operation = new Operation
             {
                 callback = ProjectManagement.Save,
-#warning Path validness check missing
                 shortcut = new Shortcut { key = KeyCode.S }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.S }
@@ -64,12 +45,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "Save as...", "另存为..." },
             operation = new Operation
             {
-                callback = () =>
-                {
-                    FileExplorer.SetTagContent("Save as...", "另存为...");
-                    FileExplorer.SetDefaultFileName("NewProject.dnt");
-                    FileExplorer.Open(FileExplorer.Mode.InputFileName, () => ProjectManagement.SaveAs(FileExplorer.Result), ".dnt");
-                },
+                callback = SaveProjectAs,
                 shortcut = new Shortcut { shift = true, key = KeyCode.S }
             },
             globalShortcut = new Shortcut { ctrl = true, shift = true, key = KeyCode.S }
@@ -85,15 +61,43 @@ public class ToolbarInitialization : MonoBehaviour
             globalShortcut = new Shortcut { alt = true, key = KeyCode.F4 }
         });
     }
+    private void CreateNewProject()
+    {
+        FileExplorer.SetTagContent("New project", "创建新项目");
+        FileExplorer.SetDefaultFileName("NewProject.dnt");
+        FileExplorer.Open(FileExplorer.Mode.InputFileName, () =>
+        {
+            ProjectManagement.filePath = FileExplorer.Result;
+            ProjectProperties.Instance.Open();
+        }, ".dnt");
+    }
+    private void OpenExistingProject()
+    {
+        FileExplorer.SetTagContent("Open project", "打开项目");
+        FileExplorer.Open(FileExplorer.Mode.SelectFile, () =>
+        {
+            ProjectManagement.LoadFrom(FileExplorer.Result);
+            ProjectProperties.Instance.UpdateProperties();
+            ProjectProperties.Instance.Open();
+        }, ".dnt");
+    }
+    private void SaveProjectAs()
+    {
+        FileExplorer.SetTagContent("Save as...", "另存为...");
+        FileExplorer.SetDefaultFileName("NewProject.dnt");
+        FileExplorer.Open(FileExplorer.Mode.InputFileName, () => ProjectManagement.SaveAs(FileExplorer.Result), ".dnt");
+    }
+
     private void InitializeEditSelectable()
     {
 
     }
+
     private void InitializeWindowsSelectable()
     {
         windowsSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new[] { "Project properties window", "项目属性窗口" },
+            strings = new[] { "Project properties", "项目属性" },
             operation = new Operation
             {
                 callback = () =>
@@ -106,7 +110,23 @@ public class ToolbarInitialization : MonoBehaviour
                 shortcut = new Shortcut { key = KeyCode.P }
             }
         });
+        windowsSelectable.operations.Add(new ToolbarOperation
+        {
+            strings = new[] { "Perspective View", "透视视图" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    if (PerspectiveView.Instance.Opened)
+                        PerspectiveView.Instance.Close();
+                    else
+                        PerspectiveView.Instance.Open();
+                },
+                shortcut = new Shortcut { key = KeyCode.P, shift = true }
+            }
+        });
     }
+
     private void InitializeSettingsSelectable()
     {
         settingsSelectable.operations.Add(new ToolbarOperation
@@ -151,6 +171,7 @@ public class ToolbarInitialization : MonoBehaviour
             }
         });
     }
+
     private void InitializeTestSelectable()
     {
         testSelectable.operations.Add(new ToolbarOperation
@@ -169,6 +190,7 @@ public class ToolbarInitialization : MonoBehaviour
             }
         });
     }
+
     private void Awake()
     {
         if (Instance == null)

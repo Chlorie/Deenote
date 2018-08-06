@@ -25,10 +25,7 @@ public class MessageBox : Window
             callback = () => { _buttons[0].onClick.Invoke(); }
         });
     }
-    public static void Activate(string[] title, string[] content, params ButtonInfo[] buttonInfos)
-    {
-        Instance.Open(title, content, buttonInfos);
-    }
+    public static void Activate(string[] title, string[] content, params ButtonInfo[] buttonInfos) => Instance.Open(title, content, buttonInfos);
     private void Open(string[] title, string[] content, ButtonInfo[] buttonInfos)
     {
         Open();

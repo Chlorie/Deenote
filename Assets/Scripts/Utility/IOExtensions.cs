@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿// ReSharper disable InconsistentNaming
+using System.IO;
 
 public static class IOExtensions
 {

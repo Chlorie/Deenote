@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 public class Chart
 {
-    public float speed = 0; // Speed value of the official charts
-    public int difficulty = 0; // Difficulty 0 Easy, 1 Normal, 2 Hard, 3 Extra
+    public float speed; // Speed value of the official charts
+    public int difficulty; // Difficulty 0 Easy, 1 Normal, 2 Hard, 3 Extra
     public string level = ""; // Level of the chart
     public List<Note> notes = new List<Note>(); // All the notes info
     public static Chart FromJsonChart(JsonChart chart)

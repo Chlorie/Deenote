@@ -15,12 +15,6 @@ public class ToolbarDropdownItem : MonoBehaviour, IPointerEnterHandler, IPointer
         ToolbarController.Instance.DeselectAll();
         callback?.Invoke();
     }
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        ToolbarController.Instance.onObjectCount++;
-    }
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        ToolbarController.Instance.onObjectCount--;
-    }
+    public void OnPointerEnter(PointerEventData eventData) => ToolbarController.Instance.onObjectCount++;
+    public void OnPointerExit(PointerEventData eventData) => ToolbarController.Instance.onObjectCount--;
 }

@@ -20,71 +20,70 @@ public class MoveAndResizeHandler : MonoBehaviour
     private Rect _beginDragRect;
     private Vector2 _beginDragPoint;
     private Window _window;
-    public UIParameters uiParameters;
     public void ChangeCursorSprite(MoveAndResizeDetector.ResizeAndMoveType position)
     {
-        if (!_dragging)
-            switch (position)
-            {
-                case MoveAndResizeDetector.ResizeAndMoveType.UpperLeft:
-                case MoveAndResizeDetector.ResizeAndMoveType.LowerRight:
-                    if (_window.horizontalResizable)
-                    {
-                        if (_window.verticalResizable)
-                            Cursor.SetCursor(uiParameters.cursorDiagonal, uiParameters.cursorDiagonalHotspot, CursorMode.Auto);
-                        else
-                            Cursor.SetCursor(uiParameters.cursorHorizontal, uiParameters.cursorHorizontalHotspot, CursorMode.Auto);
-                    }
-                    else
-                    {
-                        if (_window.verticalResizable)
-                            Cursor.SetCursor(uiParameters.cursorVertical, uiParameters.cursorVerticalHotspot, CursorMode.Auto);
-                        else
-                            Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
-                    }
-                    break;
-                case MoveAndResizeDetector.ResizeAndMoveType.UpperRight:
-                case MoveAndResizeDetector.ResizeAndMoveType.LowerLeft:
-                    if (_window.horizontalResizable)
-                    {
-                        if (_window.verticalResizable)
-                            Cursor.SetCursor(uiParameters.cursorAntiDiagonal, uiParameters.cursorAntiDiagonalHotspot, CursorMode.Auto);
-                        else
-                            Cursor.SetCursor(uiParameters.cursorHorizontal, uiParameters.cursorHorizontalHotspot, CursorMode.Auto);
-                    }
-                    else
-                    {
-                        if (_window.verticalResizable)
-                            Cursor.SetCursor(uiParameters.cursorVertical, uiParameters.cursorVerticalHotspot, CursorMode.Auto);
-                        else
-                            Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
-                    }
-                    break;
-                case MoveAndResizeDetector.ResizeAndMoveType.Up:
-                case MoveAndResizeDetector.ResizeAndMoveType.Down:
+        if (_dragging) return;
+        switch (position)
+        {
+            case MoveAndResizeDetector.ResizeAndMoveType.UpperLeft:
+            case MoveAndResizeDetector.ResizeAndMoveType.LowerRight:
+                if (_window.horizontalResizable)
+                {
                     if (_window.verticalResizable)
-                        Cursor.SetCursor(uiParameters.cursorVertical, uiParameters.cursorVerticalHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorDiagonal, Parameters.Params.cursorDiagonalHotspot, CursorMode.Auto);
                     else
-                        Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
-                    break;
-                case MoveAndResizeDetector.ResizeAndMoveType.Left:
-                case MoveAndResizeDetector.ResizeAndMoveType.Right:
-                    if (_window.horizontalResizable)
-                        Cursor.SetCursor(uiParameters.cursorHorizontal, uiParameters.cursorHorizontalHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot, CursorMode.Auto);
+                }
+                else
+                {
+                    if (_window.verticalResizable)
+                        Cursor.SetCursor(Parameters.Params.cursorVertical, Parameters.Params.cursorVerticalHotspot, CursorMode.Auto);
                     else
-                        Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
-                    break;
-                case MoveAndResizeDetector.ResizeAndMoveType.Move:
-                    if (_window.movable)
-                        Cursor.SetCursor(uiParameters.cursorMove, uiParameters.cursorMoveHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
+                }
+                break;
+            case MoveAndResizeDetector.ResizeAndMoveType.UpperRight:
+            case MoveAndResizeDetector.ResizeAndMoveType.LowerLeft:
+                if (_window.horizontalResizable)
+                {
+                    if (_window.verticalResizable)
+                        Cursor.SetCursor(Parameters.Params.cursorAntiDiagonal, Parameters.Params.cursorAntiDiagonalHotspot, CursorMode.Auto);
                     else
-                        Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
-                    break;
-            }
+                        Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot, CursorMode.Auto);
+                }
+                else
+                {
+                    if (_window.verticalResizable)
+                        Cursor.SetCursor(Parameters.Params.cursorVertical, Parameters.Params.cursorVerticalHotspot, CursorMode.Auto);
+                    else
+                        Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
+                }
+                break;
+            case MoveAndResizeDetector.ResizeAndMoveType.Up:
+            case MoveAndResizeDetector.ResizeAndMoveType.Down:
+                if (_window.verticalResizable)
+                    Cursor.SetCursor(Parameters.Params.cursorVertical, Parameters.Params.cursorVerticalHotspot, CursorMode.Auto);
+                else
+                    Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
+                break;
+            case MoveAndResizeDetector.ResizeAndMoveType.Left:
+            case MoveAndResizeDetector.ResizeAndMoveType.Right:
+                if (_window.horizontalResizable)
+                    Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot, CursorMode.Auto);
+                else
+                    Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
+                break;
+            case MoveAndResizeDetector.ResizeAndMoveType.Move:
+                if (_window.movable)
+                    Cursor.SetCursor(Parameters.Params.cursorMove, Parameters.Params.cursorMoveHotspot, CursorMode.Auto);
+                else
+                    Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
+                break;
+        }
     }
     public void ResetCursorSprite()
     {
-        if (!_dragging) Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
+        if (!_dragging) Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
     }
     public void BeginDrag(MoveAndResizeDetector.ResizeAndMoveType position, PointerEventData data)
     {

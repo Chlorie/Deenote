@@ -3,7 +3,7 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -35,6 +35,7 @@ MonoBehaviour:
   cursorDiagonalHotspot: {x: 33, y: 33}
   cursorAntiDiagonal: {fileID: 2800000, guid: 842853d4c89d04347859b3bce9e110e1, type: 3}
   cursorAntiDiagonalHotspot: {x: 33, y: 33}
+  transparent: {r: 0, g: 0, b: 0, a: 0}
   difficultyColors:
   - {r: 0.54509807, g: 0.72156864, b: 0.32941177, a: 1}
   - {r: 0.42352942, g: 0.69803923, b: 0.95686275, a: 1}
@@ -45,3 +46,84 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 00e04ef36352aaa48925ed6f8827acbd, type: 3}
   - {fileID: 21300000, guid: 146c0425b14dd7d4dbb7f84b3fc1675e, type: 3}
   - {fileID: 21300000, guid: 69197a5dd077045438231d4fe934251d, type: 3}
+  noteDisappearingSprites:
+  - {fileID: 21300000, guid: 047283161da2747409a479d63a129890, type: 3}
+  - {fileID: 21300000, guid: ba80d7547c710334698e9dfab7440e6f, type: 3}
+  - {fileID: 21300000, guid: 49fd70668a114a446b3cb0dc198316ff, type: 3}
+  - {fileID: 21300000, guid: 62b61765c61c39540b6b16b5176fc07b, type: 3}
+  - {fileID: 21300000, guid: 034a56639dc97ee4b83963a36899f311, type: 3}
+  - {fileID: 21300000, guid: cac538d301865c542bce45f5a725aa13, type: 3}
+  - {fileID: 21300000, guid: a10db4d0ca805b640b59153614ceb3de, type: 3}
+  - {fileID: 21300000, guid: b72432af3c6d1694f9548d01b66a5db0, type: 3}
+  - {fileID: 21300000, guid: 5f91f2fabeb64714bb09d81872baa84f, type: 3}
+  - {fileID: 21300000, guid: 48c4578268958134fa1fbd4d269e43f3, type: 3}
+  - {fileID: 21300000, guid: 1572153bf9909814ba400027a4124b4a, type: 3}
+  - {fileID: 21300000, guid: c46c8dabf8ed443438f75a87d0e3d805, type: 3}
+  - {fileID: 21300000, guid: 399165a2f7b86ac458183a98ca8bc48f, type: 3}
+  - {fileID: 21300000, guid: abb0cdc6b5b91ed48bd8eb0eca7c0e03, type: 3}
+  - {fileID: 21300000, guid: f2a63e4118e49b24e99701f6ec92d49d, type: 3}
+  disappearingSpriteTimePerFrame: 0.025
+  pianoNoteSprite: {fileID: 21300000, guid: 2b725307c3edd3f4c942d45cd323e842, type: 3}
+  slideNoteSprite: {fileID: 21300000, guid: 5226e031d93971a46ae92d4243a12f5d, type: 3}
+  otherNoteSprite: {fileID: 21300000, guid: 5d65f7a490f16d94bb9e79c7086172f8, type: 3}
+  circleMaxScale: 6
+  circleIncreaseTime: 0.5
+  waveWidth: 4
+  waveMaxScale: 6
+  waveExpandTime: 0.05
+  waveShrinkTime: 0.55
+  slideNoteWaveColor: {r: 1, g: 1, b: 0.6039216, a: 1}
+  glowWidth: 25
+  glowMaxScale: 40
+  glowExpandTime: 0.15
+  glowShrinkTime: 0.8
+  noteAnimationLength: 0.8
+  pianoNoteScale: 7
+  slideNoteScale: 4.5
+  otherNoteScale: 4.5
+  disappearingSpriteScale: 8.5
+  perspectiveDistancesPerSecond:
+  - 16
+  - 18
+  - 21
+  - 26
+  - 32
+  - 39
+  - 47
+  - 56
+  - 67
+  - 82
+  - 106
+  - 138
+  - 200
+  - 300
+  - 400
+  - 500
+  - 600
+  - 720
+  - 900
+  - 1200
+  perspectiveMaxDistance: 240
+  perspectiveOpaqueDistance: 120
+  perspectiveHorizontalScale: 7.5
+  orthogonalDistancesPerSecond:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0

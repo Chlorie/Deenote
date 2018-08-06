@@ -8,33 +8,31 @@ public class AudioPlayer : MonoBehaviour
     [SerializeField] private AudioSource _source;
     public delegate void AudioTimeChangeHandler(float time);
     public delegate void AudioClipChangeHandler(float length);
-    public event AudioTimeChangeHandler AudioTimeChangeEvent = null;
-    public event AudioClipChangeHandler AudioClipChangeEvent = null;
-    private float _time = 0.0f;
+    public event AudioTimeChangeHandler AudioTimeChangeEvent;
+    public event AudioClipChangeHandler AudioClipChangeEvent;
+    private float _time;
     public float Time
     {
         get { return _time; }
         set
         {
             _time = value;
-            AudioTimeChangeEvent.Invoke(_time);
+            AudioTimeChangeEvent?.Invoke(_time);
         }
     }
     public float Length => _source.clip.length;
     public void LoadAudioFromStream(Stream stream)
     {
-        WaveStream wave;
-        int initialSampleCount = 0;
-        wave = new Mp3FileReader(stream);
+        WaveStream wave = new Mp3FileReader(stream);
         Mp3Frame frame = Mp3Frame.LoadFromStream(stream);
-        initialSampleCount = frame.SampleCount * wave.WaveFormat.Channels;
+        int initialSampleCount = frame.SampleCount * wave.WaveFormat.Channels;
         stream.Seek(0, SeekOrigin.Begin);
         ISampleProvider provider = wave.ToSampleProvider();
         long length = wave.Length / (wave.WaveFormat.BitsPerSample / 8);
         float[] rawSamples = new float[length];
         provider.Read(rawSamples, 0, (int)length);
         float[] extendedSamples = new float[length + initialSampleCount];
-        rawSamples.CopyTo(extendedSamples, initialSampleCount);
+        rawSamples.CopyTo(extendedSamples, initialSampleCount); // Insert empty frame at the beginning
         AudioClip clip = AudioClip.Create("AudioClip", extendedSamples.Length / wave.WaveFormat.Channels, wave.WaveFormat.Channels, wave.WaveFormat.SampleRate, false);
         clip.SetData(extendedSamples, 0);
         _source.clip = clip;
@@ -75,10 +73,11 @@ public class AudioPlayer : MonoBehaviour
             Destroy(this);
             Debug.LogError("Error: Unexpected multiple instances of AudioPlayer");
         }
+        AudioTimeChangeEvent += (time) => _time = time;
         AudioTimeChangeEvent += ChangeAudioPlaybackPosition;
     }
     private void Update()
     {
-        if (_source.isPlaying) AudioTimeChangeEvent.Invoke(_source.time);
+        if (_source.isPlaying) AudioTimeChangeEvent?.Invoke(_source.time);
     }
 }

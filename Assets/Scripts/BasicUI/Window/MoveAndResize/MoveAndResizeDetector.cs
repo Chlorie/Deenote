@@ -18,24 +18,9 @@ public class MoveAndResizeDetector : MonoBehaviour,
         Move
     }
     public ResizeAndMoveType type;
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        handler.ChangeCursorSprite(type);
-    }
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        handler.ResetCursorSprite();
-    }
-    public void OnDrag(PointerEventData eventData)
-    {
-        handler.Dragging(type, eventData);
-    }
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        handler.BeginDrag(type, eventData);
-    }
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        handler.EndDrag(type, eventData);
-    }
+    public void OnPointerEnter(PointerEventData eventData) => handler.ChangeCursorSprite(type);
+    public void OnPointerExit(PointerEventData eventData) => handler.ResetCursorSprite();
+    public void OnDrag(PointerEventData eventData) => handler.Dragging(type, eventData);
+    public void OnBeginDrag(PointerEventData eventData) => handler.BeginDrag(type, eventData);
+    public void OnEndDrag(PointerEventData eventData) => handler.EndDrag(type, eventData);
 }

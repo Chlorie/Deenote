@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 
 public class FileExplorer : Window
 {
@@ -15,7 +15,7 @@ public class FileExplorer : Window
         InputFileName
     }
     private string[] _extensions;
-    private DirectoryInfo _currentDirectory = null;
+    private DirectoryInfo _currentDirectory;
     private Mode _mode;
     private Callback _callback;
     [SerializeField] private InputField _directoryInputField;
@@ -56,30 +56,29 @@ public class FileExplorer : Window
         }
         _callback = callback;
         if (_currentDirectory == null) _currentDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-        if (_mode == Mode.InputFileName)
+        switch (_mode)
         {
-            _fileNameInputField.gameObject.SetActive(true);
-            _selectedItemText.gameObject.SetActive(false);
-            _confirmButton.interactable = !string.IsNullOrEmpty(_fileNameInputField.text);
-        }
-        else if (_mode == Mode.SelectFile)
-        {
-            _fileNameInputField.gameObject.SetActive(false);
-            _selectedItemText.gameObject.SetActive(true);
-            _selectedItemText.text = "";
-            _confirmButton.interactable = false;
-        }
-        else
-        {
-            _fileNameInputField.gameObject.SetActive(false);
-            _selectedItemText.gameObject.SetActive(true);
-            _selectedItemText.text = _currentDirectory.Name;
-            _confirmButton.interactable = true;
+            case Mode.InputFileName:
+                _fileNameInputField.gameObject.SetActive(true);
+                _selectedItemText.gameObject.SetActive(false);
+                _confirmButton.interactable = !string.IsNullOrEmpty(_fileNameInputField.text);
+                break;
+            case Mode.SelectFile:
+                _fileNameInputField.gameObject.SetActive(false);
+                _selectedItemText.gameObject.SetActive(true);
+                _selectedItemText.text = "";
+                _confirmButton.interactable = false;
+                break;
+            case Mode.SelectFolder:
+                _fileNameInputField.gameObject.SetActive(false);
+                _selectedItemText.gameObject.SetActive(true);
+                _selectedItemText.text = _currentDirectory.Name;
+                _confirmButton.interactable = true;
+                break;
         }
         Updates();
     }
-    public static void Open(Mode mode, Callback callback, params string[] extensions) =>
-        Instance.OpenNonStatic(mode, callback, extensions);
+    public static void Open(Mode mode, Callback callback, params string[] extensions) => Instance.OpenNonStatic(mode, callback, extensions);
     public override void Close()
     {
         base.Close();
@@ -183,12 +182,15 @@ public class FileExplorer : Window
     private void GoToDirectory(DirectoryInfo directory)
     {
         _currentDirectory = directory;
-        if (_mode == Mode.SelectFolder)
-            _selectedItemText.text = directory.Name;
-        else if (_mode == Mode.SelectFile)
+        switch (_mode)
         {
-            _selectedItemText.text = "";
-            _confirmButton.interactable = false;
+            case Mode.SelectFolder:
+                _selectedItemText.text = directory.Name;
+                break;
+            case Mode.SelectFile:
+                _selectedItemText.text = "";
+                _confirmButton.interactable = false;
+                break;
         }
         Updates();
     }

@@ -5,8 +5,8 @@ using UnityEngine;
 public class UnexpectedExceptionHandler : MonoBehaviour
 {
     public static UnexpectedExceptionHandler Instance { get; private set; }
-    private int _exceptionCount = 0;
-    private bool _waitUpdateStatus = false;
+    private int _exceptionCount;
+    private bool _waitUpdateStatus;
     private void Awake()
     {
         AppDomain.CurrentDomain.UnhandledException += OnUnexpectedException;

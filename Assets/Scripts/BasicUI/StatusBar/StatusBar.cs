@@ -4,15 +4,14 @@ using UnityEngine.UI;
 public class StatusBar : MonoBehaviour
 {
     public static StatusBar Instance { get; private set; }
-    [SerializeField] private UIParameters uiParameters;
     public LocalizedText statusText;
     public Image background;
     public static bool ErrorState
     {
         set
         {
-            Instance.background.color = value ? Instance.uiParameters.statusBarErrorColor :
-                Instance.uiParameters.statusBarDefaultColor;
+            Instance.background.color = value ? Parameters.Params.statusBarErrorColor :
+           Parameters.Params.statusBarDefaultColor;
         }
     }
     private void Awake()

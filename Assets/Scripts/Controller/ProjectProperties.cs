@@ -26,7 +26,7 @@ public class ProjectProperties : Window
     public void SongNameCallback()
     {
         ProjectManagement.project.songName = _songNameInputField.text;
-#warning Needs to add method calls to change stage display
+        PerspectiveView.Instance.SetSongName(_songNameInputField.text);
     }
     public void ArtistCallback() => ProjectManagement.project.artist = _artistInputField.text;
     public void NoterCallback() => ProjectManagement.project.noter = _noterInputField.text;
@@ -53,6 +53,7 @@ public class ProjectProperties : Window
     }
     public void LoadChartCallback(int difficulty)
     {
+        AudioPlayer.Instance.Time = 0.0f;
         PerspectiveView.Instance.SetScore(0);
         PerspectiveView.Instance.SetSongName(ProjectManagement.project.songName);
         PerspectiveView.Instance.SetDifficulty(difficulty, ProjectManagement.project.charts[difficulty].level);
@@ -68,9 +69,9 @@ public class ProjectProperties : Window
             {
                 JsonChart chart = serializer.Deserialize(reader, typeof(JsonChart)) as JsonChart;
                 ProjectManagement.project.charts[difficulty] = Chart.FromJsonChart(chart);
+                if (ChartDisplayController.Instance.Difficulty == difficulty) LoadChartCallback(difficulty);
             }
         }, ".json", ".txt");
-#warning Needs to add method calls to change stage display
     }
     public void ExportChartCallback(int difficulty)
     {
@@ -91,19 +92,6 @@ public class ProjectProperties : Window
             using (StreamWriter writer = new StreamWriter(FileExplorer.Result))
                 serializer.Serialize(writer, exportedChart);
         }, ".json");
-    }
-    private void InitializeOperations()
-    {
-        operations.Add(new Operation
-        {
-            callback = null,
-            shortcut = new Shortcut { key = KeyCode.Space }
-        });
-    }
-    protected override void Start()
-    {
-        base.Start();
-        InitializeOperations();
     }
     private void Awake()
     {

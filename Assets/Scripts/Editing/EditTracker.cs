@@ -28,27 +28,21 @@ public class EditTracker : MonoBehaviour
         while (_history.Count > _currentStep) _history.RemoveAt(_currentStep);
         _history.Add(step);
         _currentStep++;
-        if (_history.Count > _maxStep)
-        {
-            _history.RemoveAt(0);
-            _currentStep--;
-        }
+        if (_history.Count <= _maxStep) return;
+        _history.RemoveAt(0);
+        _currentStep--;
     }
     public void Undo()
     {
-        if (_currentStep > 0)
-        {
-            _currentStep--;
-            _history[_currentStep].undo?.Invoke();
-        }
+        if (_currentStep <= 0) return;
+        _currentStep--;
+        _history[_currentStep].undo?.Invoke();
     }
     public void Redo()
     {
-        if (_currentStep < _history.Count)
-        {
-            _history[_currentStep].redo?.Invoke();
-            _currentStep++;
-        }
+        if (_currentStep >= _history.Count) return;
+        _history[_currentStep].redo?.Invoke();
+        _currentStep++;
     }
     private void Awake()
     {

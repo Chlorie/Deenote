@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class Window : MonoBehaviour, IPointerDownHandler
 {
-    public UIParameters uiParameters;
     private RectTransform _windowTransform;
     // Window Attributes
     public bool horizontalResizable;
@@ -22,13 +21,13 @@ public class Window : MonoBehaviour, IPointerDownHandler
     private RectTransform _tagContentTransform;
     // Events
     public delegate void WindowResizeHandler(Rect rect);
-    public event WindowResizeHandler OnWindowResize = null;
+    public event WindowResizeHandler OnWindowResize;
     // Actions
     [HideInInspector] public List<Operation> operations = new List<Operation>();
     // Properties
     public bool Opened => _contents.activeInHierarchy;
-    private float TagWidth => Mathf.Max(LayoutUtility.GetPreferredWidth(_tagContentTransform) + uiParameters.tagRightSpace
-      + uiParameters.tagLeftSpace, uiParameters.minTagWidth);
+    private float TagWidth => Mathf.Max(LayoutUtility.GetPreferredWidth(_tagContentTransform) + Parameters.Params.tagRightSpace
+      + Parameters.Params.tagLeftSpace, Parameters.Params.minTagWidth);
     private Vector2 MinPosition => new Vector2(0.0f, 45.0f - Screen.height);
     private Vector2 MaxPosition => new Vector2(Screen.width - TagWidth + 1, -25.0f);
     private Vector2 MinSize
@@ -36,13 +35,9 @@ public class Window : MonoBehaviour, IPointerDownHandler
         get
         {
             float width = TagWidth - 2;
-            if (width > minSize.x)
-                if (aspectRatio.x == 0 || aspectRatio.y == 0)
-                    return new Vector2(width, minSize.y);
-                else
-                    return new Vector2(width, width * aspectRatio.y / aspectRatio.x);
-            else
-                return minSize;
+            if (!(width > minSize.x)) return minSize;
+            if (aspectRatio.x == 0 || aspectRatio.y == 0) return new Vector2(width, minSize.y);
+            return new Vector2(width, width * aspectRatio.y / aspectRatio.x);
         }
     }
     public Rect Rect
@@ -92,12 +87,10 @@ public class Window : MonoBehaviour, IPointerDownHandler
     }
     private void AdjustTagWidth()
     {
-        if (flexibleTagWidth)
-        {
-            Vector2 sizeDelta = _tagTransform.sizeDelta;
-            sizeDelta.x = TagWidth;
-            _tagTransform.sizeDelta = sizeDelta;
-        }
+        if (!flexibleTagWidth) return;
+        Vector2 sizeDelta = _tagTransform.sizeDelta;
+        sizeDelta.x = TagWidth;
+        _tagTransform.sizeDelta = sizeDelta;
     }
     protected virtual void Open()
     {
@@ -110,7 +103,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
     public virtual void Close()
     {
         _contents.SetActive(false);
-        Cursor.SetCursor(uiParameters.cursorDefault, uiParameters.cursorDefaultHotspot, CursorMode.Auto);
+        Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
         WindowsController.Instance.MoveWindowToBottom(this);
         if (blocking) WindowsController.Instance.RemoveBlockingWindow(this);
         WindowsController.Instance.UpdateFocusedWindowRef();

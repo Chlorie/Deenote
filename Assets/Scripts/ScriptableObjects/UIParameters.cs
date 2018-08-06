@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// ReSharper disable InconsistentNaming
+using UnityEngine;
 
 [CreateAssetMenu(menuName = "Scriptable Objects/UI Parameters")]
 public class UIParameters : ScriptableObject
@@ -30,7 +31,34 @@ public class UIParameters : ScriptableObject
     public Texture2D cursorAntiDiagonal;
     public Vector2 cursorAntiDiagonalHotspot;
     // Colors
+    public Color transparent;
     public Color[] difficultyColors;
     // Stage
     public Sprite[] difficultySprites;
+    public Sprite[] noteDisappearingSprites;
+    public float disappearingSpriteTimePerFrame;
+    public Sprite pianoNoteSprite;
+    public Sprite slideNoteSprite;
+    public Sprite otherNoteSprite;
+    public float circleMaxScale;
+    public float circleIncreaseTime;
+    public float waveWidth;
+    public float waveMaxScale;
+    public float waveExpandTime;
+    public float waveShrinkTime;
+    public Color slideNoteWaveColor;
+    public float glowWidth;
+    public float glowMaxScale;
+    public float glowExpandTime;
+    public float glowShrinkTime;
+    public float noteAnimationLength;
+    public float pianoNoteScale;
+    public float slideNoteScale;
+    public float otherNoteScale;
+    public float disappearingSpriteScale;
+    public float[] perspectiveDistancesPerSecond;
+    public float perspectiveMaxDistance;
+    public float perspectiveOpaqueDistance;
+    public float perspectiveHorizontalScale;
+    public float[] orthogonalDistancesPerSecond;
 }

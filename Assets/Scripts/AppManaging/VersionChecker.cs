@@ -9,7 +9,7 @@ using System.Diagnostics;
 public class VersionChecker : MonoBehaviour
 {
     public static VersionChecker Instance { get; private set; }
-    [SerializeField] private readonly string _currentVersion;
+    [SerializeField] private string _currentVersion;
     private List<int> VersionStringToIntList(string version)
     {
         string[] strings = version.Split('.');

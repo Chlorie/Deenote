@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public UIParameters uiParameters;
     public RectTransform textTransform;
     private RectTransform _buttonTransform;
     public Button button;
@@ -15,24 +14,24 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private void UpdateMainButtonSize()
     {
         Vector2 sizeDelta = _buttonTransform.sizeDelta;
-        sizeDelta.x = LayoutUtility.GetPreferredWidth(textTransform) + 2 * uiParameters.toolbarMainButtonSideSpace;
+        sizeDelta.x = LayoutUtility.GetPreferredWidth(textTransform) + 2 * Parameters.Params.toolbarMainButtonSideSpace;
         _buttonTransform.sizeDelta = sizeDelta;
     }
     public void OnClick()
     {
-        if (!WindowsController.Instance.Blocking)
-            if (!_controller.hoverDetect)
-            {
-                _controller.currentSelected = this;
-                SetSelectedColor();
-                InitializeDropdown();
-            }
-            else
-            {
-                _controller.CloseDropdown();
-                _controller.currentSelected = null;
-                SetDefaultColor();
-            }
+        if (WindowsController.Instance.Blocking) return;
+        if (!_controller.hoverDetect)
+        {
+            _controller.currentSelected = this;
+            SetSelectedColor();
+            InitializeDropdown();
+        }
+        else
+        {
+            _controller.CloseDropdown();
+            _controller.currentSelected = null;
+            SetDefaultColor();
+        }
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -40,51 +39,37 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
         if (!WindowsController.Instance.Blocking)
         {
             SetDefaultColor();
-            if (_controller.hoverDetect)
-            {
-                InitializeDropdown();
-                _controller.currentSelected?.SetDefaultColor();
-                _controller.currentSelected = this;
-                SetSelectedColor();
-            }
+            if (!_controller.hoverDetect) return;
+            InitializeDropdown();
+            _controller.currentSelected?.SetDefaultColor();
+            _controller.currentSelected = this;
+            SetSelectedColor();
         }
         else
             SetDeactivatedColor();
     }
-    public void OnPointerExit(PointerEventData eventData)
+    public void OnPointerExit(PointerEventData eventData) => _controller.onObjectCount--;
+    private void SetSelectedColor() => button.colors = new ColorBlock
     {
-        _controller.onObjectCount--;
-    }
-    private void SetSelectedColor()
+        normalColor = Parameters.Params.toolbarSelectableSelectedColor,
+        highlightedColor = Parameters.Params.toolbarSelectableSelectedColor,
+        pressedColor = Parameters.Params.toolbarSelectableDefaultColor,
+        colorMultiplier = 1.0f
+    };
+    public void SetDefaultColor() => button.colors = new ColorBlock
     {
-        button.colors = new ColorBlock
-        {
-            normalColor = uiParameters.toolbarSelectableSelectedColor,
-            highlightedColor = uiParameters.toolbarSelectableSelectedColor,
-            pressedColor = uiParameters.toolbarSelectableDefaultColor,
-            colorMultiplier = 1.0f
-        };
-    }
-    public void SetDefaultColor()
+        normalColor = Parameters.Params.toolbarSelectableDefaultColor,
+        highlightedColor = Parameters.Params.toolbarSelectableHighlightedColor,
+        pressedColor = Parameters.Params.toolbarSelectableSelectedColor,
+        colorMultiplier = 1.0f
+    };
+    public void SetDeactivatedColor() => button.colors = new ColorBlock
     {
-        button.colors = new ColorBlock
-        {
-            normalColor = uiParameters.toolbarSelectableDefaultColor,
-            highlightedColor = uiParameters.toolbarSelectableHighlightedColor,
-            pressedColor = uiParameters.toolbarSelectableSelectedColor,
-            colorMultiplier = 1.0f
-        };
-    }
-    public void SetDeactivatedColor()
-    {
-        button.colors = new ColorBlock
-        {
-            normalColor = uiParameters.toolbarSelectableDefaultColor,
-            highlightedColor = uiParameters.toolbarSelectableDefaultColor,
-            pressedColor = uiParameters.toolbarSelectableDefaultColor,
-            colorMultiplier = 1.0f
-        };
-    }
+        normalColor = Parameters.Params.toolbarSelectableDefaultColor,
+        highlightedColor = Parameters.Params.toolbarSelectableDefaultColor,
+        pressedColor = Parameters.Params.toolbarSelectableDefaultColor,
+        colorMultiplier = 1.0f
+    };
     private void InitializeDropdown()
     {
         _controller.ReturnAllDropdownItems();

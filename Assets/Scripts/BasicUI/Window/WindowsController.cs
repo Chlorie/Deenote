@@ -17,10 +17,7 @@ public class WindowsController : MonoBehaviour
         }
         return _blockingWindows.Count == 0;
     }
-    public void MoveWindowToBottom(Window window)
-    {
-        window.transform.SetAsFirstSibling();
-    }
+    public void MoveWindowToBottom(Window window) => window.transform.SetAsFirstSibling();
     public void AddBlockingWindow(Window window)
     {
         if (!Blocking) _actionBlocker.SetActive(true);
@@ -33,10 +30,7 @@ public class WindowsController : MonoBehaviour
         if (!Blocking) { _actionBlocker.SetActive(false); return; }
         _actionBlocker.transform.SetSiblingIndex(transform.childCount - 2);
     }
-    public void UpdateFocusedWindowRef()
-    {
-        focusedWindow = (transform.childCount == 0) ? null : transform.GetChild(transform.childCount - 1).GetComponent<Window>();
-    }
+    public void UpdateFocusedWindowRef() => focusedWindow = (transform.childCount == 0) ? null : transform.GetChild(transform.childCount - 1).GetComponent<Window>();
     private void Awake()
     {
         if (Instance == null)

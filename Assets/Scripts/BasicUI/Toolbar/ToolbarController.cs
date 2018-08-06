@@ -11,7 +11,6 @@ public class ToolbarController : MonoBehaviour
     private ObjectPool<ToolbarDropdownItem> _dropdownItemPool;
     private List<ToolbarDropdownItem> _dropdownItems = new List<ToolbarDropdownItem>();
     [HideInInspector] public ToolbarSelectable currentSelected;
-    public UIParameters uiParameters;
     [HideInInspector] public int onObjectCount = 0;
     private void Awake()
     {
@@ -48,7 +47,7 @@ public class ToolbarController : MonoBehaviour
         for (int i = 0; i < infos.Count; i++)
         {
             Vector2 sizeDelta = _dropdownItems[i].buttonTransform.sizeDelta;
-            sizeDelta.x = maxTextWidth + 2 * uiParameters.toolbarMainButtonSideSpace + uiParameters.toolbarItemMiddleSpace;
+            sizeDelta.x = maxTextWidth + 2 * Parameters.Params.toolbarMainButtonSideSpace + Parameters.Params.toolbarItemMiddleSpace;
             _dropdownItems[i].buttonTransform.sizeDelta = sizeDelta;
         }
     }

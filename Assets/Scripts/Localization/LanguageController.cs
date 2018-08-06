@@ -7,7 +7,7 @@ public class LanguageController
     private static int _language;
     public static int LanguageCount => noLineBreak.Length;
     public delegate void LanguageChangeCall();
-    public static event LanguageChangeCall Call = null;
+    public static event LanguageChangeCall Call;
     public static void Refresh() => Language = _language;
     public static int Language
     {

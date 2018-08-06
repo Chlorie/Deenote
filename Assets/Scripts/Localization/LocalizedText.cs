@@ -7,13 +7,10 @@ public class LocalizedText : MonoBehaviour
     [SerializeField] [TextArea] private string[] _strings;
     private Text _text;
     private Text TextProperty => _text ?? (_text = gameObject.GetComponent<Text>());
-    [HideInInspector] public Color Color { set { _text.color = value; } }
+    public Color Color { set { _text.color = value; } }
     public string[] Strings
     {
-        get
-        {
-            return _strings;
-        }
+        get { return _strings; }
         set
         {
             if (value.Length > LanguageController.LanguageCount) // Too much texts
@@ -25,7 +22,6 @@ public class LocalizedText : MonoBehaviour
             SetLanguage(LanguageController.Language);
         }
     }
-    public void SetStrings(params string[] newStrings) => Strings = newStrings;
     public void SetLanguage(int language)
     {
         if (_strings == null || _strings.Length == 0) // Empty strings

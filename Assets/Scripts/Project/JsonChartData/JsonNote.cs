@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿// ReSharper disable InconsistentNaming, NotAccessedField.Global
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 [JsonObject(IsReference = true)]

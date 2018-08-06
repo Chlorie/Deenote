@@ -7,10 +7,10 @@ public class BackgroundImageSetter : Window
     public static BackgroundImageSetter Instance { get; private set; }
     [SerializeField] private Image _image;
     [SerializeField] private RectTransform _transform;
-    private int _width = 0;
-    private int _height = 0;
-    private int _displayWidth = 0;
-    private int _displayHeight = 0;
+    private int _width;
+    private int _height;
+    private int _displayWidth;
+    private int _displayHeight;
     public enum Position
     {
         Top,

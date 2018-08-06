@@ -5,10 +5,7 @@ using UnityEngine.EventSystems;
 public class WindowClickResponse : MonoBehaviour, IPointerDownHandler
 {
     public Window parentWindow;
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        parentWindow?.OnPointerDown(eventData);
-    }
+    public void OnPointerDown(PointerEventData eventData) => parentWindow?.OnPointerDown(eventData);
     // Called in editor, automatically fill Parent Window field
     private void OnValidate()
     {

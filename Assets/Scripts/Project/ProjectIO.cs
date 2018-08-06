@@ -1,4 +1,5 @@
-﻿using System;
+﻿// ReSharper disable InconsistentNaming
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -101,7 +102,7 @@ public static class ProjectIO
         data.music = reader.ReadByteArray();
         data.preview = reader.ReadByteArray();
         data.cover = reader.ReadByteArray();
-        data.coverFC = reader.ReadByteArray();
+        data.coverFc = reader.ReadByteArray();
         return data;
     }
     public static void Write(this BinaryWriter writer, SongData data)
@@ -119,6 +120,6 @@ public static class ProjectIO
         writer.WriteArray(data.music);
         writer.WriteArray(data.preview);
         writer.WriteArray(data.cover);
-        writer.WriteArray(data.coverFC);
+        writer.WriteArray(data.coverFc);
     }
 }

@@ -2,7 +2,7 @@
 
 public static class ProjectManagement
 {
-    public static string filePath = null;
+    public static string filePath;
     public static SongData project = new SongData();
     // Methods for I/O
     public static void LoadFrom(string path)
@@ -13,9 +13,8 @@ public static class ProjectManagement
             project = reader.ReadSongData();
             filePath = path;
         }
-        if (project.music != null)
-            using (MemoryStream stream = new MemoryStream(project.music))
-                AudioPlayer.Instance.LoadAudioFromStream(stream);
+        if (project.music == null) return;
+        using (MemoryStream stream = new MemoryStream(project.music)) AudioPlayer.Instance.LoadAudioFromStream(stream);
     }
     public static void SaveAs(string path)
     {
