@@ -1,5 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "Scriptable Objects/UI Parameters")]
 public class UIParameters : ScriptableObject
@@ -10,6 +9,8 @@ public class UIParameters : ScriptableObject
     public Color toolbarSelectableDefaultColor;
     public Color toolbarSelectableHighlightedColor;
     public Color toolbarSelectableSelectedColor;
+    public Color toolbarSelectableEnabledTextColor;
+    public Color toolbarSelectableDisabledTextColor;
     // Status bar settings
     public Color statusBarDefaultColor;
     public Color statusBarErrorColor;
@@ -35,11 +36,13 @@ public class UIParameters : ScriptableObject
     public Color[] difficultyColors;
     // Stage
     public Sprite[] difficultySprites;
-    public Sprite[] noteDisappearingSprites;
-    public float disappearingSpriteTimePerFrame;
     public Sprite pianoNoteSprite;
     public Sprite slideNoteSprite;
     public Sprite otherNoteSprite;
+    public float[] orthogonalDistancesPerSecond;
+    // Perspective view
+    public Sprite[] noteDisappearingSprites;
+    public float disappearingSpriteTimePerFrame;
     public float circleMaxScale;
     public float circleIncreaseTime;
     public float waveWidth;
@@ -47,6 +50,7 @@ public class UIParameters : ScriptableObject
     public float waveExpandTime;
     public float waveShrinkTime;
     public Color slideNoteWaveColor;
+    public Color glowColor;
     public float glowWidth;
     public float glowMaxScale;
     public float glowExpandTime;
@@ -60,5 +64,20 @@ public class UIParameters : ScriptableObject
     public float perspectiveMaxDistance;
     public float perspectiveOpaqueDistance;
     public float perspectiveHorizontalScale;
-    public float[] orthogonalDistancesPerSecond;
+    public float comboNoNumberLength;
+    public float comboNumberBlackOutTime;
+    public float comboShadowMaxTime;
+    public float comboShadowMinAlpha;
+    public float comboShockWaveMaxTime;
+    public float comboStrikeShowTime;
+    public float comboCharmingExpandTime;
+    public float comboCharmingShrinkTime;
+    public float judgeLineEffectShrinkTime;
+    public float lightEffectAngularFrequency;
+    public float lightMaskMinScale;
+    public float lightMaskMaxScale;
+    // Control
+    public float epsilonTime;
+    public float slowScrollSpeed;
+    public float fastScrollSpeed;
 }

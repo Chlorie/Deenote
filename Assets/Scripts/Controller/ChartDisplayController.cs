@@ -9,10 +9,12 @@ public class ChartDisplayController : MonoBehaviour
     private List<int> _combo = new List<int>();
     private int _playSpeed = 10;
     private int _nextShownNoteIndex;
+    public int LastHitNoteIndex { get; private set; } = -1;
     [SerializeField] private Transform _noteParent;
     [SerializeField] private NoteObject _notePrefab;
     private ObjectPool<NoteObject> _notePool;
     private List<NoteObject> _noteObjects = new List<NoteObject>();
+    public List<Operation> chartPlayingOperations = new List<Operation>();
     public float PerspectivePosition(float time) =>
         Parameters.Params.perspectiveDistancesPerSecond[_playSpeed] * (time - AudioPlayer.Instance.Time);
     public bool ShownInPerspectiveView(Note note)
@@ -44,6 +46,7 @@ public class ChartDisplayController : MonoBehaviour
     }
     private void ClearStage()
     {
+        LastHitNoteIndex = -1;
         // Return all notes
         for (int i = _noteObjects.Count - 1; i >= 0; i--)
         {
@@ -55,10 +58,11 @@ public class ChartDisplayController : MonoBehaviour
         _nextShownNoteIndex = 0;
         while (_nextShownNoteIndex < noteCount && !ShownInPerspectiveView(notes[_nextShownNoteIndex])) _nextShownNoteIndex++;
         // Return all beat lines
-#warning Should add logic for returning beat lines later
+        // TODO: Should add logic for returning beat lines later
     }
     private void SetStage()
     {
+        UpdateLastHitNoteIndex();
         // Place notes
         while (_noteObjects.Count > 0 && !_noteObjects[0].IsShown)
         {
@@ -80,7 +84,115 @@ public class ChartDisplayController : MonoBehaviour
             _nextShownNoteIndex++;
         }
         // Place beat lines
-#warning Should add logic for placing beat lines later
+        // TODO: Should add logic for placing beat lines later
+        // Update effects
+        UpdateScore();
+        UpdateJudgeLineEffect();
+        UpdateCombo();
+    }
+    private void UpdateLastHitNoteIndex()
+    {
+        while (LastHitNoteIndex < Chart.notes.Count)
+            if (LastHitNoteIndex < 0 || Chart.notes[LastHitNoteIndex].time <= AudioPlayer.Instance.Time)
+                LastHitNoteIndex++;
+            else
+                break;
+        LastHitNoteIndex--;
+        while (LastHitNoteIndex > 0)
+            if (!Chart.notes[LastHitNoteIndex].IsShown)
+                LastHitNoteIndex--;
+            else
+                break;
+    }
+    private void UpdateScore()
+    {
+        int totalShownNotes = _combo.Count > 0 ? _combo[_combo.Count - 1] : 0;
+        int currentNoteCombo = LastHitNoteIndex > 0 ? _combo[LastHitNoteIndex] : 0;
+        if (totalShownNotes <= 1)
+            PerspectiveView.Instance.SetScore(0);
+        else
+            PerspectiveView.Instance.SetScore((int)((800000.0 * currentNoteCombo * (totalShownNotes - 1) +
+                200000.0 * currentNoteCombo * (currentNoteCombo - 1)) / (totalShownNotes * (totalShownNotes - 1))));
+    }
+    private void UpdateJudgeLineEffect() =>
+        JudgeLineEffectPerspective.Instance.ChangeScale(LastHitNoteIndex < 0 ? -10.0f : Chart.notes[LastHitNoteIndex].time);
+    private void UpdateCombo()
+    {
+        if (LastHitNoteIndex < 0)
+            ComboEffectPerspective.Instance.UpdateCombo(0, 0.0f);
+        else
+            ComboEffectPerspective.Instance.UpdateCombo(_combo[LastHitNoteIndex], Chart.notes[LastHitNoteIndex].time);
+    }
+    private void InitializeChartPlayingOperations()
+    {
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = AudioPlayer.Instance.TogglePlayState,
+            shortcut = new Shortcut { key = KeyCode.Return }
+        });
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () =>
+            {
+                AudioPlayer.Instance.Time = 0;
+                TimeSliderPerspective.Instance.OnUserMoveSlider();
+            },
+            shortcut = new Shortcut { key = KeyCode.Home }
+        });
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () =>
+            {
+                AudioPlayer.Instance.Stop();
+                AudioPlayer.Instance.Time = AudioPlayer.Instance.Length - Parameters.Params.epsilonTime;
+                TimeSliderPerspective.Instance.OnUserMoveSlider();
+            },
+            shortcut = new Shortcut { key = KeyCode.End }
+        });
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () =>
+            {
+                float deltaTime = Time.deltaTime * Parameters.Params.slowScrollSpeed;
+                AudioPlayer instance = AudioPlayer.Instance;
+                if (instance.Time > deltaTime) instance.Time -= deltaTime;
+                TimeSliderPerspective.Instance.OnUserMoveSlider();
+            },
+            shortcut = new Shortcut { key = KeyCode.UpArrow, state = Shortcut.State.Hold }
+        });
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () =>
+            {
+                float deltaTime = Time.deltaTime * Parameters.Params.slowScrollSpeed;
+                AudioPlayer instance = AudioPlayer.Instance;
+                if (instance.Time < instance.Length - deltaTime) instance.Time += deltaTime;
+                TimeSliderPerspective.Instance.OnUserMoveSlider();
+            },
+            shortcut = new Shortcut { key = KeyCode.DownArrow, state = Shortcut.State.Hold }
+        });
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () =>
+            {
+                float deltaTime = Time.deltaTime * Parameters.Params.fastScrollSpeed;
+                AudioPlayer instance = AudioPlayer.Instance;
+                if (instance.Time > deltaTime) instance.Time -= deltaTime;
+                TimeSliderPerspective.Instance.OnUserMoveSlider();
+            },
+            shortcut = new Shortcut { key = KeyCode.UpArrow, shift = true, state = Shortcut.State.Hold }
+        });
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () =>
+            {
+                float deltaTime = Time.deltaTime * Parameters.Params.fastScrollSpeed;
+                AudioPlayer instance = AudioPlayer.Instance;
+                if (instance.Time < instance.Length - deltaTime) instance.Time += deltaTime;
+                TimeSliderPerspective.Instance.OnUserMoveSlider();
+            },
+            shortcut = new Shortcut { key = KeyCode.DownArrow, shift = true, state = Shortcut.State.Hold }
+        });
     }
     private void Awake()
     {
@@ -91,6 +203,7 @@ public class ChartDisplayController : MonoBehaviour
             Destroy(this);
             Debug.LogError("Error: Unexpected multiple instances of ChartDisplayController");
         }
+        InitializeChartPlayingOperations();
     }
     private void Start()
     {

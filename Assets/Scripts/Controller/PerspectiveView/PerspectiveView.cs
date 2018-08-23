@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class PerspectiveView : Window
@@ -24,26 +23,12 @@ public class PerspectiveView : Window
         _difficultyImage.sprite = Parameters.Params.difficultySprites[difficulty];
         CurrentDifficulty = difficulty;
     }
-    // Expecting an integral value score, with a maximum of 10000 meaning 100.00%
-    public void SetScore(int score) => _scoreText.text = (score / 100) + "." + (score % 100).ToString("D2") + " %";
+    // Expecting an integral value score, with a maximum of 1000000 meaning 100.00%
+    public void SetScore(int score) => _scoreText.text = (score / 10000) + "." + (score / 100 % 100).ToString("D2") + " %";
     protected override void Start()
     {
         base.Start();
-        operations.Add(new Operation
-        {
-            callback = AudioPlayer.Instance.TogglePlayState,
-            shortcut = new Shortcut { key = KeyCode.Return }
-        });
-        operations.Add(new Operation
-        {
-            callback = () => { AudioPlayer.Instance.Time = 0; },
-            shortcut = new Shortcut { key = KeyCode.Home }
-        });
-        operations.Add(new Operation
-        {
-            callback = () => { AudioPlayer.Instance.Time = AudioPlayer.Instance.Length; },
-            shortcut = new Shortcut { key = KeyCode.End }
-        });
+        foreach (Operation operation in ChartDisplayController.Instance.chartPlayingOperations) operations.Add(operation);
     }
     public new void Open()
     {

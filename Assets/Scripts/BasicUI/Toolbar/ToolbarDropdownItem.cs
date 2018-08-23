@@ -10,6 +10,7 @@ public class ToolbarDropdownItem : MonoBehaviour, IPointerEnterHandler, IPointer
     public RectTransform shortcutTransform;
     public RectTransform descriptionTransform;
     public RectTransform buttonTransform;
+    public Button button;
     public void OnClick()
     {
         ToolbarController.Instance.DeselectAll();

@@ -5,7 +5,13 @@ using UnityEngine;
 [Serializable]
 public class Shortcut
 {
-    public bool hold = false;
+    public enum State
+    {
+        Press,
+        Hold,
+        Release
+    }
+    public State state = State.Press;
     public bool ctrl = false;
     public bool alt = false;
     public bool shift = false;
@@ -23,15 +29,23 @@ public class Shortcut
     {
         get
         {
-            bool result = true;
-            if (ctrl && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl)) result = false;
-            if (!ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))) result = false;
-            if (alt && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.RightAlt)) result = false;
-            if (!alt && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt))) result = false;
-            if (shift && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) result = false;
-            if (!shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))) result = false;
-            if ((hold && !Input.GetKey(key)) || (!hold && !Input.GetKeyDown(key))) result = false;
-            return result;
+            if (ctrl && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl)) return false;
+            if (!ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))) return false;
+            if (alt && !Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.RightAlt)) return false;
+            if (!alt && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt))) return false;
+            if (shift && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) return false;
+            if (!shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))) return false;
+            switch (state)
+            {
+                case State.Press:
+                    return Input.GetKeyDown(key);
+                case State.Hold:
+                    return Input.GetKey(key);
+                case State.Release:
+                    return Input.GetKeyUp(key);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

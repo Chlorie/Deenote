@@ -26,7 +26,7 @@
         Cull Off
         Lighting Off
         ZWrite Off
-        Blend One One
+        Blend DstAlpha One
 
         Pass
         {

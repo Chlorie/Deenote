@@ -18,6 +18,8 @@ MonoBehaviour:
     a: 1}
   toolbarSelectableSelectedColor: {r: 0.078431375, g: 0.078431375, b: 0.078431375,
     a: 1}
+  toolbarSelectableEnabledTextColor: {r: 1, g: 1, b: 1, a: 1}
+  toolbarSelectableDisabledTextColor: {r: 1, g: 1, b: 1, a: 0.24705882}
   statusBarDefaultColor: {r: 0, g: 0.49803922, b: 0.78431374, a: 1}
   statusBarErrorColor: {r: 0.9019608, g: 0.234, b: 0.116, a: 1}
   minTagWidth: 60
@@ -46,6 +48,30 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 00e04ef36352aaa48925ed6f8827acbd, type: 3}
   - {fileID: 21300000, guid: 146c0425b14dd7d4dbb7f84b3fc1675e, type: 3}
   - {fileID: 21300000, guid: 69197a5dd077045438231d4fe934251d, type: 3}
+  pianoNoteSprite: {fileID: 21300000, guid: 2b725307c3edd3f4c942d45cd323e842, type: 3}
+  slideNoteSprite: {fileID: 21300000, guid: 5226e031d93971a46ae92d4243a12f5d, type: 3}
+  otherNoteSprite: {fileID: 21300000, guid: 5d65f7a490f16d94bb9e79c7086172f8, type: 3}
+  orthogonalDistancesPerSecond:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   noteDisappearingSprites:
   - {fileID: 21300000, guid: 047283161da2747409a479d63a129890, type: 3}
   - {fileID: 21300000, guid: ba80d7547c710334698e9dfab7440e6f, type: 3}
@@ -63,9 +89,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: abb0cdc6b5b91ed48bd8eb0eca7c0e03, type: 3}
   - {fileID: 21300000, guid: f2a63e4118e49b24e99701f6ec92d49d, type: 3}
   disappearingSpriteTimePerFrame: 0.025
-  pianoNoteSprite: {fileID: 21300000, guid: 2b725307c3edd3f4c942d45cd323e842, type: 3}
-  slideNoteSprite: {fileID: 21300000, guid: 5226e031d93971a46ae92d4243a12f5d, type: 3}
-  otherNoteSprite: {fileID: 21300000, guid: 5d65f7a490f16d94bb9e79c7086172f8, type: 3}
   circleMaxScale: 6
   circleIncreaseTime: 0.5
   waveWidth: 4
@@ -73,6 +96,7 @@ MonoBehaviour:
   waveExpandTime: 0.05
   waveShrinkTime: 0.55
   slideNoteWaveColor: {r: 1, g: 1, b: 0.6039216, a: 1}
+  glowColor: {r: 0.88235295, g: 0.5686275, b: 0, a: 0.6666667}
   glowWidth: 25
   glowMaxScale: 40
   glowExpandTime: 0.15
@@ -106,24 +130,18 @@ MonoBehaviour:
   perspectiveMaxDistance: 240
   perspectiveOpaqueDistance: 120
   perspectiveHorizontalScale: 7.5
-  orthogonalDistancesPerSecond:
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
+  comboNoNumberLength: 0.03
+  comboNumberBlackOutTime: 0.5
+  comboShadowMaxTime: 0.4
+  comboShadowMinAlpha: 0.1
+  comboShockWaveMaxTime: 0.15
+  comboStrikeShowTime: 0.15
+  comboCharmingExpandTime: 0.075
+  comboCharmingShrinkTime: 0.225
+  judgeLineEffectShrinkTime: 1
+  lightEffectAngularFrequency: 2
+  lightMaskMinScale: 1.8
+  lightMaskMaxScale: 2.2
+  epsilonTime: 0.001
+  slowScrollSpeed: 2.5
+  fastScrollSpeed: 10

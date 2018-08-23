@@ -2,12 +2,12 @@
 
 public class ToolbarInitialization : MonoBehaviour
 {
-    public ToolbarInitialization Instance { get; private set; }
+    public static ToolbarInitialization Instance { get; private set; }
     public ToolbarSelectable projectSelectable;
     public ToolbarSelectable editSelectable;
     public ToolbarSelectable windowsSelectable;
     public ToolbarSelectable settingsSelectable;
-    public ToolbarSelectable testSelectable;
+    public ToolbarSelectable debugSelectable;
     private void InitializeProjectSelectable()
     {
         projectSelectable.operations.Add(new ToolbarOperation
@@ -19,7 +19,7 @@ public class ToolbarInitialization : MonoBehaviour
                 shortcut = new Shortcut { key = KeyCode.N }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.N }
-        });
+        }); // New project
         projectSelectable.operations.Add(new ToolbarOperation
         {
             strings = new[] { "Open project", "打开项目" },
@@ -29,7 +29,7 @@ public class ToolbarInitialization : MonoBehaviour
                 shortcut = new Shortcut { key = KeyCode.O }
             },
             globalShortcut = new Shortcut { ctrl = true, key = KeyCode.O }
-        });
+        }); // Open project
         projectSelectable.operations.Add(new ToolbarOperation
         {
             strings = new[] { "Save project", "保存项目" },
@@ -38,8 +38,9 @@ public class ToolbarInitialization : MonoBehaviour
                 callback = ProjectManagement.Save,
                 shortcut = new Shortcut { key = KeyCode.S }
             },
-            globalShortcut = new Shortcut { ctrl = true, key = KeyCode.S }
-        });
+            globalShortcut = new Shortcut { ctrl = true, key = KeyCode.S },
+            isActive = false
+        }); // Save project
         projectSelectable.operations.Add(new ToolbarOperation
         {
             strings = new[] { "Save as...", "另存为..." },
@@ -48,8 +49,9 @@ public class ToolbarInitialization : MonoBehaviour
                 callback = SaveProjectAs,
                 shortcut = new Shortcut { shift = true, key = KeyCode.S }
             },
-            globalShortcut = new Shortcut { ctrl = true, shift = true, key = KeyCode.S }
-        });
+            globalShortcut = new Shortcut { ctrl = true, shift = true, key = KeyCode.S },
+            isActive = false
+        }); // Save as...
         projectSelectable.operations.Add(new ToolbarOperation
         {
             strings = new[] { "Quit", "退出" },
@@ -59,7 +61,7 @@ public class ToolbarInitialization : MonoBehaviour
                 shortcut = new Shortcut { key = KeyCode.Q }
             },
             globalShortcut = new Shortcut { alt = true, key = KeyCode.F4 }
-        });
+        }); // Quit
     }
     private void CreateNewProject()
     {
@@ -68,6 +70,7 @@ public class ToolbarInitialization : MonoBehaviour
         FileExplorer.Open(FileExplorer.Mode.InputFileName, () =>
         {
             ProjectManagement.filePath = FileExplorer.Result;
+            ActivateProjectRelatedFunctions();
             ProjectProperties.Instance.Open();
         }, ".dnt");
     }
@@ -78,6 +81,7 @@ public class ToolbarInitialization : MonoBehaviour
         {
             ProjectManagement.LoadFrom(FileExplorer.Result);
             ProjectProperties.Instance.UpdateProperties();
+            ActivateProjectRelatedFunctions();
             ProjectProperties.Instance.Open();
         }, ".dnt");
     }
@@ -108,11 +112,12 @@ public class ToolbarInitialization : MonoBehaviour
                         ProjectProperties.Instance.Open();
                 },
                 shortcut = new Shortcut { key = KeyCode.P }
-            }
-        });
+            },
+            isActive = false
+        }); // Project properties
         windowsSelectable.operations.Add(new ToolbarOperation
         {
-            strings = new[] { "Perspective View", "透视视图" },
+            strings = new[] { "Perspective view", "透视视图" },
             operation = new Operation
             {
                 callback = () =>
@@ -123,8 +128,9 @@ public class ToolbarInitialization : MonoBehaviour
                         PerspectiveView.Instance.Open();
                 },
                 shortcut = new Shortcut { key = KeyCode.P, shift = true }
-            }
-        });
+            },
+            isActive = false
+        }); // Perspective view
     }
 
     private void InitializeSettingsSelectable()
@@ -137,7 +143,7 @@ public class ToolbarInitialization : MonoBehaviour
                 callback = () => { VersionChecker.CheckForUpdate(true); },
                 shortcut = new Shortcut { key = KeyCode.U }
             }
-        });
+        }); // Check for updates
         settingsSelectable.operations.Add(new ToolbarOperation
         {
             strings = new[] { "Language selection", "语言选择" },
@@ -160,7 +166,7 @@ public class ToolbarInitialization : MonoBehaviour
                 },
                 shortcut = new Shortcut { key = KeyCode.L }
             }
-        });
+        }); // Language selection
         settingsSelectable.operations.Add(new ToolbarOperation
         {
             strings = new[] { "Background image settings", "背景图设置" },
@@ -169,12 +175,12 @@ public class ToolbarInitialization : MonoBehaviour
                 callback = BackgroundImageSetter.Open,
                 shortcut = new Shortcut { key = KeyCode.B }
             }
-        });
+        }); // Background image settings
     }
 
-    private void InitializeTestSelectable()
+    private void InitializeDebugSelectable()
     {
-        testSelectable.operations.Add(new ToolbarOperation
+        debugSelectable.operations.Add(new ToolbarOperation
         {
             strings = new[] { "Test Audio Playing" },
             operation = new Operation
@@ -188,7 +194,15 @@ public class ToolbarInitialization : MonoBehaviour
                 },
                 shortcut = new Shortcut { key = KeyCode.T }
             }
-        });
+        }); // Test Audio Playing
+    }
+
+    private void ActivateProjectRelatedFunctions()
+    {
+        projectSelectable.SetActive("Save project", true);
+        projectSelectable.SetActive("Save as...", true);
+        windowsSelectable.SetActive("Project properties", true);
+        windowsSelectable.SetActive("Perspective view", false);
     }
 
     private void Awake()
@@ -207,6 +221,6 @@ public class ToolbarInitialization : MonoBehaviour
         InitializeEditSelectable();
         InitializeWindowsSelectable();
         InitializeSettingsSelectable();
-        InitializeTestSelectable();
+        InitializeDebugSelectable();
     }
 }

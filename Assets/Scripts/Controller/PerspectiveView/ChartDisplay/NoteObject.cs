@@ -136,7 +136,9 @@ public class NoteObject : MonoBehaviour
             float rate = deltaTime / Parameters.Params.glowExpandTime;
             float height = rate * Parameters.Params.glowMaxScale;
             _glowSprite.transform.localScale = size * new Vector3(Parameters.Params.glowWidth, height, height);
-            _glowSprite.color = new Color(1.0f, 1.0f, 1.0f, rate);
+            Color glowColor = Parameters.Params.glowColor;
+            glowColor.a *= rate;
+            _glowSprite.color = glowColor;
         }
         else if (deltaTime > Parameters.Params.glowExpandTime && deltaTime <= Parameters.Params.glowShrinkTime)
         {
@@ -144,7 +146,9 @@ public class NoteObject : MonoBehaviour
                 (Parameters.Params.glowShrinkTime - Parameters.Params.glowExpandTime);
             float height = rate * Parameters.Params.glowMaxScale;
             _glowSprite.transform.localScale = size * new Vector3(Parameters.Params.glowWidth, height, height);
-            _glowSprite.color = new Color(1.0f, 1.0f, 1.0f, rate);
+            Color glowColor = Parameters.Params.glowColor;
+            glowColor.a *= rate;
+            _glowSprite.color = glowColor;
         }
         else
         {

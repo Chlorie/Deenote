@@ -7,11 +7,11 @@ public class ToolbarController : MonoBehaviour
     public static ToolbarController Instance { get; private set; }
     [HideInInspector] public bool hoverDetect; // Once a selectable is selected, hover actions over other selectables should be detected
     public RectTransform dropdownTransform;
-    public ToolbarDropdownItem dropdownItemPrefab;
+    [SerializeField] private ToolbarDropdownItem _dropdownItemPrefab;
     private ObjectPool<ToolbarDropdownItem> _dropdownItemPool;
     private List<ToolbarDropdownItem> _dropdownItems = new List<ToolbarDropdownItem>();
     [HideInInspector] public ToolbarSelectable currentSelected;
-    [HideInInspector] public int onObjectCount = 0;
+    [HideInInspector] public int onObjectCount;
     private void Awake()
     {
         if (Instance == null)
@@ -21,7 +21,7 @@ public class ToolbarController : MonoBehaviour
             Destroy(this);
             Debug.LogError("Error: Unexpected multiple instances of ToolbarController");
         }
-        _dropdownItemPool = new ObjectPool<ToolbarDropdownItem>(dropdownItemPrefab, 10, dropdownTransform);
+        _dropdownItemPool = new ObjectPool<ToolbarDropdownItem>(_dropdownItemPrefab, 10, dropdownTransform);
     }
     public void InitializeDropdownItems(List<ToolbarOperation> infos, float offset)
     {
@@ -37,8 +37,12 @@ public class ToolbarController : MonoBehaviour
                 for (int j = 0; j < strings.Length; j++)
                     strings[j] += "(" + infos[i].operation.shortcut + ")";
             item.description.Strings = strings;
+            item.description.Color = item.shortcut.color = infos[i].isActive
+                ? Parameters.Params.toolbarSelectableEnabledTextColor
+                : Parameters.Params.toolbarSelectableDisabledTextColor;
             item.shortcut.text = infos[i].globalShortcut?.ToString();
             item.callback = infos[i].operation.callback;
+            item.button.interactable = infos[i].isActive;
             item.gameObject.SetActive(true);
             float textWidth = LayoutUtility.GetPreferredWidth(item.descriptionTransform) + LayoutUtility.GetPreferredWidth(item.shortcutTransform);
             if (textWidth > maxTextWidth) maxTextWidth = textWidth;
@@ -74,11 +78,9 @@ public class ToolbarController : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && onObjectCount == 0)
-        {
-            CloseDropdown();
-            currentSelected?.SetDefaultColor();
-            currentSelected = null;
-        }
+        if (!Input.GetMouseButtonDown(0) || onObjectCount != 0) return;
+        CloseDropdown();
+        currentSelected?.SetDefaultColor();
+        currentSelected = null;
     }
 }

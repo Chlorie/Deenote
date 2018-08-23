@@ -57,7 +57,9 @@ public class ProjectProperties : Window
         PerspectiveView.Instance.SetScore(0);
         PerspectiveView.Instance.SetSongName(ProjectManagement.project.songName);
         PerspectiveView.Instance.SetDifficulty(difficulty, ProjectManagement.project.charts[difficulty].level);
+        // TODO: Add orthogonal view things later
         ChartDisplayController.Instance.LoadChartFromProject(difficulty);
+        ToolbarInitialization.Instance.windowsSelectable.SetActive("Perspective view", true);
     }
     public void ImportChartCallback(int difficulty)
     {
@@ -75,13 +77,14 @@ public class ProjectProperties : Window
     }
     public void ExportChartCallback(int difficulty)
     {
-        string fileName = null;
+        string fileName;
         switch (difficulty)
         {
             case 0: fileName = "easy"; break;
             case 1: fileName = "normal"; break;
             case 2: fileName = "hard"; break;
             case 3: fileName = "extra"; break;
+            default: throw new System.ArgumentOutOfRangeException(nameof(difficulty));
         }
         FileExplorer.SetTagContent("Choose where to save the file", "选择文件存储位置");
         FileExplorer.SetDefaultFileName(fileName + ".json");

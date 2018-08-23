@@ -7,7 +7,7 @@ public class AppConfig
     public string openedFile = "";
     public string backgroundImage = "";
     public bool firstLaunch = true;
-    public int language = 0;
+    public int language;
     public int backgroundPosition = (int)BackgroundImageSetter.Position.Center;
     public int backgroundStretch = (int)BackgroundImageSetter.StretchMode.FitHeight;
     public RectData fileExplorerRect;

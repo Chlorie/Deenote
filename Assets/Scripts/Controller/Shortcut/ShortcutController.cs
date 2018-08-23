@@ -21,7 +21,7 @@ public class ShortcutController : MonoBehaviour
                     return;
                 }
                 foreach (ToolbarOperation operation in toolbarSelectable.operations)
-                    if (operation.globalShortcut?.IsActive == true)
+                    if (operation.isActive && operation.globalShortcut?.IsActive == true)
                     {
                         operation.operation.callback?.Invoke(); // Invoke corresponding method
                         return;
@@ -44,7 +44,7 @@ public class ShortcutController : MonoBehaviour
         {
             // Check shortcuts in currently opened toolbar dropdown
             foreach (ToolbarOperation operation in ToolbarController.Instance.currentSelected.operations)
-                if (operation.operation.shortcut?.IsActive == true)
+                if (operation.isActive && operation.operation.shortcut?.IsActive == true)
                 {
                     ToolbarController.Instance.DeselectAll();
                     operation.operation.callback?.Invoke(); // Invoke corresponding method

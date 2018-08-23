@@ -122,7 +122,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 1}
     m_HighlightedColor: {r: 0.20392157, g: 0.20392157, b: 0.20392157, a: 1}
     m_PressedColor: {r: 0, g: 0, b: 0, a: 0.49803922}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0
   m_SpriteState:
@@ -206,6 +206,7 @@ MonoBehaviour:
   shortcutTransform: {fileID: 224049875368841172}
   descriptionTransform: {fileID: 224988515010426338}
   buttonTransform: {fileID: 224756308293779268}
+  button: {fileID: 114239695535100560}
 --- !u!114 &114718216171237886
 MonoBehaviour:
   m_ObjectHideFlags: 1

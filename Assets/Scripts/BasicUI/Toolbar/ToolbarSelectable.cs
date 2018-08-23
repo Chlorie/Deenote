@@ -11,6 +11,15 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     public List<ToolbarOperation> operations = new List<ToolbarOperation>();
     private ToolbarController _controller;
     public Shortcut shortcut;
+    public void SetActive(string text, bool value) // TODO: Change this stupid string comparison into enum or something
+    {
+        foreach (ToolbarOperation operation in operations)
+            if (operation.strings.Length > 0 && operation.strings[0] == text)
+            {
+                operation.isActive = value;
+                break;
+            }
+    }
     private void UpdateMainButtonSize()
     {
         Vector2 sizeDelta = _buttonTransform.sizeDelta;
