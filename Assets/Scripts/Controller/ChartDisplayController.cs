@@ -9,6 +9,7 @@ public class ChartDisplayController : MonoBehaviour
     private List<int> _combo = new List<int>();
     private int _playSpeed = 10;
     private int _nextShownNoteIndex;
+    private float _spaceStartTime;
     public int LastHitNoteIndex { get; private set; } = -1;
     [SerializeField] private Transform _noteParent;
     [SerializeField] private NoteObject _notePrefab;
@@ -31,6 +32,8 @@ public class ChartDisplayController : MonoBehaviour
         InitializeComboCount();
         ResetStage();
     }
+
+    // Chart playing methods
     private void InitializeComboCount()
     {
         _combo.Clear();
@@ -58,7 +61,7 @@ public class ChartDisplayController : MonoBehaviour
         _nextShownNoteIndex = 0;
         while (_nextShownNoteIndex < noteCount && !ShownInPerspectiveView(notes[_nextShownNoteIndex])) _nextShownNoteIndex++;
         // Return all beat lines
-        // TODO: Should add logic for returning beat lines later
+        // ToDo: Should add logic for returning beat lines later
     }
     private void SetStage()
     {
@@ -84,7 +87,7 @@ public class ChartDisplayController : MonoBehaviour
             _nextShownNoteIndex++;
         }
         // Place beat lines
-        // TODO: Should add logic for placing beat lines later
+        // ToDo: Should add logic for placing beat lines later
         // Update effects
         UpdateScore();
         UpdateJudgeLineEffect();
@@ -123,13 +126,34 @@ public class ChartDisplayController : MonoBehaviour
         else
             ComboEffectPerspective.Instance.UpdateCombo(_combo[LastHitNoteIndex], Chart.notes[LastHitNoteIndex].time);
     }
+
+    // Operation related methods
     private void InitializeChartPlayingOperations()
     {
         chartPlayingOperations.Add(new Operation
         {
             callback = AudioPlayer.Instance.TogglePlayState,
             shortcut = new Shortcut { key = KeyCode.Return }
-        });
+        }); // Return
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () =>
+            {
+                AudioPlayer.Instance.Play();
+                _spaceStartTime = AudioPlayer.Instance.Time;
+            },
+            shortcut = new Shortcut { key = KeyCode.Space }
+        }); // Space
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () =>
+            {
+                AudioPlayer.Instance.Time = _spaceStartTime;
+                AudioPlayer.Instance.Stop();
+                TimeSliderPerspective.Instance.OnUserMoveSlider();
+            },
+            shortcut = new Shortcut { key = KeyCode.Space, state = Shortcut.State.Release }
+        }); // Space (Release)
         chartPlayingOperations.Add(new Operation
         {
             callback = () =>
@@ -138,7 +162,7 @@ public class ChartDisplayController : MonoBehaviour
                 TimeSliderPerspective.Instance.OnUserMoveSlider();
             },
             shortcut = new Shortcut { key = KeyCode.Home }
-        });
+        }); // Home
         chartPlayingOperations.Add(new Operation
         {
             callback = () =>
@@ -148,7 +172,7 @@ public class ChartDisplayController : MonoBehaviour
                 TimeSliderPerspective.Instance.OnUserMoveSlider();
             },
             shortcut = new Shortcut { key = KeyCode.End }
-        });
+        }); // End
         chartPlayingOperations.Add(new Operation
         {
             callback = () =>
@@ -159,7 +183,7 @@ public class ChartDisplayController : MonoBehaviour
                 TimeSliderPerspective.Instance.OnUserMoveSlider();
             },
             shortcut = new Shortcut { key = KeyCode.UpArrow, state = Shortcut.State.Hold }
-        });
+        }); // Up (Hold)
         chartPlayingOperations.Add(new Operation
         {
             callback = () =>
@@ -170,7 +194,7 @@ public class ChartDisplayController : MonoBehaviour
                 TimeSliderPerspective.Instance.OnUserMoveSlider();
             },
             shortcut = new Shortcut { key = KeyCode.DownArrow, state = Shortcut.State.Hold }
-        });
+        }); // Down (Hold)
         chartPlayingOperations.Add(new Operation
         {
             callback = () =>
@@ -181,7 +205,7 @@ public class ChartDisplayController : MonoBehaviour
                 TimeSliderPerspective.Instance.OnUserMoveSlider();
             },
             shortcut = new Shortcut { key = KeyCode.UpArrow, shift = true, state = Shortcut.State.Hold }
-        });
+        }); // Shift + Up (Hold)
         chartPlayingOperations.Add(new Operation
         {
             callback = () =>
@@ -192,8 +216,28 @@ public class ChartDisplayController : MonoBehaviour
                 TimeSliderPerspective.Instance.OnUserMoveSlider();
             },
             shortcut = new Shortcut { key = KeyCode.DownArrow, shift = true, state = Shortcut.State.Hold }
-        });
+        }); // Shift + Down (Hold)
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () => { ChangePlaySpeed(1); },
+            shortcut = new Shortcut { key = KeyCode.UpArrow, alt = true }
+        }); // Alt + Up
+        chartPlayingOperations.Add(new Operation
+        {
+            callback = () => { ChangePlaySpeed(-1); },
+            shortcut = new Shortcut { key = KeyCode.DownArrow, alt = true }
+        }); // Alt + Down
     }
+    public void ChangePlaySpeed(int amount)
+    {
+        if (amount != 1 && amount != -1) throw new System.ArgumentOutOfRangeException(nameof(amount));
+        int newSpeed = _playSpeed + amount;
+        if (newSpeed < 1 || newSpeed > 19) return; // Out of range
+        _playSpeed = newSpeed;
+        // ToDo: Change the shown text for _playSpeed
+        ResetStage();
+    }
+
     private void Awake()
     {
         if (Instance == null)

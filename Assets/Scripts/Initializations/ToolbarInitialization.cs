@@ -67,7 +67,7 @@ public class ToolbarInitialization : MonoBehaviour
     {
         FileExplorer.SetTagContent("New project", "创建新项目");
         FileExplorer.SetDefaultFileName("NewProject.dnt");
-        FileExplorer.Open(FileExplorer.Mode.InputFileName, () =>
+        FileExplorer.Instance.Open(FileExplorer.Mode.InputFileName, () =>
         {
             ProjectManagement.filePath = FileExplorer.Result;
             ActivateProjectRelatedFunctions();
@@ -77,7 +77,7 @@ public class ToolbarInitialization : MonoBehaviour
     private void OpenExistingProject()
     {
         FileExplorer.SetTagContent("Open project", "打开项目");
-        FileExplorer.Open(FileExplorer.Mode.SelectFile, () =>
+        FileExplorer.Instance.Open(FileExplorer.Mode.SelectFile, () =>
         {
             ProjectManagement.LoadFrom(FileExplorer.Result);
             ProjectProperties.Instance.UpdateProperties();
@@ -89,7 +89,7 @@ public class ToolbarInitialization : MonoBehaviour
     {
         FileExplorer.SetTagContent("Save as...", "另存为...");
         FileExplorer.SetDefaultFileName("NewProject.dnt");
-        FileExplorer.Open(FileExplorer.Mode.InputFileName, () => ProjectManagement.SaveAs(FileExplorer.Result), ".dnt");
+        FileExplorer.Instance.Open(FileExplorer.Mode.InputFileName, () => ProjectManagement.SaveAs(FileExplorer.Result), ".dnt");
     }
 
     private void InitializeEditSelectable()
@@ -151,7 +151,7 @@ public class ToolbarInitialization : MonoBehaviour
             {
                 callback = () =>
                 {
-                    MessageBox.Activate(new[] { "Language", "语言" },
+                    MessageBox.Instance.Activate(new[] { "Language", "语言" },
                         new[] { "Change language to...", "语言修改为..." },
                         new MessageBox.ButtonInfo
                         {
@@ -172,7 +172,7 @@ public class ToolbarInitialization : MonoBehaviour
             strings = new[] { "Background image settings", "背景图设置" },
             operation = new Operation
             {
-                callback = BackgroundImageSetter.Open,
+                callback = BackgroundImageSetter.Instance.Open,
                 shortcut = new Shortcut { key = KeyCode.B }
             }
         }); // Background image settings

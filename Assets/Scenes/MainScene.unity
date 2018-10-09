@@ -11517,6 +11517,16 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114864073058838694, guid: 7eaa5f839bdb403439cfddac7f505cdb,
+        type: 2}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114727338088968404, guid: 7eaa5f839bdb403439cfddac7f505cdb,
+        type: 2}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7eaa5f839bdb403439cfddac7f505cdb, type: 2}
   m_IsPrefabAsset: 0
@@ -11548,6 +11558,7 @@ MonoBehaviour:
   minSize: {x: 0, y: 0}
   flexibleTagWidth: 0
   aspectRatio: {x: 4, y: 3}
+  perspectiveCamera: {fileID: 1788965582}
   _floorSongName: {fileID: 1257217640}
   _uiSongName: {fileID: 799603494}
   _difficultyText: {fileID: 565298971}
@@ -11781,6 +11792,7 @@ GameObject:
   - component: {fileID: 1543091657}
   - component: {fileID: 1543091659}
   - component: {fileID: 1543091658}
+  - component: {fileID: 1543091660}
   m_Layer: 5
   m_Name: Camera View
   m_TagString: Untagged
@@ -11839,6 +11851,18 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1543091656}
   m_CullTransparentMesh: 0
+--- !u!114 &1543091660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1543091656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7f0405a320895a4b9d21c25190e2a17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _transform: {fileID: 1543091657}
 --- !u!224 &1553957494 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224479388010174638, guid: db66afca5ff476644af593b7c9703145,

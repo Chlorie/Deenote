@@ -33,7 +33,7 @@ public class ProjectProperties : Window
     public void LoadAudioFileCallback()
     {
         FileExplorer.SetTagContent("Choose an audio file", "选择一个音频文件");
-        FileExplorer.Open(FileExplorer.Mode.SelectFile, () =>
+        FileExplorer.Instance.Open(FileExplorer.Mode.SelectFile, () =>
         {
             using (FileStream stream = File.OpenRead(FileExplorer.Result))
             {
@@ -57,14 +57,14 @@ public class ProjectProperties : Window
         PerspectiveView.Instance.SetScore(0);
         PerspectiveView.Instance.SetSongName(ProjectManagement.project.songName);
         PerspectiveView.Instance.SetDifficulty(difficulty, ProjectManagement.project.charts[difficulty].level);
-        // TODO: Add orthogonal view things later
+        // ToDo: Add orthogonal view things later
         ChartDisplayController.Instance.LoadChartFromProject(difficulty);
         ToolbarInitialization.Instance.windowsSelectable.SetActive("Perspective view", true);
     }
     public void ImportChartCallback(int difficulty)
     {
         FileExplorer.SetTagContent("Choose a chart file", "选择一个谱面文件");
-        FileExplorer.Open(FileExplorer.Mode.SelectFile, () =>
+        FileExplorer.Instance.Open(FileExplorer.Mode.SelectFile, () =>
         {
             JsonSerializer serializer = new JsonSerializer();
             using (StreamReader reader = new StreamReader(FileExplorer.Result))
@@ -88,7 +88,7 @@ public class ProjectProperties : Window
         }
         FileExplorer.SetTagContent("Choose where to save the file", "选择文件存储位置");
         FileExplorer.SetDefaultFileName(fileName + ".json");
-        FileExplorer.Open(FileExplorer.Mode.InputFileName, () =>
+        FileExplorer.Instance.Open(FileExplorer.Mode.InputFileName, () =>
         {
             JsonChart exportedChart = ProjectManagement.project.charts[difficulty].ToJsonChart();
             JsonSerializer serializer = new JsonSerializer();

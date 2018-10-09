@@ -1,6 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 
 public static class ProjectIO
@@ -84,7 +82,7 @@ public static class ProjectIO
     public static SongData ReadSongData(this BinaryReader reader)
     {
         int version = reader.ReadInt32();
-        if (version != 1) throw new Exception("Undefined version of \".dnt\" file.");
+        if (version != 1) throw new IOException("Undefined version of \".dnt\" file.");
         SongData data = new SongData
         {
             songName = reader.ReadString(),

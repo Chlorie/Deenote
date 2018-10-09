@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class MessageBox : Window
@@ -14,6 +15,13 @@ public class MessageBox : Window
         public Callback callback = null;
         public string[] texts;
     }
+    private struct CallInfo
+    {
+        public string[] title;
+        public string[] content;
+        public ButtonInfo[] buttonInfos;
+    }
+    private Stack<CallInfo> _messageStack = new Stack<CallInfo>();
     protected override void Open()
     {
         base.Open();
@@ -25,15 +33,27 @@ public class MessageBox : Window
             callback = () => { _buttons[0].onClick.Invoke(); }
         });
     }
-    public static void Activate(string[] title, string[] content, params ButtonInfo[] buttonInfos) => Instance.Open(title, content, buttonInfos);
-    private void Open(string[] title, string[] content, ButtonInfo[] buttonInfos)
+    public void Activate(string[] title, string[] content, params ButtonInfo[] buttonInfos)
     {
-        Open();
         int length = buttonInfos.Length;
         if (length == 0 || length > 4)
             Debug.LogError("Error: Too many or no selections for a MessageBox");
-        _content.Strings = content;
-        SetTagContent(title);
+        CallInfo currentInfo = new CallInfo
+        {
+            title = title,
+            content = content,
+            buttonInfos = buttonInfos
+        };
+        _messageStack.Push(currentInfo);
+        Open();
+        SetUI();
+    }
+    private void SetUI()
+    {
+        CallInfo currentInfo = _messageStack.Peek();
+        _content.Strings = currentInfo.content;
+        SetTagContent(currentInfo.title);
+        int length = currentInfo.buttonInfos.Length;
         for (int i = 0; i < 4; i++)
             if (i < length)
             {
@@ -42,10 +62,14 @@ public class MessageBox : Window
                 int temp = i;
                 _buttons[i].onClick.AddListener(() =>
                 {
-                    Close();
-                    buttonInfos[temp].callback?.Invoke();
+                    currentInfo.buttonInfos[temp].callback?.Invoke();
+                    _messageStack.Pop();
+                    if (_messageStack.Count > 0)
+                        SetUI();
+                    else
+                        Close();
                 });
-                _buttonTexts[i].Strings = buttonInfos[i].texts;
+                _buttonTexts[i].Strings = currentInfo.buttonInfos[i].texts;
                 Vector2 sizeDelta = _buttonTransforms[i].sizeDelta;
                 sizeDelta.x = _buttonWidths[length];
                 _buttonTransforms[i].sizeDelta = sizeDelta;

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static System.String;
 
 public class FileExplorer : Window
 {
@@ -37,13 +38,13 @@ public class FileExplorer : Window
     private List<FileExplorerButton> _buttons = new List<FileExplorerButton>();
     public static string Result => Instance.NonStaticResult;
     private string NonStaticResult { get; set; }
-    public new static void SetTagContent(params string[] texts) => (Instance as Window).SetTagContent(texts);
+    public static new void SetTagContent(params string[] texts) => (Instance as Window).SetTagContent(texts);
     protected override void Open()
     {
         base.Open();
         MoveToCenter();
     }
-    public void OpenNonStatic(Mode mode, Callback callback, params string[] extensions)
+    public void Open(Mode mode, Callback callback, params string[] extensions)
     {
         Open();
         NonStaticResult = null;
@@ -61,7 +62,7 @@ public class FileExplorer : Window
             case Mode.InputFileName:
                 _fileNameInputField.gameObject.SetActive(true);
                 _selectedItemText.gameObject.SetActive(false);
-                _confirmButton.interactable = !string.IsNullOrEmpty(_fileNameInputField.text);
+                _confirmButton.interactable = !IsNullOrEmpty(_fileNameInputField.text);
                 break;
             case Mode.SelectFile:
                 _fileNameInputField.gameObject.SetActive(false);
@@ -75,10 +76,11 @@ public class FileExplorer : Window
                 _selectedItemText.text = _currentDirectory.Name;
                 _confirmButton.interactable = true;
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         Updates();
     }
-    public static void Open(Mode mode, Callback callback, params string[] extensions) => Instance.OpenNonStatic(mode, callback, extensions);
     public override void Close()
     {
         base.Close();
@@ -95,6 +97,7 @@ public class FileExplorer : Window
             FileExplorerButton button = _buttonPool.GetObject();
             _buttons.Add(button);
             button.ButtonText = "..";
+            button.ButtonTextColor = new Color(1.0f, 1.0f, 1.0f, 0.5f);
             button.callback = () => { GoToDirectory(_currentDirectory.Parent); };
         }
         try
@@ -105,6 +108,7 @@ public class FileExplorer : Window
                 FileExplorerButton button = _buttonPool.GetObject();
                 _buttons.Add(button);
                 button.ButtonText = directories[i].Name;
+                button.ButtonTextColor = new Color(1.0f, 1.0f, 1.0f, 0.5f);
                 int temp = i;
                 button.callback = () => { GoToDirectory(directories[temp]); };
             }
@@ -112,11 +116,13 @@ public class FileExplorer : Window
             {
                 FileInfo[] files = _currentDirectory.GetFiles();
                 for (int i = 0; i < files.Length; i++)
-                    if (Array.Exists(_extensions, extension => extension.ToLower() == files[i].Extension.ToLower()))
+                    if (Array.Exists(_extensions, extension =>
+                        string.Equals(extension, files[i].Extension, StringComparison.OrdinalIgnoreCase)))
                     {
                         FileExplorerButton button = _buttonPool.GetObject();
                         _buttons.Add(button);
                         button.ButtonText = files[i].Name;
+                        button.ButtonTextColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
                         int temp = i;
                         if (_mode == Mode.SelectFile)
                             button.callback = () =>
@@ -136,7 +142,7 @@ public class FileExplorer : Window
         }
         catch (UnauthorizedAccessException)
         {
-            MessageBox.Activate(new[] { "Error", "错误" }, new[] { "Access to the current path is denied", "拒绝访问当前路径" },
+            MessageBox.Instance.Activate(new[] { "Error", "错误" }, new[] { "Access to the current path is denied", "拒绝访问当前路径" },
                 new MessageBox.ButtonInfo { texts = new[] { "Back", "返回" } });
         }
     }
@@ -150,7 +156,7 @@ public class FileExplorer : Window
     }
     public void FileNameInputCallback()
     {
-        if (string.IsNullOrWhiteSpace(_fileNameInputField.text))
+        if (IsNullOrWhiteSpace(_fileNameInputField.text))
         {
             _confirmButton.interactable = false;
             return;
@@ -174,7 +180,7 @@ public class FileExplorer : Window
         {
             _fileNameInputField.text = "";
             _confirmButton.interactable = false;
-            MessageBox.Activate(new[] { "Error", "错误" },
+            MessageBox.Instance.Activate(new[] { "Error", "错误" },
                 new[] { "Please input a valid file name", "请输入合法的文件名" },
                 new MessageBox.ButtonInfo { texts = new[] { "OK", "好的" } });
         }
@@ -191,6 +197,10 @@ public class FileExplorer : Window
                 _selectedItemText.text = "";
                 _confirmButton.interactable = false;
                 break;
+            case Mode.InputFileName:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         Updates();
     }
@@ -212,7 +222,7 @@ public class FileExplorer : Window
                 NonStaticResult = CurrentDirectory + _fileNameInputField.text;
                 FileInfo file = new FileInfo(NonStaticResult);
                 if (file.Exists)
-                    MessageBox.Activate(new[] { "Overwriting existing file", "覆盖已存在文件" },
+                    MessageBox.Instance.Activate(new[] { "Overwriting existing file", "覆盖已存在文件" },
                         new[]
                         {
                             "A file with the file name already exists. Are you sure to overwrite it?",
@@ -233,6 +243,8 @@ public class FileExplorer : Window
                     _callback();
                 }
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
     private void Awake()

@@ -41,6 +41,7 @@ public class UIParameters : ScriptableObject
     public Sprite otherNoteSprite;
     public float[] orthogonalDistancesPerSecond;
     // Perspective view
+    public Vector2 perspectiveRenderTextureSize;
     public Sprite[] noteDisappearingSprites;
     public float disappearingSpriteTimePerFrame;
     public float circleMaxScale;
@@ -76,6 +77,8 @@ public class UIParameters : ScriptableObject
     public float lightEffectAngularFrequency;
     public float lightMaskMinScale;
     public float lightMaskMaxScale;
+    // Other UI
+    public float minDeltaAlpha;
     // Control
     public float epsilonTime;
     public float slowScrollSpeed;

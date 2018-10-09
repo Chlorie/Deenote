@@ -27,16 +27,15 @@ public class BackgroundImageSetter : Window
     }
     private Position _position = Position.Center;
     private StretchMode _stretch = StretchMode.FitHeight;
-    private void OpenNonStatic()
+    public new void Open()
     {
         base.Open();
         LanguageController.Refresh();
     }
-    public static new void Open() => Instance.OpenNonStatic();
     public void SelectFile()
     {
         FileExplorer.SetTagContent("Change background image", "更改背景图");
-        FileExplorer.Open(FileExplorer.Mode.SelectFile, () => SetBackgroundImage(FileExplorer.Result), ".png", ".jpg");
+        FileExplorer.Instance.Open(FileExplorer.Mode.SelectFile, () => SetBackgroundImage(FileExplorer.Result), ".png", ".jpg");
     }
     public void SetBackgroundImage(string path) => StartCoroutine(SetBackgroundImageCoroutine(path));
     private IEnumerator SetBackgroundImageCoroutine(string path)
@@ -50,7 +49,7 @@ public class BackgroundImageSetter : Window
                 if (!string.IsNullOrEmpty(www.error))
                 {
                     sprite = null;
-                    MessageBox.Activate(new[] { "Error", "错误" }, new[] { "Cannot find file " + path, "未找到文件 " + path },
+                    MessageBox.Instance.Activate(new[] { "Error", "错误" }, new[] { "Cannot find file " + path, "未找到文件 " + path },
                         new MessageBox.ButtonInfo { texts = new[] { "OK", "好的" } });
                     path = "";
                 }

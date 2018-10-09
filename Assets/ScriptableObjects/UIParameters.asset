@@ -72,6 +72,7 @@ MonoBehaviour:
   - 0
   - 0
   - 0
+  perspectiveRenderTextureSize: {x: 960, y: 720}
   noteDisappearingSprites:
   - {fileID: 21300000, guid: 047283161da2747409a479d63a129890, type: 3}
   - {fileID: 21300000, guid: ba80d7547c710334698e9dfab7440e6f, type: 3}
@@ -140,8 +141,9 @@ MonoBehaviour:
   comboCharmingShrinkTime: 0.225
   judgeLineEffectShrinkTime: 1
   lightEffectAngularFrequency: 2
-  lightMaskMinScale: 1.8
-  lightMaskMaxScale: 2.2
+  lightMaskMinScale: 1.9
+  lightMaskMaxScale: 2.1
+  minDeltaAlpha: 0.02
   epsilonTime: 0.001
   slowScrollSpeed: 2.5
   fastScrollSpeed: 10

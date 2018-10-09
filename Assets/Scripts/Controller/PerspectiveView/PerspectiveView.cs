@@ -5,6 +5,7 @@ public class PerspectiveView : Window
 {
     private static readonly string[] LevelTexts = { "Easy", "Normal", "Hard", "Extra" };
     public static PerspectiveView Instance { get; private set; }
+    public Camera perspectiveCamera;
     [SerializeField] private TextMesh _floorSongName;
     [SerializeField] private Text _uiSongName;
     [SerializeField] private Text _difficultyText;
@@ -24,7 +25,7 @@ public class PerspectiveView : Window
         CurrentDifficulty = difficulty;
     }
     // Expecting an integral value score, with a maximum of 1000000 meaning 100.00%
-    public void SetScore(int score) => _scoreText.text = (score / 10000) + "." + (score / 100 % 100).ToString("D2") + " %";
+    public void SetScore(int score) => _scoreText.text = $"{score / 10000}.{score / 100 % 100:D2} %";
     protected override void Start()
     {
         base.Start();
@@ -44,5 +45,12 @@ public class PerspectiveView : Window
             Destroy(this);
             Debug.LogError("Error: Unexpected multiple instances of PerspectiveView");
         }
+    }
+
+    public Vector3 WorldToScreenPoint(Vector3 point)
+    {
+        Vector3 result = perspectiveCamera.WorldToScreenPoint(point);
+        result.z = 0.0f;
+        return result;
     }
 }

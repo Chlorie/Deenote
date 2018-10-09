@@ -10,6 +10,7 @@ public class AppConfig
     public int language;
     public int backgroundPosition = (int)BackgroundImageSetter.Position.Center;
     public int backgroundStretch = (int)BackgroundImageSetter.StretchMode.FitHeight;
+    public bool perspectiveLightEffectIsActive;
     public RectData fileExplorerRect;
     public RectData messageBoxRect;
     public RectData backgroundImageSetterRect;
@@ -23,7 +24,7 @@ public class AppConfig
             using (StreamReader reader = new StreamReader("config.json"))
                 config = serializer.Deserialize(reader, typeof(AppConfig)) as AppConfig;
         }
-        config.ApplyConfig();
+        config?.ApplyConfig();
     }
     public static void Write()
     {
@@ -38,16 +39,19 @@ public class AppConfig
         BackgroundImageSetter.Instance.SetBackgroundImage(backgroundImage);
         BackgroundImageSetter.Instance.SetPosition(backgroundPosition);
         BackgroundImageSetter.Instance.SetStretchMode(backgroundStretch);
+        LightEffectPerspective.Instance.IsActive = perspectiveLightEffectIsActive;
         FileExplorer.Instance.Rect = fileExplorerRect.ToRect();
         MessageBox.Instance.Rect = messageBoxRect.ToRect();
         BackgroundImageSetter.Instance.Rect = backgroundImageSetterRect.ToRect();
         ProjectProperties.Instance.Rect = projectPropertiesRect.ToRect();
         PerspectiveView.Instance.Rect = perspectiveViewRect.ToRect();
+        if (openedFile != "") ProjectManagement.TryLoadFrom(openedFile);
     }
     private void UpdateConfig()
     {
         language = LanguageController.Language;
         firstLaunch = false;
+        perspectiveLightEffectIsActive = LightEffectPerspective.Instance.IsActive;
         fileExplorerRect = new RectData(FileExplorer.Instance.Rect);
         messageBoxRect = new RectData(MessageBox.Instance.Rect);
         backgroundImageSetterRect = new RectData(BackgroundImageSetter.Instance.Rect);

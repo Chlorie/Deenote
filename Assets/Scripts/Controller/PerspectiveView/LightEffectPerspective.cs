@@ -21,7 +21,6 @@ public class LightEffectPerspective : MonoBehaviour
     private float _shift;
     private float _lightMaskMaxScale;
     private float _angularFrequency;
-    // TODO: Add app config for isActive
     private void Update()
     {
         if (!_isActive) return;

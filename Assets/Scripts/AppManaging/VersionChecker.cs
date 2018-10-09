@@ -36,7 +36,7 @@ public class VersionChecker : MonoBehaviour
     {
         if (Application.internetReachability == NetworkReachability.NotReachable)
         {
-            MessageBox.Activate(new[] { "Update check", "更新检测" },
+            MessageBox.Instance.Activate(new[] { "Update check", "更新检测" },
                 new[]
                 {
                     "No Internet connection. Please make sure that you've connected " +
@@ -72,7 +72,7 @@ public class VersionChecker : MonoBehaviour
         if (UpToDate(current, latest))
         {
             if (noticeAnyway)
-                MessageBox.Activate(new[] { "Update check", "更新检测" },
+                MessageBox.Instance.Activate(new[] { "Update check", "更新检测" },
                     new[] { "Your program is up to date!", "程序已是最新版本！" },
                     new MessageBox.ButtonInfo { texts = new[] { "OK", "好的" } });
         }
@@ -80,7 +80,7 @@ public class VersionChecker : MonoBehaviour
         {
             string download = "https://github.com/Chlorie/Deenote/releases/download/v" + latestString +
                 "/Deenote-" + latestString + ((IntPtr.Size == 8) ? ".zip" : "-32bit.zip");
-            MessageBox.Activate(new[] { "Update check", "更新检测" },
+            MessageBox.Instance.Activate(new[] { "Update check", "更新检测" },
                 new[]
                 {
                         $"New version detected!\nCurrent: {_currentVersion}  Latest: {latestString}",

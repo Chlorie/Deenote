@@ -5,13 +5,13 @@ using UnityEngine;
 public class EditTracker : MonoBehaviour
 {
     public static EditTracker Instance { get; private set; }
-    public class EditOperation
+    public struct EditOperation
     {
         public Action redo;
         public Action undo;
     }
     private List<EditOperation> _history = new List<EditOperation>();
-    private int _currentStep = 0;
+    private int _currentStep;
     private int _maxStep = 100;
     public int MaxStep
     {
@@ -23,7 +23,7 @@ public class EditTracker : MonoBehaviour
             while (_history.Count > _maxStep) _history.RemoveAt(0);
         }
     }
-    public void RegisterStep(EditOperation step)
+    public void AddStep(EditOperation step)
     {
         while (_history.Count > _currentStep) _history.RemoveAt(_currentStep);
         _history.Add(step);

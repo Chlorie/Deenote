@@ -4,7 +4,7 @@ public class QuitApp : MonoBehaviour
 {
     public static QuitApp Instance { get; private set; }
     public static void ShowConfirmQuitMessage() => 
-        MessageBox.Activate(new[] { "Quit", "退出" }, new[] { "Are you sure to quit Deenote?", "你确认要退出Deenote吗？" },
+        MessageBox.Instance.Activate(new[] { "Quit", "退出" }, new[] { "Are you sure to quit Deenote?", "你确认要退出Deenote吗？" },
             new MessageBox.ButtonInfo
             {
                 callback = () =>

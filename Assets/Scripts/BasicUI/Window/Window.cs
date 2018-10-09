@@ -40,6 +40,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
             return new Vector2(width, width * aspectRatio.y / aspectRatio.x);
         }
     }
+    public Vector2 Size => _windowTransform.offsetMax - _windowTransform.offsetMin;
     public Rect Rect
     {
         get
@@ -78,7 +79,7 @@ public class Window : MonoBehaviour, IPointerDownHandler
         if (tagContent != null) tagContent.Strings = texts;
         AdjustTagWidth();
     }
-    public void MoveToCenter()
+    protected void MoveToCenter()
     {
         Rect currentRect = Rect;
         currentRect.position = new Vector2((int)(Screen.width / 2 - currentRect.size.x / 2),
