@@ -34,6 +34,10 @@ public class UIParameters : ScriptableObject
     // Colors
     public Color transparent;
     public Color[] difficultyColors;
+    public Color subBeatLineColor;
+    public Color beatLineColor;
+    public Color freeTempoLineColor;
+    public Color tempoChangeLineColor;
     // Stage
     public Sprite[] difficultySprites;
     public Sprite pianoNoteSprite;

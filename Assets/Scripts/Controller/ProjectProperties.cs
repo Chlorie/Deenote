@@ -58,8 +58,8 @@ public class ProjectProperties : Window
         PerspectiveView.Instance.SetSongName(ProjectManagement.project.songName);
         PerspectiveView.Instance.SetDifficulty(difficulty, ProjectManagement.project.charts[difficulty].level);
         // ToDo: Add orthogonal view things later
-        ChartDisplayController.Instance.LoadChartFromProject(difficulty);
-        ToolbarInitialization.Instance.windowsSelectable.SetActive("Perspective view", true);
+        ChartDisplayController.Instance.LoadFromProject(difficulty);
+        ToolbarInitialization.Instance.windowsSelectable.SetActive(OperationName.PerspectiveViewWindow, true);
     }
     public void ImportChartCallback(int difficulty)
     {

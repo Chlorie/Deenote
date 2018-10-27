@@ -54,8 +54,8 @@ public class PerspectiveLine : MonoBehaviour
             _line.positionCount = 2;
             _line.SetPositions(new[]
             {
-                PerspectiveView.Instance.WorldToScreenPoint(point1),
-                PerspectiveView.Instance.WorldToScreenPoint(point2)
+                PerspectiveView.Instance.WorldPointTransform(point1),
+                PerspectiveView.Instance.WorldPointTransform(point2)
             });
         }
         else
@@ -69,8 +69,8 @@ public class PerspectiveLine : MonoBehaviour
             {
                 float farAlpha = (maxDistance - point1.z) / (maxDistance - opaqueDistance);
                 float nearAlpha = (maxDistance - point2.z) / (maxDistance - opaqueDistance);
-                Vector3 far = PerspectiveView.Instance.WorldToScreenPoint(point1);
-                Vector3 near = PerspectiveView.Instance.WorldToScreenPoint(point2);
+                Vector3 far = PerspectiveView.Instance.WorldPointTransform(point1);
+                Vector3 near = PerspectiveView.Instance.WorldPointTransform(point2);
                 Gradient gradient = _line.colorGradient;
                 gradient.alphaKeys = new[]
                 {
@@ -83,8 +83,8 @@ public class PerspectiveLine : MonoBehaviour
             }
             else if (point1.z < opaqueDistance)
             {
-                Vector3 far = PerspectiveView.Instance.WorldToScreenPoint(point1);
-                Vector3 near = PerspectiveView.Instance.WorldToScreenPoint(point2);
+                Vector3 far = PerspectiveView.Instance.WorldPointTransform(point1);
+                Vector3 near = PerspectiveView.Instance.WorldPointTransform(point2);
                 Gradient gradient = _line.colorGradient;
                 gradient.alphaKeys = new[] { new GradientAlphaKey { alpha = 1.0f, time = 0.0f } };
                 _line.colorGradient = gradient;
@@ -96,9 +96,9 @@ public class PerspectiveLine : MonoBehaviour
                 float x = point1.x + (point2.x - point1.x) * (point1.z - opaqueDistance) / (point1.z - point2.z);
                 Vector3 cross = new Vector3(x, 0.0f, opaqueDistance);
                 float alpha = (maxDistance - point1.z) / (maxDistance - opaqueDistance);
-                Vector3 far = PerspectiveView.Instance.WorldToScreenPoint(point1);
-                Vector3 mid = PerspectiveView.Instance.WorldToScreenPoint(cross);
-                Vector3 near = PerspectiveView.Instance.WorldToScreenPoint(point2);
+                Vector3 far = PerspectiveView.Instance.WorldPointTransform(point1);
+                Vector3 mid = PerspectiveView.Instance.WorldPointTransform(cross);
+                Vector3 near = PerspectiveView.Instance.WorldPointTransform(point2);
                 float midTime = (far - mid).magnitude / (far - near).magnitude;
                 Gradient gradient = _line.colorGradient;
                 gradient.alphaKeys = new[]
@@ -131,7 +131,7 @@ public class PerspectiveLine : MonoBehaviour
         float[] sums = new float[n];
         for (int i = 0; i < n; i++)
         {
-            screenPoints[i] = PerspectiveView.Instance.WorldToScreenPoint(points[i]);
+            screenPoints[i] = PerspectiveView.Instance.WorldPointTransform(points[i]);
             if (i == 0) sums[i] = 0.0f;
             else sums[i] = sums[i - 1] + (screenPoints[i] - screenPoints[i - 1]).magnitude;
         }

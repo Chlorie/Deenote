@@ -39,8 +39,7 @@ public class VersionChecker : MonoBehaviour
             MessageBox.Instance.Activate(new[] { "Update check", "更新检测" },
                 new[]
                 {
-                    "No Internet connection. Please make sure that you've connected " +
-                    "to the Internet.",
+                    "No Internet connection. Please make sure that you've connected to the Internet.",
                     "无网络连接。请连接互联网。"
                 },
                 new MessageBox.ButtonInfo
@@ -63,11 +62,9 @@ public class VersionChecker : MonoBehaviour
         foreach (string versionString in versions)
         {
             List<int> version = VersionStringToIntList(versionString);
-            if (UpToDate(version, latest))
-            {
-                latest = version;
-                latestString = versionString;
-            }
+            if (!UpToDate(version, latest)) continue;
+            latest = version;
+            latestString = versionString;
         }
         if (UpToDate(current, latest))
         {
@@ -78,8 +75,8 @@ public class VersionChecker : MonoBehaviour
         }
         else
         {
-            string download = "https://github.com/Chlorie/Deenote/releases/download/v" + latestString +
-                "/Deenote-" + latestString + ((IntPtr.Size == 8) ? ".zip" : "-32bit.zip");
+            string end = IntPtr.Size == 8 ? ".zip" : "-32bit.zip";
+            string zip = $"https://github.com/Chlorie/Deenote/releases/download/v{latestString}/Deenote-{latestString}{end}";
             MessageBox.Instance.Activate(new[] { "Update check", "更新检测" },
                 new[]
                 {
@@ -93,7 +90,7 @@ public class VersionChecker : MonoBehaviour
                 },
                 new MessageBox.ButtonInfo
                 {
-                    callback = () => { Process.Start(download); },
+                    callback = () => { Process.Start(zip); },
                     texts = new[] { "Download page", "前往下载页" }
                 },
                 new MessageBox.ButtonInfo { texts = new[] { "Update later", "稍后更新" } });

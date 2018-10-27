@@ -45,10 +45,10 @@ public static class ProjectManagement
         AppConfig.config.openedFile = path;
         // Activate toolbar selections
         ToolbarInitialization instance = ToolbarInitialization.Instance;
-        instance.projectSelectable.SetActive("Save project", true);
-        instance.projectSelectable.SetActive("Save as...", true);
-        instance.windowsSelectable.SetActive("Project properties", true);
-        instance.windowsSelectable.SetActive("Perspective view", false);
+        instance.projectSelectable.SetActive(OperationName.SaveProject, true);
+        instance.projectSelectable.SetActive(OperationName.SaveProjectAs, true);
+        instance.windowsSelectable.SetActive(OperationName.ProjectPropertiesWindow, true);
+        instance.windowsSelectable.SetActive(OperationName.PerspectiveViewWindow, false);
     }
     public static void SaveAs(string path)
     {

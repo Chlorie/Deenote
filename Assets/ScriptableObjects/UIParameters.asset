@@ -43,6 +43,10 @@ MonoBehaviour:
   - {r: 0.42352942, g: 0.69803923, b: 0.95686275, a: 1}
   - {r: 1, g: 0.9411765, b: 0.54901963, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
+  subBeatLineColor: {r: 0.23529412, g: 0.23529412, b: 0.23529412, a: 1}
+  beatLineColor: {r: 0.5882353, g: 0.15686275, b: 0.15686275, a: 1}
+  freeTempoLineColor: {r: 0.15686275, g: 0.5882353, b: 0.15686275, a: 1}
+  tempoChangeLineColor: {r: 0.15686275, g: 0.33333334, b: 0.49803922, a: 1}
   difficultySprites:
   - {fileID: 21300000, guid: ec26a647e907c964996a885ab5bf1fe2, type: 3}
   - {fileID: 21300000, guid: 00e04ef36352aaa48925ed6f8827acbd, type: 3}

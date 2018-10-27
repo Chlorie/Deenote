@@ -11,13 +11,13 @@ public class ToolbarSelectable : MonoBehaviour, IPointerEnterHandler, IPointerEx
     public List<ToolbarOperation> operations = new List<ToolbarOperation>();
     private ToolbarController _controller;
     public Shortcut shortcut;
-    public void SetActive(string text, bool value) // ToDo: Change this stupid string comparison into enum or something
+    public void SetActive(OperationName operationName, bool value)
     {
         foreach (ToolbarOperation operation in operations)
-            if (operation.strings.Length > 0 && operation.strings[0] == text)
+            if (operation.name == operationName)
             {
                 operation.isActive = value;
-                break;
+                return;
             }
     }
     private void UpdateMainButtonSize()

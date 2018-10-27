@@ -12,6 +12,7 @@ public class ToolbarInitialization : MonoBehaviour
     {
         projectSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.NewProject,
             strings = new[] { "New project", "创建新项目" },
             operation = new Operation
             {
@@ -22,6 +23,7 @@ public class ToolbarInitialization : MonoBehaviour
         }); // New project
         projectSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.OpenProject,
             strings = new[] { "Open project", "打开项目" },
             operation = new Operation
             {
@@ -32,6 +34,7 @@ public class ToolbarInitialization : MonoBehaviour
         }); // Open project
         projectSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.SaveProject,
             strings = new[] { "Save project", "保存项目" },
             operation = new Operation
             {
@@ -43,6 +46,7 @@ public class ToolbarInitialization : MonoBehaviour
         }); // Save project
         projectSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.SaveProjectAs,
             strings = new[] { "Save as...", "另存为..." },
             operation = new Operation
             {
@@ -54,6 +58,7 @@ public class ToolbarInitialization : MonoBehaviour
         }); // Save as...
         projectSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.QuitApp,
             strings = new[] { "Quit", "退出" },
             operation = new Operation
             {
@@ -101,6 +106,7 @@ public class ToolbarInitialization : MonoBehaviour
     {
         windowsSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.ProjectPropertiesWindow,
             strings = new[] { "Project properties", "项目属性" },
             operation = new Operation
             {
@@ -117,6 +123,7 @@ public class ToolbarInitialization : MonoBehaviour
         }); // Project properties
         windowsSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.PerspectiveViewWindow,
             strings = new[] { "Perspective view", "透视视图" },
             operation = new Operation
             {
@@ -137,6 +144,7 @@ public class ToolbarInitialization : MonoBehaviour
     {
         settingsSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.UpdateCheck,
             strings = new[] { "Check for updates", "更新检测" },
             operation = new Operation
             {
@@ -146,6 +154,7 @@ public class ToolbarInitialization : MonoBehaviour
         }); // Check for updates
         settingsSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.LanguageSelection,
             strings = new[] { "Language selection", "语言选择" },
             operation = new Operation
             {
@@ -169,6 +178,7 @@ public class ToolbarInitialization : MonoBehaviour
         }); // Language selection
         settingsSelectable.operations.Add(new ToolbarOperation
         {
+            name = OperationName.SelectBackgroundImage,
             strings = new[] { "Background image settings", "背景图设置" },
             operation = new Operation
             {
@@ -199,10 +209,11 @@ public class ToolbarInitialization : MonoBehaviour
 
     private void ActivateProjectRelatedFunctions()
     {
-        projectSelectable.SetActive("Save project", true);
-        projectSelectable.SetActive("Save as...", true);
-        windowsSelectable.SetActive("Project properties", true);
-        windowsSelectable.SetActive("Perspective view", false);
+        projectSelectable.SetActive(OperationName.SaveProject, true);
+        projectSelectable.SetActive(OperationName.SaveProjectAs, true);
+        windowsSelectable.SetActive(OperationName.ProjectPropertiesWindow, true);
+        PerspectiveView.Instance.Close();
+        windowsSelectable.SetActive(OperationName.PerspectiveViewWindow, false);
     }
 
     private void Awake()

@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 
-public class NoteObject : MonoBehaviour
+public class NoteObjectPerspective : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _noteSprite;
     [SerializeField] private SpriteRenderer _waveSprite;
     [SerializeField] private SpriteRenderer _circleSprite;
     [SerializeField] private SpriteRenderer _glowSprite;
     [SerializeField] private AudioSource _hitEffectSource;
+    private Color _noteColor = new Color(1.0f, 1.0f, 1.0f);
     private Color _waveColor;
     private bool _soundPlayed;
     private int _id;
@@ -23,7 +24,16 @@ public class NoteObject : MonoBehaviour
             UpdateNoteProperties();
         }
     }
-    public bool IsShown => ChartDisplayController.Instance.ShownInPerspectiveView(_note);
+    public bool IsShown => ChartDisplayController.Instance.NoteShownInPerspectiveView(_note.time);
+    public Color NoteColor
+    {
+        get { return _noteColor; }
+        set
+        {
+            _noteColor = value;
+            UpdateColor(transform.localPosition.z);
+        }
+    }
     private void UpdateNoteProperties()
     {
         Vector3 rawScale = new Vector3(_note.size, 1.0f, 1.0f);
@@ -54,12 +64,12 @@ public class NoteObject : MonoBehaviour
     public void Activate()
     {
         gameObject.SetActive(true);
-        _soundPlayed = ChartDisplayController.Instance.PerspectivePosition(_note.time) < 0;
+        _soundPlayed = ChartDisplayController.Instance.PerspectiveTime(_note.time) < 0;
         Update();
     }
     private void UpdatePosition()
     {
-        float z = ChartDisplayController.Instance.PerspectivePosition(_note.time);
+        float z = ChartDisplayController.Instance.PerspectiveTime(_note.time);
         Vector3 position = transform.localPosition;
         if (z < 0.0f)
         {
@@ -77,11 +87,17 @@ public class NoteObject : MonoBehaviour
         position.x = _x;
         position.z = z;
         transform.localPosition = position;
+        UpdateColor(z);
+    }
+    private void UpdateColor(float z)
+    {
         float alpha = z > Parameters.Params.perspectiveOpaqueDistance
             ? (Parameters.Params.perspectiveMaxDistance - z) / (Parameters.Params.perspectiveMaxDistance -
                 Parameters.Params.perspectiveOpaqueDistance)
             : 1.0f;
-        _noteSprite.color = new Color(1.0f, 1.0f, 1.0f, alpha);
+        Color color = _noteColor;
+        color.a = alpha;
+        _noteSprite.color = color;
     }
     private void ShowDisappearFrame()
     {

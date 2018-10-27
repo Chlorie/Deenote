@@ -47,10 +47,10 @@ public class PerspectiveView : Window
         }
     }
 
-    public Vector3 WorldToScreenPoint(Vector3 point)
+    public Vector3 WorldPointTransform(Vector3 point)
     {
-        Vector3 result = perspectiveCamera.WorldToScreenPoint(point);
-        result.z = 0.0f;
-        return result;
+        Vector3 screenPoint = perspectiveCamera.WorldToScreenPoint(point);
+        screenPoint.z = 10.0f;
+        return perspectiveCamera.ScreenToWorldPoint(screenPoint);
     }
 }
