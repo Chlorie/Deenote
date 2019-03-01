@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class StageController : MonoBehaviour
 {
     //-Stage activation-
-    public bool stageActivated = false;
+    public bool stageActivated;
     //-Sounds-
     public AudioSource musicSource;
     public AudioSource clickSoundSource;
@@ -18,14 +18,15 @@ public class StageController : MonoBehaviour
     public int diff;
     private List<NoteController> notes = new List<NoteController>();
     public List<bool> collided = new List<bool>();
-    public NoteObjectPool notePool;
+    public NoteController notePrefab;
+    public ObjectPool<NoteController> notePool;
     public int prevNoteID;
     public int returnNoteID;
     public Transform noteParentTransform;
-    public bool forceToPlaceNotes = false;
-    private float antiZureTime = 0.0f;
+    public bool forceToPlaceNotes;
+    private float antiZureTime;
     //-T grid controlling-
-    public TGridID prevLineID;
+    public TGridId prevLineID;
     private List<TGridController> tGrids = new List<TGridController>();
     public TGridObjectPool tGridPool;
     //-Combo and score effect-
@@ -59,8 +60,8 @@ public class StageController : MonoBehaviour
     public GameObject musicSpeedChangeSetting;
     public EditorController editor;
     //-FPS calculating-
-    private float timeCount = 0.0f, frameCount = 0;
-    private float fps = 0.0f;
+    private float timeCount, frameCount;
+    private float fps;
     public bool showFPS = true;
     public Toggle fpsToggle;
     //-Other things-
@@ -77,16 +78,16 @@ public class StageController : MonoBehaviour
     public Transform lineCanvas;
     //-About sounds playing-
     public PianoSoundsLoader pianoSoundsLoader;
-    public float musicLength = 0.0f; //In seconds
-    private bool musicPlayState = false;
-    private bool musicEnds = false;
+    public float musicLength; // In seconds
+    private bool musicPlayState;
+    private bool musicEnds;
     public void ClearStage()
     {
         while (notes.Count > 0) notes[0].ForceReturn();
         while (tGrids.Count > 0) tGrids[0].ForceReturn();
         prevNoteID = -1;
         returnNoteID = -1;
-        prevLineID = new TGridID(0, -1, editor.tGrid);
+        prevLineID = new TGridId(0, -1, editor.tGrid);
     }
     public void ToggleLightEffect()
     {
@@ -132,7 +133,6 @@ public class StageController : MonoBehaviour
     public void InitializeStage(Project initProj, int difficulty, ProjectController projCtrl)
     {
         projectController = projCtrl;
-        notePool.Initialize();
         tGridPool.Initialize();
         comboParent.SetActive(true);
         comboController.stage = this;
@@ -149,10 +149,10 @@ public class StageController : MonoBehaviour
         timeSlider.minValue = 0.0f;
         timeSlider.maxValue = musicLength;
         timeSlider.value = 0.0f;
-        noteSpeedIntText.text = "" + chartPlaySpeed / 2;
-        noteSpeedDeciText.text = "" + chartPlaySpeed % 2 * 5;
-        musicSpeedIntText.text = "" + musicPlaySpeed / 10;
-        musicSpeedDeciText.text = "" + musicPlaySpeed % 10;
+        noteSpeedIntText.text = (chartPlaySpeed / 2).ToString();
+        noteSpeedDeciText.text = (chartPlaySpeed % 2 * 5).ToString();
+        musicSpeedIntText.text = (musicPlaySpeed / 10).ToString();
+        musicSpeedDeciText.text = (musicPlaySpeed % 10).ToString();
         OnSliderValueChanged();
     }
     public void OnSliderValueChanged()
@@ -161,39 +161,36 @@ public class StageController : MonoBehaviour
         musicEnds = false;
         ResetStage();
     }
-    private void InitNoteObject(int noteID)
+    private void InitNoteObject(int noteId)
     {
-        NoteController note;
-        note = notePool.GetObject();
+        NoteController note = notePool.GetObject();
         notes.Add(note);
         note.gameObject.SetActive(true);
         note.gameObject.transform.SetParent(noteParentTransform);
-        note.Activate(noteID, chart.notes[noteID], this, pianoSoundsLoader);
+        note.Activate(noteId, chart.notes[noteId], this, pianoSoundsLoader);
     }
-    private TGridController InitTGridObject(TGridID id)
+    private void InitTGridObject(TGridId id)
     {
-        TGridController tGrid;
-        tGrid = tGridPool.GetObject();
+        TGridController tGrid = tGridPool.GetObject();
         tGrids.Add(tGrid);
         tGrid.grid.SetActive(true);
         tGrid.Activate(id, TGridTime(id), this);
-        return tGrid;
     }
-    private float TGridTime(TGridID id)
+    private float TGridTime(TGridId id)
     {
-        float curLineTime, dTime = 0.0f;
-        curLineTime = chart.beats[id.id];
+        float curLineTime = chart.beats[id.id];
         if (id.sub != 0)
         {
-            dTime = chart.beats[id.id + 1] - curLineTime;
+            float dTime = chart.beats[id.id + 1] - curLineTime;
             curLineTime += dTime / editor.tGrid * id.sub;
         }
         return curLineTime;
     }
     public void ReturnNote(NoteController note)
     {
-        note.gameObject.SetActive(false);
-        note.gameObject.transform.localPosition = Vector3.zero;
+        GameObject noteObject = note.gameObject;
+        noteObject.SetActive(false);
+        noteObject.transform.localPosition = Vector3.zero;
         if (returnNoteID < note.id) returnNoteID = note.id;
         notePool.ReturnObject(note);
         notes.Remove(note);
@@ -201,40 +198,35 @@ public class StageController : MonoBehaviour
     public void ReturnLine(TGridController tGrid)
     {
         tGrid.grid.SetActive(false);
-        SetPrevLineID(tGrid.id);
+        SetPrevLineId(tGrid.id);
         tGridPool.ReturnObject(tGrid);
         tGrids.Remove(tGrid);
     }
-    public void SetPrevNoteID(int id)
+    public void SetPrevNoteId(int id)
     {
         if (id > prevNoteID) prevNoteID = id;
     }
-    public void SetPrevLineID(TGridID id)
+    public void SetPrevLineId(TGridId id)
     {
         if (id > prevLineID) prevLineID = id;
     }
     private void PlaceNewObjects()
     {
         {
-            int prev, cur, i;
-            if (notes.Count > 0)
-                prev = notes[notes.Count - 1].id;
-            else
-                prev = returnNoteID;
+            int cur;
+            int prev = notes.Count > 0 ? notes[notes.Count - 1].id : returnNoteID;
             for (cur = prev + 1; cur < chart.notes.Count; cur++)
                 if (chart.notes[cur].time > timeSlider.value + Parameters.NoteFallTime(chartPlaySpeed))
                     break;
-            for (i = prev + 1; i < cur; i++) InitNoteObject(i);
+            for (int i = prev + 1; i < cur; i++) InitNoteObject(i);
         }
         {
-            TGridID prev, cur, i;
-            if (tGrids.Count > 0) prev = tGrids[tGrids.Count - 1].id;
-            else prev = prevLineID;
-            cur = prev; cur++;
-            for (; cur <= new TGridID(chart.beats.Count - 1, 0, editor.tGrid); cur++)
+            TGridId prev = tGrids.Count > 0 ? tGrids[tGrids.Count - 1].id : prevLineID;
+            TGridId cur = prev; cur++;
+            for (; cur <= new TGridId(chart.beats.Count - 1, 0, editor.tGrid); cur++)
                 if (TGridTime(cur) > timeSlider.value + Parameters.NoteFallTime(chartPlaySpeed))
                     break;
-            i = prev; i++;
+            TGridId i = prev; i++;
             for (; i < cur; i++) InitTGridObject(i);
         }
         ChangeScoreText();
@@ -249,7 +241,8 @@ public class StageController : MonoBehaviour
         for (returnNoteID = prevNoteID; returnNoteID >= 0; returnNoteID--)
             if (chart.notes[returnNoteID].time + Parameters.noteReturnTime <= timeSlider.value)
                 break;
-        for (prevLineID = new TGridID(0, 0, editor.tGrid); prevLineID <= new TGridID(chart.beats.Count - 1, 0, editor.tGrid); prevLineID++)
+        for (prevLineID = new TGridId(0, 0, editor.tGrid);
+            prevLineID <= new TGridId(chart.beats.Count - 1, 0, editor.tGrid); prevLineID++)
             if (TGridTime(prevLineID) > timeSlider.value)
                 break;
         prevLineID--;
@@ -257,28 +250,20 @@ public class StageController : MonoBehaviour
     }
     private void ChangeScoreText()
     {
-        if (chart.notes.Count > 1) //score calculation
-        {
-            int ttl = inGameNoteIDs[chart.notes.Count - 1] + 1, cur = 0;
-            if (prevNoteID > 0) cur = inGameNoteIDs[prevNoteID] + 1;
-            int score = (int)((800000.0 * cur * (ttl - 1) + 200000.0 * cur * (cur - 1)) / (ttl * (ttl - 1)));
-            int intPart = score / 10000, decPart = (score / 100) % 100;
-            string str = "" + intPart;
-            if (decPart >= 10) str += "." + decPart + " %"; else str += ".0" + decPart + " %";
-            scoreText.text = str;
-        }
+        if (chart.notes.Count <= 1) return;
+        int ttl = inGameNoteIDs[chart.notes.Count - 1] + 1, cur = 0;
+        if (prevNoteID > 0) cur = inGameNoteIDs[prevNoteID] + 1;
+        int score = (int)((800000.0 * cur * (ttl - 1) + 200000.0 * cur * (cur - 1)) / (ttl * (ttl - 1)));
+        int intPart = score / 10000, decPart = (score / 100) % 100;
+        string str = "" + intPart;
+        if (decPart >= 10) str += "." + decPart + " %"; else str += ".0" + decPart + " %";
+        scoreText.text = str;
     }
     public void NoteSpeedChange(bool increase)
     {
         if (increase) chartPlaySpeed++; else chartPlaySpeed--;
-        if (chartPlaySpeed == 1)
-            noteSpeedLeftButton.interactable = false;
-        else
-            noteSpeedLeftButton.interactable = true;
-        if (chartPlaySpeed == 19)
-            noteSpeedRightButton.interactable = false;
-        else
-            noteSpeedRightButton.interactable = true;
+        noteSpeedLeftButton.interactable = chartPlaySpeed != 1;
+        noteSpeedRightButton.interactable = chartPlaySpeed != 19;
         noteSpeedIntText.text = "" + chartPlaySpeed / 2;
         noteSpeedDeciText.text = "" + chartPlaySpeed % 2 * 5;
         ResetStage();
@@ -286,38 +271,34 @@ public class StageController : MonoBehaviour
     public void MusicSpeedChange(bool increase)
     {
         if (increase) musicPlaySpeed++; else musicPlaySpeed--;
-        if (musicPlaySpeed == 1)
-            musicSpeedLeftButton.interactable = false;
-        else
-            musicSpeedLeftButton.interactable = true;
-        if (musicPlaySpeed == 30)
-            musicSpeedRightButton.interactable = false;
-        else
-            musicSpeedRightButton.interactable = true;
+        musicSpeedLeftButton.interactable = musicPlaySpeed != 1;
+        musicSpeedRightButton.interactable = musicPlaySpeed != 30;
         musicSpeedIntText.text = "" + musicPlaySpeed / 10;
         musicSpeedDeciText.text = "" + musicPlaySpeed % 10;
         musicSource.pitch = musicPlaySpeed / 10.0f;
     }
     public void MusicVolSliderChange()
     {
-        musicVolume = (int)musicVolSlider.value;
+        float value = musicVolSlider.value;
+        musicVolume = (int)value;
         musicSource.volume = musicVolume / 100.0f;
-        musicVolInputField.text = "" + (int)musicVolSlider.value;
+        musicVolInputField.text = "" + (int)value;
     }
     public void EffectVolSliderChange()
     {
-        effectVolume = (int)effectVolSlider.value;
-        effectVolInputField.text = "" + (int)effectVolSlider.value;
+        float value = effectVolSlider.value;
+        effectVolume = (int)value;
+        effectVolInputField.text = "" + (int)value;
     }
     public void PianoVolSliderChange()
     {
-        pianoVolume = (int)pianoVolSlider.value;
-        pianoVolInputField.text = "" + (int)pianoVolSlider.value;
+        float value = pianoVolSlider.value;
+        pianoVolume = (int)value;
+        pianoVolInputField.text = "" + (int)value;
     }
     public void MusicVolInput()
     {
-        int vol;
-        vol = Utility.GetInt(musicVolInputField.text);
+        int vol = Utility.GetInt(musicVolInputField.text);
         if (vol > 100 || vol < 0) { musicVolInputField.text = "" + musicVolume; return; }
         musicVolInputField.text = "" + vol;
         musicVolSlider.value = vol;
@@ -326,8 +307,7 @@ public class StageController : MonoBehaviour
     }
     public void EffectVolInput()
     {
-        int vol;
-        vol = Utility.GetInt(effectVolInputField.text);
+        int vol = Utility.GetInt(effectVolInputField.text);
         if (vol > 100 || vol < 0) { effectVolInputField.text = "" + effectVolume; return; }
         effectVolInputField.text = "" + vol;
         effectVolSlider.value = vol;
@@ -335,8 +315,7 @@ public class StageController : MonoBehaviour
     }
     public void PianoVolInput()
     {
-        int vol;
-        vol = Utility.GetInt(pianoVolInputField.text);
+        int vol = Utility.GetInt(pianoVolInputField.text);
         if (vol > 100 || vol < 0) { pianoVolInputField.text = "" + pianoVolume; return; }
         pianoVolInputField.text = "" + vol;
         pianoVolSlider.value = vol;
@@ -344,8 +323,7 @@ public class StageController : MonoBehaviour
     }
     public void MouseSensInput()
     {
-        int mSens;
-        mSens = Utility.GetInt(mouseSensInputField.text);
+        int mSens = Utility.GetInt(mouseSensInputField.text);
         if (mSens >= 100 || mSens <= 0) { mouseSensInputField.text = "" + mouseSens; return; }
         mouseSensInputField.text = "" + mSens;
         mouseSens = mSens;
@@ -355,76 +333,67 @@ public class StageController : MonoBehaviour
         showFPS = fpsToggle.isOn;
         fpsText.gameObject.SetActive(showFPS);
     }
-    public void ToggleLinkLine(bool state)
-    {
-        Utility.linkLineParent.gameObject.SetActive(state);
-    }
+    public void ToggleLinkLine(bool state) => Utility.linkLineParent.gameObject.SetActive(state);
     private void OnApplicationFocus(bool focus)
     {
         if (musicPlayState) ToggleMusicPlayState();
     }
     private void Shortcuts()
     {
-        if (stageActivated && !CurrentState.ignoreAllInput)
+        if (!stageActivated || CurrentState.ignoreAllInput) return;
+        if (Utility.DetectKeys(KeyCode.Return)) //Enter
+            ToggleMusicPlayState();
+        if (Utility.DetectKeys(KeyCode.Space)) //Space
         {
-            if (Utility.DetectKeys(KeyCode.Return)) //Enter
-                ToggleMusicPlayState();
-            if (Utility.DetectKeys(KeyCode.Space)) //Space
-            {
-                if (timeSlider.value >= musicLength)
-                    antiZureTime = 0.0f;
-                else
-                    antiZureTime = timeSlider.value;
-                if (!musicPlayState) ToggleMusicPlayState();
-            }
-            if (Utility.ReleaseKeys(KeyCode.Space)) //Space(Release)
-            {
-                timeSlider.value = antiZureTime;
-                StopPlaying();
-                ResetStage();
-            }
-            if(Utility.DetectKeys(KeyCode.Home))
-            {
-                timeSlider.value = 0.0f;
-                OnSliderValueChanged();
-            }
-            if(Utility.DetectKeys(KeyCode.End))
-            {
-                timeSlider.value = musicLength - 0.001f;
-                OnSliderValueChanged();
-            }
-            if (Utility.DetectKeys(KeyCode.UpArrow, Utility.CTRL)) //Ctrl+Up
-                if (noteSpeedRightButton.IsInteractable())
-                    NoteSpeedChange(true);
-            if (Utility.DetectKeys(KeyCode.DownArrow, Utility.CTRL)) //Ctrl+Down
-                if (noteSpeedLeftButton.IsInteractable())
-                    NoteSpeedChange(false);
-            if (Utility.DetectKeys(KeyCode.UpArrow, Utility.ALT)) //Alt+Up
-                if (musicSpeedRightButton.IsInteractable())
-                    MusicSpeedChange(true);
-            if (Utility.DetectKeys(KeyCode.DownArrow, Utility.ALT)) //Alt+Down
-                if (musicSpeedLeftButton.IsInteractable())
-                    MusicSpeedChange(false);
-            if (Utility.HeldKeys(KeyCode.UpArrow)) //Up(Hold)
-                if (timeSlider.value > Time.deltaTime * Parameters.slowScrollSpeed)
-                { timeSlider.value -= Time.deltaTime * Parameters.slowScrollSpeed; OnSliderValueChanged(); }
-            if (Utility.HeldKeys(KeyCode.DownArrow)) //Down(Hold)
-                if (timeSlider.value < musicLength - Time.deltaTime * Parameters.slowScrollSpeed)
-                { timeSlider.value += Time.deltaTime * Parameters.slowScrollSpeed; OnSliderValueChanged(); }
-            if (Utility.HeldKeys(KeyCode.UpArrow, Utility.SHIFT)) //Shift+Up(Hold)
-                if (timeSlider.value > Time.deltaTime * Parameters.fastScrollSpeed)
-                { timeSlider.value -= Time.deltaTime * Parameters.fastScrollSpeed; OnSliderValueChanged(); }
-            if (Utility.HeldKeys(KeyCode.DownArrow, Utility.SHIFT)) //Shift+Down(Hold)
-                if (timeSlider.value < musicLength - Time.deltaTime * Parameters.fastScrollSpeed)
-                { timeSlider.value += Time.deltaTime * Parameters.fastScrollSpeed; OnSliderValueChanged(); }
-            float mWheel = Input.GetAxis("Mouse ScrollWheel");
-            float difTime = mWheel * mouseSens * 0.1f;
-            if (difTime != 0 && Input.mousePosition.x < Utility.stageWidth && !CurrentState.ignoreScroll)
-            {
-                timeSlider.value = Mathf.Clamp(timeSlider.value - difTime, 0, musicLength);
-                OnSliderValueChanged();
-            }
+            float value = timeSlider.value;
+            antiZureTime = value >= musicLength ? 0.0f : value;
+            if (!musicPlayState) ToggleMusicPlayState();
         }
+        if (Utility.ReleaseKeys(KeyCode.Space)) //Space(Release)
+        {
+            timeSlider.value = antiZureTime;
+            StopPlaying();
+            ResetStage();
+        }
+        if (Utility.DetectKeys(KeyCode.Home))
+        {
+            timeSlider.value = 0.0f;
+            OnSliderValueChanged();
+        }
+        if (Utility.DetectKeys(KeyCode.End))
+        {
+            timeSlider.value = musicLength - 0.001f;
+            OnSliderValueChanged();
+        }
+        if (Utility.DetectKeys(KeyCode.UpArrow, Utility.CTRL)) //Ctrl+Up
+            if (noteSpeedRightButton.IsInteractable())
+                NoteSpeedChange(true);
+        if (Utility.DetectKeys(KeyCode.DownArrow, Utility.CTRL)) //Ctrl+Down
+            if (noteSpeedLeftButton.IsInteractable())
+                NoteSpeedChange(false);
+        if (Utility.DetectKeys(KeyCode.UpArrow, Utility.ALT)) //Alt+Up
+            if (musicSpeedRightButton.IsInteractable())
+                MusicSpeedChange(true);
+        if (Utility.DetectKeys(KeyCode.DownArrow, Utility.ALT)) //Alt+Down
+            if (musicSpeedLeftButton.IsInteractable())
+                MusicSpeedChange(false);
+        if (Utility.HeldKeys(KeyCode.UpArrow)) //Up(Hold)
+            if (timeSlider.value > Time.deltaTime * Parameters.slowScrollSpeed)
+            { timeSlider.value -= Time.deltaTime * Parameters.slowScrollSpeed; OnSliderValueChanged(); }
+        if (Utility.HeldKeys(KeyCode.DownArrow)) //Down(Hold)
+            if (timeSlider.value < musicLength - Time.deltaTime * Parameters.slowScrollSpeed)
+            { timeSlider.value += Time.deltaTime * Parameters.slowScrollSpeed; OnSliderValueChanged(); }
+        if (Utility.HeldKeys(KeyCode.UpArrow, Utility.SHIFT)) //Shift+Up(Hold)
+            if (timeSlider.value > Time.deltaTime * Parameters.fastScrollSpeed)
+            { timeSlider.value -= Time.deltaTime * Parameters.fastScrollSpeed; OnSliderValueChanged(); }
+        if (Utility.HeldKeys(KeyCode.DownArrow, Utility.SHIFT)) //Shift+Down(Hold)
+            if (timeSlider.value < musicLength - Time.deltaTime * Parameters.fastScrollSpeed)
+            { timeSlider.value += Time.deltaTime * Parameters.fastScrollSpeed; OnSliderValueChanged(); }
+        float mWheel = Input.GetAxis("Mouse ScrollWheel");
+        float difTime = mWheel * mouseSens * 0.1f;
+        if (difTime == 0 || Input.mousePosition.x >= Utility.stageWidth || CurrentState.ignoreScroll) return;
+        timeSlider.value = Mathf.Clamp(timeSlider.value - difTime, 0, musicLength);
+        OnSliderValueChanged();
     }
     private void LoadPlayerPrefs()
     {
@@ -449,7 +418,9 @@ public class StageController : MonoBehaviour
     }
     private void Start()
     {
-        //Utility changes
+        // Pool initialization
+        notePool = new ObjectPool<NoteController>(notePrefab, null, 20, note => note.stage = this);
+        // Utility changes
         Utility.stageCamera = stageCamera;
         Utility.emptyImage = emptyImage;
         Utility.cameraUICanvas = cameraUICanvas;
@@ -458,11 +429,10 @@ public class StageController : MonoBehaviour
         Utility.linePool = linePool;
         Utility.lineCanvas = lineCanvas;
         linePool.Initialize();
-        //Load player prefs
+        // Load player prefs
         LoadPlayerPrefs();
-        //Draw border
-        Line line;
-        line = Utility.DrawLineInWorldSpace
+        // Draw border
+        Line line = Utility.DrawLineInWorldSpace
         (
             new Vector3(-15.0f, 0.0f, 32.0f + Parameters.maximumNoteRange),
             new Vector3(-15.0f, 0.0f, 32.0f),
@@ -491,7 +461,7 @@ public class StageController : MonoBehaviour
                 timeCount -= 1.0f;
                 fps = frameCount;
                 frameCount = 0;
-                if (stageActivated) fpsText.color = Color.white; else fpsText.color = Color.black;
+                fpsText.color = stageActivated ? Color.white : Color.black;
                 fpsText.text = "FPS: " + fps;
             }
         }

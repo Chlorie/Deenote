@@ -11,7 +11,7 @@ public class VersionChecker : MonoBehaviour
     public LocalizedText updateHistoryText;
     public string currentVersion;
     private string latestVersion;
-    private bool finished = false;
+    private bool finished;
     private List<int> GetVersion(string str)
     {
         string[] strings = str.Split('.');
@@ -51,11 +51,9 @@ public class VersionChecker : MonoBehaviour
         foreach (string versionString in versions)
         {
             List<int> version = GetVersion(versionString);
-            if (UpToDate(version, latest))
-            {
-                latest = version;
-                latestVersion = versionString;
-            }
+            if (!UpToDate(version, latest)) continue;
+            latest = version;
+            latestVersion = versionString;
         }
         finished = true;
     }
@@ -77,13 +75,17 @@ public class VersionChecker : MonoBehaviour
         updateHistoryText.SetStrings("New version detected", "检测到新版本");
         FindObjectOfType<UpdateHistory>().Deactivate();
         MessageScreen.Activate(
-            new string[] { "New version of Deenote detected", "检测到新版本" },
-            new string[]
-            {"Current version: " + currentVersion + " | Latest version: " + latestVersion,
-            "当前版本: " + currentVersion + " | 最新版本: " + latestVersion},
-            new string[] { "Go to release page", "转到发布页面" }, delegate { Process.Start("https://github.com/Chlorie/Deenote/releases/latest"); },
-            new string[] { "Go to download page", "转到下载页面" }, GoToDownloadPage,
-            new string[] { "Update later", "稍后更新" });
+            new[] { "New version of Deenote detected", "检测到新版本" },
+            new[]
+            {
+                "Current version: " + currentVersion + " | Latest version: " + latestVersion,
+                "当前版本: " + currentVersion + " | 最新版本: " + latestVersion
+            },
+            new[] { "Go to release page", "转到发布页面" },
+            () => Process.Start("https://github.com/Chlorie/Deenote/releases/latest"),
+            new[] { "Go to download page", "转到下载页面" },
+            GoToDownloadPage,
+            new[] { "Update later", "稍后更新" });
     }
     public void GoToDownloadPage()
     {
@@ -94,10 +96,7 @@ public class VersionChecker : MonoBehaviour
             downloadUrl += "-32bit.zip";
         Process.Start(downloadUrl);
     }
-    private void Start()
-    {
-        CheckForUpdate();
-    }
+    private void Start() => CheckForUpdate();
     private void Update()
     {
         if (finished) CheckVersion();

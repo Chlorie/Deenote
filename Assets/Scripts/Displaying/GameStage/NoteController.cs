@@ -22,7 +22,7 @@ public class NoteController : MonoBehaviour
     private float blankNoteScale = 4.5f;
     private float slideNoteScale = 4.5f;
     private float noteEffectScale = 8.5f;
-    private bool soundPlayed = false;
+    private bool soundPlayed;
     private bool inRange = true;
     public AudioSource audioSource;
     public PianoSoundsLoader piano;
@@ -38,14 +38,14 @@ public class NoteController : MonoBehaviour
     {
         gameObject.SetActive(false);
         linkLine.SetActive(false);
-        stage.SetPrevNoteID(id);
+        stage.SetPrevNoteId(id);
         stage.ReturnNote(this);
     }
     private void PositionUpdate()
     {
-        float x, z, alpha;
-        x = Parameters.maximumNoteWidth * curNote.position;
-        z = Parameters.maximumNoteRange / Parameters.NoteFallTime(stage.chartPlaySpeed) * (curNote.time - time);
+        float alpha;
+        float x = Parameters.maximumNoteWidth * curNote.position;
+        float z = Parameters.maximumNoteRange / Parameters.NoteFallTime(stage.chartPlaySpeed) * (curNote.time - time);
         if (inRange)
         {
             if (z <= Parameters.maximumNoteRange && z >= Parameters.alpha1NoteRange)
@@ -78,7 +78,7 @@ public class NoteController : MonoBehaviour
                 soundPlayed = true;
                 if (inRange)
                 {
-                    stage.SetPrevNoteID(id);
+                    stage.SetPrevNoteId(id);
                     if (curNote.isLink)
                         audioSource.PlayOneShot(clickClip, 0.5f * stage.effectVolume / 100);
                     else

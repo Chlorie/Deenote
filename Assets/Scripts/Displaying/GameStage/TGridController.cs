@@ -1,25 +1,23 @@
 ﻿using UnityEngine;
 
-public class TGridController: MonoBehaviour
+public class TGridController : MonoBehaviour
 {
-    public TGridID id;
+    public TGridId id;
     private float time;
     private float curTime;
     public StageController stage;
     public Line grid;
     private void CheckForReturn()
     {
-        if (time > curTime)
-        {
-            grid.SetActive(false);
-            stage.SetPrevLineID(id);
-            stage.ReturnLine(this);
-        }
+        if (time <= curTime) return;
+        grid.SetActive(false);
+        stage.SetPrevLineId(id);
+        stage.ReturnLine(this);
     }
     public void ForceReturn()
     {
         grid.SetActive(false);
-        stage.SetPrevLineID(id);
+        stage.SetPrevLineId(id);
         stage.ReturnLine(this);
     }
     private void PositionUpdate()
@@ -41,9 +39,9 @@ public class TGridController: MonoBehaviour
             grid.AlphaMultiplier = 0.75f;
         }
     }
-    public void Activate(TGridID lineID, float lineTime, StageController stageController)
+    public void Activate(TGridId lineId, float lineTime, StageController stageController)
     {
-        id = lineID;
+        id = lineId;
         curTime = lineTime;
         stage = stageController;
         if (id.sub == 0)
@@ -66,51 +64,42 @@ public class TGridController: MonoBehaviour
     }
 }
 
-public class TGridID
+public class TGridId
 {
     public int id;
     public int sub;
     public int maxSub;
-    public TGridID(int newId, int newSub, int newMaxSub)
+    public TGridId(int newId, int newSub, int newMaxSub)
     {
         id = newId;
         sub = newSub;
         maxSub = newMaxSub;
     }
-    public static TGridID operator ++(TGridID cur)
+    public static TGridId operator ++(TGridId cur)
     {
-        TGridID res = new TGridID(cur.id, cur.sub + 1, cur.maxSub);
+        TGridId res = new TGridId(cur.id, cur.sub + 1, cur.maxSub);
         if (res.sub >= res.maxSub) { res.id++; res.sub -= res.maxSub; }
         return res;
     }
-    public static TGridID operator --(TGridID cur)
+    public static TGridId operator --(TGridId cur)
     {
-        TGridID res = new TGridID(cur.id, cur.sub - 1, cur.maxSub);
+        TGridId res = new TGridId(cur.id, cur.sub - 1, cur.maxSub);
         if (res.sub < 0) { res.id--; res.sub += res.maxSub; }
         return res;
     }
-    public static bool operator <(TGridID a, TGridID b)
+    public static bool operator <(TGridId a, TGridId b)
     {
         if (a.id < b.id) return true;
         if (a.id > b.id) return false;
         return a.sub < b.sub;
     }
-    public static bool operator >(TGridID a, TGridID b)
+    public static bool operator >(TGridId a, TGridId b)
     {
         if (a.id > b.id) return true;
         if (a.id < b.id) return false;
         return a.sub > b.sub;
     }
-    public static bool operator <=(TGridID a, TGridID b)
-    {
-        return !(a > b);
-    }
-    public static bool operator >=(TGridID a, TGridID b)
-    {
-        return !(a < b);
-    }
-    public static implicit operator TGridID(int id)
-    {
-        return new TGridID(id, 0, 0);
-    }
+    public static bool operator <=(TGridId a, TGridId b) => !(a > b);
+    public static bool operator >=(TGridId a, TGridId b) => !(a < b);
+    public static implicit operator TGridId(int id) => new TGridId(id, 0, 0);
 }

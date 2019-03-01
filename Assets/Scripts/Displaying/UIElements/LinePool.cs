@@ -35,7 +35,6 @@ public class LinePool : MonoBehaviour
             }
         Debug.LogError("Try to return an object that's not from the pool. Destroying the object.");
         Destroy(returnObject.gameObject);
-        return;
     }
     public void Initialize()
     {

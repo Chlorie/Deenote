@@ -37,8 +37,8 @@ public class Utility
     }
     public static bool FunctionalKeysHeld(int holdKeys = NONE)
     {
-        bool ctrl = false, alt = false, shift = false;
-        bool ctrlDown = false, altDown = false, shiftDown = false;
+        bool ctrl, alt, shift;
+        bool ctrlDown, altDown, shiftDown;
         ctrl = holdKeys % 2 == 1; holdKeys >>= 1;
         alt = holdKeys % 2 == 1; holdKeys >>= 1;
         shift = holdKeys % 2 == 1;
@@ -56,63 +56,82 @@ public class Utility
          * So C# would be messed up with those strange variable names...
          * I'm parsing these values manually...
          */
-        string substr;
-        int i = 0, temp = 0;
+        int i = 0, temp;
         while (str[i] != '{') i++;
-        substr = GetSubStr(str, ref i); //"speed"
+        GetSubStr(str, ref i); //"speed"
         jchart.speed = GetFloat(str, ref i);
-        substr = GetSubStr(str, ref i); //"notes"
+        GetSubStr(str, ref i); //"notes"
         while (str[i] != ']')
         {
-            substr = GetSubStr(str, ref i); //"$id"
+            GetSubStr(str, ref i); //"$id"
             JSONChart.note note = new JSONChart.note();
             temp = 0;
             note.id = GetInt(GetSubStr(str, ref i), ref temp);
             while (str[i] != '}')
             {
-                substr = GetSubStr(str, ref i);
-                if (substr == "sounds")
-                    while (str[i] != ']')
+                string substr = GetSubStr(str, ref i);
+                switch (substr)
+                {
+                    case "sounds":
                     {
-                        JSONChart.sound sound = new JSONChart.sound();
-                        while (str[i] != '}')
+                        while (str[i] != ']')
                         {
-                            substr = GetSubStr(str, ref i);
-                            if (substr == "d")
-                                sound.d = GetFloat(str, ref i);
-                            else if (substr == "p")
-                                sound.p = GetInt(str, ref i);
-                            else if (substr == "v")
-                                sound.v = GetInt(str, ref i);
-                            else if (substr == "w")
-                                sound.w = GetFloat(str, ref i);
+                            JSONChart.sound sound = new JSONChart.sound();
+                            while (str[i] != '}')
+                            {
+                                substr = GetSubStr(str, ref i);
+                                switch (substr)
+                                {
+                                    case "d":
+                                        sound.d = GetFloat(str, ref i);
+                                        break;
+                                    case "p":
+                                        sound.p = GetInt(str, ref i);
+                                        break;
+                                    case "v":
+                                        sound.v = GetInt(str, ref i);
+                                        break;
+                                    case "w":
+                                        sound.w = GetFloat(str, ref i);
+                                        break;
+                                }
+                            }
+                            i++;
+                            note.sounds.Add(sound);
                         }
-                        i++;
-                        note.sounds.Add(sound);
+                        break;
                     }
-                else if (substr == "pos")
-                    note.pos = GetFloat(str, ref i);
-                else if (substr == "size")
-                    note.size = GetFloat(str, ref i);
-                else if (substr == "_time")
-                    note.time = GetFloat(str, ref i);
-                else if (substr == "shift")
-                    note.shift = GetFloat(str, ref i);
-                else
-                    while (str[i] != ',' && str[i] != '}') i++;
+                    case "pos":
+                        note.pos = GetFloat(str, ref i);
+                        break;
+                    case "size":
+                        note.size = GetFloat(str, ref i);
+                        break;
+                    case "_time":
+                        note.time = GetFloat(str, ref i);
+                        break;
+                    case "shift":
+                        note.shift = GetFloat(str, ref i);
+                        break;
+                    default:
+                    {
+                        while (str[i] != ',' && str[i] != '}') i++;
+                        break;
+                    }
+                }
             }
             i++;
             jchart.notes.Add(note);
-        }//"notes" complete
-        substr = GetSubStr(str, ref i); //"links"
+        } // "notes" complete
+        GetSubStr(str, ref i); // "links"
         i += 2;
         while (str[i] != ']')
         {
             JSONChart.link link = new JSONChart.link();
-            substr = GetSubStr(str, ref i); //"notes"
+            GetSubStr(str, ref i); // "notes"
             while (str[i] != ']')
             {
-                substr = GetSubStr(str, ref i); //"$ref"
+                GetSubStr(str, ref i); // "$ref"
                 temp = 0;
                 link.noteRef.Add(GetInt(GetSubStr(str, ref i), ref temp));
                 i++;
@@ -122,7 +141,7 @@ public class Utility
         }
         return jchart;
     }
-    private static float GetFloat(string str, ref int i) //Search from str[i]
+    private static float GetFloat(string str, ref int i) // Search from str[i]
     {
         int sign = 1;
         float fnumber = 0.0f;
@@ -134,8 +153,8 @@ public class Utility
         while (i < str.Length && IsNumberChar(str[i]))
         {
             if (str[i] == '-') { sign = -1; i++; continue; }
-            else if (str[i] == '.') { dec = true; i++; continue; }
-            else if (str[i] == 'e' || str[i] == 'E') { e = GetInt(str, ref i); break; }
+            if (str[i] == '.') { dec = true; i++; continue; }
+            if (str[i] == 'e' || str[i] == 'E') { e = GetInt(str, ref i); break; }
             if (!dec)
             {
                 inumber *= 10;
@@ -185,12 +204,10 @@ public class Utility
     }
     private static string GetSubStr(string str, ref int i)
     {
-        string result = "";
-        int j = i;
         while (str[i] != '"') i++;
-        j = i + 1;
+        int j = i + 1;
         while (str[j] != '"') j++;
-        result = str.Substring(i + 1, j - i - 1);
+        string result = str.Substring(i + 1, j - i - 1);
         i = j + 1;
         return result;
     }
@@ -240,12 +257,12 @@ public class Utility
     public static JSONChart CytusChartToJChart(string[] cytusChart)
     {
         JSONChart jchart = new JSONChart();
-        int i, n = cytusChart.Length, j, ivalue;
-        float fvalue;
+        int n = cytusChart.Length;
         jchart.speed = 5.0f;
-        for (i = 4; i < n; i++)
+        for (int i = 4; i < n; i++)
         {
-            j = 0;
+            int j = 0;
+            int ivalue;
             if (cytusChart[i][0] == 'N')
             {
                 ivalue = GetInt(cytusChart[i], ref j);
@@ -253,7 +270,7 @@ public class Utility
                 {
                     id = ivalue - 3
                 };
-                fvalue = GetFloat(cytusChart[i], ref j);
+                float fvalue = GetFloat(cytusChart[i], ref j);
                 //note.time = fvalue - 0.08f;
                 note.time = fvalue;
                 fvalue = GetFloat(cytusChart[i], ref j);
@@ -266,11 +283,9 @@ public class Utility
                 while (j < cytusChart[i].Length)
                 {
                     ivalue = GetInt(cytusChart[i], ref j);
-                    if (ivalue != -2147483648)
-                    {
-                        link.noteRef.Add(ivalue + 1);
-                        jchart.notes[ivalue].size = 0.8f;
-                    }
+                    if (ivalue == -2147483648) continue;
+                    link.noteRef.Add(ivalue + 1);
+                    jchart.notes[ivalue].size = 0.8f;
                 }
                 jchart.links.Add(link);
             }
@@ -378,11 +393,7 @@ public class Utility
     public static Vector3 GetMouseWorldPos()
     {
         Ray ray = stageCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-            return hit.point;
-        else
-            return new Vector3(0, -10, 0);
+        return Physics.Raycast(ray, out RaycastHit hit) ? hit.point : new Vector3(0, -10, 0);
     }
     public static Vector3 WorldToScreenPoint(Vector3 worldPos) // Result in 1280x720 resolution (same to the canvas)
     {
@@ -391,16 +402,7 @@ public class Utility
         res.z = 0.0f;
         return res;
     }
-    public static void DebugText(string text)
-    {
-        debugText.text = text;
-    }
-    public static void PlayerPrefsSetBool(string key, bool value)
-    {
-        PlayerPrefs.SetInt(key, value ? 1 : 0);
-    }
-    public static bool PlayerPrefsGetBool(string key, bool defaultValue)
-    {
-        return PlayerPrefs.GetInt(key, defaultValue ? 1 : 0) == 1;
-    }
+    public static void DebugText(string text) => debugText.text = text;
+    public static void PlayerPrefsSetBool(string key, bool value) => PlayerPrefs.SetInt(key, value ? 1 : 0);
+    public static bool PlayerPrefsGetBool(string key, bool defaultValue) => PlayerPrefs.GetInt(key, defaultValue ? 1 : 0) == 1;
 }

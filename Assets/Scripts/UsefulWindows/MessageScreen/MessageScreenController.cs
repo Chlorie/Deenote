@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public delegate void MessageScreenCallback();
 
@@ -17,7 +14,7 @@ public class MessageScreenController : MonoBehaviour
     [SerializeField] private LocalizedText title;
     [SerializeField] private LocalizedText notice;
     private MessageScreenCallback[] callbacks = new MessageScreenCallback[4];
-    private int activatedButtonGroup = 0;
+    private int activatedButtonGroup;
     public void Activate(string[] title, string[] notice,
         MessageScreenCallback callback1, string[] buttonText1,
         MessageScreenCallback callback2, string[] buttonText2,
@@ -50,10 +47,7 @@ public class MessageScreenController : MonoBehaviour
         callbacks[index]?.Invoke();
         CurrentState.ignoreAllInput = false;
     }
-    private void Awake()
-    {
-        Instance = this;
-    }
+    private void Awake() => Instance = this;
 }
 
 public class MessageScreen // Static methods for using message screen
@@ -72,7 +66,5 @@ public class MessageScreen // Static methods for using message screen
                 callback2, buttonText2,
                 callback3, buttonText3,
                 callback4, buttonText4);
-        else
-            return;
     }
 }

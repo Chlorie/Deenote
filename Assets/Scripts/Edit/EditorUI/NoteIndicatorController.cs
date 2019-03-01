@@ -10,31 +10,25 @@ public class NoteIndicatorController : MonoBehaviour
     public EditorController editor;
     private Note note;
     private Note nextLink;
-    private float pianoNoteScale = 7.0f;
-    private float blankNoteScale = 4.5f;
-    private float slideNoteScale = 4.5f;
+    private const float PianoNoteScale = 7.0f;
+    private const float BlankNoteScale = 4.5f;
+    private const float SlideNoteScale = 4.5f;
     private float musicLength;
     private float time;
     public Line linkLine;
     public float placeTime;
     public float placePos;
-    public Note Note
+    public Note Note => new Note
     {
-        get
-        {
-            return new Note
-            {
-                isLink = note.isLink,
-                prevLink = note.prevLink,
-                nextLink = note.nextLink,
-                position = placePos,
-                time = placeTime,
-                shift = note.shift,
-                size = note.size,
-                sounds = note.sounds
-            };
-        }
-    }
+        isLink = note.isLink,
+        prevLink = note.prevLink,
+        nextLink = note.nextLink,
+        position = placePos,
+        time = placeTime,
+        shift = note.shift,
+        size = note.size,
+        sounds = note.sounds
+    };
     public void Initialize(EditorController controller, Note cur, Note next, float length)
     {
         editor = controller;
@@ -51,17 +45,17 @@ public class NoteIndicatorController : MonoBehaviour
         if (cur.isLink)
         {
             noteSprite.sprite = slideNoteSprite;
-            noteSprite.transform.localScale = slideNoteScale * new Vector3(cur.size, 1.0f, 1.0f);
+            noteSprite.transform.localScale = SlideNoteScale * new Vector3(cur.size, 1.0f, 1.0f);
         }
         else if (cur.sounds.Count > 0)
         {
             noteSprite.sprite = pianoNoteSprite;
-            noteSprite.transform.localScale = pianoNoteScale * new Vector3(cur.size, 1.0f, 1.0f);
+            noteSprite.transform.localScale = PianoNoteScale * new Vector3(cur.size, 1.0f, 1.0f);
         }
         else
         {
             noteSprite.sprite = blankNoteSprite;
-            noteSprite.transform.localScale = blankNoteScale * new Vector3(cur.size, 1.0f, 1.0f);
+            noteSprite.transform.localScale = BlankNoteScale * new Vector3(cur.size, 1.0f, 1.0f);
         }
     }
     public void Move(float timeOffset, float posOffset, float stageTime)
@@ -86,11 +80,10 @@ public class NoteIndicatorController : MonoBehaviour
         if (nextTime > musicLength) nextTime = musicLength;
         placePos = curPos;
         placeTime = curTime;
-        float x, z, x2, z2;
-        x = Parameters.maximumNoteWidth * curPos;
-        z = Parameters.maximumNoteRange / Parameters.NoteFallTime(editor.stage.chartPlaySpeed) * (curTime - time);
-        x2 = Parameters.maximumNoteWidth * nextPos;
-        z2 = Parameters.maximumNoteRange / Parameters.NoteFallTime(editor.stage.chartPlaySpeed) * (nextTime - time);
+        float x = Parameters.maximumNoteWidth * curPos;
+        float z = Parameters.maximumNoteRange / Parameters.NoteFallTime(editor.stage.chartPlaySpeed) * (curTime - time);
+        float x2 = Parameters.maximumNoteWidth * nextPos;
+        float z2 = Parameters.maximumNoteRange / Parameters.NoteFallTime(editor.stage.chartPlaySpeed) * (nextTime - time);
         float alpha = z < Parameters.alpha1NoteRange ? 1.0f : (Parameters.maximumNoteRange - z) / (Parameters.maximumNoteRange - Parameters.alpha1NoteRange);
         noteSprite.color = new Color(1.0f, 1.0f, 1.0f, alpha * 0.4f);
         gameObject.transform.localPosition = new Vector3(x, 0.0f, z);

@@ -14,7 +14,7 @@ public class ProjectSaveLoad : MonoBehaviour
     public GameObject savingText;
     public GameObject loadingText;
     public StageController stage;
-    private FullProjectDataV2 projectData = null;
+    private FullProjectDataV2 projectData;
     private void Save(FullProjectDataV2 projectData, string fileFullName)
     {
         BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -30,10 +30,15 @@ public class ProjectSaveLoad : MonoBehaviour
         try
         {
             object deserializedData = binaryFormatter.Deserialize(fileStream);
-            if (deserializedData is SerializableProjectData)
-                projectData = ProjectVersionConversion.Version1To2((SerializableProjectData)deserializedData);
-            else if (deserializedData is FullProjectDataV2)
-                projectData = (FullProjectDataV2)deserializedData;
+            switch (deserializedData)
+            {
+                case SerializableProjectData v1:
+                    projectData = ProjectVersionConversion.Version1To2(v1);
+                    break;
+                case FullProjectDataV2 v2:
+                    projectData = v2;
+                    break;
+            }
         }
         catch (Exception exc)
         {
@@ -44,10 +49,7 @@ public class ProjectSaveLoad : MonoBehaviour
     public IEnumerator SaveProjectIntoFile(Project project, byte[] audio, string fileFullName) //Save the project in file fileFullName
     {
         stage.forceToPlaceNotes = true;
-        if (backGroundImageLeft.activeInHierarchy == true)
-            savingText.GetComponent<Text>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        else
-            savingText.GetComponent<Text>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        savingText.GetComponent<Text>().color = backGroundImageLeft.activeInHierarchy ? Color.black : Color.white;
         savingText.SetActive(true);
         projectData = new FullProjectDataV2
         {
@@ -59,10 +61,7 @@ public class ProjectSaveLoad : MonoBehaviour
         saveThread.Start();
         while (saveThread.IsAlive) yield return null;
         savingText.SetActive(false);
-        if (backGroundImageLeft.activeInHierarchy == true)
-            saveCompleteText.GetComponent<Text>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        else
-            saveCompleteText.GetComponent<Text>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        saveCompleteText.GetComponent<Text>().color = backGroundImageLeft.activeInHierarchy ? Color.black : Color.white;
         saveCompleteText.SetActive(true);
         stage.forceToPlaceNotes = false;
         yield return new WaitForSeconds(3.0f);
@@ -72,20 +71,14 @@ public class ProjectSaveLoad : MonoBehaviour
         Action<string> audioType, string fileFullName) //Load a project from a project file
     {
         stage.forceToPlaceNotes = true;
-        if (backGroundImageLeft.activeInHierarchy == true)
-            loadingText.GetComponent<Text>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        else
-            loadingText.GetComponent<Text>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        loadingText.GetComponent<Text>().color = backGroundImageLeft.activeInHierarchy ? Color.black : Color.white;
         loadingText.SetActive(true);
         Thread loadThread = new Thread(() => Load(fileFullName));
         loadThread.Start();
         while (loadThread.IsAlive) yield return null;
         project(projectData.project); audio(projectData.audio); audioType(projectData.audioType);
         loadingText.SetActive(false);
-        if (backGroundImageLeft.activeInHierarchy == true)
-            loadCompleteText.GetComponent<Text>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        else
-            loadCompleteText.GetComponent<Text>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        loadCompleteText.GetComponent<Text>().color = backGroundImageLeft.activeInHierarchy ? Color.black : Color.white;
         loadCompleteText.SetActive(true);
         stage.forceToPlaceNotes = false;
     }

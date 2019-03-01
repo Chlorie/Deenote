@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -27,7 +28,6 @@ public class ProjectController : MonoBehaviour
     public LocalizedText songSelectButtonText;
     public LocalizedText fileSelectButtonText;
     public Button songSelectConfirmButton;
-    public string dragAndDropFileName = null;
     //-Info Panel-
     public InputField infoProjectNameInputField;
     public InputField charterNameInputField;
@@ -35,11 +35,12 @@ public class ProjectController : MonoBehaviour
     //-Charts Panel-
     public InputField[] lvlInputFields;
     //-Settings Panel-
-    private float lastAutoSaveTime = 0.0f;
-    private float autoSaveTime = 300.0f;
-    public Toggle autoSaveToggle;
+    private float lastAutoSaveTime;
+    private const float AutoSaveTime = 300.0f;
+    public Dropdown autoSaveDropdown;
     public Toggle vSyncToggle;
-    private bool autoSaveState = true;
+    private enum AutoSaveState { Off, On, OnAndSaveJson }
+    private AutoSaveState autoSaveState = AutoSaveState.On;
     private bool vSync = true;
     //-About the project-
     private AudioClip songAudioClip; // Audio clip of the song
@@ -47,7 +48,7 @@ public class ProjectController : MonoBehaviour
     private string projectFileName; // Name of the project file
     private string projectFolder; // Where the project file is at
     private FileInfo songFile; // Where the song is saved, only used when loading song for the 1st time
-    public Project project = null; // The project itself
+    public Project project; // The project itself
     //-Other scripts-
     public StageController stage;
     public ProjectSaveLoad projectSL;
@@ -97,18 +98,18 @@ public class ProjectController : MonoBehaviour
             stage.StopPlaying();
             stage.editor.pianoSoundEditor.Deactivate(false);
             MessageScreen.Activate(
-                new string[] { "Current project will be closed when you start a new project", "启动新项目时当前的项目会被关闭" },
-                new string[] { "<color=#ff5555>Make sure that you have SAVED your project!</color>", "<color=#ff5555>请确认你已经保存当前的项目文件!</color>" },
-                new string[] { "Start a new project now!", "启动新项目!" }, ClearStageStartNewProject,
-                new string[] { "Take me back to my project", "返回到当前项目" }, delegate { dragAndDropFileName = null; });
+                new[] { "Current project will be closed when you start a new project", "启动新项目时当前的项目会被关闭" },
+                new[] { "<color=#ff5555>Make sure that you have SAVED your project!</color>", "<color=#ff5555>请确认你已经保存当前的项目文件!</color>" },
+                new[] { "Start a new project now!", "启动新项目!" }, ClearStageStartNewProject,
+                new[] { "Take me back to my project", "返回到当前项目" }, () => { });
             clearStageNewProjectMode = true;
             return;
         }
         songFile = null;
         projectFileName = null;
         projectFolder = null;
-        songSelectButtonText.color = new Color(25.0f / 64, 25.0f / 64, 25.0f / 64, 0.5f);
-        fileSelectButtonText.color = new Color(25.0f / 64, 25.0f / 64, 25.0f / 64, 0.5f);
+        songSelectButtonText.Color = new Color(25.0f / 64, 25.0f / 64, 25.0f / 64, 0.5f);
+        fileSelectButtonText.Color = new Color(25.0f / 64, 25.0f / 64, 25.0f / 64, 0.5f);
         songSelectButtonText.SetStrings("Select the song file", "选择音乐文件");
         fileSelectButtonText.SetStrings("Create a new project file", "创建新工程文件");
         newProjectPanel.SetActive(true);
@@ -133,7 +134,7 @@ public class ProjectController : MonoBehaviour
     private void SongSelected() //Called by directory selector controller when song selected
     {
         songFile = new FileInfo(directorySelectorController.selectedItemFullName);
-        songSelectButtonText.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+        songSelectButtonText.Color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
         songSelectButtonText.SetStrings(songFile.Name);
         directorySelectorController.DeactivateSelection();
         CheckConfirmButton();
@@ -142,7 +143,7 @@ public class ProjectController : MonoBehaviour
     {
         projectFolder = directorySelectorController.selectedItemFullName;
         projectFileName = directorySelectorController.fileName;
-        fileSelectButtonText.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+        fileSelectButtonText.Color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
         fileSelectButtonText.SetStrings(projectFileName + ".dsproj");
         directorySelectorController.DeactivateSelection();
         CheckConfirmButton();
@@ -197,12 +198,11 @@ public class ProjectController : MonoBehaviour
     public void SaveProject() //Project - Save
     {
         SavePlayerPrefs();
-        if (project != null)
-        {
-            if (currentInStage != -1)
-                foreach (Chart chart in project.charts) chart.beats = project.charts[currentInStage].beats;
-            StartCoroutine(projectSL.SaveProjectIntoFile(project, audioFileBytes, projectFolder + projectFileName + ".dsproj"));
-        }
+        if (project == null) return;
+        if (currentInStage != -1)
+            foreach (Chart chart in project.charts)
+                chart.beats = project.charts[currentInStage].beats;
+        StartCoroutine(projectSL.SaveProjectIntoFile(project, audioFileBytes, projectFolder + projectFileName + ".dsproj"));
     }
     public void SaveAs() //Project - Save As
     {
@@ -216,34 +216,27 @@ public class ProjectController : MonoBehaviour
         string asFile = directorySelectorController.fileName;
         string asFileFullName = asFolder + asFile + ".dsproj";
         directorySelectorController.DeactivateSelection();
-        if (project != null)
-        {
-            if (currentInStage != -1)
-                foreach (Chart chart in project.charts) chart.beats = project.charts[currentInStage].beats;
-            projectSL.SaveProjectIntoFile(project, audioFileBytes, asFileFullName);
-        }
+        if (project == null) return;
+        if (currentInStage != -1)
+            foreach (Chart chart in project.charts)
+                chart.beats = project.charts[currentInStage].beats;
+        projectSL.SaveProjectIntoFile(project, audioFileBytes, asFileFullName);
     }
     public void LoadProject() //Project - Open
     {
-        if (project != null)
+        if (project == null)
         {
-            stage.StopPlaying();
-            stage.editor.pianoSoundEditor.Deactivate(false);
-            MessageScreen.Activate(
-                new string[] { "Current project will be closed when you start a new project", "启动新项目时当前的项目会被关闭" },
-                new string[] { "<color=#ff5555>Make sure that you have SAVED your project!</color>", "<color=#ff5555>请确认你已经保存当前的项目文件!</color>" },
-                new string[] { "Start a new project now!", "启动新项目!" }, ClearStageStartNewProject,
-                new string[] { "Take me back to my project", "返回到当前项目" }, delegate { dragAndDropFileName = null; });
-            clearStageNewProjectMode = false;
+            directorySelectorController.ActivateSelection(new[] { ".dsproj" }, ProjectToLoadSelected());
             return;
         }
-        if (dragAndDropFileName == null || dragAndDropFileName == "")
-        {
-            string[] extensions = { ".dsproj" };
-            directorySelectorController.ActivateSelection(extensions, ProjectToLoadSelected());
-        }
-        else
-            StartCoroutine(ProjectToLoadSelected(dragAndDropFileName));
+        stage.StopPlaying();
+        stage.editor.pianoSoundEditor.Deactivate(false);
+        MessageScreen.Activate(
+            new[] { "Current project will be closed when you start a new project", "启动新项目时当前的项目会被关闭" },
+            new[] { "<color=#ff5555>Make sure that you have SAVED your project!</color>", "<color=#ff5555>请确认你已经保存当前的项目文件!</color>" },
+            new[] { "Start a new project now!", "启动新项目!" }, ClearStageStartNewProject,
+            new[] { "Take me back to my project", "返回到当前项目" }, () => { });
+        clearStageNewProjectMode = false;
     }
     public IEnumerator ProjectToLoadSelected(string fileName = null)
     {
@@ -251,7 +244,6 @@ public class ProjectController : MonoBehaviour
         string audioType = null;
         FileInfo projectFile;
         directorySelectorController.DeactivateSelection();
-        dragAndDropFileName = null;
         yield return StartCoroutine(projectSL.LoadProjectFromFile(res => project = res,
             res => audioFileBytes = res, res => audioType = res, projectFullDir));
         songAudioClip = AudioLoader.LoadFromBuffer(audioFileBytes, audioType);
@@ -285,24 +277,6 @@ public class ProjectController : MonoBehaviour
         leftBackgroundImage.SetActive(true);
         stage.editor.activated = false;
         PanelSelectionInit();
-    }
-    public void DragAndDropFileAccept(List<string> paths)
-    {
-        try
-        {
-            if (paths.Count != 1) return;
-            FileInfo file = new FileInfo(paths[0]);
-            string extension = file.Extension;
-            if (extension == ".dsproj")
-            {
-                dragAndDropFileName = paths[0];
-                LoadProject();
-            }
-        }
-        catch
-        {
-            return;
-        }
     }
     //-Info Panel-
     private void InfoInitialization() //After creating a project, initialize info panel
@@ -371,12 +345,11 @@ public class ProjectController : MonoBehaviour
     {
         byte[] bytes = File.ReadAllBytes(directorySelectorController.selectedItemFullName); //JSON file bytes
         char[] bytechars = new char[bytes.Length + 1];
-        string str; //JSON string
-        int length = bytes.Length, i = 0, offset = 0;
+        int length = bytes.Length, i = 0;
         while (bytes[i] != 0x7B) i++;
-        offset = i;
+        int offset = i;
         for (; i < length && bytes[i] != 0x00; i++) bytechars[i - offset] = (char)bytes[i];
-        str = new string(bytechars);
+        string str = new string(bytechars);
         JSONChart jchart = Utility.JSONtoJChart(str);
         string level = project.charts[diff].level;
         List<float> beats = project.charts[diff].beats;
@@ -389,8 +362,7 @@ public class ProjectController : MonoBehaviour
     {
         string[] cychart = File.ReadAllLines(directorySelectorController.selectedItemFullName);
         JSONChart jchart = Utility.CytusChartToJChart(cychart);
-        string level;
-        level = project.charts[diff].level;
+        string level = project.charts[diff].level;
         project.charts[diff] = Utility.JCharttoChart(jchart);
         project.charts[diff].level = level;
         directorySelectorController.DeactivateSelection();
@@ -400,24 +372,23 @@ public class ProjectController : MonoBehaviour
         if (project != null)
             JSONExportDirectorySelect(diff + 4);
         else
-            MessageScreen.Activate(new string[] { "No project file is opened!", "目前没有已经打开的项目文件!" },
-                new string[] { "<color=ff7f7f>What are you expecting to be exported???</color>",
+            MessageScreen.Activate(new[] { "No project file is opened!", "目前没有已经打开的项目文件!" },
+                new[] { "<color=ff7f7f>What are you expecting to be exported???</color>",
                     "<color=ff7f7f>你认为这样能导出什么东西呢???</color>" },
-                new string[] { "Back", "返回" }, delegate { });
+                new[] { "Back", "返回" }, delegate { });
     }
     public void JSONExportDirectorySelect(int diff)
     {
         string[] allowedExtension = { ".json" };
         string[] difficultyStrings = { "easy", "normal", "hard", "extra" };
-        if (project.charts[diff % 4].notes.Count > 0)
-        {
-            directorySelectorController.ActivateSelection(allowedExtension, delegate { ExportChartToJSONChart(diff); }, true);
-            directorySelectorController.SetInitialFileName(projectFileName + "." + difficultyStrings[diff % 4]);
-        }
+        if (project.charts[diff % 4].notes.Count <= 0) return;
+        directorySelectorController.ActivateSelection(allowedExtension, () => ExportChartToJSONChart(diff), true);
+        directorySelectorController.SetInitialFileName(projectFileName + "." + difficultyStrings[diff % 4]);
     }
     public void ExportChartToJSONChart(int diff)
     {
-        FileStream fs = new FileStream(directorySelectorController.selectedItemFullName + directorySelectorController.fileName + ".json", FileMode.Create);
+        FileStream fs = new FileStream(directorySelectorController.selectedItemFullName +
+            directorySelectorController.fileName + ".json", FileMode.Create);
         directorySelectorController.DeactivateSelection();
         Utility.WriteCharttoJSON(project.charts[diff % 4], fs);
         fs.Close();
@@ -430,7 +401,7 @@ public class ProjectController : MonoBehaviour
         editPanelButton.SetActive(true);
         stageUIDiff.sprite = diffImage[diff];
         stageUIProjectName.text = project.name;
-        stageUILvl.text = diffNames[diff] + " Lv" + project.charts[diff].level;
+        stageUILvl.text = diffNames[diff] + " LV" + project.charts[diff].level;
         stageUILvl.color = textColors[diff];
         timeSliderImage.color = textColors[diff];
         stageUIScore.text = "0.00 %";
@@ -443,10 +414,10 @@ public class ProjectController : MonoBehaviour
         currentInStage = diff;
     }
     //-Settings Panel-
-    public void ToggleAutoSave()
+    public void UpdateAutoSave(int state)
     {
-        autoSaveState = autoSaveToggle.isOn;
-        if (autoSaveState) lastAutoSaveTime = Time.time;
+        autoSaveState = (AutoSaveState)state;
+        if (autoSaveState != AutoSaveState.Off) lastAutoSaveTime = Time.time;
     }
     public void ToggleVSync(bool on)
     {
@@ -474,15 +445,15 @@ public class ProjectController : MonoBehaviour
     }
     private void LoadPlayerPrefs()
     {
-        autoSaveToggle.isOn = Utility.PlayerPrefsGetBool("Autosave", autoSaveToggle.isOn);
-        ToggleAutoSave();
+        autoSaveDropdown.value = PlayerPrefs.GetInt("Autosave", 0);
+        UpdateAutoSave(autoSaveDropdown.value);
         vSyncToggle.isOn = Utility.PlayerPrefsGetBool("VSync On", vSyncToggle.isOn);
         ToggleVSync(vSyncToggle.isOn);
         languageDropdown.value = PlayerPrefs.GetInt("Language", 0);
     }
     public void SavePlayerPrefs()
     {
-        Utility.PlayerPrefsSetBool("Autosave", autoSaveState);
+        PlayerPrefs.SetInt("Autosave", (int)autoSaveState);
         Utility.PlayerPrefsSetBool("Light Effect", stage.lightEffectState);
         Utility.PlayerPrefsSetBool("Show FPS", stage.showFPS);
         Utility.PlayerPrefsSetBool("VSync On", vSync);
@@ -515,22 +486,16 @@ public class ProjectController : MonoBehaviour
     private void CheckResolutionChange()
     {
         int width = Screen.width, height = Screen.height;
-        if (width != screenWidth)
-        {
-            screenWidth = width;
-            screenHeight = height;
-            Utility.stageWidth = screenWidth * 3 / 4;
-            Utility.stageHeight = screenHeight;
-            resolutionChange.Invoke();
-        }
+        if (width == screenWidth) return;
+        screenWidth = width;
+        screenHeight = height;
+        Utility.stageWidth = screenWidth * 3 / 4;
+        Utility.stageHeight = screenHeight;
+        resolutionChange.Invoke();
     }
-    public void SetLanguage(int language)
-    {
-        LanguageSelector.Language = language;
-    }
+    public void SetLanguage(int language) => LanguageSelector.Language = language;
     private void Start()
     {
-        DragAndDropUnity.Enable(DragAndDropFileAccept);
         SetScreenResolution(1);
         LoadPlayerPrefs();
         Utility.debugText = debugText;
@@ -538,7 +503,6 @@ public class ProjectController : MonoBehaviour
         PanelSelectionInit();
         UpdateAboutCanvas();
         Application.runInBackground = true;
-        fileOpener.CheckRegistry();
         fileOpener.CheckCommandLine();
     }
     private void Shortcuts()
@@ -573,19 +537,34 @@ public class ProjectController : MonoBehaviour
     }
     private void Update()
     {
-        //Autosave
+        // Autosave
         lastAutoSaveTime += Time.deltaTime;
-        if (autoSaveState && lastAutoSaveTime > autoSaveTime)
+        if (autoSaveState != AutoSaveState.Off && lastAutoSaveTime > AutoSaveTime)
         {
-            lastAutoSaveTime -= autoSaveTime;
+            lastAutoSaveTime -= AutoSaveTime;
             SaveProject();
+            if (autoSaveState == AutoSaveState.OnAndSaveJson && project != null)
+            {
+                string timeString = DateTime.Now.ToString("yyMMddHHmmss");
+                for (int i = 0; i < 4; i++)
+                {
+                    if (project.charts[i].notes.Count == 0) continue;
+                    string fileName = projectFolder + timeString + diffNames[i] + ".json";
+                    FileStream fs = new FileStream(fileName, FileMode.Create);
+                    Utility.WriteCharttoJSON(project.charts[i], fs);
+                    fs.Close();
+                }
+            }
         }
         CheckResolutionChange();
         Shortcuts();
     }
-    private void OnApplicationQuit()
-    {
-        Application.CancelQuit();
-        FindObjectOfType<RightScrollViewController>().OpenQuitScreen();
-    }
+
+    [RuntimeInitializeOnLoadMethod]
+    private static void RunOnStart() =>
+        Application.wantsToQuit += () =>
+        {
+            FindObjectOfType<RightScrollViewController>().OpenQuitScreen();
+            return false;
+        };
 }

@@ -4,53 +4,29 @@ using UnityEngine.UI;
 public class PianoSoundItem : MonoBehaviour
 {
     public PianoSoundEditor editor;
-    public float duration = 0.0f;
+    public float duration;
     public InputField durationField;
-    public float delay = 0.0f;
+    public float delay;
     public InputField delayField;
-    public int pitch = 0;
+    public int pitch;
     public Text pitchText;
-    public int volume = 0;
+    public int volume;
     public InputField volumeField;
     public void DurationFieldChanged()
     {
-        float value = duration;
-        try
-        {
-            value = System.Convert.ToSingle(durationField.text);
-        }
-        catch (System.FormatException)
-        {
-            throw;
-        }
+        float value = System.Convert.ToSingle(durationField.text);
         durationField.text = value.ToString("F3");
         duration = value;
     }
     public void DelayFieldChanged()
     {
-        float value = delay;
-        try
-        {
-            value = System.Convert.ToSingle(delayField.text);
-        }
-        catch (System.FormatException)
-        {
-            throw;
-        }
+        float value = System.Convert.ToSingle(delayField.text);
         delayField.text = value.ToString("F3");
         delay = value;
     }
     public void VolumeFieldChanged()
     {
-        int value = volume;
-        try
-        {
-            value = System.Convert.ToInt32(volumeField.text);
-        }
-        catch (System.FormatException)
-        {
-            throw;
-        }
+        int value = System.Convert.ToInt32(volumeField.text);
         volumeField.text = value.ToString();
         volume = value;
     }
@@ -66,8 +42,8 @@ public class PianoSoundItem : MonoBehaviour
         delayField.text = delay.ToString("F3");
         volumeField.text = volume.ToString();
         int octave = pit / 12 - 2;
-        string[] name = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
-        pitchText.text = name[pit % 12] + octave;
+        string[] noteNames = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+        pitchText.text = noteNames[pit % 12] + octave;
     }
     public void Delete()
     {
