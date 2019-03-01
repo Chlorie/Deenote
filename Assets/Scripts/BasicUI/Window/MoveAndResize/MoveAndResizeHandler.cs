@@ -30,14 +30,17 @@ public class MoveAndResizeHandler : MonoBehaviour
                 if (_window.horizontalResizable)
                 {
                     if (_window.verticalResizable)
-                        Cursor.SetCursor(Parameters.Params.cursorDiagonal, Parameters.Params.cursorDiagonalHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorDiagonal, Parameters.Params.cursorDiagonalHotspot, 
+                            CursorMode.Auto);
                     else
-                        Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot, 
+                            CursorMode.Auto);
                 }
                 else
                 {
                     if (_window.verticalResizable)
-                        Cursor.SetCursor(Parameters.Params.cursorVertical, Parameters.Params.cursorVerticalHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorVertical, Parameters.Params.cursorVerticalHotspot, 
+                            CursorMode.Auto);
                     else
                         Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
                 }
@@ -47,14 +50,17 @@ public class MoveAndResizeHandler : MonoBehaviour
                 if (_window.horizontalResizable)
                 {
                     if (_window.verticalResizable)
-                        Cursor.SetCursor(Parameters.Params.cursorAntiDiagonal, Parameters.Params.cursorAntiDiagonalHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorAntiDiagonal, Parameters.Params.cursorAntiDiagonalHotspot,
+                            CursorMode.Auto);
                     else
-                        Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot,
+                            CursorMode.Auto);
                 }
                 else
                 {
                     if (_window.verticalResizable)
-                        Cursor.SetCursor(Parameters.Params.cursorVertical, Parameters.Params.cursorVerticalHotspot, CursorMode.Auto);
+                        Cursor.SetCursor(Parameters.Params.cursorVertical, Parameters.Params.cursorVerticalHotspot,
+                            CursorMode.Auto);
                     else
                         Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
                 }
@@ -69,7 +75,8 @@ public class MoveAndResizeHandler : MonoBehaviour
             case MoveAndResizeDetector.ResizeAndMoveType.Left:
             case MoveAndResizeDetector.ResizeAndMoveType.Right:
                 if (_window.horizontalResizable)
-                    Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot, CursorMode.Auto);
+                    Cursor.SetCursor(Parameters.Params.cursorHorizontal, Parameters.Params.cursorHorizontalHotspot, 
+                        CursorMode.Auto);
                 else
                     Cursor.SetCursor(Parameters.Params.cursorDefault, Parameters.Params.cursorDefaultHotspot, CursorMode.Auto);
                 break;

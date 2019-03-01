@@ -15,7 +15,7 @@ public class NoteObjectPerspective : MonoBehaviour
     private Note _note;
     public int Id
     {
-        get { return _id; }
+        get => _id;
         set
         {
             _id = value;
@@ -27,7 +27,7 @@ public class NoteObjectPerspective : MonoBehaviour
     public bool IsShown => ChartDisplayController.Instance.NoteShownInPerspectiveView(_note.time);
     public Color NoteColor
     {
-        get { return _noteColor; }
+        get => _noteColor;
         set
         {
             _noteColor = value;

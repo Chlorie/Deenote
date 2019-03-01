@@ -9,7 +9,7 @@ public class MessageBox : Window
     [SerializeField] private Button[] _buttons;
     [SerializeField] private LocalizedText[] _buttonTexts;
     [SerializeField] private RectTransform[] _buttonTransforms;
-    private float[] _buttonWidths = { 0.0f, 200.0f, 150.0f, 110.0f, 85.0f };
+    private readonly float[] _buttonWidths = { 0.0f, 200.0f, 150.0f, 110.0f, 85.0f };
     public class ButtonInfo
     {
         public Callback callback = null;
@@ -77,6 +77,7 @@ public class MessageBox : Window
             else
                 _buttons[i].gameObject.SetActive(false);
     }
+    private void DefaultInvoke() => _buttons[0].onClick.Invoke();
     private void Awake()
     {
         if (Instance == null)
@@ -86,5 +87,10 @@ public class MessageBox : Window
             Destroy(this);
             Debug.LogError("Error: Unexpected multiple instances of MessageBox");
         }
+        operations.Add(new Operation
+        {
+            callback = DefaultInvoke,
+            shortcut = new Shortcut { key = KeyCode.Return }
+        });
     }
 }

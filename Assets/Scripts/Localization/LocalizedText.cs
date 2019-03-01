@@ -6,11 +6,11 @@ public class LocalizedText : MonoBehaviour
 {
     [SerializeField] [TextArea] private string[] _strings;
     private Text _text;
-    private Text TextProperty => _text ?? (_text = gameObject.GetComponent<Text>());
-    public Color Color { set { _text.color = value; } }
+    private Text TextProperty => _text ? _text : (_text = gameObject.GetComponent<Text>());
+    public Color Color { set => _text.color = value; }
     public string[] Strings
     {
-        get { return _strings; }
+        get => _strings;
         set
         {
             if (value.Length > LanguageController.LanguageCount) // Too much texts
@@ -29,12 +29,13 @@ public class LocalizedText : MonoBehaviour
         else
         {
             if (language >= _strings.Length) language = 0;
-            TextProperty.text = SpaceConverter(_strings[language], LanguageController.noLineBreak[language]);
+            TextProperty.text = SpaceConverter(_strings[language], LanguageController.NoLineBreak[language]);
         }
     }
-    public void ForceUpdate() => SetLanguage(LanguageController.Language);
-    private string SpaceConverter(string original, bool noLineBreak) => noLineBreak ? original.Replace(' ', '\u00a0') : original;
-    private void Awake() => LanguageController.localizedTexts.Add(this);
+    private string SpaceConverter(string original, bool noLineBreak) => 
+        noLineBreak ? original.Replace(' ', '\u00a0') : original;
+    private void Awake() => LanguageController.LocalizedTexts.Add(this);
+    private void Start() => SetLanguage(LanguageController.Language);
     // Called in editor, automatically updates the text component
 #if UNITY_EDITOR
     private void OnValidate()

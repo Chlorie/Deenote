@@ -45,8 +45,8 @@ public class Window : MonoBehaviour, IPointerDownHandler
     {
         get
         {
-            Vector2 size = _windowTransform.offsetMax - _windowTransform.offsetMin;
             Vector2 position = _windowTransform.offsetMin;
+            Vector2 size = _windowTransform.offsetMax - position;
             Rect result = new Rect(position, size);
             return result;
         }
@@ -99,7 +99,6 @@ public class Window : MonoBehaviour, IPointerDownHandler
         _contents.SetActive(true);
         SetFocus();
         if (blocking && !active) WindowsController.Instance.AddBlockingWindow(this);
-        tagContent.ForceUpdate();
     }
     public virtual void Close()
     {
@@ -111,7 +110,8 @@ public class Window : MonoBehaviour, IPointerDownHandler
     }
     public void SetFocus()
     {
-        if (_contents.activeSelf) WindowsController.Instance.SetFocusToWindow(this);
+        if (_contents.activeSelf)
+            WindowsController.Instance.SetFocusToWindow(this);
     }
     public virtual void OnPointerDown(PointerEventData eventData) => SetFocus();
     private void Awake() => LanguageController.Call += AdjustTagWidth;

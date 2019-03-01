@@ -8,11 +8,8 @@ public class StatusBar : MonoBehaviour
     public Image background;
     public static bool ErrorState
     {
-        set
-        {
-            Instance.background.color = value ? Parameters.Params.statusBarErrorColor :
-           Parameters.Params.statusBarDefaultColor;
-        }
+        set => Instance.background.color = value ? Parameters.Params.statusBarErrorColor :
+                Parameters.Params.statusBarDefaultColor;
     }
     private void Awake()
     {

@@ -31,11 +31,7 @@ public class PerspectiveView : Window
         base.Start();
         foreach (Operation operation in ChartDisplayController.Instance.chartPlayingOperations) operations.Add(operation);
     }
-    public new void Open()
-    {
-        base.Open();
-        LanguageController.Refresh();
-    }
+    public new void Open() => base.Open();
     private void Awake()
     {
         if (Instance == null)

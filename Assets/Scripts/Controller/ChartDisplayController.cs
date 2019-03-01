@@ -11,7 +11,7 @@ public class ChartDisplayController : MonoBehaviour
     private Chart _chart;
     public Chart Chart
     {
-        get { return _chart; }
+        get => _chart;
         private set
         {
             _chart = value;
@@ -30,16 +30,12 @@ public class ChartDisplayController : MonoBehaviour
     // Beat line related
     public List<TempoEvent> Tempos { get; private set; }
     public int TimeGridPartition { get; private set; } = 4;
-    [HideInInspector] public List<TimeGridData> timeGrids = new List<TimeGridData>();
+    public readonly List<TimeGridData> timeGrids = new List<TimeGridData>();
     public void UpdateTimeGrid()
     {
-        if (TimeGridPartition == 0)
-        {
-            timeGrids.Clear();
-            return;
-        }
-        int tempoCount = Tempos.Count;
-        for (int i = 0; i < tempoCount; i++)
+        timeGrids.Clear();
+        if (TimeGridPartition == 0) return;
+        for (int i = 0; i < Tempos.Count; i++)
         {
             float currentTempo = Tempos[i].tempo;
             float currentTime = Tempos[i].time;
@@ -48,7 +44,7 @@ public class ChartDisplayController : MonoBehaviour
                 timeGrids.Add(new TimeGridData { time = currentTime, type = TimeGridData.Type.FreeTempo });
                 continue;
             }
-            float nextTime = i != tempoCount - 1 ? Tempos[i + 1].time : AudioPlayer.Instance.Length;
+            float nextTime = i != Tempos.Count - 1 ? Tempos[i + 1].time : AudioPlayer.Instance.Length;
             int counter = 0;
             float increment = 60.0f / currentTempo / TimeGridPartition;
             float time;
@@ -121,11 +117,8 @@ public class ChartDisplayController : MonoBehaviour
     {
         // Return all notes
         LastHitNoteIndex = -1;
-        for (int i = _noteObjects.Count - 1; i >= 0; i--)
-        {
-            _notePool.ReturnObject(_noteObjects[i]);
-            _noteObjects.RemoveAt(i);
-        }
+        for (int i = 0; i < _noteObjects.Count; i++) _notePool.ReturnObject(_noteObjects[i]);
+        _noteObjects.Clear();
         List<Note> notes = _chart.notes;
         int noteCount = notes.Count;
         _nextShownNoteIndex = 0;

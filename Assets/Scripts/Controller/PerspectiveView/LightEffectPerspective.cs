@@ -6,7 +6,7 @@ public class LightEffectPerspective : MonoBehaviour
     private bool _isActive;
     public bool IsActive
     {
-        get { return _isActive; }
+        get => _isActive;
         set
         {
             _isActive = value;

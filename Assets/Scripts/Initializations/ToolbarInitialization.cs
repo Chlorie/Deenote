@@ -68,28 +68,58 @@ public class ToolbarInitialization : MonoBehaviour
             globalShortcut = new Shortcut { alt = true, key = KeyCode.F4 }
         }); // Quit
     }
-    private void CreateNewProject()
+    private void SaveBeforeOpening(Callback callback)
     {
-        FileExplorer.SetTagContent("New project", "创建新项目");
-        FileExplorer.SetDefaultFileName("NewProject.dnt");
-        FileExplorer.Instance.Open(FileExplorer.Mode.InputFileName, () =>
-        {
-            ProjectManagement.filePath = FileExplorer.Result;
-            ActivateProjectRelatedFunctions();
-            ProjectProperties.Instance.Open();
-        }, ".dnt");
+        if (EditTracker.Instance.Edited)
+            MessageBox.Instance.Activate(new[] { "Unsaved changes", "更改未保存" },
+                new[]
+                {
+                    "There are unsaved changes in this project. Would you like to save them before" +
+                    "opening another project?",
+                    "当前项目中有尚未保存的更改。是否保存？"
+                },
+                new MessageBox.ButtonInfo
+                {
+                    callback = () =>
+                    {
+                        ProjectManagement.Save();
+                        callback();
+                    },
+                    texts = new[] { "Yes", "是的" }
+                },
+                new MessageBox.ButtonInfo
+                {
+                    callback = callback,
+                    texts = new[] { "Don't save", "不保存" }
+                },
+                new MessageBox.ButtonInfo { texts = new[] { "Cancel", "取消" } });
+        else
+            callback();
     }
-    private void OpenExistingProject()
-    {
-        FileExplorer.SetTagContent("Open project", "打开项目");
-        FileExplorer.Instance.Open(FileExplorer.Mode.SelectFile, () =>
+    private void CreateNewProject() =>
+        SaveBeforeOpening(() =>
         {
-            ProjectManagement.LoadFrom(FileExplorer.Result);
-            ProjectProperties.Instance.UpdateProperties();
-            ActivateProjectRelatedFunctions();
-            ProjectProperties.Instance.Open();
-        }, ".dnt");
-    }
+            FileExplorer.SetTagContent("New project", "创建新项目");
+            FileExplorer.SetDefaultFileName("NewProject.dnt");
+            FileExplorer.Instance.Open(FileExplorer.Mode.InputFileName, () =>
+            {
+                ProjectManagement.filePath = FileExplorer.Result;
+                ActivateProjectRelatedFunctions();
+                ProjectProperties.Instance.Open();
+            }, ".dnt");
+        });
+    private void OpenExistingProject() =>
+        SaveBeforeOpening(() =>
+        {
+            FileExplorer.SetTagContent("Open project", "打开项目");
+            FileExplorer.Instance.Open(FileExplorer.Mode.SelectFile, () =>
+            {
+                ProjectManagement.LoadFrom(FileExplorer.Result);
+                ProjectProperties.Instance.UpdateProperties();
+                ActivateProjectRelatedFunctions();
+                ProjectProperties.Instance.Open();
+            }, ".dnt");
+        });
     private void SaveProjectAs()
     {
         FileExplorer.SetTagContent("Save as...", "另存为...");
@@ -99,7 +129,75 @@ public class ToolbarInitialization : MonoBehaviour
 
     private void InitializeEditSelectable()
     {
-
+        editSelectable.operations.Add(new ToolbarOperation
+        {
+            name = OperationName.Undo,
+            strings = new[] { "Undo", "撤销" },
+            operation = new Operation
+            {
+                callback = EditTracker.Instance.Undo,
+                shortcut = new Shortcut { key = KeyCode.U }
+            },
+            globalShortcut = new Shortcut { key = KeyCode.Z, ctrl = true },
+            isActive = false
+        }); // Undo
+        editSelectable.operations.Add(new ToolbarOperation
+        {
+            name = OperationName.Redo,
+            strings = new[] { "Redo", "重做" },
+            operation = new Operation
+            {
+                callback = EditTracker.Instance.Redo,
+                shortcut = new Shortcut { key = KeyCode.R }
+            },
+            globalShortcut = new Shortcut { key = KeyCode.Y, ctrl = true },
+            isActive = false
+        }); // Redo
+        editSelectable.operations.Add(new ToolbarOperation
+        {
+            name = OperationName.Cut,
+            strings = new[] { "Cut", "剪切" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    // ToDo: Implement cut operation
+                },
+                shortcut = new Shortcut { key = KeyCode.T }
+            },
+            globalShortcut = new Shortcut { key = KeyCode.X, ctrl = true },
+            isActive = false
+        }); // Cut
+        editSelectable.operations.Add(new ToolbarOperation
+        {
+            name = OperationName.Copy,
+            strings = new[] { "Copy", "复制" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    // ToDo: Implement copy operation
+                },
+                shortcut = new Shortcut { key = KeyCode.C }
+            },
+            globalShortcut = new Shortcut { key = KeyCode.C, ctrl = true },
+            isActive = false
+        }); // Copy
+        editSelectable.operations.Add(new ToolbarOperation
+        {
+            name = OperationName.Paste,
+            strings = new[] { "Paste", "粘贴" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    // ToDo: Implement paste operation
+                },
+                shortcut = new Shortcut { key = KeyCode.P }
+            },
+            globalShortcut = new Shortcut { key = KeyCode.V, ctrl = true },
+            isActive = false
+        }); // Paste
     }
 
     private void InitializeWindowsSelectable()
@@ -138,6 +236,22 @@ public class ToolbarInitialization : MonoBehaviour
             },
             isActive = false
         }); // Perspective view
+        windowsSelectable.operations.Add(new ToolbarOperation
+        {
+            name = OperationName.PlayerSettingsWindow,
+            strings = new[] { "Player settings", "播放设置" },
+            operation = new Operation
+            {
+                callback = () =>
+                {
+                    if (PlayerSettings.Instance.Opened)
+                        PlayerSettings.Instance.Close();
+                    else
+                        PlayerSettings.Instance.Open();
+                },
+                shortcut = new Shortcut { key = KeyCode.S }
+            }
+        }); // Player settings
     }
 
     private void InitializeSettingsSelectable()

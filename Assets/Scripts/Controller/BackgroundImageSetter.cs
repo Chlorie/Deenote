@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class BackgroundImageSetter : Window
@@ -27,11 +28,7 @@ public class BackgroundImageSetter : Window
     }
     private Position _position = Position.Center;
     private StretchMode _stretch = StretchMode.FitHeight;
-    public new void Open()
-    {
-        base.Open();
-        LanguageController.Refresh();
-    }
+    public new void Open() => base.Open();
     public void SelectFile()
     {
         FileExplorer.SetTagContent("Change background image", "更改背景图");
@@ -41,26 +38,29 @@ public class BackgroundImageSetter : Window
     private IEnumerator SetBackgroundImageCoroutine(string path)
     {
         Texture2D texture = new Texture2D(0, 0, TextureFormat.DXT1, false);
-        Sprite sprite;
+        Sprite sprite = null;
         if (!string.IsNullOrWhiteSpace(path))
-            using (WWW www = new WWW("file:///" + path))
+        {
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture("file:///" + path);
+            yield return request.SendWebRequest();
+            if (request.isHttpError || request.isNetworkError)
             {
-                yield return www;
-                if (!string.IsNullOrEmpty(www.error))
-                {
-                    sprite = null;
-                    MessageBox.Instance.Activate(new[] { "Error", "错误" }, new[] { "Cannot find file " + path, "未找到文件 " + path },
-                        new MessageBox.ButtonInfo { texts = new[] { "OK", "好的" } });
-                    path = "";
-                }
-                else
-                {
-                    www.LoadImageIntoTexture(texture);
-                    sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                }
+                MessageBox.Instance.Activate(new[] { "Error", "错误" },
+                    new[]
+                    {
+                        "Cannot find file " + path,
+                        "未找到文件 " + path
+                    },
+                    new MessageBox.ButtonInfo { texts = new[] { "OK", "好的" } });
+                path = "";
             }
-        else
-            sprite = null;
+            else
+            {
+                texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height),
+                    new Vector2(0.5f, 0.5f));
+            }
+        }
         _image.sprite = sprite;
         _image.type = Image.Type.Simple;
         _image.preserveAspect = true;

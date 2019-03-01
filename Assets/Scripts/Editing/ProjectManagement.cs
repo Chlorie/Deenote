@@ -56,6 +56,7 @@ public static class ProjectManagement
         using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write))
         using (BinaryWriter writer = new BinaryWriter(stream))
             writer.Write(project);
+        EditTracker.Instance.Edited = false;
     }
     public static void Save() => SaveAs(filePath);
 }

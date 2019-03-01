@@ -13,7 +13,7 @@ public class AudioPlayer : MonoBehaviour
     private float _time;
     public float Time
     {
-        get { return _time; }
+        get => _time;
         set
         {
             _time = value;
@@ -48,13 +48,13 @@ public class AudioPlayer : MonoBehaviour
     public void Stop() => _source.Stop();
     public float Volume
     {
-        get { return _source.volume; }
-        set { _source.volume = value; }
+        get => _source.volume;
+        set => _source.volume = value;
     }
     public float Pitch
     {
-        get { return _source.pitch; }
-        set { _source.pitch = value; }
+        get => _source.pitch;
+        set => _source.pitch = value;
     }
     public bool IsPlaying => _source.isPlaying;
     public void TogglePlayState()

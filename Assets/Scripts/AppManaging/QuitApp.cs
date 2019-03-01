@@ -3,27 +3,44 @@
 public class QuitApp : MonoBehaviour
 {
     public static QuitApp Instance { get; private set; }
-    public static void ShowConfirmQuitMessage() => 
-        MessageBox.Instance.Activate(new[] { "Quit", "退出" }, new[] { "Are you sure to quit Deenote?", "你确认要退出Deenote吗？" },
-            new MessageBox.ButtonInfo
-            {
-                callback = () =>
+    public static void ShowConfirmQuitMessage()
+    {
+        string[] title = { "Quit", "退出" };
+        string[] notice = { "Are you sure to quit Deenote?", "你确认要退出Deenote吗？" };
+        if (EditTracker.Instance.Edited)
+            MessageBox.Instance.Activate(title, notice,
+                new MessageBox.ButtonInfo
                 {
-                    ProjectManagement.Save();
-                    Instance.QuitAppActions();
+                    callback = () =>
+                    {
+                        ProjectManagement.Save();
+                        Instance.QuitAppActions();
+                    },
+                    texts = new[] { "Quit and save", "退出并保存" }
                 },
-                texts = new[] { "Quit and save", "退出并保存" }
-            },
-            new MessageBox.ButtonInfo
-            {
-                callback = () => Instance.QuitAppActions(),
-                texts = new[] { "Quit but not save", "退出但不保存" }
-            },
-            new MessageBox.ButtonInfo
-            {
-                callback = null,
-                texts = new[] { "Back", "返回" }
-            });
+                new MessageBox.ButtonInfo
+                {
+                    callback = Instance.QuitAppActions,
+                    texts = new[] { "Quit but not save", "退出但不保存" }
+                },
+                new MessageBox.ButtonInfo
+                {
+                    callback = null,
+                    texts = new[] { "Back", "返回" }
+                });
+        else
+            MessageBox.Instance.Activate(title, notice,
+                new MessageBox.ButtonInfo
+                {
+                    callback = Instance.QuitAppActions,
+                    texts = new[] { "Quit", "退出" }
+                },
+                new MessageBox.ButtonInfo
+                {
+                    callback = null,
+                    texts = new[] { "Back", "返回" }
+                });
+    }
     private void QuitAppActions()
     {
         AppConfig.Write();

@@ -8,12 +8,12 @@ public class PerspectiveLine : MonoBehaviour
     public void SetActive(bool state) => gameObject.SetActive(state);
     public int Layer
     {
-        get { return _line.sortingOrder; }
-        set { _line.sortingOrder = value; }
+        get => _line.sortingOrder;
+        set => _line.sortingOrder = value;
     }
     public Color Color
     {
-        get { return _line.colorGradient.colorKeys[0].color; }
+        get => _line.colorGradient.colorKeys[0].color;
         set
         {
             Gradient gradient = _line.colorGradient;
@@ -25,8 +25,8 @@ public class PerspectiveLine : MonoBehaviour
     }
     public float Width
     {
-        get { return _line.widthMultiplier; }
-        set { _line.widthMultiplier = value; }
+        get => _line.widthMultiplier;
+        set => _line.widthMultiplier = value;
     }
     public float AlphaMultiplier
     {

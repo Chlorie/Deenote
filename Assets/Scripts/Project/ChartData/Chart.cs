@@ -6,6 +6,7 @@ public class Chart
     public int difficulty; // Difficulty 0 Easy, 1 Normal, 2 Hard, 3 Extra
     public string level = ""; // Level of the chart
     public List<Note> notes = new List<Note>(); // All the notes info
+    public bool IsEmpty => notes.Count == 0;
     public static Chart FromJsonChart(JsonChart chart)
     {
         Chart result = new Chart { speed = chart.speed };

@@ -8,7 +8,13 @@
     QuitApp,
     ProjectPropertiesWindow,
     PerspectiveViewWindow,
+    PlayerSettingsWindow,
     UpdateCheck,
     LanguageSelection,
-    SelectBackgroundImage
+    SelectBackgroundImage,
+    Undo,
+    Redo,
+    Cut,
+    Copy,
+    Paste
 }
