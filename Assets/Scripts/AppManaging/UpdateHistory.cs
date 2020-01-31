@@ -10,7 +10,7 @@ public class UpdateHistory : MonoBehaviour
     public VersionChecker versionChecker;
     private readonly List<string> versions = new List<string>
     {
-        "Deenote 0.7.2", "Deenote 0.7.1", "Deenote 0.7",
+        "Deenote 0.7.3", "Deenote 0.7.2", "Deenote 0.7.1", "Deenote 0.7",
         "Deenote 0.6.12", "Deenote 0.6.11", "Deenote 0.6.10", "Deenote 0.6.9", "Deenote 0.6.8", "Deenote 0.6.7",
         "Deenote 0.6.6", "Deenote 0.6.5", "Deenote 0.6.4", "Deenote 0.6.3", "Deenote 0.6.2", "Deenote 0.6.1", "Deenote 0.6",
         "Deenote 0.5.10", "Deenote 0.5.9", "Deenote 0.5.8", "Deenote 0.5.7", "Deenote 0.5.6",
@@ -24,6 +24,8 @@ public class UpdateHistory : MonoBehaviour
     };
     private readonly List<string[]> updateInfo = new List<string[]>
     {
+        new[]{ "Added function of saving selected resolution.\nReplace the font of song title, now numbers and some punctuations look official.",
+            "增加了保存选定分辨率的功能。\n换掉了歌曲标题的字体，现在数字和部分标点跟官方一样了。" },
         new[]{ "Fixed the issue in version checker.\nAdded settings for auto-saving json charts.",
             "修复了更新检查的问题。\n加入了自动保存Json谱面的功能。" },
         new[]{ "Fixed a bug in the new feature in version 0.7.", "修复了版本0.7新功能中的一个bug。" },
@@ -34,7 +36,7 @@ public class UpdateHistory : MonoBehaviour
             "Removed support for .ogg audio files.\n" +
             "If exception is caught during audio file loading, the user is forced to select another audio file.\n",
             "修改了charming光效的颜色。现在光效应该更偏橙色而不是黄色。\n" +
-            "现在若发现未经处理的异常则会弹出对话框提醒并保存到文件, 反馈bug会更容易一些。\n" +
+            "现在若发现未经处理的异常则会弹出对话框提醒并保存到文件，反馈bug会更容易一些。\n" +
             "取消了对.ogg文件的支持。\n" +
             "若在读取音频时捕获到异常, 用户会被强制重新选择音频文件。" },
         new[]{ "Final changed the shader used for charming glow effects. Now the glows should be much prettier than before.",

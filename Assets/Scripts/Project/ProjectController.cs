@@ -9,6 +9,7 @@ using UnityEngine.Events;
 public class ProjectController : MonoBehaviour
 {
     //-Declaration-
+    public static ProjectController Instance { get; private set; } 
     //-Panel control buttons-
     public GameObject filePanelButton;
     public GameObject infoPanelButton;
@@ -72,11 +73,28 @@ public class ProjectController : MonoBehaviour
     public GameObject leftBackgroundImage;
     public GameObject aboutWindow;
     public Text debugText;
-    public UnityEvent resolutionChange;
-    public int screenWidth = 1280;
-    public int screenHeight = 720;
+
+    //UGUI
+    public Dropdown ResolutionDropDown;
+    
+    public UnityEvent ResolutionChange
+    {
+        get => ScreenResolutionSelector.resolutionChange;
+        set => ScreenResolutionSelector.resolutionChange = value;
+    }
     public Dropdown languageDropdown;
+
+
     //-Functions-
+    private void Awake()
+    {
+        if (!(Instance is null))
+            throw new InvalidOperationException($"{nameof(ProjectController)} is not allowed existing more than one instance");
+        Instance = this;
+
+        ScreenResolutionSelector.InitializeResolutionDropdown(ResolutionDropDown);
+    }
+
     //-Initialization-
     public void PanelSelectionInit()
     {
@@ -131,6 +149,7 @@ public class ProjectController : MonoBehaviour
         string[] acceptedExtension = { ".dsproj" };
         directorySelectorController.ActivateSelection(acceptedExtension, FileSelected, true);
     }
+    
     private void SongSelected() //Called by directory selector controller when song selected
     {
         songFile = new FileInfo(directorySelectorController.selectedItemFullName);
@@ -472,31 +491,13 @@ public class ProjectController : MonoBehaviour
         Utility.PlayerPrefsSetBool("Show Indicator", stage.editor.noteIndicatorsToggler.activeSelf);
         Utility.PlayerPrefsSetBool("Show Border", stage.editor.border.activeSelf);
     }
-    public void SetScreenResolution(int selection)
-    {
-        int width = 0, height = 0;
-        switch (selection)
-        {
-            case 0: width = 960; height = 540; break;
-            case 1: width = 1280; height = 720; break;
-            case 2: width = 1920; height = 1080; break;
-        }
-        Screen.SetResolution(width, height, false);
-    }
-    private void CheckResolutionChange()
-    {
-        int width = Screen.width, height = Screen.height;
-        if (width == screenWidth) return;
-        screenWidth = width;
-        screenHeight = height;
-        Utility.stageWidth = screenWidth * 3 / 4;
-        Utility.stageHeight = screenHeight;
-        resolutionChange.Invoke();
-    }
+
+    public void SetScreenResolution(int section) => ScreenResolutionSelector.SetScreenResolution(section);
+
     public void SetLanguage(int language) => LanguageSelector.Language = language;
+
     private void Start()
     {
-        SetScreenResolution(1);
         LoadPlayerPrefs();
         Utility.debugText = debugText;
         project = null;
@@ -505,6 +506,7 @@ public class ProjectController : MonoBehaviour
         Application.runInBackground = true;
         fileOpener.CheckCommandLine();
     }
+
     private void Shortcuts()
     {
         if (Utility.DetectKeys(KeyCode.S, Utility.CTRL)) //Ctrl+S
@@ -556,7 +558,6 @@ public class ProjectController : MonoBehaviour
                 }
             }
         }
-        CheckResolutionChange();
         Shortcuts();
     }
 

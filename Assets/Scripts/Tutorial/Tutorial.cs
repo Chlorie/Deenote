@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Tutorial : MonoBehaviour
 {
     private StageController stage;
-    private string[][] text = new string[][]
+    private readonly string[][] text = new string[][]
     {
         new string[] // Language 0 (English)
         {

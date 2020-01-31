@@ -65,6 +65,7 @@ public class UnexpectedExceptionHandler : MonoBehaviour
     }
     private void OutputMessage(string message)
     {
+        //Unity不支持这个C#8的语法
         using (StreamWriter streamWriter = new StreamWriter("exceptions.log", true))
             streamWriter.WriteLine(message);
     }
