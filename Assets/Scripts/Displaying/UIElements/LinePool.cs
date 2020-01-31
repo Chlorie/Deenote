@@ -18,7 +18,7 @@ public class LinePool : MonoBehaviour
             }
         GameObject newObject = Instantiate(prefab, Utility.lineCanvas);
         Line line = newObject.GetComponent<Line>();
-        projectController.resolutionChange.AddListener(line.ResolutionReset);
+        projectController.ResolutionChange.AddListener(line.ResolutionReset);
         pooledObjects.Add(line);
         newObject.SetActive(false);
         objectAvailable.Add(false);
@@ -43,7 +43,7 @@ public class LinePool : MonoBehaviour
         {
             GameObject newObject = Instantiate(prefab, Utility.lineCanvas);
             Line line = newObject.GetComponent<Line>();
-            projectController.resolutionChange.AddListener(line.ResolutionReset);
+            projectController.ResolutionChange.AddListener(line.ResolutionReset);
             pooledObjects.Add(line);
             objectAvailable.Add(true);
             newObject.SetActive(false);
