@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 0
 --- !u!196 &4
@@ -553,6 +554,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -15045,12 +15047,12 @@ MonoBehaviour:
     issue on Deenote's github repository, the link is: https://github.com/Chlorie/Deenote/issues
     . You'd better not to contact me by QQ or E-mail or something...\r\n     \r\n-Special
     thanks-\r\n     Thanks to the developers of Cytunity and Deemo Note Memory for
-    inspiration.\r\n     Thanks to Schwarzer for the drag-and-drop library he made!\r\n
-    \    Millions of thanks to rkevin and \u3086\u3086 for technical support! \r"
-  - "-\u5DF2\u77E5bug-\r\n        \u5173\u4E8EUI\u548C\u5FEB\u6377\u952E\u7684bug\u5F88\u591A\uFF08\u6BD4\u5982\u4F60\u5728\u94A2\u7434\u7A97\u53E3\u6253\u5F00\u7684\u65F6\u5019\u8BD5\u56FE\u6253\u5F00\u65B0\u9879\u76EE\u7684\u8BDD\u94A2\u7434\u7A97\u53E3\u4F1A\u7559\u5728\u90A3\u4E0D\u4F1A\u5173\u95ED\uFF0C\u8FD9\u6709\u53EF\u80FD\u4F1A\u5BFC\u81F4\u4E00\u4E9B\u95EE\u9898\u4EA7\u751F\uFF09\u3002\u73B0\u5728\u7684\u72B6\u51B5\u4E0D\u662F\u6211\u4FEE\u4E0D\u4E86\u800C\u662F\u4FEE\u8FD9\u4E2A\u5B9E\u5728\u8D39\u4E8B\u8D39\u65F6\u95F4...\u6240\u4EE5\u8BF7\u7ED9\u6211\u8DB3\u591F\u7684\u65F6\u95F4...\r\n\r\n-\u5982\u679C\u4F60\u53D1\u73B0\u4E86\u66F4\u591Abug\u6216\u8005\u60F3\u63D0\u4E00\u4E9B\u65B0\u529F\u80FD\u7684\u5EFA\u8BAE-\r\n
-    \       \u8BF7\u5728github\u4E0ADeenote\u7684repo\u8FD9\u91CC\u5EFA\u7ACBIssue\uFF0C\u94FE\u63A5\uFF1Ahttps://github.com/Chlorie/Deenote/issues\u3002\u4E0D\u8981\u603B\u79C1\u804A\u6211...\r\n
-    \    \r\n-\u9E23\u8C22-\r\n        \u611F\u8C22Cytunity\u548CDeemo Note Memory\uFF08\u7684\u5236\u4F5C\u8005\u4EEC\uFF09\u7ED9\u6211\u5E26\u6765\u7684\u7075\u611F\u3002\r\n
-    \       \u611F\u8C22Schwarzer\u540C\u5B66\u7684dll\u3002\r\n        \u7279\u522B\u8981\u611F\u8C22rkevin\u548C\u3086\u3086\u63D0\u4F9B\u7684\u6280\u672F\u652F\u6301\uFF01"
+    inspiration.\r\n     Thanks to Schwarzer for the drag-and-drop library he made!\r\n   
+    Millions of thanks to rkevin and \u3086\u3086 for technical support! \r"
+  - "-\u5DF2\u77E5bug-\r\n        \u5173\u4E8EUI\u548C\u5FEB\u6377\u952E\u7684bug\u5F88\u591A\uFF08\u6BD4\u5982\u4F60\u5728\u94A2\u7434\u7A97\u53E3\u6253\u5F00\u7684\u65F6\u5019\u8BD5\u56FE\u6253\u5F00\u65B0\u9879\u76EE\u7684\u8BDD\u94A2\u7434\u7A97\u53E3\u4F1A\u7559\u5728\u90A3\u4E0D\u4F1A\u5173\u95ED\uFF0C\u8FD9\u6709\u53EF\u80FD\u4F1A\u5BFC\u81F4\u4E00\u4E9B\u95EE\u9898\u4EA7\u751F\uFF09\u3002\u73B0\u5728\u7684\u72B6\u51B5\u4E0D\u662F\u6211\u4FEE\u4E0D\u4E86\u800C\u662F\u4FEE\u8FD9\u4E2A\u5B9E\u5728\u8D39\u4E8B\u8D39\u65F6\u95F4...\u6240\u4EE5\u8BF7\u7ED9\u6211\u8DB3\u591F\u7684\u65F6\u95F4...\r\n\r\n-\u5982\u679C\u4F60\u53D1\u73B0\u4E86\u66F4\u591Abug\u6216\u8005\u60F3\u63D0\u4E00\u4E9B\u65B0\u529F\u80FD\u7684\u5EFA\u8BAE-\r\n      
+    \u8BF7\u5728github\u4E0ADeenote\u7684repo\u8FD9\u91CC\u5EFA\u7ACBIssue\uFF0C\u94FE\u63A5\uFF1Ahttps://github.com/Chlorie/Deenote/issues\u3002\u4E0D\u8981\u603B\u79C1\u804A\u6211...\r\n   
+    \r\n-\u9E23\u8C22-\r\n        \u611F\u8C22Cytunity\u548CDeemo Note Memory\uFF08\u7684\u5236\u4F5C\u8005\u4EEC\uFF09\u7ED9\u6211\u5E26\u6765\u7684\u7075\u611F\u3002\r\n      
+    \u611F\u8C22Schwarzer\u540C\u5B66\u7684dll\u3002\r\n        \u7279\u522B\u8981\u611F\u8C22rkevin\u548C\u3086\u3086\u63D0\u4F9B\u7684\u6280\u672F\u652F\u6301\uFF01"
 --- !u!1 &351825310
 GameObject:
   m_ObjectHideFlags: 0
@@ -20814,7 +20816,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &498475206
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20839,10 +20841,10 @@ RectTransform:
   m_Father: {fileID: 1032904075}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 290}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 155, y: -542}
+  m_SizeDelta: {x: 306, y: 290}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &498475207
 MonoBehaviour:
@@ -24705,6 +24707,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -28590,7 +28593,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &709670157
 RectTransform:
   m_ObjectHideFlags: 0
@@ -28606,10 +28609,10 @@ RectTransform:
   m_Father: {fileID: 1032904075}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 155, y: -22}
-  m_SizeDelta: {x: 306, y: 40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &709670158
 MonoBehaviour:
@@ -33433,6 +33436,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -37784,7 +37788,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &937485683
 RectTransform:
   m_ObjectHideFlags: 0
@@ -37800,10 +37804,10 @@ RectTransform:
   m_Father: {fileID: 1032904075}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 155, y: -22}
-  m_SizeDelta: {x: 306, y: 40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &937485684
 MonoBehaviour:
@@ -40732,7 +40736,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1004995603}
   - component: {fileID: 1004995602}
-  - component: {fileID: 1004995601}
   - component: {fileID: 1004995600}
   - component: {fileID: 1004995599}
   m_Layer: 0
@@ -40751,14 +40754,6 @@ AudioListener:
   m_GameObject: {fileID: 1004995598}
   m_Enabled: 1
 --- !u!124 &1004995600
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1004995598}
-  m_Enabled: 1
---- !u!92 &1004995601
 Behaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41904,6 +41899,11 @@ PrefabInstance:
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: InfoProjectNameFinishedEditing
       objectReference: {fileID: 0}
+    - target: {fileID: 114562081415970320, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
+        type: 3}
+      propertyPath: m_Text
+      value: Enter the project name
+      objectReference: {fileID: 0}
     - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -41993,11 +41993,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114562081415970320, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 3}
-      propertyPath: m_Text
-      value: Enter the project name
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4a5d7ff6a6912f14f86f796a6a378a44, type: 3}
@@ -42129,6 +42124,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -45250,8 +45246,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141096095}
   m_Enabled: 1
-  serializedVersion: 9
+  serializedVersion: 10
   m_Type: 0
+  m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 2
   m_Range: 325
@@ -47573,6 +47570,11 @@ PrefabInstance:
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: CharterNameFinishedEditing
       objectReference: {fileID: 0}
+    - target: {fileID: 114562081415970320, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
+        type: 3}
+      propertyPath: m_Text
+      value: Who's the charter?
+      objectReference: {fileID: 0}
     - target: {fileID: 224741546300476140, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -47662,11 +47664,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114562081415970320, guid: 4a5d7ff6a6912f14f86f796a6a378a44,
-        type: 3}
-      propertyPath: m_Text
-      value: Who's the charter?
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4a5d7ff6a6912f14f86f796a6a378a44, type: 3}
@@ -51801,6 +51798,130 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1336994938}
   m_CullTransparentMesh: 0
+--- !u!1001 &1339541568
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1622406566}
+    m_Modifications:
+    - target: {fileID: 1980457510478770, guid: 08ffe87269a43cc44a01940a8ccbfaad, type: 3}
+      propertyPath: m_Name
+      value: FileButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 305
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 610
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+        type: 3}
+      propertyPath: m_Pivot.y
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 08ffe87269a43cc44a01940a8ccbfaad, type: 3}
+--- !u!224 &1339541569 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 224654906756225872, guid: 08ffe87269a43cc44a01940a8ccbfaad,
+    type: 3}
+  m_PrefabInstance: {fileID: 1339541568}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1340132058
 GameObject:
   m_ObjectHideFlags: 0
@@ -52104,7 +52225,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 603413216}
   m_HandleRect: {fileID: 603413215}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -52549,6 +52670,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -58123,6 +58245,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -62215,14 +62338,15 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1339541569}
   m_Father: {fileID: 2030793416}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -0.000016579994}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 30}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1622406567
 MonoBehaviour:
@@ -74776,8 +74900,8 @@ MonoBehaviour:
   - "Deenote by HCl\r\n\r\n*Bad English Alert*\r\n--31 Jan 2020--\r\n     This is
     NachtgeistW, or you can call me Nightwheel. For some reasons, I forked this project
     and tried to learn C# while fixing deenote.\r\n     I'm a junior in a Chinese
-    University. Origin developer HCl has graduated with excellent grades, now he is
-    a graduate student.\r\n     Version 0.7.3 gets the help from Blurring Shadow.
+    University. Origin developer HCl has graduated with excellent grades, now he
+    is a graduate student.\r\n     Version 0.7.3 gets the help from Blurring Shadow.
     Thank you.\r\n     I don't know what I will bring for this project, so... don't
     expect.\r\n     Last of all. Thank you for using Deenote.\r\n\r\n--2 Dec 2017--\r\n-Things
     that must be mentioned-\r\n     Thank you for using my app!\r\n     Something
@@ -74791,25 +74915,26 @@ MonoBehaviour:
     studying Computational Mathematics in USTC (University of Science and Technology
     of China) for the third year.\r\n     [About this app?]\r\n     I'm making this
     app just for fun. Still a C#/Unity3D newbie so there may be tons of bugs in my
-    code, but who cares? (No, everyone cares.) Since I'm still a student, and as you
-    all know everyone is pretty busy in the third year in university, so I don't have
-    much time to develop this thing. Don't push me please.\r\n     About the drag-and-drop
-    file opener added in 0.5.6, I\u2019m using a dll coded and compiled by my friend
-    Schwarzer (The one working on Lanotalium, an easy-to-use Lanota chart editor.
-    That guy does awesome works, you really should check him out.) You know who to
-    blame and what to do if that specific thing goes wrong. XD\r\n     [Anything else?]\r\n
-    \    Just enjoy yourself making some fun charts with this app. Hope you love it."
+    code, but who cares? (No, everyone cares.) Since I'm still a student, and as
+    you all know everyone is pretty busy in the third year in university, so I don't
+    have much time to develop this thing. Don't push me please.\r\n     About the
+    drag-and-drop file opener added in 0.5.6, I\u2019m using a dll coded and compiled
+    by my friend Schwarzer (The one working on Lanotalium, an easy-to-use Lanota
+    chart editor. That guy does awesome works, you really should check him out.)
+    You know who to blame and what to do if that specific thing goes wrong. XD\r\n    
+    [Anything else?]\r\n    Just enjoy yourself making some fun charts with this
+    app. Hope you love it."
   - "Deenote by HCl\r\n\r\n--2020.1.31--\r\n        \u8FD9\u91CC\u591C\u8F6E\u3002\u6211\u51FA\u4E8E\u67D0\u79CD\u539F\u56E0\u6361\u8D77\u4E86\u8FD9\u4E2A\u9879\u76EE\uFF0C\u5F00\u59CB\u8FB9\u5B66
-    C# \u8FB9\u8BD5\u56FE\u4FEE Deenote\u3002\r\n        \u6211\u4ECA\u5E74\u5927\u4E09\uFF0C\u800C\u76D0\u9178\u5DF2\u7ECF\u4EE5\u4F18\u5F02\u7684\u6210\u7EE9\u5927\u5B66\u6BD5\u4E1A\uFF0C\u4ED6\u4ECA\u5E74\u7814\u4E00\u3002\r\n
-    \       0.7.3 \u662F\u5728\u6B8B\u50CF\u7684\u5E2E\u52A9\u4E0B\u5199\u7684\u3002\u4E00\u5E76\u611F\u8C22\u3002\r\n
-    \       \u6211\u4E5F\u4E0D\u77E5\u9053\u6211\u4F1A\u7ED9\u8FD9\u4E2A\u9879\u76EE\u5E26\u6765\u4EC0\u4E48\uFF0C\u6240\u4EE5\u8D70\u4E00\u6B65\u7B97\u4E00\u6B65\u5427\u3002\r\n
-    \       \u611F\u8C22\u4F60\u4F7F\u7528 Deenote\u3002\r\n\r\n--2017.12.2--\r\n-\u5FC5\u987B\u8981\u8BF4\u7684\u90A3\u4E9B\u8BDD-\r\n
-    \       \u8C22\u8C22\u4F60\u4F7F\u7528\u6211\u5199\u7684\u7A0B\u5E8F\uFF01\r\n
-    \       \u6709\u4E9B\u4E8B\u6211\u5728\u5F00\u5934\u8FD8\u662F\u5FC5\u987B\u8981\u63D0\u4E00\u4E0B\u7684\uFF1A\u6B64\u5E94\u7528\u53EA\u5F97\u88AB\u7528\u4E8EDeemo\u8C31\u9762\u81EA\u5236\uFF0C\u4E25\u7981\u7528\u4E8E\u4EFB\u4F55\u5546\u4E1A\u7528\u9014\u3002\u8FD9\u4E2A\u5E94\u7528\u5236\u4F5C\u81EA\u5236\u8C31\u9762\u53EA\u662F\u7528\u6765\u89C2\u770B\u7684\uFF0C\u4F46\u5982\u679C\u4F60\u4ECE\u67D0\u4E9B\u6E20\u9053\u5F97\u77E5\u4E86\u5C06\u8C31\u9762\u5BFC\u5165\u6E38\u620F\u7684\u65B9\u6CD5\uFF0C<color=#ff7f7f>\u8BF7\u4E0D\u8981</color>\u6563\u5E03\uFF08\u751A\u81F3\u516C\u5F00\uFF09\u7834\u89E3\u6216\u4FEE\u6539\u8FC7\u7684\u6E38\u620F\u6587\u4EF6\u3002\u8FD9\u6837\u505A\u7684\u8BDD\u540E\u679C\u81EA\u8D1F\u3002\r\n\r\n-\u4E00\u4E9B\u4E71\u4E03\u516B\u7CDF\u7684\u4E1C\u897F-\r\n
-    \   [\u81EA\u6211\u4ECB\u7ECD\u4E00\u4E0B\uFF1F]\r\n        \u672C\u4EBA\u662F\u4E2A\u97F3\u6E38\u73A9\u5BB6\uFF0C\u5708\u540DHCl\u3002\u76EE\u524D\uFF08\u5728\u5199\u8FD9\u4E2A\u7684\u65F6\u5019\uFF09\u5E74\u9F8417\u5C81\uFF0C\u5728\u4E2D\u56FD\u79D1\u5B66\u6280\u672F\u5927\u5B66\uFF08USTC\uFF09\u5B66\u4E60\u8BA1\u7B97\u6570\u5B66\uFF0C\u4ECA\u5E74\u5927\u4E09\u3002\r\n
-    \   [\u5173\u4E8E\u8FD9\u4E2A\u5E94\u7528\u5462\uFF1F]\r\n        \u6211\u5199\u8FD9\u4E2A\u5C31\u662F\u7528\u6765\u73A9\u7684\u3002\u56E0\u4E3A\u672C\u4EBA\u7F16\u7A0B\u80FD\u529B\u4E0D\u5F3A\uFF0CC#/Unity3D\u8FD9\u65B9\u9762\u8FD8\u662F\u4E2A\u65B0\u624B\u6240\u4EE5\u4EE3\u7801\u91CC\u53EF\u80FD\u4F1A\u67095000\u5146\u4E2Abug\uFF0C\u4F46\u662F\u8C01\u5173\u5FC3\u8FD9\u4E2A\u554A\uFF1F\uFF08\u4E0D\u662F\uFF0C\u6240\u6709\u4EBA\u90FD\u5173\u5FC3\u3002\uFF09\u56E0\u4E3A\u6211\u8FD8\u662F\u4E2A\u5B66\u751F\uFF0C\u800C\u4E14\u4F60\u4EEC\u90FD\u77E5\u9053\u7684\uFF0C\u5927\u4E09\u975E\u5E38\u5FD9\uFF0C\u6240\u4EE5\u6211\u5199\u8FD9\u4E2A\u7684\u65F6\u95F4\u4E0D\u662F\u5F88\u591A\uFF0C\u6C42\u522B\u50AC\u3002\r\n
-    \       \u5173\u4E8E\u57280.5.6\u7248\u672C\u6DFB\u52A0\u7684\u62D6\u52A8\u6587\u4EF6\u5230\u7A97\u53E3\u5185\u6253\u5F00\u7684\u529F\u80FD\uFF0C\u6211\u662F\u7528\u4E86Schwarzer\uFF08Lanota\u8C31\u9762\u7F16\u8F91\u5668Lanotalium\u7684\u4F5C\u8005\uFF0C\u662F\u4E2Adalao\uFF0C\u63A8\u8350\u770B\u4E00\u770B\u4ED6\u7684\u4F5C\u54C1\uFF09\u5199\u7684\u4E00\u4E2A\u52A8\u6001\u94FE\u63A5\u5E93\u3002\u6240\u4EE5\u8FD9\u5757\u51FA\u4E86\u95EE\u9898\u7684\u8BDD\u4F60\u4EEC\u77E5\u9053\u5E94\u8BE5\u627E\u8C01XD\r\n
-    \   [\u522B\u7684\u5462\uFF1F]\r\n        \u5E0C\u671B\u4F60\u4EEC\u559C\u6B22Deenote\u3002\u6CA1\u4E86\u3002\uFF08\u600E\u4E48\u8DDF\u82F1\u6587\u90A3\u8FB9\u8BF4\u597D\u7684\u4E0D\u4E00\u6837\u5462.jpg\uFF09\r\n"
+    C# \u8FB9\u8BD5\u56FE\u4FEE Deenote\u3002\r\n        \u6211\u4ECA\u5E74\u5927\u4E09\uFF0C\u800C\u76D0\u9178\u5DF2\u7ECF\u4EE5\u4F18\u5F02\u7684\u6210\u7EE9\u5927\u5B66\u6BD5\u4E1A\uFF0C\u4ED6\u4ECA\u5E74\u7814\u4E00\u3002\r\n      
+    0.7.3 \u662F\u5728\u6B8B\u50CF\u7684\u5E2E\u52A9\u4E0B\u5199\u7684\u3002\u4E00\u5E76\u611F\u8C22\u3002\r\n      
+    \u6211\u4E5F\u4E0D\u77E5\u9053\u6211\u4F1A\u7ED9\u8FD9\u4E2A\u9879\u76EE\u5E26\u6765\u4EC0\u4E48\uFF0C\u6240\u4EE5\u8D70\u4E00\u6B65\u7B97\u4E00\u6B65\u5427\u3002\r\n      
+    \u611F\u8C22\u4F60\u4F7F\u7528 Deenote\u3002\r\n\r\n--2017.12.2--\r\n-\u5FC5\u987B\u8981\u8BF4\u7684\u90A3\u4E9B\u8BDD-\r\n      
+    \u8C22\u8C22\u4F60\u4F7F\u7528\u6211\u5199\u7684\u7A0B\u5E8F\uFF01\r\n      
+    \u6709\u4E9B\u4E8B\u6211\u5728\u5F00\u5934\u8FD8\u662F\u5FC5\u987B\u8981\u63D0\u4E00\u4E0B\u7684\uFF1A\u6B64\u5E94\u7528\u53EA\u5F97\u88AB\u7528\u4E8EDeemo\u8C31\u9762\u81EA\u5236\uFF0C\u4E25\u7981\u7528\u4E8E\u4EFB\u4F55\u5546\u4E1A\u7528\u9014\u3002\u8FD9\u4E2A\u5E94\u7528\u5236\u4F5C\u81EA\u5236\u8C31\u9762\u53EA\u662F\u7528\u6765\u89C2\u770B\u7684\uFF0C\u4F46\u5982\u679C\u4F60\u4ECE\u67D0\u4E9B\u6E20\u9053\u5F97\u77E5\u4E86\u5C06\u8C31\u9762\u5BFC\u5165\u6E38\u620F\u7684\u65B9\u6CD5\uFF0C<color=#ff7f7f>\u8BF7\u4E0D\u8981</color>\u6563\u5E03\uFF08\u751A\u81F3\u516C\u5F00\uFF09\u7834\u89E3\u6216\u4FEE\u6539\u8FC7\u7684\u6E38\u620F\u6587\u4EF6\u3002\u8FD9\u6837\u505A\u7684\u8BDD\u540E\u679C\u81EA\u8D1F\u3002\r\n\r\n-\u4E00\u4E9B\u4E71\u4E03\u516B\u7CDF\u7684\u4E1C\u897F-\r\n  
+    [\u81EA\u6211\u4ECB\u7ECD\u4E00\u4E0B\uFF1F]\r\n        \u672C\u4EBA\u662F\u4E2A\u97F3\u6E38\u73A9\u5BB6\uFF0C\u5708\u540DHCl\u3002\u76EE\u524D\uFF08\u5728\u5199\u8FD9\u4E2A\u7684\u65F6\u5019\uFF09\u5E74\u9F8417\u5C81\uFF0C\u5728\u4E2D\u56FD\u79D1\u5B66\u6280\u672F\u5927\u5B66\uFF08USTC\uFF09\u5B66\u4E60\u8BA1\u7B97\u6570\u5B66\uFF0C\u4ECA\u5E74\u5927\u4E09\u3002\r\n  
+    [\u5173\u4E8E\u8FD9\u4E2A\u5E94\u7528\u5462\uFF1F]\r\n        \u6211\u5199\u8FD9\u4E2A\u5C31\u662F\u7528\u6765\u73A9\u7684\u3002\u56E0\u4E3A\u672C\u4EBA\u7F16\u7A0B\u80FD\u529B\u4E0D\u5F3A\uFF0CC#/Unity3D\u8FD9\u65B9\u9762\u8FD8\u662F\u4E2A\u65B0\u624B\u6240\u4EE5\u4EE3\u7801\u91CC\u53EF\u80FD\u4F1A\u67095000\u5146\u4E2Abug\uFF0C\u4F46\u662F\u8C01\u5173\u5FC3\u8FD9\u4E2A\u554A\uFF1F\uFF08\u4E0D\u662F\uFF0C\u6240\u6709\u4EBA\u90FD\u5173\u5FC3\u3002\uFF09\u56E0\u4E3A\u6211\u8FD8\u662F\u4E2A\u5B66\u751F\uFF0C\u800C\u4E14\u4F60\u4EEC\u90FD\u77E5\u9053\u7684\uFF0C\u5927\u4E09\u975E\u5E38\u5FD9\uFF0C\u6240\u4EE5\u6211\u5199\u8FD9\u4E2A\u7684\u65F6\u95F4\u4E0D\u662F\u5F88\u591A\uFF0C\u6C42\u522B\u50AC\u3002\r\n      
+    \u5173\u4E8E\u57280.5.6\u7248\u672C\u6DFB\u52A0\u7684\u62D6\u52A8\u6587\u4EF6\u5230\u7A97\u53E3\u5185\u6253\u5F00\u7684\u529F\u80FD\uFF0C\u6211\u662F\u7528\u4E86Schwarzer\uFF08Lanota\u8C31\u9762\u7F16\u8F91\u5668Lanotalium\u7684\u4F5C\u8005\uFF0C\u662F\u4E2Adalao\uFF0C\u63A8\u8350\u770B\u4E00\u770B\u4ED6\u7684\u4F5C\u54C1\uFF09\u5199\u7684\u4E00\u4E2A\u52A8\u6001\u94FE\u63A5\u5E93\u3002\u6240\u4EE5\u8FD9\u5757\u51FA\u4E86\u95EE\u9898\u7684\u8BDD\u4F60\u4EEC\u77E5\u9053\u5E94\u8BE5\u627E\u8C01XD\r\n  
+    [\u522B\u7684\u5462\uFF1F]\r\n        \u5E0C\u671B\u4F60\u4EEC\u559C\u6B22Deenote\u3002\u6CA1\u4E86\u3002\uFF08\u600E\u4E48\u8DDF\u82F1\u6587\u90A3\u8FB9\u8BF4\u597D\u7684\u4E0D\u4E00\u6837\u5462.jpg\uFF09\r\n"
 --- !u!1 &1948497611
 GameObject:
   m_ObjectHideFlags: 0
@@ -77007,6 +77132,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
