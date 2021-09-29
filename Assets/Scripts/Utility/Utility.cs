@@ -58,49 +58,58 @@ public class Utility
          */
         int i = 0, temp;
         while (str[i] != '{') i++;
-        GetSubStr(str, ref i); //"speed"
-        jchart.speed = GetFloat(str, ref i);
-        GetSubStr(str, ref i); //"notes"
+        string firstSubStr = GetSubStr(str, ref i);
+        bool isSpeed = (firstSubStr == "speed");
+        if (isSpeed)
+        {
+            jchart.speed = GetFloat(str, ref i);
+            GetSubStr(str, ref i); //"notes"
+        }
         while (str[i] != ']')
         {
-            GetSubStr(str, ref i); //"$id"
+            string noteSubStr = GetSubStr(str, ref i);
+            bool isId = (noteSubStr == "id");
             JSONChart.note note = new JSONChart.note();
-            temp = 0;
-            note.id = GetInt(GetSubStr(str, ref i), ref temp);
+            if (!isId)
+            {
+                note.time = GetFloat(str, ref i);
+                GetSubStr(str, ref i); //"$id"
+            }
+            note.id = GetIntFromIntOrSubStr(str, ref i);
             while (str[i] != '}')
             {
                 string substr = GetSubStr(str, ref i);
                 switch (substr)
                 {
                     case "sounds":
-                    {
-                        while (str[i] != ']')
                         {
-                            JSONChart.sound sound = new JSONChart.sound();
-                            while (str[i] != '}')
+                            while (str[i] != ']')
                             {
-                                substr = GetSubStr(str, ref i);
-                                switch (substr)
+                                JSONChart.sound sound = new JSONChart.sound();
+                                while (str[i] != '}')
                                 {
-                                    case "d":
-                                        sound.d = GetFloat(str, ref i);
-                                        break;
-                                    case "p":
-                                        sound.p = GetInt(str, ref i);
-                                        break;
-                                    case "v":
-                                        sound.v = GetInt(str, ref i);
-                                        break;
-                                    case "w":
-                                        sound.w = GetFloat(str, ref i);
-                                        break;
+                                    substr = GetSubStr(str, ref i);
+                                    switch (substr)
+                                    {
+                                        case "d":
+                                            sound.d = GetFloat(str, ref i);
+                                            break;
+                                        case "p":
+                                            sound.p = GetInt(str, ref i);
+                                            break;
+                                        case "v":
+                                            sound.v = GetInt(str, ref i);
+                                            break;
+                                        case "w":
+                                            sound.w = GetFloat(str, ref i);
+                                            break;
+                                    }
                                 }
+                                i++;
+                                note.sounds.Add(sound);
                             }
-                            i++;
-                            note.sounds.Add(sound);
+                            break;
                         }
-                        break;
-                    }
                     case "pos":
                         note.pos = GetFloat(str, ref i);
                         break;
@@ -114,10 +123,10 @@ public class Utility
                         note.shift = GetFloat(str, ref i);
                         break;
                     default:
-                    {
-                        while (str[i] != ',' && str[i] != '}') i++;
-                        break;
-                    }
+                        {
+                            while (str[i] != ',' && str[i] != '}') i++;
+                            break;
+                        }
                 }
             }
             i++;
@@ -132,12 +141,16 @@ public class Utility
             while (str[i] != ']')
             {
                 GetSubStr(str, ref i); // "$ref"
-                temp = 0;
-                link.noteRef.Add(GetInt(GetSubStr(str, ref i), ref temp));
+                link.noteRef.Add(GetIntFromIntOrSubStr(str, ref i));
                 i++;
             }
             i += 2;
             jchart.links.Add(link);
+        }
+        if (!isSpeed)
+        {
+            GetSubStr(str, ref i); // "speed"
+            jchart.speed = GetFloat(str, ref i);
         }
         return jchart;
     }
@@ -210,6 +223,12 @@ public class Utility
         string result = str.Substring(i + 1, j - i - 1);
         i = j + 1;
         return result;
+    }
+    private static int GetIntFromIntOrSubStr(string str, ref int i)
+    {
+        while (str[i] != '"' && !IsNumberChar(str[i])) i++;
+        if (str[i] == '"') return GetInt(GetSubStr(str, ref i));
+        return GetInt(str, ref i);
     }
     public static Chart JCharttoChart(JSONChart jchart)
     {
