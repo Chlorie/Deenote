@@ -1,0 +1,145 @@
+English
+Menu_File=File
+MenuDropDown_New=New Project
+MenuDropDown_Open=Open Project
+MenuDropDown_Save=Save Project
+MenuDropDown_SaveAs=Save As...
+MenuDropDown_Quit=Quit
+
+Menu_Edit=Edit
+MenuDropDown_Undo=Undo
+MenuDropDown_Redo=Redo
+
+Menu_View=View
+MenuDropDown_ProjectProperties=Project Properties
+MenuDropDown_Perspective=Perspective View
+
+Menu_Settings=Settings
+MenuDropDown_Preferences=Preferences
+MenuDropDown_Tutorial=Tutorial
+MenuDropDown_About=About
+
+# Windows
+
+## Project Properties
+
+WindowTitleBar_ProjectProperties=Project Properties
+WindowTitleBar_ProjectProperties_Create=Create New Project
+Window_ProjectProperties_AudioFile=Audio Files
+Window_ProjectProperties_AudioFileLoad=Load Audio File...
+Window_ProjectProperties_AudioFileLoad_Loading=Loading...
+Window_ProjectProperties_AudioFileLoad_Failed=Load Failed.
+Window_ProjectProperties_MusicName=Music Name
+Window_ProjectProperties_Composer=Composer
+Window_ProjectProperties_ChartDesigner=Chart Designer
+Window_ProjectProperties_Charts=Charts
+Window_ProjectProperties_ChartLoad=Load
+Window_ProjectProperties_ChartImport=Import
+Window_ProjectProperties_ChartExport=Export
+Window_ProjectProperties_ChartRemove=Remove
+Window_ProjectProperties_ChartRemoveConfirm=Confirm?
+
+## File Explorer
+
+WindowTitleBar_FileExplorer=File Explorer
+Window_FileExplorer_Confirm=Confirm
+Window_FileExplorer_Cancel=Cancel
+Window_FileExplorer_EnterFileNamePrompt=Enter file name...
+
+## Perspective View
+
+WindowTitleBar_Perspective=Perspective View
+
+## Properties
+
+WindowTitleBar_Properties=Properties
+Window_Properties_ProjectInfo=Project Info
+Window_Properties_ProjectInfo_Audio=Audio
+Window_Properties_ProjectInfo_Name=Music Name
+Window_Properties_ProjectInfo_Composer=Composer
+Window_Properties_ProjectInfo_Charter=Chart Designer
+Window_Properties_ProjectInfo_Chart=Loaded Chart
+Window_Properties_ChartInfo=Chart Info
+Window_Properties_ChartInfo_Name=Name
+Window_Properties_ChartInfo_Difficulty=Difficulty
+Window_Properties_ChartInfo_Level=Level
+Window_Properties_ChartInfo_Speed=Speed
+Window_Properties_ChartInfo_RemapV=Remap Volume
+Window_Properties_ChartInfo_Selected=Selected Notes
+Window_Properties_NoteInfo=Note Info
+Window_Properties_NoteInfo_Pos=Position
+Window_Properties_NoteInfo_Time=Time
+Window_Properties_NoteInfo_Size=Size
+Window_Properties_NoteInfo_Shift=Shift
+Window_Properties_NoteInfo_Speed=Speed
+Window_Properties_NoteInfo_Duration=Duration
+Window_Properties_NoteInfo_Vibrate=Vibrate
+Window_Properties_NoteInfo_Swipe=Is Swipe
+Window_Properties_NoteInfo_WarningType=WarningType
+Window_Properties_NoteInfo_EventId=EventId
+Window_Properties_NoteInfo_IsLink=Is Link
+Window_Properties_NoteInfo_Sounds=Sounds
+
+## Piano Sound Edit
+
+WindowTitleBar_SoundEdit=Piano Sound Edit
+Window_SoundEdit_InfoP=Pitch
+Window_SoundEdit_InfoV=Volume
+Window_SoundEdit_InfoD=Duration
+Window_SoundEdit_InfoW=Delay
+
+## Editor Properties
+
+WindowTitleBar_Editor=Editor Properties
+Window_Editor_Bpm=BPM
+Window_Editor_Bpm_Calculator=BPM Calculator
+Window_Editor_Player=Player
+Window_Editor_Player_NoteSpeed=Note Speed
+Window_Editor_Player_MusicSpeed=Music Speed
+Window_Editor_Player_MusicSpeed_Half=Half
+Window_Editor_Player_MusicSpeed_Reset=Reset
+Window_Editor_Player_EffectVolume=Effect Volume
+Window_Editor_Player_MusicVolume=Music Volume
+Window_Editor_Player_PianoVolume=Piano Volume
+Window_Editor_Player_ShowLinks=Show Links
+Window_Editor_Player_SuddenPlus=Sudden +
+Window_Editor_Placement=Placement
+Window_Editor_Placement_NoteIndicator=Show Note Indicator
+Window_Editor_Placement_Vertical=Vertical Grid
+Window_Editor_Placement_Horizontal=Horizontal Grid
+Window_Editor_Placement_GridSnap=Snap
+Window_Editor_Placement_CubicCurve=Cubic
+Window_Editor_Placement_LinearCurve=Linear
+Window_Editor_Placement_FillAmount=Fill Amount
+Window_Editor_Placement_FillGrid=Fill Grid
+
+## Preferences
+
+WindowTitleBar_Preferences=Preferences
+Window_Preferences_StageEffect=Stage Effect
+Window_Preferences_Fps=Show FPS
+Window_Preferences_VSync=VSync
+Window_Preferences_MouseSensitivity=Mouse Wheel Sensitivity
+Window_Preferences_MouseReverse=Reverse
+Window_Preferences_Language=Language
+Window_Preferences_AutoSave=Auto Save
+Window_Preferences_IneffectiveProperties=Show Ineffective Properties
+
+## About
+
+WindowTitleBar_About=About
+
+## Warning Message
+WindowTitleBar_WarningMessage=Warning
+
+# Status bar & Messages
+
+Message_NewProjectOnOpen_Title=Create new project
+Message_NewProjectOnOpen_Content=Creating a new project will close the current project.<br/><color=#ff5555>Make sure that you have SAVED your project!</color>
+Message_NewProjectOnOpen_Y=Create
+Message_NewProjectOnOpen_N=Cancel
+Status_NewProject_Completed=New project created.
+Status_OpenProject_Loading=Loading project...
+Status_OpenProject_Completed=Loading completed.
+Status_SaveProject_Saving=Saving...
+Status_SaveProject_Completed=Save completed.

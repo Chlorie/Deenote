@@ -1,35 +1,63 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
+using UnityEngine;
 
-[RequireComponent(typeof(Text))]
-public class LocalizedText : MonoBehaviour
+namespace Deenote.Localization
 {
-    private Text text;
-    private Text TextProperty { get { if (text == null) text = GetComponent<Text>(); return text; } }
-    [SerializeField] [TextArea] private string[] strings;
-    public string[] Strings => strings;
-    public Color Color { set => TextProperty.color = value; }
-    public string CurrentText => TextProperty.text;
-    public void SetStrings(params string[] newStrings)
+    [RequireComponent(typeof(TMP_Text))]
+    public sealed class LocalizedText : MonoBehaviour
     {
-        strings = newStrings;
-        if (strings != null) SetLanguage(LanguageSelector.Language);
+        [SerializeField] TMP_Text _text;
+        [SerializeField] string _textKey;
+
+        private bool _isLocalized;
+
+        public TMP_Text TmpText => _text;
+
+        private void Awake()
+        {
+            MainSystem.Localization.RegisterLocalizedText(this);
+        }
+
+        private void OnDestroy()
+        {
+            MainSystem.Localization.UnregisterLocalizedText(this);
+        }
+
+        public void NotifyLanguageUpdated()
+        {
+            if (_isLocalized) {
+                if (_textKey == null)
+                    _text.text = "";
+                else
+                    _text.text = MainSystem.Localization.GetLocalizedText(_textKey);
+            }
+        }
+
+        public void SetRawText(string text)
+        {
+            _isLocalized = false;
+            _text.text = text;
+        }
+
+        public void SetLocalizedText(string textKey)
+        {
+            if (_isLocalized && _textKey == textKey) {
+                return;
+            }
+
+            _textKey = textKey;
+            _isLocalized = true;
+            NotifyLanguageUpdated();
+        }
+
+        public void SetText(LocalizableText text)
+        {
+            if (text.IsLocalized) {
+                SetLocalizedText(text.TextOrKey);
+            }
+            else {
+                SetRawText(text.TextOrKey);
+            }
+        }
     }
-    public void SetLanguage(int language)
-    {
-        if (strings == null || strings.Length == 0)
-            Debug.Log("No localization text assigned for a certain LocalizationText component");
-        else if (language < strings.Length)
-            TextProperty.text = LineBreakConversion(strings[language], LanguageSelector.noLineBreak[language]);
-        else
-            TextProperty.text = LineBreakConversion(strings[0], LanguageSelector.noLineBreak[0]);
-    }
-    private string LineBreakConversion(string original, bool noLineBreak) =>
-        noLineBreak ? original.Replace(" ", "\u00A0") : original;
-    private void Awake()
-    {
-        LanguageSelector.localizedTexts.Add(this);
-        SetLanguage(LanguageSelector.Language);
-    }
-    private void OnDestroy() => LanguageSelector.localizedTexts.Remove(this);
 }

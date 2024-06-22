@@ -1,0 +1,35 @@
+# Editor
+
+## New
+
+- 可以手动输入音乐速度
+- 添加了Half和Reset音乐速度的快捷键
+- 加入上隐
+- NoteInfo面板现在可以显示部分钢琴音的信息
+
+- 允许小键盘Enter可以播放/暂停音乐
+
+- 允许设置滚轮灵敏度为负，效果为滚轮反向
+
+## Bug
+
+- 修复了按空格播放到音乐结束后松开，再次播放时音乐会从头开始播放的bug
+
+## Changes
+
+- 简化了Horizontal Grid的设置
+- 拆分了Snap to Grid，现在可以分别设置是否吸附到横纵格线
+- 按住右键时未松开，点击左键将直接取消下键
+
+## TBC
+- 单击选择note时
+  - 选中当前鼠标指针处的所有note
+  - 选中一个note
+- 是否允许在线下放置note？
+
+## TODO:
+- 线性渐变bpm拍线
+- 在设置中回复旧版Horizontal Grid设置方式
+- FillGrid按横格线间距填充curve
+- 参考Deemo3.x修改Perspective View的界面
+- 导出为dsproj格式
