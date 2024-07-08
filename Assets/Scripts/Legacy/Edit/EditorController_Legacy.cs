@@ -1031,6 +1031,7 @@ public class EditorController_Legacy : MonoBehaviour
     //Interpolate
     public void InitSpline(bool linear)
     {
+        // TRA: get selected notes
         int firstIndex = -1, lastIndex = -1;
         List<float> size = new List<float>();
         List<float> position = new List<float>();
@@ -1049,6 +1050,7 @@ public class EditorController_Legacy : MonoBehaviour
                 time.Add(t);
             }
         if (time.Count < 2) return;
+        // TRA: selection edit
         noteSelect[firstIndex].selected = !noteSelect[firstIndex].selected;
         noteSelect[lastIndex].selected = !noteSelect[lastIndex].selected;
         DeleteSelectedNotes();

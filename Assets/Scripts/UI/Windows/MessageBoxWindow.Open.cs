@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
+using Deenote.UI.Windows.Elements;
+using Deenote.Utilities;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -9,43 +11,40 @@ namespace Deenote.UI.Windows
     partial class MessageBoxWindow : MonoBehaviour
     {
         private readonly List<UniTask> _buttonClickTasks = new();
+        //private readonly List<MessageBoxButtonController> _buttons = new();
 
         /// <returns>
         /// Returns the index of clicked button, -1 if close button
         /// </returns>
         public async UniTask<int> ShowAsync(LocalizableText title, LocalizableText content, LocalizableText[] buttonTexts)
         {
-            gameObject.SetActive(true);
+            Window.IsActivated = true;
 
             _window.SetTitle(title);
             _contentText.SetText(content);
 
-            if (_buttons.Capacity < buttonTexts.Length) {
-                _buttons.Capacity = buttonTexts.Length;
-                _buttonClickTasks.Capacity = buttonTexts.Length + 1;
+            using (var resettingButtons = _buttons.Resetting(buttonTexts.Length)) {
+                foreach (var text in buttonTexts) {
+                    resettingButtons.Add(out var button);
+                    button.Initialize(text);
+                }
             }
+            _buttons.SetSiblingIndicesInOrder();
 
             var cts = new CancellationTokenSource();
 
             _buttonClickTasks.Add(_window.OnCloseButtonClickAsync(cts.Token));
 
-            foreach (var text in buttonTexts) {
-                var btn = GetButton(text);
-                btn.transform.SetAsLastSibling();
-                _buttons.Add(btn);
+            foreach (var btn in _buttons) {
                 _buttonClickTasks.Add(btn.Button.OnClickAsync(cts.Token));
             }
 
             var clickTask = await UniTask.WhenAny(_buttonClickTasks);
             cts.Cancel();
             _buttonClickTasks.Clear();
-
-            foreach (var button in _buttons) {
-                _buttonPool.Release(button);
-            }
             _buttons.Clear();
 
-            gameObject.SetActive(false);
+            Window.IsActivated = false;
             return clickTask - 1;
         }
     }

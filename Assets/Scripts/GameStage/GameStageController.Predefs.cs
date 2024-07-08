@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Deenote.GameStage
 {
-    partial class GameStageController : MonoBehaviour
+    partial class GameStageController
     {
         [Header("Prefabs")]
         [SerializeField] StageNoteController _noteControllerPrefab;

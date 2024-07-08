@@ -532,6 +532,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 5733693879789628265}
   _textKey: 
+  _isLocalized: 1
 --- !u!1 &5099117028064390540
 GameObject:
   m_ObjectHideFlags: 0

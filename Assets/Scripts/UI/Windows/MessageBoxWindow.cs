@@ -1,9 +1,8 @@
 using Deenote.Localization;
 using Deenote.UI.Windows.Elements;
 using Deenote.Utilities;
-using System.Collections.Generic;
+using Deenote.Utilities.Robustness;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace Deenote.UI.Windows
 {
@@ -11,6 +10,7 @@ namespace Deenote.UI.Windows
     public sealed partial class MessageBoxWindow : MonoBehaviour
     {
         [SerializeField] Window _window;
+        public Window Window => _window;
 
         [Header("UI")]
         [SerializeField] LocalizedText _contentText;
@@ -18,20 +18,12 @@ namespace Deenote.UI.Windows
         [Header("Prefab")]
         [SerializeField] Transform _buttonParentTransform;
         [SerializeField] MessageBoxButtonController _buttonPrefab;
-        private ObjectPool<MessageBoxButtonController> _buttonPool;
-        private List<MessageBoxButtonController> _buttons;
+        private PooledObjectListView<MessageBoxButtonController> _buttons;
 
         private void Awake()
         {
-            _buttonPool = UnityUtils.CreateObjectPool(_buttonPrefab, _buttonParentTransform, 0);
-            _buttons = new();
-        }
-
-        private MessageBoxButtonController GetButton(LocalizableText text)
-        {
-            var btn = _buttonPool.Get();
-            btn.Initialize(text);
-            return btn;
+            _buttons = new PooledObjectListView<MessageBoxButtonController>(
+                UnityUtils.CreateObjectPool(_buttonPrefab, _buttonParentTransform, 4));
         }
     }
 }

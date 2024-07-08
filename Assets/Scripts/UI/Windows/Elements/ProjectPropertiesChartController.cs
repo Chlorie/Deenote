@@ -12,7 +12,6 @@ namespace Deenote.UI.Windows.Elements
 {
     public sealed class ProjectPropertiesChartController : MonoBehaviour
     {
-        private static readonly string[] _supportChartExtensions = { ".json", ".txt" };
 
         [Header("UI")]
         [SerializeField] TMP_InputField _nameInputField;
@@ -24,60 +23,62 @@ namespace Deenote.UI.Windows.Elements
         [SerializeField] Button _removeButton;
         [SerializeField] TMP_Text _removeText;
 
-        private UnityAction<ProjectPropertiesChartController> _onLoad;
-        private UnityAction<ProjectPropertiesChartController> _onRemove;
+        private ProjectPropertiesWindow _window;
 
-        private ChartData _chartData;
+        private bool _isMainChart;
+
+        private ChartModel __chartModel;
 
         public string FilePath;
 
         public Button LoadButton => _loadButton;
 
-        public void Initialize(UnityAction<ProjectPropertiesChartController> onLoad, UnityAction<ProjectPropertiesChartController> onRemove)
+        public ChartModel Chart => __chartModel;
+
+        public void OnCreated(ProjectPropertiesWindow window)
         {
-            _onLoad = onLoad;
-            _onRemove = onRemove;
-
-            _nameInputField.text = "";
-            _levelInputField.text = "";
-            //_difficultyDropDown
-            _removeText.text = "-";
-
-            _loadButton.onClick.AddListener(() => _onLoad(this));
-            _removeButton.onClick.AddListener(() => _onRemove(this));
+            _window = window;
         }
 
-        public void InitializeMain(UnityAction onLoad, UnityAction onAdd)
+        public void Initialize(ChartModel chart, bool isMainChart)
         {
-            _nameInputField.text = "";
-            _levelInputField.text = "";
-            //_difficultyDropDown
-            _removeText.text = "+";
-            _loadButton.onClick.AddListener(onLoad);
-            _removeButton.onClick.AddListener(onAdd);
-        }
-
-        public ChartModel BuildChart()
-        {
-            var chart = new ChartModel(_chartData ?? new()) {
-                Name = _nameInputField.text,
-                Difficulty = DifficultyExt.FromInt32(_difficultyDropDown.value),
-                Level = _levelInputField.text,
+            __chartModel = chart ?? new(new()) {
+                Name = "",
+                Difficulty = Difficulty.Hard,
+                Level = "",
             };
-            return chart;
+
+            _nameInputField.text = __chartModel.Name;
+            _levelInputField.text = __chartModel.Level;
+            _difficultyDropDown.value = __chartModel.Difficulty.ToInt32();
+            _removeText.text = isMainChart ? "+" : "-";
+
+            _isMainChart = isMainChart;
         }
 
         private void Awake()
         {
+            _nameInputField.onSubmit.AddListener(val => Chart.Name = val);
+            _levelInputField.onSubmit.AddListener(val => Chart.Level = val);
+            _difficultyDropDown.onValueChanged.AddListener(val => Chart.Difficulty = DifficultyExt.FromInt32(val));
+
+            _loadButton.onClick.AddListener(() => _window.SelectChartToLoad(this));
             _importButton.onClick.AddListener(ImportChartAsync);
             _exportButton.onClick.AddListener(ExportChartAsync);
+            _removeButton.onClick.AddListener(() =>
+            {
+                if (_isMainChart)
+                    _window.AddNewChart();
+                else
+                    _window.RemoveChart(this);
+            });
         }
 
         #region UIEvents
 
         private async UniTaskVoid ImportChartAsync()
         {
-            var res = await MainSystem.FileExplorer.OpenSelectFileAsync(_supportChartExtensions);
+            var res = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args.SupportChartFileExtensions);
             if (res.IsCancelled)
                 return;
 
@@ -88,29 +89,20 @@ namespace Deenote.UI.Windows.Elements
                 return;
             }
 
-            _chartData = chartData;
+            Chart.Data = chartData;
         }
 
         private async UniTaskVoid ExportChartAsync()
         {
-            if (_chartData is null)
-                return;
-
             var res = await MainSystem.FileExplorer.OpenSelectDirectoryAsync();
             if (res.IsCancelled)
                 return;
 
             // TODO: Exporting message
-            await File.WriteAllTextAsync(res.Path, _chartData.ToJsonString());
+            await File.WriteAllTextAsync(res.Path, Chart.Data.ToJsonString());
             // TODO: Exported message
         }
 
         #endregion
-
-        private void OnDisable()
-        {
-            _onRemove = null;
-            _removeButton.onClick.RemoveAllListeners();
-        }
     }
 }

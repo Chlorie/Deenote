@@ -1,92 +1,314 @@
 using Deenote.Utilities;
-using System.Collections;
-using System.Collections.Generic;
+using Deenote.Utilities.Robustness;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace Deenote.GameStage
 {
     partial class GridController
     {
+        private const int MaxKeyCount = 41;
+
         [Header("Vertical Grid")]
         [SerializeField] GameObject _bordersGameObject;
+        [SerializeField] Transform _verticalGridParentTransform;
 
-        private ObjectPool<LineRenderer> _verticalGridPool;
-        private List<LineRenderer> _verticalGrids;
+        private PooledObjectListView<LineRenderer> _verticalGrids;
 
-        [SerializeField] float _verticalGridOffset;
-        // [SerializeField] bool _showBorder;
+        private VerticalGridGenerationKind _verticalGridGenerationKind;
 
-        public bool IsBorderVisible
+        [SerializeField, Range(0, 41)]
+        private int __verticalGridCount;
+        [SerializeField, Range(-1f, 1f)]
+        private float __verticalGridOffset;
+        [SerializeField]
+        private bool __isVerticalBorderVisible;
+
+        public VerticalGridGenerationKind VerticalGridGeneration
         {
-            get => _bordersGameObject.activeSelf;
-            set => _bordersGameObject.SetActive(value);
+            get => _verticalGridGenerationKind;
+            set {
+                if (_verticalGridGenerationKind == value)
+                    return;
+                if (value == VerticalGridGenerationKind.ByCountAndOffset) {
+                    switch (__verticalGridCount) {
+                        case < 2:
+                            __isVerticalBorderVisible = false;
+                            __verticalGridOffset = 0f;
+                            break;
+                        case 2:
+                            __isVerticalBorderVisible = true;
+                            __verticalGridCount = 0;
+                            __verticalGridOffset = 0f;
+                            break;
+                        case > 2:
+                            __isVerticalBorderVisible = true;
+                            __verticalGridCount = __verticalGridCount - 1;
+                            __verticalGridOffset = 2 / __verticalGridCount;
+                            break;
+                    }
+                }
+                else { // ByKeyCount
+                    __verticalGridCount = __verticalGridCount + 1;
+                }
+                // We do not immediately update grids when generation kind changed
+            }
+        }
+
+        public int VerticalGridCount
+        {
+            get => __verticalGridCount;
+            set {
+                value = Mathf.Clamp(value, 0, MaxKeyCount);
+                if (__verticalGridCount == value)
+                    return;
+
+                __verticalGridCount = value;
+                UpdateVerticalGrids();
+                _editorPropertiesWindow.NotifyVerticalGridCountChanged(__verticalGridCount);
+            }
+        }
+
+        public bool IsBorderVisible_Legacy
+        {
+            get => __isVerticalBorderVisible;
+            set {
+                Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
+                if (__isVerticalBorderVisible == value)
+                    return;
+
+                __isVerticalBorderVisible = value;
+                _bordersGameObject.SetActive(value);
+            }
         }
 
         /// <summary>
-        /// 
+        /// Valid when <see cref="VerticalGridGenerationKind.ByCountAndOffset"/>
         /// </summary>
-        /// <param name="keyCount">
-        /// Count of line including border,
-        /// Eg: 5 will draw lines for 5 key placement, on -2, -1, 0, 1, 2.
-        /// </param>
-        public void SetVerticalGridEqualInterval(int keyCount)
+        public int VerticalGridCount_Legacy
         {
-            if (keyCount <= 0) {
-                foreach (var line in _verticalGrids)
-                    _verticalGridPool.Release(line);
-                _verticalGrids.Clear();
-            }
-            else if (keyCount == 1) {
-                if (_verticalGrids.Count < 1) {
-                    _verticalGrids.Add(GetVerticalGrid(0 + _verticalGridOffset));
-                }
-                else {
-                    SetVerticalGridPosition(_verticalGrids[0], 0 + _verticalGridOffset);
-                    for (int i = 1; i < _verticalGrids.Count; i++)
-                        _verticalGridPool.Release(_verticalGrids[i]);
-                    _verticalGrids.RemoveRange(1, _verticalGrids.Count - 1);
-                }
-            }
-            else {
-                // TODO:Optimize
-                foreach (var line in _verticalGrids)
-                    _verticalGridPool.Release(line);
-                _verticalGrids.Clear();
-                // Generated position contains -2 and 2
-                for (int i = 0; i < keyCount; i++)
-                    _verticalGrids.Add(GetVerticalGrid(2 * MainSystem.Args.StageMaxPosition * ((float)i / (keyCount - 1)) - MainSystem.Args.StageMaxPosition + _verticalGridOffset));
+            get => __verticalGridCount;
+            set {
+                Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
+                value = Mathf.Clamp(value, 0, MaxKeyCount - 1);
+                if (__verticalGridCount == value)
+                    return;
+
+                __verticalGridCount = value;
+                UpdateVerticalGrids();
             }
         }
 
-        public float GetNearestVerticalGridPosition(float position)
+        /// <summary>
+        /// Valid when <see cref="VerticalGridGenerationKind.ByCountAndOffset"/>
+        /// </summary>
+        public float VerticalGridOffset_Legacy
         {
-            float minDist = float.MaxValue;
-            float snapPos = default;
-            foreach (var gridPos in new VerticalGridEnumerable(this)) {
-                float dist = Mathf.Abs(gridPos - position);
-                if (minDist <= dist)
+            get => __verticalGridOffset;
+            set {
+                Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
+                value = Mathf.Clamp(value, -1f, 1f);
+                if (__verticalGridOffset == value)
+                    return;
+
+                __verticalGridOffset = value;
+                UpdateVerticalGrids();
+            }
+        }
+
+        private void UpdateVerticalGrids()
+        {
+            switch (VerticalGridGeneration) {
+                case VerticalGridGenerationKind.ByCountAndOffset:
+                    ByCountAndOffset();
                     break;
-
-                minDist = dist;
-                snapPos = gridPos;
+                case VerticalGridGenerationKind.ByKeyCount:
+                    ByKeyCount();
+                    break;
+                default:
+                    Debug.Assert(false, $"Unknown enum value of {nameof(VerticalGridGenerationKind)}");
+                    break;
             }
 
-            return snapPos;
+            void ByCountAndOffset()
+            {
+                _verticalGrids.SetCount(VerticalGridCount_Legacy);
+                for (int i = 0; i < VerticalGridCount_Legacy; i++) {
+                    SetVerticalGridPosition(_verticalGrids[i], GetVerticalGridPosition_Legacy(i));
+                }
+            }
+
+            void ByKeyCount()
+            {
+                switch (VerticalGridCount) {
+                    case <= 0: {
+                        _verticalGrids.Clear();
+                        _bordersGameObject.SetActive(false);
+                        break;
+                    }
+                    case 1: {
+                        _verticalGrids.SetCount(1);
+                        SetVerticalGridPosition(_verticalGrids[0], position: 0f);
+                        _bordersGameObject.SetActive(false);
+                        break;
+                    }
+                    default: {
+                        _verticalGrids.SetCount(VerticalGridCount - 2);
+                        for (int i = 0; i < VerticalGridCount - 2; i++) {
+                            SetVerticalGridPosition(_verticalGrids[i], GetVerticalGridPosition(i + 1));
+                        }
+                        _bordersGameObject.SetActive(true);
+                        break;
+                    }
+                }
+            }
         }
 
-        /// <param name="position">-2 - 2</param>
-        private LineRenderer GetVerticalGrid(float position)
+        /// <returns><see langword="null"/> if gridCount == 0</returns>
+        public float? GetNearestVerticalGridPosition(float position)
         {
-            var line = _verticalGridPool.Get();
-            line.widthMultiplier = 0.035f;
-            line.positionCount = 2;
-            line.SetSolidColor(new Color(42f / 255f, 42 / 255f, 42 / 255f, 0.75f));
+            switch (VerticalGridGeneration) {
+                case VerticalGridGenerationKind.ByCountAndOffset: {
+                    if (VerticalGridCount_Legacy == 0)
+                        return null;
 
-            SetVerticalGridPosition(line, position);
+                    float minDist = float.MaxValue;
+                    float snapPos = default;
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
+                        float gridPos = GetVerticalGridPosition_Legacy(i);
+                        float dist = Mathf.Abs(gridPos - position);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            snapPos = gridPos;
+                        }
+                    }
 
-            return line;
+                    if (IsBorderVisible_Legacy) {
+                        float dist = Mathf.Abs(position - (-MainSystem.Args.StageMaxPosition));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            snapPos = -MainSystem.Args.StageMaxPosition;
+                        }
+                        dist = Mathf.Abs(position - MainSystem.Args.StageMaxPosition);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            snapPos = MainSystem.Args.StageMaxPosition;
+                        }
+                    }
+
+                    return snapPos;
+                }
+                case VerticalGridGenerationKind.ByKeyCount: {
+                    if (VerticalGridCount == 0)
+                        return null;
+
+                    float minDist = float.MaxValue;
+                    float snapPos = default;
+                    for (int i = 0; i < VerticalGridCount; i++) {
+                        float gridPos = GetVerticalGridPosition(i);
+                        float dist = Mathf.Abs(gridPos - position);
+                        if (minDist <= dist)
+                            break;
+
+                        minDist = dist;
+                        snapPos = gridPos;
+                    }
+
+                    return snapPos;
+                }
+                default:
+                    Debug.Assert(false, $"Unknown enum value of {nameof(VerticalGridGenerationKind)}");
+                    return null;
+            }
         }
+
+        public float? FloorToNearestNextVerticalGridPosition(float position)
+        {
+            switch (VerticalGridGeneration) {
+                case VerticalGridGenerationKind.ByCountAndOffset: {
+                    if (VerticalGridCount_Legacy == 0)
+                        return null;
+
+                    float minDist = float.MaxValue;
+                    float? snapPos = null;
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
+                        float gridPos = GetVerticalGridPosition_Legacy(i);
+                        if (position > gridPos) {
+                            minDist = position - gridPos;
+                            snapPos = gridPos;
+                        }
+                    }
+
+                    if (IsBorderVisible_Legacy) {
+                        if (position > -MainSystem.Args.StageMaxPosition) {
+                            minDist = position - (-MainSystem.Args.StageMaxPosition);
+                            snapPos = -MainSystem.Args.StageMaxPosition;
+                        }
+                    }
+
+                    return snapPos;
+                }
+                case VerticalGridGenerationKind.ByKeyCount: {
+                    if (VerticalGridCount == 0)
+                        return null;
+
+                    float pos = position;
+                    for (int i = 0; i < VerticalGridCount; i++) {
+                        float gridPos = GetVerticalGridPosition(i);
+                        if (gridPos >= position)
+                            break;
+                        pos = gridPos;
+                    }
+                    Debug.Assert(false, "Unreachable");
+                    return null;
+                }
+                default:
+                    Debug.Assert(false, $"Unknown enum value of {nameof(VerticalGridGenerationKind)}");
+                    return null;
+            }
+        }
+
+        public float? CeilToNearestNextVerticalGridPosition(float position)
+        {
+            switch (VerticalGridGeneration) {
+                case VerticalGridGenerationKind.ByCountAndOffset: {
+                    if (VerticalGridCount_Legacy == 0)
+                        return null;
+
+                    float minDist = float.MaxValue;
+                    float? snapPos = null;
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
+                        float gridPos = GetVerticalGridPosition_Legacy(i);
+                        if (position < gridPos) {
+                            minDist = gridPos - position;
+                            snapPos = gridPos;
+                        }
+                    }
+
+                    if (IsBorderVisible_Legacy) {
+                        if (position < MainSystem.Args.StageMaxPosition) {
+                            minDist = MainSystem.Args.StageMaxPosition - position;
+                            snapPos = MainSystem.Args.StageMaxPosition;
+                        }
+                    }
+
+                    return snapPos;
+                }
+                case VerticalGridGenerationKind.ByKeyCount: {
+                    for (int i = 0; i < VerticalGridCount; i++) {
+                        float gridPos = GetVerticalGridPosition(i);
+                        if (gridPos > position)
+                            return gridPos;
+                    }
+                    Debug.Assert(false, "Unreachable");
+                    return null;
+                }
+                default:
+                    Debug.Assert(false, $"Unknown enum value of {nameof(VerticalGridGenerationKind)}");
+                    return null;
+            }
+        }
+
+        #region Pool & Unity
 
         private void SetVerticalGridPosition(LineRenderer line, float position)
         {
@@ -97,53 +319,35 @@ namespace Deenote.GameStage
 
         private void AwakeVerticalGrid()
         {
-            _verticalGridPool = UnityUtils.CreateObjectPool(_linePrefab, _lineParentTransform);
-            _verticalGrids = new();
+            _verticalGrids = new PooledObjectListView<LineRenderer>(UnityUtils.CreateObjectPool(() =>
+            {
+                var line = Instantiate(_linePrefab, _verticalGridParentTransform);
+                line.sortingOrder = -14;
+                line.widthMultiplier = 0.035f;
+                line.positionCount = 2;
+                line.SetSolidColor(MainSystem.Args.SubBeatLineColor);
+                return line;
+            }));
         }
 
-        public readonly struct VerticalGridEnumerable : IEnumerable<float>
+        #endregion
+
+        private float GetVerticalGridPosition(int index) => 2 * MainSystem.Args.StageMaxPosition * ((float)index / (VerticalGridCount - 1)) - MainSystem.Args.StageMaxPosition;
+
+        private float GetVerticalGridPosition_Legacy(int index)
         {
-            private readonly int _count;
-            private readonly float _offset;
+            float result = (index + 0.5f) / VerticalGridCount_Legacy * 4 - 2 + VerticalGridOffset_Legacy;
+            if (result < -MainSystem.Args.StageMaxPosition)
+                result += MainSystem.Args.StageMaxPosition * 2;
+            else if (result > MainSystem.Args.StageMaxPosition)
+                result -= MainSystem.Args.StageMaxPosition * 2;
+            return result;
+        }
 
-            public VerticalGridEnumerable(GridController gridController)
-            {
-                _count = gridController._verticalGrids.Count;
-                _offset = gridController._verticalGridOffset;
-            }
-
-            public Enumerator GetEnumerator() => new(_count, _offset);
-
-            IEnumerator<float> IEnumerable<float>.GetEnumerator() => GetEnumerator();
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-            public struct Enumerator : IEnumerator<float>
-            {
-                private readonly int _count;
-                private readonly float _offset;
-                private int _current;
-
-                public Enumerator(int count, float offset)
-                {
-                    _count = count;
-                    _offset = offset;
-                    _current = -1;
-                }
-
-                public readonly float Current => 2 * MainSystem.Args.StageMaxPosition * ((float)_current / (_count - 1)) - MainSystem.Args.StageMaxPosition + _offset;
-
-                readonly object IEnumerator.Current => Current;
-
-                public readonly void Dispose() { }
-                public bool MoveNext()
-                {
-                    if (++_current < _count) {
-                        return true;
-                    }
-                    return false;
-                }
-                void IEnumerator.Reset() => _current = -1;
-            }
+        public enum VerticalGridGenerationKind
+        {
+            ByCountAndOffset,
+            ByKeyCount,
         }
     }
 }

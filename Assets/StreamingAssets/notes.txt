@@ -1,0 +1,49 @@
+# Structure
+
+- GlobalSettings
+- System
+  - LocalizationSystem
+  - ProjectManager
+  - GameStage
+    - Grids
+  - Editor
+  - PianoSoundManager
+- UI
+  - MenuBar
+  - StatusBar
+  - Windows
+    - PerspectiveView
+    - EditorProperties
+    - PianoSoundEdit
+    - Properties
+  - Dialogs
+    - FileExplorer
+    - ProjectProperties
+    - MessageBox
+
+# Code comments
+// Note
+// Optimizable
+
+# Layer
+
+   10
+   |-effect
+  2|  explosion
+  1|  wave
+   0  judgeline
+   |-effect
+ -1|  note sprite
+   -10 
+   |-grid
+-11|  link line
+-12|  sp grid
+-13|  border
+-14|  normal grid
+   -20
+   |-effect
+-21|  circle
+-22|  glow
+   -30
+   |-background
+   |  stave

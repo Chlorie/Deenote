@@ -1,5 +1,4 @@
 using Deenote.Project.Models;
-using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using UnityEngine;
 
@@ -15,6 +14,8 @@ namespace Deenote.GameStage.Elements
 
         [Header("")]
         [SerializeField] AudioSource _effectSoundSource;
+
+        private LineRenderer _linkLineRender;
 
         public GameStageController Stage => MainSystem.GameStage;
 
@@ -36,15 +37,12 @@ namespace Deenote.GameStage.Elements
 
                 _state = value;
                 switch (_state) {
-                    case NoteState.Inactive:
-                        _noteSpriteRenderer.gameObject.SetActive(false);
-                        _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
-                        _circleHitEffectSpriteRenderer.gameObject.SetActive(false);
-                        _waveHitEffectSpriteRenderer.gameObject.SetActive(false);
-                        _glowHitEffectSpriteRenderer.gameObject.SetActive(false);
+                    case NoteState.Activated:
+                        // Blank
                         break;
                     case NoteState.Fall:
                         _noteSpriteRenderer.gameObject.SetActive(true);
+                        _linkLineRender?.gameObject.SetActive(true);
                         _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _circleHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _waveHitEffectSpriteRenderer.gameObject.SetActive(false);
@@ -52,13 +50,19 @@ namespace Deenote.GameStage.Elements
                         break;
                     case NoteState.HitEffect:
                         _noteSpriteRenderer.gameObject.SetActive(false);
+                        _linkLineRender?.gameObject.SetActive(false);
                         _explosionHitEffectSpriteRenderer.gameObject.SetActive(true);
                         _circleHitEffectSpriteRenderer.gameObject.SetActive(true);
                         _waveHitEffectSpriteRenderer.gameObject.SetActive(true);
                         _glowHitEffectSpriteRenderer.gameObject.SetActive(true);
                         break;
-                    case NoteState.Activated:
-                        // Blank
+                    case NoteState.Inactive:
+                        _noteSpriteRenderer.gameObject.SetActive(false);
+                        _linkLineRender?.gameObject.SetActive(false);
+                        _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
+                        _circleHitEffectSpriteRenderer.gameObject.SetActive(false);
+                        _waveHitEffectSpriteRenderer.gameObject.SetActive(false);
+                        _glowHitEffectSpriteRenderer.gameObject.SetActive(false);
                         break;
                     default:
                         break;
@@ -70,17 +74,13 @@ namespace Deenote.GameStage.Elements
         {
             _note = noteModel;
             State = NoteState.Activated;
-            // _notespriteRender.color
-            gameObject.transform.localPosition = new(MainSystem.Args.PositionToX(_note.Data.Position), 0f, 0f);
 
-            var prefab = _note.Data switch {
-                 { IsSlide: true } => MainSystem.GameStage.SlideNoteSpritePrefab,
-                 { HasSound: true } => MainSystem.GameStage.BlackNoteSpritePrefab,
-                _ => MainSystem.GameStage.NoSoundNoteSpritePrefab,
-            };
-            _noteSpriteRenderer.sprite = prefab.Sprite;
-            _noteSpriteRenderer.gameObject.transform.localScale = new(prefab.Scale * _note.Data.Size, prefab.Scale, prefab.Scale);
-            _waveColor = prefab.WaveColor;
+            SyncNoteDataUpdate();
+        }
+
+        private void OnDisable()
+        {
+            SetLinkLine(false);
         }
 
         // GameStageController will select notes in stage when Update,
@@ -102,9 +102,25 @@ namespace Deenote.GameStage.Elements
         /// This should be called when manually set music time when music is paused,
         /// as NoteController wont invoke UpdateDisplay() when paused.
         /// </remarks>
-        public void ForceUpdate()
+        public void ForceUpdate(bool noteDataChangedExceptTime)
         {
+            if (noteDataChangedExceptTime)
+                SyncNoteDataUpdate();
             UpdateDisplay(false);
+        }
+
+        public void SyncNoteDataUpdate()
+        {
+            gameObject.transform.localPosition = gameObject.transform.localPosition.WithX(MainSystem.Args.PositionToX(_note.Data.Position));
+            var prefab = _note.Data switch {
+                { IsSlide: true } => MainSystem.GameStage.SlideNoteSpritePrefab,
+                { HasSound: true } => MainSystem.GameStage.BlackNoteSpritePrefab,
+                _ => MainSystem.GameStage.NoSoundNoteSpritePrefab,
+            };
+            _noteSpriteRenderer.sprite = prefab.Sprite;
+            _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(_note.Data.Size, 1f, 1f) * prefab.Scale;
+            _waveColor = prefab.WaveColor;
+            SetLinkLine(_note.Data.NextLink is not null);
         }
 
         private void UpdateDisplay(bool musicPlaying)
@@ -119,8 +135,8 @@ namespace Deenote.GameStage.Elements
             // Hit effect or released
             else {
                 if (State != NoteState.HitEffect) {
-                    if (musicPlaying && Stage.EffectVolume > 0) {
-                        PlayEffectSound();
+                    if (musicPlaying) {
+                        PlayNoteSounds();
                     }
                     State = NoteState.HitEffect;
                 }
@@ -131,15 +147,29 @@ namespace Deenote.GameStage.Elements
             {
                 // Color
                 float alpha = Mathf.Clamp01((Stage.StageNoteAheadTime - timeOffset) / MainSystem.Args.StageNoteFadeInTime);
-                if (Model.IsSelected)
-                    _noteSpriteRenderer.color = new Color(85f / 255f, 192f / 255f, 1f, alpha);
-                else
-                    _noteSpriteRenderer.color = new Color(1f, 1f, 1f, alpha);
+                _noteSpriteRenderer.color =
+                    Model.IsSelected ? MainSystem.Args.NoteSelectedColor.WithAlpha(alpha) :
+                    Model.IsCollided && !Model.Data.IsSlide ? MainSystem.Args.NoteCollidedColor.WithAlpha(alpha) :
+                    Color.white.WithAlpha(alpha);
 
                 // Position
                 Debug.Assert(_note.Data.Time > Stage.CurrentMusicTime);
                 float z = MainSystem.Args.OffsetTimeToZ(timeOffset);
                 gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, 0f, z);
+
+                // Link line
+                if (!MainSystem.GameStage.IsShowLinkLines)
+                    return;
+
+                var from = Model.Data;
+                var to = from.NextLink;
+                if (to is null)
+                    return;
+
+                var (fromX, fromZ) = MainSystem.Args.NoteCoordToWorldPosition(from.PositionCoord, Stage.CurrentMusicTime);
+                var (toX, toZ) = MainSystem.Args.NoteCoordToWorldPosition(to.PositionCoord, Stage.CurrentMusicTime);
+                _linkLineRender.SetPosition(0, new Vector3(fromX, 0, fromZ));
+                _linkLineRender.SetPosition(1, new Vector3(toX, 0, toZ));
             }
 
             void OnHitEffect()
@@ -153,7 +183,7 @@ namespace Deenote.GameStage.Elements
                 float noteSize = _note.Data.Size;
                 _explosionHitEffectSpriteRenderer.transform.localScale = noteSize * prefabs.ExplosionScale * Vector3.one;
 
-                // Copied from Chlorie
+                // Copied from Chlorie's
                 var time = -timeOffset;
                 if (time > prefabs.HitEffectTime) {
                     return;
@@ -206,20 +236,39 @@ namespace Deenote.GameStage.Elements
             }
         }
 
-        private void PlayEffectSound()
+        private void PlayNoteSounds()
         {
-            if (Model.Data.IsSlide)
-                _effectSoundSource.PlayOneShot(Stage.EffectSoundAudioClip, Stage.EffectVolume / 100f / 2);
-            else
-                _effectSoundSource.PlayOneShot(Stage.EffectSoundAudioClip, Stage.EffectVolume / 100f);
+            if (Stage.EffectVolume > 0f) {
+                if (Model.Data.IsSlide)
+                    _effectSoundSource.PlayOneShot(Stage.EffectSoundAudioClip, Stage.EffectVolume / 200f);
+                else
+                    _effectSoundSource.PlayOneShot(Stage.EffectSoundAudioClip, Stage.EffectVolume / 100f);
+            }
+
+            if (Stage.MusicVolume > 0f && Model.Data.HasSound) {
+                MainSystem.PianoSoundManager.PlaySoundsAsync(Model.Data.Sounds, Stage.PianoVolume / 100f, Stage.MusicSpeed / 10f).Forget();
+            }
+        }
+
+        private void SetLinkLine(bool show)
+        {
+            if (show) {
+                _linkLineRender ??= MainSystem.GameStage.GetLinkLine();
+            }
+            else {
+                if (_linkLineRender is not null) {
+                    MainSystem.GameStage.ReleaseLinkLine(_linkLineRender);
+                    _linkLineRender = null;
+                }
+            }
         }
 
         public enum NoteState
         {
-            Inactive,
             Activated,
             Fall,
             HitEffect,
+            Inactive,
         }
     }
 }

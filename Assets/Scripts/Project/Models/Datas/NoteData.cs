@@ -50,8 +50,9 @@ namespace Deenote.Project.Models.Datas
         /// Note speed in DEEMO II
         /// </summary>
         [SerializeField]
-        [JsonProperty("speed")]
-        public float Speed;
+        [JsonProperty("speed", DefaultValueHandling = DefaultValueHandling.Populate)]
+        [DefaultValue(1f)]
+        public float Speed = 1f;
 
         /// <summary>
         /// Hold duration in DEEMO II
@@ -78,8 +79,9 @@ namespace Deenote.Project.Models.Datas
         /// Unknown property in DEEMO II
         /// </summary>
         [SerializeField]
-        [JsonProperty("warningType")]
-        public WarningType WarningType;
+        [JsonProperty("warningType", DefaultValueHandling = DefaultValueHandling.Populate)]
+        [DefaultValue(WarningType.Default)]
+        public WarningType WarningType = WarningType.Default;
 
         [SerializeField]
         [JsonProperty("eventId")]
@@ -92,7 +94,6 @@ namespace Deenote.Project.Models.Datas
         /// Make this property invalid if the usage of "time" in json is unclear 
         /// </summary>
         [Obsolete("For deserialization only, use Time instead", true)]
-        [SerializeField]
         [JsonProperty("time")]
         public float TimeDuplicate { get => Time; set { } }
 
@@ -113,9 +114,9 @@ namespace Deenote.Project.Models.Datas
                     return;
                 if (!value) {
                     if (_prevLinkNote is not null)
-                        _prevLinkNote.NextLink = _nextLinkNote;
+                        _prevLinkNote.NextLink = null;
                     if (_nextLinkNote is not null)
-                        _nextLinkNote.PrevLink = _prevLinkNote;
+                        _nextLinkNote.PrevLink = null;
                 }
                 _prevLinkNote = _nextLinkNote = null;
                 _isSlide = value;
@@ -157,12 +158,19 @@ namespace Deenote.Project.Models.Datas
             set => (Position, Time) = (value.Position, value.Time);
         }
 
-        public NoteData Clone()
+        public NoteData Clone(bool cloneSounds = true)
         {
+            List<PianoSoundData> sounds = null;
+            if (cloneSounds) {
+                sounds = new List<PianoSoundData>(Sounds.Count);
+                foreach (var s in Sounds) {
+                    sounds.Add(s.Clone());
+                }
+            }
 #pragma warning disable CS0618 // Clone all
             return new NoteData {
                 Type = Type,
-                Sounds = Sounds.Select(s => s.Clone()).ToList(),
+                Sounds = sounds,
                 Position = Position,
                 Size = Size,
                 Time = Time,

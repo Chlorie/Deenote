@@ -116,7 +116,7 @@ PrefabInstance:
     - target: {fileID: 2210422582290694879, guid: 8dda372081d67a045b05a0c2b434663a,
         type: 3}
       propertyPath: m_Name
-      value: NumberProperty Variant
+      value: TextProperty Variant
       objectReference: {fileID: 0}
     - target: {fileID: 2887187107503803003, guid: 8dda372081d67a045b05a0c2b434663a,
         type: 3}
@@ -282,6 +282,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: WindowInputField
+      objectReference: {fileID: 0}
+    - target: {fileID: 3411341038512019139, guid: 67ee86bf2b5b2134ab0acc0ea9e4180e,
+        type: 3}
+      propertyPath: m_Colors.m_DisabledColor.a
+      value: 0.5019608
+      objectReference: {fileID: 0}
+    - target: {fileID: 3411341038512019139, guid: 67ee86bf2b5b2134ab0acc0ea9e4180e,
+        type: 3}
+      propertyPath: m_Colors.m_DisabledColor.b
+      value: 0.1764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 3411341038512019139, guid: 67ee86bf2b5b2134ab0acc0ea9e4180e,
+        type: 3}
+      propertyPath: m_Colors.m_DisabledColor.g
+      value: 0.1764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 3411341038512019139, guid: 67ee86bf2b5b2134ab0acc0ea9e4180e,
+        type: 3}
+      propertyPath: m_Colors.m_DisabledColor.r
+      value: 0.1764706
       objectReference: {fileID: 0}
     - target: {fileID: 8784715420607210961, guid: 67ee86bf2b5b2134ab0acc0ea9e4180e,
         type: 3}

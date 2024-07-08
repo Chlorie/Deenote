@@ -1,13 +1,12 @@
+using Deenote.Edit;
 using Deenote.GameStage.Elements;
-using Deenote.Project;
+using Deenote.Project.Comparers;
 using Deenote.Project.Models;
-using Deenote.Project.Models.Datas;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
-using System.Collections.Generic;
+using Deenote.Utilities.Robustness;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace Deenote.GameStage
 {
@@ -21,16 +20,16 @@ namespace Deenote.GameStage
         [SerializeField] Transform _judgeLineHitEffectTransform;
 
         [Header("Notify")]
+        [SerializeField] EditorController _editorController;
         [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
         [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
         [SerializeField] GridController _gridController;
 
         [Header("Prefabs")]
-        [SerializeField] Transform _notesParentTransform;
+        [SerializeField] Transform _noteParentTransform;
         [SerializeField] StageNoteController _notePrefab;
 
-        private ObjectPool<StageNoteController> _stageNotePool;
-        private List<StageNoteController> _onStageNotes;
+        private PooledObjectListView<StageNoteController> _stageNotes;
 
         [Header("ReadOnly")]
         /// <summary>
@@ -125,7 +124,7 @@ namespace Deenote.GameStage
                     return;
                 __noteSpeed = value;
                 UpdateStageNotes();
-                _editorPropertiesWindow.NofityNoteSpeedChanged(__noteSpeed);
+                _editorPropertiesWindow.NotifyNoteSpeedChanged(__noteSpeed);
             }
         }
 
@@ -285,28 +284,48 @@ namespace Deenote.GameStage
             _nextDisappearNoteIndex = 0;
             _nextHitNoteIndex = 0;
 
+            CheckCollision();
+
             SetMusicTime(0f, setStageNotes: false);
             UpdateStageNotes();
             ForceUpdateNotesDisplay();
 
             _perspectiveViewWindow.NotifyChartChanged(project, chart);
 
+            void CheckCollision()
+            {
+                for (int i = 0; i < _chart.Notes.Count; i++) {
+                    var note = _chart.Notes[i];
+                    for (int j = i + 1; j < _chart.Notes.Count; j++) {
+                        var noteCmp = _chart.Notes[j];
+                        if (MainSystem.Args.IsCollided(note.Data, noteCmp.Data)) {
+                            note.IsCollided = true;
+                            noteCmp.IsCollided = true;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         #region Note
 
-        public void ForceUpdateNotesDisplay()
+        private void ForceUpdateNotesDisplay()
         {
-            foreach (var note in _onStageNotes) {
-                note.ForceUpdate();
+            foreach (var note in _stageNotes) {
+                note.ForceUpdate(false);
             }
         }
 
-        public void UpdateStageNotes(bool musicTimeChanged)
+        public void ForceUpdateStageNotes(bool notesOrderChanged, bool noteDataChangedExceptTime)
         {
-            // TODO: Optimize
-            UpdateStageNotes();
-            ForceUpdateNotesDisplay();
+            if (notesOrderChanged)
+                UpdateStageNotes();
+            foreach (var note in _stageNotes) {
+                note.ForceUpdate(noteDataChangedExceptTime);
+            }
         }
 
         /// <remarks>
@@ -322,33 +341,28 @@ namespace Deenote.GameStage
             if (forward) OnPlayForward();
             else OnPlayBackward();
 
-            UpdateJudgeLineHitEffect();
-            _gridController.UpdateTimeGrids();
-            _perspectiveViewWindow.NotifyChartProgressChanged(_nextHitNoteIndex);
+            OnStageNoteUpdated();
 
             void OnPlayForward()
             {
-                NoteTimeComparer.AssertInOrder(_onStageNotes.Select(n => n.Model));
-                // Notes in _onStageNote are sorted by time
+                NoteTimeComparer.AssertInOrder(_stageNotes.Select(n => n.Model), "In forward");
+                // Notes in _onStageNotes are sorted by time
                 // so inactive notes always appears at leading of list
                 var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
                 var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
                 // Update _nextDisappear
                 // Remove inactive notes
                 int removeCount;
-                for (removeCount = 0; removeCount < _onStageNotes.Count; removeCount++) {
-                    var note = _onStageNotes[removeCount];
+                for (removeCount = 0; removeCount < _stageNotes.Count; removeCount++) {
+                    var note = _stageNotes[removeCount];
                     if (note.Model.Data.Time > disappearNoteTime)
                         break;
-                    _stageNotePool.Release(note);
                 }
-                if (removeCount < _onStageNotes.Count) {
-                    _onStageNotes.RemoveRange(0, removeCount);
-                    _nextDisappearNoteIndex += removeCount;
-                }
-                else {
-                    _onStageNotes.Clear();
-                    _nextDisappearNoteIndex += removeCount;
+                _stageNotes.RemoveRange(..removeCount);
+                _nextDisappearNoteIndex += removeCount;
+                // All notes on stage are removed, we need to continue iterating
+                // to find the first note that should display
+                if (_stageNotes.Count == 0) {
                     for (; _nextDisappearNoteIndex < _chart.Notes.Count; _nextDisappearNoteIndex++) {
                         var note = _chart.Notes[_nextDisappearNoteIndex];
                         if (note.Data.Time > disappearNoteTime) {
@@ -357,7 +371,7 @@ namespace Deenote.GameStage
                     }
                 }
 
-                // Update _nextHit
+                // Update _nextHit, Add active note that playing hit effect
                 if (_nextDisappearNoteIndex > _nextHitNoteIndex)
                     _nextHitNoteIndex = _nextDisappearNoteIndex;
                 for (; _nextHitNoteIndex < _chart.Notes.Count; _nextHitNoteIndex++) {
@@ -369,44 +383,38 @@ namespace Deenote.GameStage
 
                 // Update _nextAppear
                 // Add active notes
-                // If new _nextDisappear is greater, we search start from _nextDisappear
-                if (_nextHitNoteIndex > _nextAppearNoteIndex)
-                    _nextAppearNoteIndex = _nextHitNoteIndex;
+                // If new _nextDiappear is greater, we search start from _nextDisappear
+                if (_nextDisappearNoteIndex > _nextAppearNoteIndex) {
+                    _nextAppearNoteIndex = _nextDisappearNoteIndex;
+                }
                 for (; _nextAppearNoteIndex < _chart.Notes.Count; _nextAppearNoteIndex++) {
                     var note = _chart.Notes[_nextAppearNoteIndex];
                     if (note.Data.Time > appearNoteTime) {
                         break;
                     }
-                    var noteController = _stageNotePool.Get();
+                    _stageNotes.Add(out var noteController);
                     noteController.Initialize(note);
-                    Debug.Log("Add In Forward");
-                    _onStageNotes.Add(noteController);
                 }
             }
 
             void OnPlayBackward()
             {
+                NoteTimeComparer.AssertInOrder(_stageNotes.Select(n => n.Model), "In backward");
                 var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
                 var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
                 // Remove trailing inactive notes
                 int removeStart;
-                for (removeStart = _onStageNotes.Count - 1; removeStart >= 0; removeStart--) {
-                    var note = _onStageNotes[removeStart];
+                for (removeStart = _stageNotes.Count - 1; removeStart >= 0; removeStart--) {
+                    var note = _stageNotes[removeStart];
                     if (note.Model.Data.Time <= appearNoteTime)
                         break;
-                    _stageNotePool.Release(note);
                 }
-
-                if (removeStart >= 0) {
-                    removeStart++;
-                    int count = _onStageNotes.Count - removeStart;
-                    _onStageNotes.RemoveRange(removeStart, count);
-                    _nextAppearNoteIndex -= count;
-                }
-                else {
-                    // Remove all on stage
-                    _nextAppearNoteIndex -= _onStageNotes.Count;
-                    _onStageNotes.Clear();
+                removeStart++;
+                var removeCount = _stageNotes.Count - removeStart;
+                _stageNotes.RemoveRange(removeStart..);
+                _nextAppearNoteIndex -= removeCount;
+                // All notes on stage removed, continue iterating for display
+                if (_stageNotes.Count == 0) {
                     var prevAppearNoteIndex = _nextAppearNoteIndex - 1;
                     for (; prevAppearNoteIndex >= 0; prevAppearNoteIndex--) {
                         var note = _chart.Notes[prevAppearNoteIndex];
@@ -436,9 +444,8 @@ namespace Deenote.GameStage
                     if (note.Data.Time <= disappearNoteTime) {
                         break;
                     }
-                    var noteController = _stageNotePool.Get();
+                    _stageNotes.Insert(0, out var noteController);
                     noteController.Initialize(note);
-                    _onStageNotes.Insert(0, noteController);
                 }
                 _nextDisappearNoteIndex = prevDisappearNoteIndex + 1;
             }
@@ -450,50 +457,84 @@ namespace Deenote.GameStage
         /// </summary>
         private void UpdateStageNotes()
         {
-            if (_onStageNotes.Count > 0) {
-                foreach (var note in _onStageNotes)
-                    _stageNotePool.Release(note);
-                _onStageNotes.Clear();
-            }
-
-            var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
-            var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
-            int i = 0;
-            for (; i < _chart.Notes.Count; i++) {
-                var note = _chart.Notes[i];
-                if (note.Data.Time > disappearNoteTime) {
-                    break;
+            using (var stageNotes = _stageNotes.Resetting()) {
+                var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
+                var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
+                int i = 0;
+                for (; i < _chart.Notes.Count; i++) {
+                    var note = _chart.Notes[i];
+                    if (note.Data.Time > disappearNoteTime) {
+                        break;
+                    }
                 }
-            }
-            _nextDisappearNoteIndex = i;
+                _nextDisappearNoteIndex = i;
 
-            for (; i < _chart.Notes.Count; i++) {
-                var note = _chart.Notes[i];
-                if (note.Data.Time > CurrentMusicTime) {
-                    break;
+                for (; i < _chart.Notes.Count; i++) {
+                    var note = _chart.Notes[i];
+                    if (note.Data.Time > CurrentMusicTime) {
+                        break;
+                    }
+                    stageNotes.Add(out var noteController);
+                    noteController.Initialize(note);
                 }
+                _nextHitNoteIndex = i;
 
-                var noteController = _stageNotePool.Get();
-                noteController.Initialize(note);
-                _onStageNotes.Add(noteController);
-            }
-            _nextHitNoteIndex = i;
-
-            for (; i < _chart.Notes.Count; i++) {
-                var note = _chart.Notes[i];
-                if (note.Data.Time > appearNoteTime) {
-                    break;
+                for (; i < _chart.Notes.Count; i++) {
+                    var note = _chart.Notes[i];
+                    if (note.Data.Time > appearNoteTime) {
+                        break;
+                    }
+                    stageNotes.Add(out var noteController);
+                    noteController.Initialize(note);
                 }
+                _nextAppearNoteIndex = i;
 
-                var noteController = _stageNotePool.Get();
-                noteController.Initialize(note);
-                _onStageNotes.Add(noteController);
             }
-            _nextAppearNoteIndex = i;
+            #region Legacy
+            //if (_onStageNotes.Count > 0) {
+            //    foreach (var note in _onStageNotes)
+            //        _stageNotePool.Release(note);
+            //    _onStageNotes.Clear();
+            //}
 
-            UpdateJudgeLineHitEffect();
-            _gridController.UpdateTimeGrids();
-            _perspectiveViewWindow.NotifyChartProgressChanged(_nextHitNoteIndex);
+            //var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
+            //var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
+            //int i = 0;
+            //for (; i < _chart.Notes.Count; i++) {
+            //    var note = _chart.Notes[i];
+            //    if (note.Data.Time > disappearNoteTime) {
+            //        break;
+            //    }
+            //}
+            //_nextDisappearNoteIndex = i;
+
+            //for (; i < _chart.Notes.Count; i++) {
+            //    var note = _chart.Notes[i];
+            //    if (note.Data.Time > CurrentMusicTime) {
+            //        break;
+            //    }
+
+            //    var noteController = _stageNotePool.Get();
+            //    noteController.Initialize(note);
+            //    _onStageNotes.Add(noteController);
+            //}
+            //_nextHitNoteIndex = i;
+
+            //for (; i < _chart.Notes.Count; i++) {
+            //    var note = _chart.Notes[i];
+            //    if (note.Data.Time > appearNoteTime) {
+            //        break;
+            //    }
+
+            //    var noteController = _stageNotePool.Get();
+            //    noteController.Initialize(note);
+            //    _onStageNotes.Add(noteController);
+            //}
+            //_nextAppearNoteIndex = i;
+
+            #endregion
+
+            OnStageNoteUpdated();
         }
 
         #endregion
@@ -550,6 +591,13 @@ namespace Deenote.GameStage
 
         #endregion
 
+        private void OnStageNoteUpdated()
+        {
+            UpdateJudgeLineHitEffect();
+            _gridController.NotifyGameStageProgressChanged();
+            _perspectiveViewWindow.NotifyGameStageProgressChanged(_nextHitNoteIndex);
+        }
+
         public bool TryConvertViewPointToNoteCoord(Vector3 viewPoint, out NoteCoord coord)
         {
             Ray ray = _camera.ViewportPointToRay(viewPoint);
@@ -564,8 +612,9 @@ namespace Deenote.GameStage
 
         private void Awake()
         {
-            _onStageNotes = new();
-            _stageNotePool = UnityUtils.CreateObjectPool(_notePrefab, _notesParentTransform);
+            _stageNotes = new PooledObjectListView<StageNoteController>(
+                UnityUtils.CreateObjectPool(_notePrefab, _noteParentTransform));
+            AwakeLinkLine();
         }
 
         private void Start()

@@ -12,6 +12,10 @@ namespace Deenote.Edit
         private int _currentOffset;
         private int _count;
 
+        public bool CanRedo => _currentOffset < _count;
+
+        public bool CanUndo => _currentOffset > 0;
+
         public UndoableOperationHistory(int maxCount)
         {
             _maxCount = maxCount;
@@ -50,7 +54,7 @@ namespace Deenote.Edit
 
         public void Redo()
         {
-            if (_currentOffset == _count)
+            if (!CanRedo)
                 return;
 
             _operations[ActualIndex(_currentOffset)].Redo();
@@ -59,7 +63,7 @@ namespace Deenote.Edit
 
         public void Undo()
         {
-            if (_currentOffset == 0)
+            if (!CanUndo)
                 return;
 
             _operations[ActualIndex(_currentOffset - 1)].Undo();

@@ -1,11 +1,16 @@
+using Deenote.UI.Windows;
 using UnityEngine;
 
 namespace Deenote.GameStage
 {
     public sealed partial class GridController : MonoBehaviour
     {
+        [SerializeField] GameStageController _stage;
+
+        [Header("Notify")]
+        [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
+
         [Header("Prefabs")]
-        [SerializeField] Transform _lineParentTransform;
         [SerializeField] LineRenderer _linePrefab;
 
         /// <returns>
@@ -14,8 +19,12 @@ namespace Deenote.GameStage
         /// </returns>
         public NoteCoord Quantize(NoteCoord coord, bool snapPosition, bool snapTime)
         {
-            float snappedPos = snapPosition ? GetNearestVerticalGridPosition(coord.Position) : coord.Position;
             float snappedTime = snapTime ? GetNearestTimeGridTime(coord.Time) ?? coord.Time : coord.Time;
+            float snappedPos = (snapPosition, IsCurveOn) switch {
+                (true, true) => _curveLineData.GetPosition(snappedTime) ?? GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
+                (true, false) => GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
+                (false, _) => coord.Position,
+            };
             return new(snappedPos, snappedTime);
         }
 
@@ -23,11 +32,28 @@ namespace Deenote.GameStage
         {
             AwakeTimeGrid();
             AwakeVerticalGrid();
+            AwakeCurve();
         }
 
         private void Start()
         {
-            SetVerticalGridEqualInterval(9);
+            _verticalGridGenerationKind = VerticalGridGenerationKind.ByKeyCount;
+            VerticalGridCount = 9;
         }
+
+        #region Notify
+
+        public void NotifyGameStageProgressChanged()
+        {
+            UpdateTimeGrids();
+            UpdateCurveLine();
+        }
+
+        public void NotifyCurrentProjectTemposChanged()
+        {
+            UpdateTimeGrids();
+        }
+
+        #endregion
     }
 }

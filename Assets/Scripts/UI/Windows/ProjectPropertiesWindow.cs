@@ -1,12 +1,12 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
+using Deenote.Project.Models;
 using Deenote.UI.Windows.Elements;
 using Deenote.Utilities;
-using System.Collections.Generic;
+using Deenote.Utilities.Robustness;
 using System.IO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Windows
@@ -15,6 +15,7 @@ namespace Deenote.UI.Windows
     public sealed partial class ProjectPropertiesWindow : MonoBehaviour
     {
         [SerializeField] Window _window;
+        public Window Window => _window;
 
         [Header("UI")]
         [SerializeField] Button _audioFileButton;
@@ -23,18 +24,11 @@ namespace Deenote.UI.Windows
         [SerializeField] TMP_InputField _composerInputField;
         [SerializeField] TMP_InputField _chartDesignerInputField;
         [SerializeField] Transform _chartsParentTransform;
-        [SerializeField] ProjectPropertiesChartController _mainChartController;
 
         [Header("Prefabs")]
         [SerializeField] ProjectPropertiesChartController _chartPrefab;
 
-        private ObjectPool<ProjectPropertiesChartController> _chartPool;
-        /// <summary>
-        /// Includes <see cref="_mainChartController"/>
-        /// </summary>
-        private List<ProjectPropertiesChartController> _charts;
-
-        private static readonly string[] _supportMusicExtensions = { ".mp3", ".wav" };
+        private PooledObjectListView<ProjectPropertiesChartController> _charts;
 
         private string _selectedMainAudioPath;
         private byte[] _loadedBytes;
@@ -42,21 +36,19 @@ namespace Deenote.UI.Windows
 
         private void Awake()
         {
-            _chartPool = UnityUtils.CreateObjectPool(_chartPrefab, _chartsParentTransform);
-            _charts = new() { _mainChartController };
+            _charts = new PooledObjectListView<ProjectPropertiesChartController>(UnityUtils.CreateObjectPool(() =>
+            {
+                var item = Instantiate(_chartPrefab, _chartsParentTransform);
+                item.OnCreated(this);
+                return item;
+            }, 1));
 
             _audioFileButton.onClick.AddListener(LoadAudioFileAsync);
-            _mainChartController.InitializeMain(() => _newProjTcs.TrySetResult(_mainChartController), AddChart);
         }
 
         private void OnEnable()
         {
-            _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad");
-            _musicNameInputField.text = "";
-            _composerInputField.text = "";
-            _chartDesignerInputField.text = "";
-            _audioFileText.TmpText.alignment = TextAlignmentOptions.CenterGeoAligned;
-            SetChartLoadable(false);
+            InitializeProject(null);
         }
 
         private void OnDisable()
@@ -66,12 +58,41 @@ namespace Deenote.UI.Windows
 
         private void SetChartLoadable(bool value)
         {
-            if (_mainChartController.LoadButton.interactable == value)
+            if (_charts[0].LoadButton.interactable == value)
                 return;
 
-            _mainChartController.LoadButton.interactable = value;
             foreach (var chart in _charts) {
                 chart.LoadButton.interactable = value;
+            }
+        }
+
+        private void InitializeProject(ProjectModel project)
+        {
+            if (project is null) {
+                _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad");
+                _musicNameInputField.text = "";
+                _composerInputField.text = "";
+                _chartDesignerInputField.text = "";
+                _audioFileText.TmpText.alignment = TextAlignmentOptions.CenterGeoAligned;
+
+                _charts.SetCount(1);
+                _charts[0].Initialize(null, true);
+                SetChartLoadable(false);
+            }
+            else {
+                _audioFileText.SetRawText(Path.GetFileName(project.AudioFileRelativePath));
+                _musicNameInputField.text = project.MusicName;
+                _composerInputField.text = project.Composer;
+                _chartDesignerInputField.text = project.ChartDesigner;
+                _audioFileText.TmpText.alignment = TextAlignmentOptions.BaselineLeft;
+
+                _charts.SetCount(project.Charts.Count);
+                _charts[0].Initialize(project.Charts[0], true);
+                for (int i = 1; i < _charts.Count; i++) {
+                    _charts[i].Initialize(project.Charts[i], true);
+                }
+                _charts.SetSiblingIndicesInOrder();
+                SetChartLoadable(true);
             }
         }
 
@@ -80,22 +101,22 @@ namespace Deenote.UI.Windows
         private async UniTaskVoid LoadAudioFileAsync()
         {
             _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad_Loading");
-            var res = await MainSystem.FileExplorer.OpenSelectFileAsync(_supportMusicExtensions);
+            var res = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args.SupportAudioFileExtensions);
             if (res.IsCancelled)
                 return;
 
             SetChartLoadable(false);
 
-            var bytes = await File.ReadAllBytesAsync(res.Path);
-            var clip = AudioUtils.LoadFromBuffer(bytes, Path.GetExtension(res.Path));
-
-            if (!clip.HasValue) {
+            using var fs = File.OpenRead(res.Path);
+            if (!AudioUtils.TryLoad(fs, Path.GetExtension(res.Path), out var clip)) {
                 _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad_Failed");
                 return;
             }
 
-            _loadedBytes = bytes;
-            _loadedClip = clip.Value;
+            _loadedBytes = new byte[fs.Length];
+            fs.Seek(0, SeekOrigin.Begin);
+            fs.Read(_loadedBytes);
+            _loadedClip = clip;
             _selectedMainAudioPath = res.Path;
             _audioFileText.SetRawText(Path.GetFileName(res.Path));
             if (string.IsNullOrEmpty(_musicNameInputField.text))
@@ -104,18 +125,21 @@ namespace Deenote.UI.Windows
             SetChartLoadable(true);
         }
 
-        private void AddChart()
+        public void AddNewChart()
         {
-            var chartFile = _chartPool.Get();
-            chartFile.Initialize(
-                cht => _newProjTcs.TrySetResult(cht),
-                cht =>
-                {
-                    _chartPool.Release(cht);
-                    _charts.Remove(cht);
-                });
-            chartFile.transform.SetAsLastSibling();
-            _charts.Add(chartFile);
+            _charts.Add(out var item);
+            item.Initialize(null, false);
+            item.transform.SetAsLastSibling();
+        }
+
+        public void SelectChartToLoad(ProjectPropertiesChartController chart)
+        {
+            _newProjTcs.TrySetResult(chart);
+        }
+
+        public void RemoveChart(ProjectPropertiesChartController chart)
+        {
+            _charts.Remove(chart);
         }
 
         #endregion

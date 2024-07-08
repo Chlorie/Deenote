@@ -16,9 +16,13 @@ namespace Deenote.UI.Windows.Elements
 
         public string FileName => _text.text;
 
-        public void Initialize(FileExplorerWindow dialog, string path, bool isDirectory)
+        public void OnCreated(FileExplorerWindow dialog)
         {
             _dialog = dialog;
+        }
+
+        public void Initialize(string path, bool isDirectory)
+        {
             IsDirectory = isDirectory;
             Path = path;
 

@@ -238,7 +238,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.23529412, g: 0.23529412, b: 0.23529412, a: 1}
     m_PressedColor: {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 1}
     m_SelectedColor: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -534,6 +534,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 8057581707352088130}
   _textKey: 
+  _isLocalized: 1
 --- !u!114 &319173547282954855
 MonoBehaviour:
   m_ObjectHideFlags: 0

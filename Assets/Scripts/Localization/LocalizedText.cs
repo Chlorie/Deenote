@@ -8,14 +8,18 @@ namespace Deenote.Localization
     {
         [SerializeField] TMP_Text _text;
         [SerializeField] string _textKey;
-
-        private bool _isLocalized;
+        [SerializeField] bool _isLocalized;
 
         public TMP_Text TmpText => _text;
 
         private void Awake()
         {
             MainSystem.Localization.RegisterLocalizedText(this);
+        }
+
+        private void Start()
+        {
+            NotifyLanguageUpdated();
         }
 
         private void OnDestroy()

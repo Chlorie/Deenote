@@ -11,20 +11,23 @@ namespace Deenote.Project
 {
     partial class ProjectManager
     {
-        private static MayBeNull<ProjectModel> LoadFromDsproj(string filePath)
+        private static bool TryLoadFromDsproj(string filePath, out ProjectModel project)
         {
             try {
                 using var fs = File.OpenRead(filePath);
                 var obj = LegacyProjectSerialization.Formatter.Deserialize(fs);
-                return obj switch {
+                project = obj switch {
                     LegacyProjectSerialization.SerializableProjectData v1 => ToVer3(v1),
                     LegacyProjectSerialization.FullProjectDataV2 v2 => ToVer3(v2),
                     _ => null,
                 };
+                return project is not null;
             } catch (Exception ex) {
                 Debug.LogError(ex.Message);
-                return null;
+                project = null;
+                return false; ;
             }
+
         }
 
         // Copy from Chlorie
@@ -88,7 +91,7 @@ namespace Deenote.Project
                 }
 
                 if (typeName.StartsWith("System.Collections.Generic.List`1")) {
-                    var typeFullName = typeName.AsSpan(35);
+                    var typeFullName = typeName.AsSpan("System.Collections.Generic.List`1".Length + 2);
                     var comma = typeFullName.IndexOf(',');
                     var assName = typeFullName[(comma + 2)..];
                     if (assName.StartsWith("Assembly-CSharp")) {
@@ -108,7 +111,7 @@ namespace Deenote.Project
             public class SerializableProjectData //Saves all the project data including the audio clip data
             {
                 public Project project; //Other project data
-                                               //Audio clip data
+                                        //Audio clip data
                 public float[] sampleData;
                 public int frequency;
                 public int channel;

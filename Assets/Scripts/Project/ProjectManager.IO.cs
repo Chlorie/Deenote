@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Deenote.Project
@@ -28,8 +29,10 @@ namespace Deenote.Project
 
         public static MayBeNull<ProjectModel> Load(string projectFilePath)
         {
-            if (projectFilePath.EndsWith(".dsproj"))
-                return LoadFromDsproj(projectFilePath);
+            if (projectFilePath.EndsWith(".dsproj")) {
+                if (TryLoadFromDsproj(projectFilePath, out var dsprojProject))
+                    return dsprojProject;
+            }
 
             using var fs = File.OpenRead(projectFilePath);
             using var br = new BinaryReader(fs);
@@ -67,7 +70,7 @@ namespace Deenote.Project
             writer.Write(project.ChartDesigner);
             writer.Write(project.SaveAsRefPath);
             if (project.SaveAsRefPath) {
-                writer.Write(project.RefPath);
+                writer.Write(project.AudioFileRelativePath);
             }
             else {
                 writer.Write(project.AudioData.Length);
@@ -93,7 +96,7 @@ namespace Deenote.Project
                 SaveAsRefPath = reader.ReadBoolean(),
             };
             if (project.SaveAsRefPath) {
-                project.RefPath = reader.ReadString();
+                project.AudioFileRelativePath = reader.ReadString();
             }
             else {
                 var len = reader.ReadInt32();
@@ -105,12 +108,13 @@ namespace Deenote.Project
                 project.Charts.Add(ReadChart(reader));
             }
             var tempoLen = reader.ReadInt32();
-            project.Tempos.Capacity = tempoLen;
+            var tempos = new List<Tempo>(tempoLen);
             for (int i = 0; i < tempoLen; i++) {
                 var bpm = reader.ReadSingle();
                 var startTime = reader.ReadSingle();
-                project.Tempos[i] = new Tempo(bpm, startTime);
+                tempos.Add(new Tempo(bpm, startTime));
             }
+            ProjectModel.InitializeHelper.SetTempoList(project, tempos);
 
             return project;
         }

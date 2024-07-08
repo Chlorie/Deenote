@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace Deenote.UI.Windows
 {
     [RequireComponent(typeof(Window))]
-    public sealed class PerspectiveViewWindow : MonoBehaviour
+    public sealed partial class PerspectiveViewWindow : MonoBehaviour
     {
         [SerializeField] Window _window;
         [SerializeField] GameStageController _gameStageController;
@@ -24,8 +24,6 @@ namespace Deenote.UI.Windows
         [SerializeField] Button _pauseButton;
         [SerializeField] Image _backgroundBreathingMaskImage;
         [SerializeField] TMP_Text _backgroundStaveText;
-        [SerializeField] TMP_Text _comboText;
-        [SerializeField] TMP_Text _comboShadowText;
         [SerializeField] RawImage _cameraViewRawImage;
         [SerializeField] Transform _cameraViewTransform;
 
@@ -67,10 +65,13 @@ namespace Deenote.UI.Windows
         private void DetectMouseMove()
         {
             if (TryGetCurrentMouseToNoteCoordInSelectionRange(out NoteCoord coord)) {
-                _editorController.MoveNoteIndicator(coord);
+                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                    _editorController.MoveNoteIndicator(coord, true);
+                else
+                    _editorController.MoveNoteIndicator(coord, false);
             }
             else {
-                _editorController.MoveNoteIndicator(null);
+                _editorController.HideNoteIndicator();
             }
         }
 
@@ -80,7 +81,7 @@ namespace Deenote.UI.Windows
                 // This will cancel NotePlacing state
                 _mouseActionState = MouseActionState.NoteSelecting;
                 if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord)) {
-                    _editorController.StartNoteSelection(coord, deselectPrevious: !UnityUtils.IsFunctionalKeyHolding(ctrl: true));
+                    _editorController.StartNoteSelection(coord, toggleMode: UnityUtils.IsFunctionalKeyHolding(ctrl: true));
                 }
             }
             else if (_mouseActionState is MouseActionState.NoteSelecting && Input.GetMouseButton(0)) {
@@ -102,7 +103,10 @@ namespace Deenote.UI.Windows
             else if (_mouseActionState is MouseActionState.NotePlacing && Input.GetMouseButtonUp(1)) {
                 _mouseActionState = MouseActionState.None;
                 if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord)) {
-                    _editorController.PlaceNoteAt(coord);
+                    if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                        _editorController.PlaceNoteAt(coord, true);
+                    else
+                        _editorController.PlaceNoteAt(coord, false);
                 }
             }
         }
@@ -111,7 +115,6 @@ namespace Deenote.UI.Windows
         {
             float wheel = Input.GetAxis("Mouse ScrollWheel");
             if (wheel != 0f) {
-                // TODO: Mouse sensitivity
                 float deltaTime = wheel * MainSystem.GlobalSettings.MouseScrollSensitivity;
                 _gameStageController.CurrentMusicTime -= deltaTime;
             }
@@ -120,38 +123,70 @@ namespace Deenote.UI.Windows
         private void DetectKeys()
         {
             // TODO:如果有两个View的话，考虑把这些东西扔到一个新的单例类里，不然会执行两次
+            // Operation
             if (UnityUtils.IsKeyDown(KeyCode.Z, ctrl: true))
                 _editorController.Undo();
             if (UnityUtils.IsKeyDown(KeyCode.Z, ctrl: true, shift: true) || UnityUtils.IsKeyDown(KeyCode.Y, ctrl: true))
                 _editorController.Redo();
-            //if(UnityUtils.IsKeyDown(KeyCode.C,ctrl:true))
-            //if(UnityUtils.IsKeyDown(KeyCode.X,ctrl:true))
-            //if(UnityUtils.IsKeyDown(KeyCode.V,ctrl:true))
+            if (UnityUtils.IsKeyDown(KeyCode.C, ctrl: true))
+                _editorController.CopySelectedNotes();
+            if (UnityUtils.IsKeyDown(KeyCode.X, ctrl: true))
+                _editorController.CutSelectedNotes();
+            if (UnityUtils.IsKeyDown(KeyCode.V, ctrl: true))
+                _editorController.PasteNotes();
 
-            if (UnityUtils.IsKeyDown(KeyCode.Delete))
-                _editorController.RemoveSelectedNotes();
+            // Edit
             if (UnityUtils.IsKeyDown(KeyCode.G))
                 _editorController.SnapToPositionGrid = _editorController.SnapToTimeGrid = !(_editorController.SnapToPositionGrid && _editorController.SnapToTimeGrid);
+            if (UnityUtils.IsKeyDown(KeyCode.Delete))
+                _editorController.RemoveSelectedNotes();
             if (UnityUtils.IsKeyDown(KeyCode.A, ctrl: true))
                 _editorController.SelectAllNotes();
-            //if(UnityUtils.IsKeyDown(KeyCode.L))
-            //if(UnityUtils.IsKeyDown(KeyCode.U))
+            if (UnityUtils.IsKeyDown(KeyCode.L))
+                _editorController.LinkSelectedNotes();
+            if (UnityUtils.IsKeyDown(KeyCode.U))
+                _editorController.UnlinkSelectedNotes();
+            if (UnityUtils.IsKeyDown(KeyCode.P))
+                _editorController.ToggleSoundOfSelectedNotes();
             if (UnityUtils.IsKeyDown(KeyCode.Q))
-                _editorController.EditSelectedNotes(n => n.PositionCoord = _gameStageController.Grids.Quantize(n.PositionCoord, true, true));
-            // TODO: Optimize?
+                _editorController.EditSelectedNotesPositionCoord(c => _gameStageController.Grids.Quantize(c, true, true));
+
+            // Adjust
             if (UnityUtils.IsKeyDown(KeyCode.W))
-                _editorController.EditSelectedNotes(n => n.Time += 0.001f);
+                _editorController.EditSelectedNotesTime(t => t + 0.001f);
             else if (UnityUtils.IsKeyDown(KeyCode.W, alt: true))
-                _editorController.EditSelectedNotes(n => n.Time += 0.01f);
+                _editorController.EditSelectedNotesTime(t => t + 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.W, shift: true))
-                _editorController.EditSelectedNotes(n => n.Time = _gameStageController.Grids.CeilToNearestTimeGridTime(n.Time) ?? n.Time);
+                _editorController.EditSelectedNotesTime(t => _gameStageController.Grids.CeilToNearestNextTimeGridTime(t) ?? t);
             if (UnityUtils.IsKeyDown(KeyCode.S))
-                _editorController.EditSelectedNotes(n => n.Time -= 0.001f);
+                _editorController.EditSelectedNotesTime(t => t - 0.001f);
             else if (UnityUtils.IsKeyDown(KeyCode.S, alt: true))
-                _editorController.EditSelectedNotes(n => n.Time -= 0.01f);
+                _editorController.EditSelectedNotesTime(t => t - 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.S, shift: true))
-                _editorController.EditSelectedNotes(n => n.Time = _gameStageController.Grids.FloorToNearestTimeGridTime(n.Time) ?? n.Time);
-            // ADZXM
+                _editorController.EditSelectedNotesTime(t => _gameStageController.Grids.FloorToNearestNextTimeGridTime(t) ?? t);
+            if (UnityUtils.IsKeyDown(KeyCode.A))
+                _editorController.EditSelectedNotesPosition(p => p - 0.01f);
+            else if (UnityUtils.IsKeyDown(KeyCode.A, alt: true))
+                _editorController.EditSelectedNotesPosition(p => p - 0.1f);
+            else if (UnityUtils.IsKeyDown(KeyCode.A, shift: true))
+                _editorController.EditSelectedNotesPosition(p => _gameStageController.Grids.FloorToNearestNextVerticalGridPosition(p) ?? p);
+            if (UnityUtils.IsKeyDown(KeyCode.D))
+                _editorController.EditSelectedNotesPosition(p => p + 0.01f);
+            else if (UnityUtils.IsKeyDown(KeyCode.D, alt: true))
+                _editorController.EditSelectedNotesPosition(p => p + 0.1f);
+            else if (UnityUtils.IsKeyDown(KeyCode.D, shift: true))
+                _editorController.EditSelectedNotesPosition(p => _gameStageController.Grids.CeilToNearestNextVerticalGridPosition(p) ?? p);
+            if (UnityUtils.IsKeyDown(KeyCode.Z))
+                _editorController.EditSelectedNotesSize(s => s - 0.01f);
+            else if (UnityUtils.IsKeyDown(KeyCode.Z, shift: true))
+                _editorController.EditSelectedNotesSize(s => s - 0.1f);
+            if (UnityUtils.IsKeyDown(KeyCode.X))
+                _editorController.EditSelectedNotesSize(s => s + 0.01f);
+            else if (UnityUtils.IsKeyDown(KeyCode.X))
+                _editorController.EditSelectedNotesSize(s => s + 0.1f);
+            if (UnityUtils.IsKeyDown(KeyCode.M))
+                _editorController.EditSelectedNotesPosition(p => -p);
+            // Curve
             // IF
 
             // Stage
@@ -217,10 +252,10 @@ namespace Deenote.UI.Windows
             // _levelText.text
         }
 
-        public void NotifyChartProgressChanged(int nextHitNoteIndex)
+        public void NotifyGameStageProgressChanged(int nextHitNoteIndex)
         {
             UpdateScore(nextHitNoteIndex);
-            UpdateCombo(nextHitNoteIndex - 1);
+            UpdateCombo(nextHitNoteIndex);
         }
 
         public void NotifyStageEffectUpdate(bool isOn)
@@ -264,38 +299,6 @@ namespace Deenote.UI.Windows
             }
 
             return true;
-        }
-
-        private void UpdateScore(int judgedNoteCount)
-        {
-            if (judgedNoteCount <= 0) {
-                _scoreText.text = "0.00 %";
-                return;
-            }
-
-            // TODO: If both judged count and total count not changed
-            if (_judgedNoteCount == judgedNoteCount)
-                return;
-
-            int noteCount = _chart.Notes.Count;
-            float accScore = (float)judgedNoteCount / noteCount;
-            // comboActual = Sum(1..judgeNoteCount);
-            // comboTotal = Sum(1..noteCount)
-            // comboScore = comboActual / comboTotal
-            //            = ((1 + judged) * judged) / ((1 + count) * count)
-            float comboScore = (float)((1 + judgedNoteCount) * judgedNoteCount) / ((1 + noteCount) * noteCount);
-
-            float score = accScore * 80_00f + comboScore * 20_00f; ;
-            _scoreText.text = $"{Mathf.Floor(score) / 100f:F2} %";
-        }
-
-        private void UpdateCombo(int prevHitNoteIndex)
-        {
-            if (prevHitNoteIndex < 0)
-                return;
-            var deltaTime = _gameStageController.CurrentMusicTime - _chart.Notes[prevHitNoteIndex].Data.Time;
-            Debug.Assert(deltaTime >= 0, $"actual delta time:{deltaTime}");
-            // TODO: Update combo
         }
 
         private enum MouseActionState

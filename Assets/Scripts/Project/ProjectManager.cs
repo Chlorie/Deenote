@@ -1,22 +1,26 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.Project.Models;
+using Deenote.UI.Windows;
+using System.IO;
 using UnityEngine;
 
 namespace Deenote.Project
 {
     public sealed partial class ProjectManager : MonoBehaviour
     {
+        [Header("Notify")]
+        [SerializeField] PropertiesWindow _propertiesWindow;
+
         private string _projectSavePath;
+        public string CurrentProjectSavePath => _projectSavePath;
 
         public ProjectModel CurrentProject { get; private set; }
-
 
         private static readonly LocalizableText[] _newProjMsgBtnTxt = new[] {
             LocalizableText.Localized("Message_NewProjectOnOpen_Y"),
             LocalizableText.Localized("Message_NewProjectOnOpen_N"),
         };
-        private static readonly string[] _supportProjFileExts = new[] { ".dsproj", ".dnt" };
 
         private void Awake()
         {
@@ -46,7 +50,7 @@ namespace Deenote.Project
 
         public async UniTaskVoid OpenProjectAsync()
         {
-            var result = await MainSystem.FileExplorer.OpenSelectFileAsync(_supportProjFileExts);
+            var result = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args.SupportProjectFileExtensions);
             if (result.IsCancelled)
                 return;
 
@@ -58,6 +62,7 @@ namespace Deenote.Project
                 return;
             }
 
+            // TODO:Load AudioClip
             CurrentProject = proj.Value;
             _projectSavePath = result.Path;
             MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_OpenProject_Completed"), 3f).Forget();

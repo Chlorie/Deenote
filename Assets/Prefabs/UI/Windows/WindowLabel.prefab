@@ -151,6 +151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 178477389476263789}
   _textKey: 
+  _isLocalized: 1
 --- !u!114 &663350670933602111
 MonoBehaviour:
   m_ObjectHideFlags: 0

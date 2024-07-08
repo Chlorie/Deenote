@@ -1,6 +1,8 @@
+using Deenote.Localization;
+using Deenote.UI.MenuBar.Components;
+using Deenote.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace Deenote.UI.MenuBar
 {
@@ -8,7 +10,7 @@ namespace Deenote.UI.MenuBar
     {
         [Header("UI")]
         [SerializeField] MenuBarController _menuBar;
-        [SerializeField] Toggle _toggle;
+        [SerializeField] MenuItemToggle _toggle;
         [SerializeField] GameObject _menuDropDownParentGameObject;
 
         private void Awake()
@@ -19,12 +21,23 @@ namespace Deenote.UI.MenuBar
         private void OnToggle(bool value)
         {
             if (value) {
+                Debug.Log($"Toggle on:{_toggle.gameObject.GetComponentInChildren<LocalizedText>().TmpText.text}");
                 _menuDropDownParentGameObject.SetActive(true);
+                var colors = _toggle.colors;
+                colors.normalColor = colors.normalColor.WithAlpha(1f);
+                colors.selectedColor = colors.selectedColor.WithAlpha(1f);
+                _toggle.colors = colors;
                 _menuBar.IsHovering = true;
             }
             else {
+                Debug.Log($"Toggle off:{_toggle.gameObject.GetComponentInChildren<LocalizedText>().TmpText.text}");
                 _menuDropDownParentGameObject.SetActive(false);
+                var colors = _toggle.colors;
+                colors.normalColor = colors.normalColor.WithAlpha(0f);
+                colors.selectedColor = colors.selectedColor.WithAlpha(0f);
+                _toggle.colors = colors;
                 _menuBar.IsHovering = false;
+                // TODO: 手动取消选择后，toggle的状态是Selected，导致没有highlight
             }
         }
 
@@ -40,5 +53,6 @@ namespace Deenote.UI.MenuBar
         {
             _toggle.isOn = false;
         }
+
     }
 }

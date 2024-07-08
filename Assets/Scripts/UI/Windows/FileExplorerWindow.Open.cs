@@ -48,7 +48,7 @@ namespace Deenote.UI.Windows
         private async UniTask<bool> OpenAsync(string[] extensionFilters, string initialDirectory = null,
             bool inputMode = false, string inputModeFileExtension = null)
         {
-            gameObject.SetActive(true);
+            Window.IsActivated = true;
 
             using var confirmHandler = _confirmButton.GetAsyncClickEventHandler();
             using var cancelHandler = _cancelButton.GetAsyncClickEventHandler();
@@ -83,7 +83,7 @@ namespace Deenote.UI.Windows
             ResetFileList(initialDirectory);
 
             var index = await clickTask;
-            gameObject.SetActive(false);
+            Window.IsActivated = false;
             return index == 0;
         }
 

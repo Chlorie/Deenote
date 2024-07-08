@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Deenote.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,7 +30,15 @@ namespace Deenote.UI.MenuBar
             _openButton.onClick.AddListener(MainSystem.ProjectManager.OpenProjectAsync);
             _saveButton.onClick.AddListener(MainSystem.ProjectManager.SaveProjectAsync);
             _saveAsButton.onClick.AddListener(MainSystem.ProjectManager.SaveAsAsync);
-            //TODO quit and export 
+            _quitButton.onClick.AddListener(OnQuitAsync);
+            //TODO export
+        }
+
+        private async UniTaskVoid OnQuitAsync()
+        {
+            if (await MainSystem.ConfirmQuitAsync()) {
+                MainSystem.QuitApplication();
+            }
         }
     }
 }

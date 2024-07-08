@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
+using System.Text;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Deenote.Localization
 {
@@ -78,8 +77,8 @@ namespace Deenote.Localization
 
             var name = reader.ReadLine();
 
-            while (true) {
-                var line = reader.ReadLine();
+            while (!reader.EndOfStream) {
+                string line = reader.ReadLine();
                 if (line is null)
                     break;
 
@@ -88,11 +87,28 @@ namespace Deenote.Localization
                     continue;
 
                 // If '=' not found, we ignore this line
-                var seperator = line.IndexOf('=');
+                int seperator = line.IndexOf('=');
                 if (seperator < 0)
                     continue;
 
-                dict.Add(line[..seperator], line[(seperator + 1)..].Replace("<br/>","\n"));
+                string key = line[..seperator];
+                string value;
+                if (line.AsSpan(seperator + 1).SequenceEqual("\"\"\"")) {
+                    StringBuilder sb = new();
+                    while (!reader.EndOfStream) {
+                        line = reader.ReadLine();
+                        if (line == null || line == "\"\"\"") {
+                            break;
+                        }
+                        sb.AppendLine(line);
+                    }
+                    value = sb.ToString();
+                }
+                else {
+                    value = line[(seperator + 1)..].Replace("<br/>", "\r\n");
+                }
+
+                dict.Add(key, value);
             }
 
             return (name, dict);

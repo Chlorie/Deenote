@@ -1,7 +1,12 @@
+using Cysharp.Threading.Tasks;
+using Deenote.Edit;
+using Deenote.GameStage;
+using Deenote.Localization;
+using Deenote.Project;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
-using System;
-using System.Collections.Generic;
+using Deenote.Utilities;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,19 +14,27 @@ using UnityEngine.UI;
 namespace Deenote.UI.Windows
 {
     [RequireComponent(typeof(Window))]
-    public sealed class PropertiesWindow : MonoBehaviour
+    public sealed partial class PropertiesWindow : MonoBehaviour
     {
         [SerializeField] Window _window;
+        [SerializeField] ProjectManager _projectManager;
+        [SerializeField] GameStageController _gameStageController;
+        [SerializeField] EditorController _editorController;
 
         [Header("UI")]
         [Header("Project Info")]
+        [SerializeField] Button _projectInfoGroupButton;
+        [SerializeField] GameObject _projectInfoGroupGameObject;
         [SerializeField] Button _projectAudioButton;
+        [SerializeField] TMP_Text _projectAudioText;
         [SerializeField] TMP_InputField _projectNameInputField;
         [SerializeField] TMP_InputField _projectComposerInputField;
         [SerializeField] TMP_InputField _projectChartDesignerInputField;
         [SerializeField] TMP_Dropdown _projectLoadedChartDropdown;
 
         [Header("Chart Info")]
+        [SerializeField] Button _chartInfoGroupButton;
+        [SerializeField] GameObject _chartInfoGroupGameObject;
         [SerializeField] TMP_InputField _chartNameInputField;
         [SerializeField] TMP_Dropdown _chartDifficultyDropdown;
         [SerializeField] TMP_InputField _chartLevelInputField;
@@ -30,127 +43,105 @@ namespace Deenote.UI.Windows
         [SerializeField] TMP_InputField _chartRemapVMaxInputField;
         [SerializeField] TMP_Text _selectedNotesText;
 
-        [Header("Note Info")]
-        [SerializeField] TMP_InputField _notePositionInputField;
-        [SerializeField] TMP_InputField _noteTimeInputField;
-        [SerializeField] TMP_InputField _noteSizeInputField;
-        [SerializeField] TMP_InputField _noteShiftInputField;
-        [SerializeField] TMP_InputField _noteSpeedInputField;
-        [SerializeField] TMP_InputField _noteDurationInputField;
-        [SerializeField] Toggle _noteVibrateToggle;
-        [SerializeField] Toggle _noteSwipeToggle;
-        [SerializeField] TMP_InputField _noteWarningTypeInputField;
-        [SerializeField] TMP_InputField _noteEventIdInputField;
-        [SerializeField] Toggle _noteIsLinkToggle;
-        [SerializeField] Button _noteSoundsButton;
-        [SerializeField] TMP_Text _noteSoundsText;
+
+        private void Awake()
+        {
+            _projectInfoGroupButton.onClick.AddListener(() => _projectInfoGroupGameObject.SetActive(!_projectInfoGroupGameObject.activeSelf));
+            _projectAudioButton.onClick.AddListener(OnAudioButtonClickedAsync);
+            _projectNameInputField.onSubmit.AddListener(OnProjectMusicNameChanged);
+            _projectComposerInputField.onSubmit.AddListener(OnProjectComposerChanged);
+            _projectChartDesignerInputField.onSubmit.AddListener(OnProjectChartDesignerChanged);
+
+            _chartInfoGroupButton.onClick.AddListener(() => _chartInfoGroupGameObject.SetActive(!_chartInfoGroupGameObject.activeSelf));
+            _chartNameInputField.onSubmit.AddListener(OnChartNameChanged);
+            _chartDifficultyDropdown.onValueChanged.AddListener(OnChartDifficultyChanged);
+            _chartLevelInputField.onSubmit.AddListener(null);
+            _chartSpeedInputField.onSubmit.AddListener(null);
+            _chartRemapVMinInputField.onSubmit.AddListener(null);
+            _chartRemapVMaxInputField.onSubmit.AddListener(null);
+            // TODO: complete
+
+            AwakeNoteInfo();
+        }
+
+        #region UI Events
+
+        private static readonly LocalizableText[] _loadAudioFailedMessageButtonTexts = new[] {
+            LocalizableText.Localized("Message_AudioLoadFailed_Y"),
+            LocalizableText.Localized("Message_AudioLoadFailed_N"),
+        };
+
+        private async UniTaskVoid OnAudioButtonClickedAsync()
+        {
+            FileStream fs = null;
+            try {
+            SelectFile:
+                var res = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args.SupportAudioFileExtensions);
+                if (res.IsCancelled)
+                    return;
+
+                fs = File.OpenRead(res.Path);
+                if (!AudioUtils.TryLoad(fs, Path.GetExtension(res.Path), out var clip)) {
+                    var btn = await MainSystem.MessageBox.ShowAsync(
+                        LocalizableText.Localized("Message_AudioLoadFailed_Title"),
+                        LocalizableText.Localized("Message_AudioLoadFailed_Content"),
+                        _loadAudioFailedMessageButtonTexts);
+                    if (btn != 0)
+                        return;
+                    // Reselect file
+                    goto SelectFile;
+                }
+
+                var bytes = new byte[fs.Length];
+                fs.Seek(0, SeekOrigin.Begin);
+                fs.Read(bytes);
+                // TODO: 这里的bytes可以不用了
+                _editorController.EditProjectAudio(res.Path, bytes, clip);
+            } finally {
+                fs?.Dispose();
+            }
+        }
+
+        private void OnProjectMusicNameChanged(string value)
+        {
+            _editorController.EditProjectMusicName(value);
+        }
+
+        private void OnProjectComposerChanged(string value)
+        {
+            _editorController.EditProjectComposer(value);
+        }
+
+        private void OnProjectChartDesignerChanged(string value)
+        {
+            _editorController.EditProjectChartDesigner(value);
+        }
+
+        private void OnChartNameChanged(string value)
+        {
+            _editorController.EditChartName(value);
+        }
+
+        private void OnChartDifficultyChanged(int value)
+        {
+            _editorController.EditChartDifficulty(DifficultyExt.FromInt32(value));
+        }
+
+        #endregion
 
         #region Notify
 
-        public void NotifyNoteSelectionChanged(List<NoteModel> selectedNotes)
-        {
-            _selectedNotesText.text = selectedNotes.Count.ToString();
+        public void NotifyAudioFileChanged(string filePath) => _projectAudioText.text = Path.GetFileName(filePath);
 
-            switch (selectedNotes.Count) {
-                case 0: {
-                    _notePositionInputField.SetTextWithoutNotify("-");
-                    _noteTimeInputField.SetTextWithoutNotify("-");
-                    _noteSizeInputField.SetTextWithoutNotify("-");
-                    _noteShiftInputField.SetTextWithoutNotify("-");
-                    _noteSpeedInputField.SetTextWithoutNotify("-");
-                    _noteDurationInputField.SetTextWithoutNotify("-");
-                    _noteVibrateToggle.SetIsOnWithoutNotify(false);
-                    _noteSwipeToggle.SetIsOnWithoutNotify(false);
-                    _noteWarningTypeInputField.SetTextWithoutNotify("-");
-                    _noteEventIdInputField.SetTextWithoutNotify("-");
-                    _noteIsLinkToggle.SetIsOnWithoutNotify(false);
-                    _noteSoundsText.SetText("-");
-                    SetControlsInteractable(false);
-                    break;
-                }
+        public void NotifyProjectMusicNameChanged(string name) => _projectNameInputField.SetTextWithoutNotify(name);
 
-                case 1: {
-                    var note = selectedNotes[0].Data;
+        public void NotifyProjectComposerChanged(string composer) => _projectComposerInputField.SetTextWithoutNotify(composer);
 
-                    _notePositionInputField.SetTextWithoutNotify(note.Position.ToString("F3"));
-                    _noteTimeInputField.SetTextWithoutNotify(note.Time.ToString("F3"));
-                    _noteSizeInputField.SetTextWithoutNotify(note.Size.ToString("F3"));
-                    _noteShiftInputField.SetTextWithoutNotify(note.Shift.ToString("F3"));
-                    _noteSpeedInputField.SetTextWithoutNotify(note.Speed.ToString("F3"));
-                    _noteDurationInputField.SetTextWithoutNotify(note.Duration.ToString("F3"));
-                    _noteVibrateToggle.SetIsOnWithoutNotify(note.Vibrate);
-                    _noteSwipeToggle.SetIsOnWithoutNotify(note.IsSwipe);
-                    _noteWarningTypeInputField.SetTextWithoutNotify(note.WarningType.ToString());
-                    _noteEventIdInputField.SetTextWithoutNotify(note.EventId);
-                    _noteIsLinkToggle.SetIsOnWithoutNotify(note.IsSlide);
-                    _noteSoundsText.SetText(note.Sounds.Count switch {
-                        0 => "-",
-                        1 => note.Sounds[0].ToPitchDisplayString(),
-                        _ => note.Sounds.Count.ToString(),
-                    });
+        public void NotifyProjectChartDesignerChanged(string charter) => _projectChartDesignerInputField.SetTextWithoutNotify(charter);
 
-                    SetControlsInteractable(true);
-                    break;
-                }
+        public void NotifyChartNameChanged(string name) => _chartNameInputField.SetTextWithoutNotify(name);
 
-                default: {
-                    _notePositionInputField.SetTextWithoutNotify(GetDisplayString(selectedNotes, n => n.Position));
-                    _noteTimeInputField.SetTextWithoutNotify(GetDisplayString(selectedNotes, n => n.Time));
-                    _noteSizeInputField.SetTextWithoutNotify(GetDisplayString(selectedNotes, n => n.Size));
-                    _noteShiftInputField.SetTextWithoutNotify(GetDisplayString(selectedNotes, n => n.Shift));
-                    _noteSpeedInputField.SetTextWithoutNotify(GetDisplayString(selectedNotes, n => n.Speed));
-                    _noteDurationInputField.SetTextWithoutNotify(GetDisplayString(selectedNotes, n => n.Duration));
-                    _noteVibrateToggle.SetIsOnWithoutNotify(SameForAll(selectedNotes, n => n.Vibrate) ? selectedNotes[0].Data.Vibrate : false);
-                    _noteSwipeToggle.SetIsOnWithoutNotify(SameForAll(selectedNotes, n => n.IsSwipe) ? selectedNotes[0].Data.IsSwipe : false);
-                    _noteWarningTypeInputField.SetTextWithoutNotify(SameForAll(selectedNotes, n => n.WarningType) ? selectedNotes[0].Data.WarningType.ToInt32().ToString() : "-");
-                    _noteEventIdInputField.SetTextWithoutNotify(SameForAll(selectedNotes, n => n.EventId) ? selectedNotes[0].Data.EventId : "-");
-                    _noteIsLinkToggle.SetIsOnWithoutNotify(SameForAll(selectedNotes, n => n.IsSlide) ? selectedNotes[0].Data.IsSlide : false);
-                    _noteSoundsText.text = "-";
-
-                    SetControlsInteractable(true);
-                    break;
-
-                    static string GetDisplayString(List<NoteModel> notes, Func<NoteData, float> propertyGetter)
-                    {
-                        var compare = propertyGetter(notes[0].Data);
-                        foreach (var note in notes) {
-                            if (propertyGetter(note.Data) != compare)
-                                return "-";
-                        }
-                        return compare.ToString("F3");
-                    }
-
-                    static bool SameForAll<T>(List<NoteModel> notes, Func<NoteData, T> propertyGetter)
-                    {
-                        var compare = propertyGetter(notes[0].Data);
-                        foreach (var note in notes) {
-                            if (!EqualityComparer<T>.Default.Equals(propertyGetter(note.Data), compare))
-                                return false;
-                        }
-                        return true;
-                    }
-                }
-            }
-
-            void SetControlsInteractable(bool value)
-            {
-                if (_notePositionInputField.interactable == value)
-                    return;
-
-                _notePositionInputField.interactable = value;
-                _noteTimeInputField.interactable = value;
-                _noteSizeInputField.interactable = value;
-                _noteShiftInputField.interactable = value;
-                _noteSpeedInputField.interactable = value;
-                _noteDurationInputField.interactable = value;
-                _noteVibrateToggle.interactable = value;
-                _noteSwipeToggle.interactable = value;
-                _noteWarningTypeInputField.interactable = value;
-                _noteEventIdInputField.interactable = value;
-                _noteIsLinkToggle.interactable = value;
-                _noteSoundsButton.interactable = value;
-            }
-        }
+        public void NotifyChartDifficultyChanged(Difficulty difficulty) => _chartDifficultyDropdown.SetValueWithoutNotify(difficulty.ToInt32());
 
         #endregion
     }

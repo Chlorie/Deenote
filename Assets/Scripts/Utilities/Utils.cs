@@ -1,3 +1,4 @@
+using Deenote.Utilities.Robustness;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +22,49 @@ namespace Deenote.Utilities
                     return true;
             }
             return false;
+        }
+
+        public static void RemoveRange<T>(this List<T> list, Range range)
+        {
+            var (offset, length) = range.GetOffsetAndLength(list.Count);
+            list.RemoveRange(offset, length);
+        }
+
+        public static void RemoveAt<T>(this List<T> list,Index index)
+        {
+            list.RemoveAt(index.GetOffset(list.Count));
+        }
+
+        public static T[] Array<T>(int length)
+        {
+            if (length == 0)
+                return System.Array.Empty<T>();
+            else
+                return new T[length];
+        }
+
+        public static bool IsSameForAll<T, TValue>(this ListReadOnlyView<T> list, Func<T, TValue> valueGetter, out TValue value, IEqualityComparer<TValue> comparer = null)
+        {
+            switch (list.Count) {
+                case 0:
+                    value = default;
+                    return true;
+                case 1:
+                    value = valueGetter(list[0]);
+                    return true;
+            }
+
+            value = valueGetter(list[0]);
+            comparer ??= EqualityComparer<TValue>.Default;
+
+            for (int i = 0; i < list.Count; i++) {
+                if (!comparer.Equals(value, valueGetter(list[i]))) {
+                    value = default;
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

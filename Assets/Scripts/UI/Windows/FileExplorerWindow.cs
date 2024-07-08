@@ -1,12 +1,9 @@
-using Cysharp.Threading.Tasks;
-using Deenote.UI.Windows;
 using Deenote.UI.Windows.Elements;
 using Deenote.Utilities;
-using System.Collections.Generic;
+using Deenote.Utilities.Robustness;
 using System.IO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Windows
@@ -15,11 +12,13 @@ namespace Deenote.UI.Windows
     public sealed partial class FileExplorerWindow : MonoBehaviour
     {
         [SerializeField] Window _window;
+        public Window Window => _window;
+
         [Header("UI")]
         [SerializeField] Button _backDirButton;
-        /// <remark>
+        /// <remarks>
         /// Keep text property sync with <see cref="__currentDirectory"/>
-        /// </remark>
+        /// </remarks>
         [SerializeField] TMP_InputField _currentDirectoryInputField;
         [SerializeField] Button _confirmButton;
         [SerializeField] Button _cancelButton;
@@ -30,9 +29,10 @@ namespace Deenote.UI.Windows
         [Header("Prefabs")]
         [SerializeField] FileExplorerListItemController _fileItemPrefab;
 
-        private ObjectPool<FileExplorerListItemController> _fileItemPool;
-        private List<FileExplorerListItemController> _fileItems;
+        private PooledObjectListView<FileExplorerListItemController> _fileItems;
 
+        // null: filter directory
+        // []: no filter
         private string[] _extensionFilters;
         private string _selectedFilePath;
 
@@ -50,36 +50,36 @@ namespace Deenote.UI.Windows
             else
                 CurrentDirectory ??= Directory.GetCurrentDirectory();
 
-            foreach (var item in _fileItems)
-                ReleaseFileItem(item);
-            _fileItems.Clear();
+            var resettingFileItems = _fileItems.Resetting();
 
-            int i = 0;
             foreach (var dir in Directory.GetDirectories(CurrentDirectory)) {
-                var item = GetFileItem(dir, true);
-                item.transform.SetSiblingIndex(i++);
-                _fileItems.Add(item);
+                resettingFileItems.Add(out var item);
+                item.Initialize(dir, true);
             }
 
-            if (_extensionFilters is null)
+            if (_extensionFilters is null) {
+                resettingFileItems.Dispose();
+                _fileItems.SetSiblingIndicesInOrder();
                 return;
+            }
 
             if (_extensionFilters.Length == 0) {
                 foreach (var file in Directory.GetFiles(CurrentDirectory)) {
-                    var item = GetFileItem(file, false);
-                    item.transform.SetSiblingIndex(i++);
-                    _fileItems.Add(item);
+                    resettingFileItems.Add(out var item);
+                    item.Initialize(file, false);
                 }
             }
             else {
                 foreach (var file in Directory.GetFiles(CurrentDirectory)) {
                     if (file.EndsWithOneOf(_extensionFilters)) {
-                        var item = GetFileItem(file, false);
-                        item.transform.SetSiblingIndex(i++);
-                        _fileItems.Add(item);
+                        resettingFileItems.Add(out var item);
+                        item.Initialize(file, false);
                     }
                 }
             }
+
+            resettingFileItems.Dispose();
+            _fileItems.SetSiblingIndicesInOrder();
         }
 
         private void Awake()
@@ -103,34 +103,19 @@ namespace Deenote.UI.Windows
                 _confirmButton.interactable = Utils.IsValidFileName(fileName);
             });
 
-            _fileItemPool = UnityUtils.CreateObjectPool(_fileItemPrefab, _fileItemParentTransform);
-            _fileItems = new();
+            _fileItems = new PooledObjectListView<FileExplorerListItemController>(UnityUtils.CreateObjectPool(() =>
+            {
+                var item = Instantiate(_fileItemPrefab, _fileItemParentTransform);
+                item.OnCreated(this);
+                return item;
+            }, 0));
         }
 
         private void OnDisable()
         {
             // Clear file items when close FileExplorer
-            foreach (var item in _fileItems)
-                ReleaseFileItem(item);
-            _fileItems.Clear();
-            _fileItemPool.Clear();
+            _fileItems.Clear(clearPool: true);
         }
-
-        #region Pool
-
-        private FileExplorerListItemController GetFileItem(string path, bool isDirectory)
-        {
-            var item = _fileItemPool.Get();
-            item.Initialize(this, path, isDirectory);
-            return item;
-        }
-
-        private void ReleaseFileItem(FileExplorerListItemController fileItem)
-        {
-            _fileItemPool.Release(fileItem);
-        }
-
-        #endregion
 
         internal void SelectItem(FileExplorerListItemController fileItem)
         {
