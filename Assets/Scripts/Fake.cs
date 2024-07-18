@@ -1,4 +1,3 @@
-using Deenote.Project;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;

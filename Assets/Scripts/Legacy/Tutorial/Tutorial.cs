@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Tutorial : MonoBehaviour
 {

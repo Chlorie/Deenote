@@ -6,98 +6,98 @@
 
 # Project
 
-- [ ] Tools²Ëµ¥£ºµ¼³öÎªdsproj
-- [ ] Æ×Ãæ¸´ÖÆ
-  - ProjectPropertiesÒ³£¬Ìí¼ÓCopy°´Å¥£¬°´ÏÂÊ±£¬¸ü¸ÄÎªCancel£¬ÆäËûÆ×ÃæµÄ¸Ã°´Å¥¸ü¸ÄÎªPaste¡£
+- [ ] Toolsèœå•ï¼šå¯¼å‡ºä¸ºdsproj
+- [ ] è°±é¢å¤åˆ¶
+  - ProjectPropertiesé¡µï¼Œæ·»åŠ CopyæŒ‰é’®ï¼ŒæŒ‰ä¸‹æ—¶ï¼Œæ›´æ”¹ä¸ºCancelï¼Œå…¶ä»–è°±é¢çš„è¯¥æŒ‰é’®æ›´æ”¹ä¸ºPasteã€‚
 
 # Stage
 
-- [B] ÐÞ¸´ÁË°´¿Õ¸ñ²¥·Åµ½ÒôÀÖ½áÊøºóËÉ¿ª£¬ÔÙ´Î²¥·ÅÊ±ÒôÀÖ»á´ÓÍ·¿ªÊ¼µÄBug
-- [ ] ²Î¿¼Deemo 3.xµ÷ÕûPerspective View
-- [ ] Ö§³ÖDEEMO II
-  - [ ] FlickÓëHoldµÄ¼æÈÝÇé¿öÎ´Öª£¬Ä¿Ç°Ñ¡ÔñholdÇ¿ÖÆÖÃ0
-  - [ ] SpeedÉèÖÃ·½Ê½Î´Öª£¬´ý¶¨
-  - [ ] ÒýÈëPseudoTime£¬±íÊ¾»»ËãÎªSpeed=1Ê±Í¬Ò»¸öÎ»ÖÃµÄNoteµÄTime£¬»ùÓÚPseudoTime¼ÆËãÎ»ÖÃ
+- [B] ä¿®å¤äº†æŒ‰ç©ºæ ¼æ’­æ”¾åˆ°éŸ³ä¹ç»“æŸåŽæ¾å¼€ï¼Œå†æ¬¡æ’­æ”¾æ—¶éŸ³ä¹ä¼šä»Žå¤´å¼€å§‹çš„Bug
+- [ ] å‚è€ƒDeemo 3.xè°ƒæ•´Perspective View
+- [ ] æ”¯æŒDEEMO II
+  - [ ] Flickä¸ŽHoldçš„å…¼å®¹æƒ…å†µæœªçŸ¥ï¼Œç›®å‰é€‰æ‹©holdå¼ºåˆ¶ç½®0
+  - [ ] Speedè®¾ç½®æ–¹å¼æœªçŸ¥ï¼Œå¾…å®š
+  - [ ] å¼•å…¥PseudoTimeï¼Œè¡¨ç¤ºæ¢ç®—ä¸ºSpeed=1æ—¶åŒä¸€ä¸ªä½ç½®çš„Noteçš„Timeï¼ŒåŸºäºŽPseudoTimeè®¡ç®—ä½ç½®
     - TimeToPseudoTime(offsetTime, speed) => offsetTime * speed;
-  - [ ] NoteÑ¡ÔñÊ±£¬¶ÔÓÚÏßÏÂNote£¬»ùÓÚTime½øÐÐÑ¡Ôñ£»¶ÔÓÚÎ´³öÏÖNote£¬»ùÓÚÆä¸Õ³öÏÖÊ±µÄPseudoTimeÑ¡Ôñ
-    - ÉèÖÃ±£Ö¤ÔÚNote³öÏÖÊ±Ñ¡ÖÐµÄNoteÔÚNoteÏûÊ§ºóÒÀÈ»±»Ñ¡ÖÐ¡£
-  - [ ] ´ý¶¨HoldËã·¨
-    1 µ¥¶ÀÉèÖÃÒ»¸öList<>ÓÃÓÚ´æ·ÅHold£¬¸üÐÂ³¡¾°Ê±±éÀúÑ°ÕÒHold
-    2 ChartModel.Notes: List<NoteModel>°´ÕÕNoteµÄStartTimeºÍEndTime´æ·ÅÁ½¸öNote£¬×¢ÒâÁ½¸ö¶¼ÔÚ³¡¾°ÖÐÊ±¿ÉÄÜ»á·¢ÉúÖØ¸´
-    3 µ¥¶ÀÉèÖÃÒ»¸öList<>ÓÃÓÚ´æ·Å³¬¹ýStageMaxTimeµÄHold£¬¶ÔÓÚÆäËûNote£¬¸üÐÂ³¡¾°ÈôStartTimeºÍEndTimeÖ®Ò»ÔÚ·¶Î§ÄÚ¼´¿É£¬¶ÔÓÚ¸ÃÁÐ±íÖÐµÄNote£¬½øÐÐ±éÀú£¨±éÀú»òÐí¿ÉÒÔÓÅ»¯£©
+  - [ ] Noteé€‰æ‹©æ—¶ï¼Œå¯¹äºŽçº¿ä¸‹Noteï¼ŒåŸºäºŽTimeè¿›è¡Œé€‰æ‹©ï¼›å¯¹äºŽæœªå‡ºçŽ°Noteï¼ŒåŸºäºŽå…¶åˆšå‡ºçŽ°æ—¶çš„PseudoTimeé€‰æ‹©
+    - è®¾ç½®ä¿è¯åœ¨Noteå‡ºçŽ°æ—¶é€‰ä¸­çš„Noteåœ¨Noteæ¶ˆå¤±åŽä¾ç„¶è¢«é€‰ä¸­ã€‚
+  - [ ] å¾…å®šHoldç®—æ³•
+    1 å•ç‹¬è®¾ç½®ä¸€ä¸ªList<>ç”¨äºŽå­˜æ”¾Holdï¼Œæ›´æ–°åœºæ™¯æ—¶éåŽ†å¯»æ‰¾Hold
+    2 ChartModel.Notes: List<NoteModel>æŒ‰ç…§Noteçš„StartTimeå’ŒEndTimeå­˜æ”¾ä¸¤ä¸ªNoteï¼Œæ³¨æ„ä¸¤ä¸ªéƒ½åœ¨åœºæ™¯ä¸­æ—¶å¯èƒ½ä¼šå‘ç”Ÿé‡å¤
+    3 å•ç‹¬è®¾ç½®ä¸€ä¸ªList<>ç”¨äºŽå­˜æ”¾è¶…è¿‡StageMaxTimeçš„Holdï¼Œå¯¹äºŽå…¶ä»–Noteï¼Œæ›´æ–°åœºæ™¯è‹¥StartTimeå’ŒEndTimeä¹‹ä¸€åœ¨èŒƒå›´å†…å³å¯ï¼Œå¯¹äºŽè¯¥åˆ—è¡¨ä¸­çš„Noteï¼Œè¿›è¡ŒéåŽ†ï¼ˆéåŽ†æˆ–è®¸å¯ä»¥ä¼˜åŒ–ï¼‰
 
 # Info Panel
 
-- [N] ¿ÉÒÔÏÔÊ¾²¿·Ö¸ÖÇÙÒôÐÅÏ¢
-- [ ] Ìá¹©¸ÖÇÙÒôÏÔÊ¾ÎªÒô·ûÃû»òÊý×ÖµÄÑ¡Ïî£¬¶Ô¸ÖÇÙÒô±à¼­Ãæ°åÒ²ÓÐÐ§
-- [ ] È«¾ÖÉèÖÃHide Ineffective Properties£ºÒþ²ØÎÞÐ§¹ûÊôÐÔ
+- [N] å¯ä»¥æ˜¾ç¤ºéƒ¨åˆ†é’¢ç´éŸ³ä¿¡æ¯
+- [ ] æä¾›é’¢ç´éŸ³æ˜¾ç¤ºä¸ºéŸ³ç¬¦åæˆ–æ•°å­—çš„é€‰é¡¹ï¼Œå¯¹é’¢ç´éŸ³ç¼–è¾‘é¢æ¿ä¹Ÿæœ‰æ•ˆ
+- [ ] å…¨å±€è®¾ç½®Hide Ineffective Propertiesï¼šéšè—æ— æ•ˆæžœå±žæ€§
 
 # Editor
 
-- [B] ÐÞ¸´ÁË³·ÏúÕ³Ìù²Ù×÷Ê±£¬»á¸ü¸ÄÒÑÑ¡ÖÐNoteµÄBug
-- [B] ÐÞ¸´ÁËShift+S¿ÉÄÜ»áÖ±½Ó°ÑNoteÉèÎªTime=0µÄBug£¨°É£¿£¨Êµ¼ÊÉÏÓÉÓÚBpm LineÖØÐ´ÁËÎÒ¸ù±¾Ã»¿´¶®ÔõÃ´ÊµÏÖµÄ
-- [C] °´×¡ÓÒ¼üÎ´ËÉ¿ªÊ±£¬µã»÷×ó¼ü¿ÉÒÔÖ±½ÓÈ¡ÏûÏÂ¼ü
-- [?] µ¥»÷Ñ¡ÖÐNoteÊ±£º
-  - Ñ¡ÖÐ¸Ã´¦ÖØµþµÄËùÓÐNote
-  - Ñ¡ÖÐµ¥¸öNote
-- [?] ÔÊÐíÔÚÅÐ¶¨ÏßÒÔÏÂ·ÅÖÃNote
-- [C] ¼´Ê¹±³¾°Note¿¿½ü±ß½ç£¬Ò²ÎÞ·¨Ñ¡ÖÐ±³¾°Note
-- [ ] Ìá¹©±³¾°NoteµÄ±à¼­
+- [B] ä¿®å¤äº†æ’¤é”€ç²˜è´´æ“ä½œæ—¶ï¼Œä¼šæ›´æ”¹å·²é€‰ä¸­Noteçš„Bug
+- [B] ä¿®å¤äº†Shift+Så¯èƒ½ä¼šç›´æŽ¥æŠŠNoteè®¾ä¸ºTime=0çš„Bugï¼ˆå§ï¼Ÿï¼ˆå®žé™…ä¸Šç”±äºŽBpm Lineé‡å†™äº†æˆ‘æ ¹æœ¬æ²¡çœ‹æ‡‚æ€Žä¹ˆå®žçŽ°çš„
+- [C] æŒ‰ä½å³é”®æœªæ¾å¼€æ—¶ï¼Œç‚¹å‡»å·¦é”®å¯ä»¥ç›´æŽ¥å–æ¶ˆä¸‹é”®
+- [?] å•å‡»é€‰ä¸­Noteæ—¶ï¼š
+  - é€‰ä¸­è¯¥å¤„é‡å çš„æ‰€æœ‰Note
+  - é€‰ä¸­å•ä¸ªNote
+- [?] å…è®¸åœ¨åˆ¤å®šçº¿ä»¥ä¸‹æ”¾ç½®Note
+- [C] å³ä½¿èƒŒæ™¯Noteé è¿‘è¾¹ç•Œï¼Œä¹Ÿæ— æ³•é€‰ä¸­èƒŒæ™¯Note
+- [ ] æä¾›èƒŒæ™¯Noteçš„ç¼–è¾‘
 
-- [C] ¸ÖÇÙÒô±à¼­Ãæ°å²»ÔÙ×èÖ¹ÆäËû²Ù×÷
-  - [N] ¸ÖÇÙÒô±à¼­Ãæ°åÌá¹©Òô¸ßÊýÖµ(0-127)Ö±½ÓÊäÈëµÄ¹¦ÄÜ
-  - [C] Ñ¡ÔñÐÂNoteÖ®ºó½«×Ô¶¯±£´æ¸ÖÇÙÒô¸ü¸Ä
-  - [?] ÊÔ²¥·Å¸ÖÇÙÒôÊ±£¬ÊÇ·ñÓ¦ÓÃStageµÄÒôÁ¿ÉèÖÃ£¿
-    - Èç¹û²»Ó¦ÓÃ£¬ÊÇ·ñÐèÒªÌí¼ÓÁíÒ»¸öµ¥¶ÀµÄÒôÁ¿ÉèÖÃ£¿
+- [C] é’¢ç´éŸ³ç¼–è¾‘é¢æ¿ä¸å†é˜»æ­¢å…¶ä»–æ“ä½œ
+  - [N] é’¢ç´éŸ³ç¼–è¾‘é¢æ¿æä¾›éŸ³é«˜æ•°å€¼(0-127)ç›´æŽ¥è¾“å…¥çš„åŠŸèƒ½
+  - [C] é€‰æ‹©æ–°Noteä¹‹åŽå°†è‡ªåŠ¨ä¿å­˜é’¢ç´éŸ³æ›´æ”¹
+  - [?] è¯•æ’­æ”¾é’¢ç´éŸ³æ—¶ï¼Œæ˜¯å¦åº”ç”¨Stageçš„éŸ³é‡è®¾ç½®ï¼Ÿ
+    - å¦‚æžœä¸åº”ç”¨ï¼Œæ˜¯å¦éœ€è¦æ·»åŠ å¦ä¸€ä¸ªå•ç‹¬çš„éŸ³é‡è®¾ç½®ï¼Ÿ
 
-- [ ] ¿ì½Ý¼üP£ºÇÐ»»Òô·û¸ÖÇÙÒô×´Ì¬
-  - Èô¿ÕÒô£¬Ìí¼ÓÒ»¸ö¸ÖÇÙÒô(Òô¸ßC4/72£¬ÒôÁ¿0)
-  - ÈôÓÐ¸ÖÇÙÒô£¬É¾³ý0ÒôÁ¿¸ÖÇÙÒô£¬½«·Ç0ÒôÁ¿¸ÖÇÙÒôÒÆÖÁ±³¾°£¨ÕâÏîÐèÒª¸ÖÇÙÒô±à¼­µÄÖ§³Ö£¬²»È»ÒÆÁË¾Í»Ø²»À´ÁË£©
+- [ ] å¿«æ·é”®Pï¼šåˆ‡æ¢éŸ³ç¬¦é’¢ç´éŸ³çŠ¶æ€
+  - è‹¥ç©ºéŸ³ï¼Œæ·»åŠ ä¸€ä¸ªé’¢ç´éŸ³(éŸ³é«˜C4/72ï¼ŒéŸ³é‡0)
+  - è‹¥æœ‰é’¢ç´éŸ³ï¼Œåˆ é™¤0éŸ³é‡é’¢ç´éŸ³ï¼Œå°†éž0éŸ³é‡é’¢ç´éŸ³ç§»è‡³èƒŒæ™¯ï¼ˆè¿™é¡¹éœ€è¦é’¢ç´éŸ³ç¼–è¾‘çš„æ”¯æŒï¼Œä¸ç„¶ç§»äº†å°±å›žä¸æ¥äº†ï¼‰
 
 
 # Player Settings
 
-- [ ] Basic CommandsÒÆÖÁ¹¤¾ßÀ¸
-  - [ ] View²Ëµ¥ÖÐÌá¹©¹¤¾ßÀ¸µÄ¿ª¹Ø
+- [ ] Basic Commandsç§»è‡³å·¥å…·æ 
+  - [ ] Viewèœå•ä¸­æä¾›å·¥å…·æ çš„å¼€å…³
 
-- [N] ÔÊÐíÊÖ¶¯ÊäÈëÒôÀÖËÙ¶È
-- [N] Ìí¼ÓÁËHalfºÍResetµÄ¿ì½ÝÒôÀÖËÙ¶Èµ÷Õû
-- [N] ¼ÓÈëÉÏÒþ
-- [C] È¡ÏûÁËShow Links¶ÔCurveÏÔÊ¾Ð§¹ûµÄ¿ª¹Ø£¬ÏÖÔÚÈôCurve´æÔÚ½«Ê¼ÖÕÏÔÊ¾
+- [N] å…è®¸æ‰‹åŠ¨è¾“å…¥éŸ³ä¹é€Ÿåº¦
+- [N] æ·»åŠ äº†Halfå’ŒResetçš„å¿«æ·éŸ³ä¹é€Ÿåº¦è°ƒæ•´
+- [N] åŠ å…¥ä¸Šéš
+- [C] å–æ¶ˆäº†Show Linkså¯¹Curveæ˜¾ç¤ºæ•ˆæžœçš„å¼€å…³ï¼ŒçŽ°åœ¨è‹¥Curveå­˜åœ¨å°†å§‹ç»ˆæ˜¾ç¤º
 
-- [N] ¿ì½Ý¼üNum Enter£º²¥·Å/ÔÝÍ£ÒôÀÖ
+- [N] å¿«æ·é”®Num Enterï¼šæ’­æ”¾/æš‚åœéŸ³ä¹
 
-- [ ] ÏßÐÔ½¥±äBPM
-- [N] ÏÖÔÚÒ»¸öBPM¶ÎÂäµÄÆðÖ¹ÅÄÏßÎªÇ¿µ÷ÎªÀ¶É«
-- [B] ÐÞ¸´ÁË²¿·ÖÇé¿öbpm±à¼­Ê±End´¦ÅÄÏß²»ÄÜÕý³£Ìí¼ÓµÄBug
+- [ ] çº¿æ€§æ¸å˜BPM
+- [N] çŽ°åœ¨ä¸€ä¸ªBPMæ®µè½çš„èµ·æ­¢æ‹çº¿ä¸ºå¼ºè°ƒä¸ºè“è‰²
+- [B] ä¿®å¤äº†éƒ¨åˆ†æƒ…å†µbpmç¼–è¾‘æ—¶Endå¤„æ‹çº¿ä¸èƒ½æ­£å¸¸æ·»åŠ çš„Bug
 
-- [ ] Æ×ÃæÁ¬½Ó¹¦ÄÜÒÆÖÁ²Ëµ¥À¸
+- [ ] è°±é¢è¿žæŽ¥åŠŸèƒ½ç§»è‡³èœå•æ 
 
 # Note Placement
 
-- [C] ¼ò»¯ÁËVertical GridµÄÉèÖÃ
-  - [ ] ÔÚÉèÖÃÖÐ»Ö¸´¾É°æÉèÖÃ·½Ê½
-- [B] ÐÞ¸´ÁËÉèÖÃ×Ý¸ñÏß>25Ê±£¬ÖØÉè¸ñÏßÓÐ²ÐÁôÏÔÊ¾µÄBug£¨Magic number´òßã
-- [C] µ±ºá¸ñÏßÉèÖÃÎª0Ê±£¬¸ü¸Ä¡°Îü¸½µ½¸ñÏß¡±ÎªÓÐÐ§¡£
-- [C] ²ð·ÖÁËSnap To Grid£¬ÏÖÔÚ¿ÉÒÔ·Ö±ðÉèÖÃÊÇ·ñÎü¸½µ½ºá×Ý¸ñÏß
-- [C] ¹Ø±Õ×Ý¸ñÏßBorderÊ±£¬²»ÔÙÎü¸½µ½³¡¾°±ß½ç
-- [C] ÔÚÁ½¸öbpm¶ÎÂäÏÎ½ÓÊ±£¬×îºóÒ»ÅÄµÄ×ÓÅÄÏßµÄÎ»ÖÃ½«²»ÔÙ°´ÕÕÓëÏÂÒ»¸öbpm¶ÎÂäµÄÆðÊ¼Ê±¼äµÄ¾àÀëÆ½·Ö¡£
-  - [?] ÔÚÉèÖÃÖÐ»Ö¸´£¿
+- [C] ç®€åŒ–äº†Vertical Gridçš„è®¾ç½®
+  - [ ] åœ¨è®¾ç½®ä¸­æ¢å¤æ—§ç‰ˆè®¾ç½®æ–¹å¼
+- [B] ä¿®å¤äº†è®¾ç½®çºµæ ¼çº¿>25æ—¶ï¼Œé‡è®¾æ ¼çº¿æœ‰æ®‹ç•™æ˜¾ç¤ºçš„Bugï¼ˆMagic numberæ‰“å’©
+- [C] å½“æ¨ªæ ¼çº¿è®¾ç½®ä¸º0æ—¶ï¼Œæ›´æ”¹â€œå¸é™„åˆ°æ ¼çº¿â€ä¸ºæœ‰æ•ˆã€‚
+- [C] æ‹†åˆ†äº†Snap To Gridï¼ŒçŽ°åœ¨å¯ä»¥åˆ†åˆ«è®¾ç½®æ˜¯å¦å¸é™„åˆ°æ¨ªçºµæ ¼çº¿
+- [C] å…³é—­çºµæ ¼çº¿Borderæ—¶ï¼Œä¸å†å¸é™„åˆ°åœºæ™¯è¾¹ç•Œ
+- [C] åœ¨ä¸¤ä¸ªbpmæ®µè½è¡”æŽ¥æ—¶ï¼Œæœ€åŽä¸€æ‹çš„å­æ‹çº¿çš„ä½ç½®å°†ä¸å†æŒ‰ç…§ä¸Žä¸‹ä¸€ä¸ªbpmæ®µè½çš„èµ·å§‹æ—¶é—´çš„è·ç¦»å¹³åˆ†ã€‚
+  - [?] åœ¨è®¾ç½®ä¸­æ¢å¤ï¼Ÿ
 
-- [ ] °´ºá¸ñÏß¼ä¾àÌî³äCurve
-- [ ] Ìá¹©ÊÇ·ñ°´Curve±ä»¯SizeµÄ¿ª¹Ø
+- [ ] æŒ‰æ¨ªæ ¼çº¿é—´è·å¡«å……Curve
+- [ ] æä¾›æ˜¯å¦æŒ‰Curveå˜åŒ–Sizeçš„å¼€å…³
 
 # Settings
 
-- [N] ÔÊÐíÉèÖÃ¹öÂÖÁéÃô¶ÈÎª¸º£¬Ð§¹ûÎª¹öÂÖ·´Ïò
-- [ ] AutoSaveAndJsonµÄjson±£´æµ½Í¬Ä¿Â¼µÄÎÄ¼þ¼ÐProjectName_$autosaveÖÐ
+- [N] å…è®¸è®¾ç½®æ»šè½®çµæ•åº¦ä¸ºè´Ÿï¼Œæ•ˆæžœä¸ºæ»šè½®åå‘
+- [ ] AutoSaveAndJsonçš„jsonä¿å­˜åˆ°åŒç›®å½•çš„æ–‡ä»¶å¤¹ProjectName_$autosaveä¸­
 
-- [ ] AboutÒ³Éè¼Æ·ÖÎª±êÌâ¡¢×óÀ¸¡¢ÕýÎÄÈý²¿·Ö
-  - ÄÚÈÝÎª
+- [ ] Abouté¡µè®¾è®¡åˆ†ä¸ºæ ‡é¢˜ã€å·¦æ ã€æ­£æ–‡ä¸‰éƒ¨åˆ†
+  - å†…å®¹ä¸º
 <About>
   <HCl>
   <NachtgeistW>
 <Update History>
   <...>
-<Tutorial>ÎÞ×Ó½çÃæ£¬×óÀ¸²»ÏÔÊ¾
-  - [?] ÑÎËá°ÑAboutÀïµÄDeemo's Note MemoryÃû×Ö´ò´íÁË.jpg
+<Tutorial>æ— å­ç•Œé¢ï¼Œå·¦æ ä¸æ˜¾ç¤º
+  - [?] ç›é…¸æŠŠAbouté‡Œçš„Deemo's Note Memoryåå­—æ‰“é”™äº†.jpg

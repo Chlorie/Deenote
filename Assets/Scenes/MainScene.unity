@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -57921,7 +57920,6 @@ MonoBehaviour:
   _judgeLineBreathingEffectTransform: {fileID: 1817747903}
   _judgeLineHitEffectTransform: {fileID: 414012529}
   _editorController: {fileID: 0}
-  _propertiesWindow: {fileID: 0}
   _editorPropertiesWindow: {fileID: 1111557501}
   _perspectiveViewWindow: {fileID: 1858221819}
   _gridController: {fileID: 1260819580}
@@ -72204,8 +72202,9 @@ MonoBehaviour:
   __timeGridSubBeatCount: 2
   _bordersGameObject: {fileID: 274828251}
   _verticalGridParentTransform: {fileID: 2050611727}
-  _verticalGridOffset: 0
   __verticalGridCount: 0
+  __verticalGridOffset: 0
+  __isVerticalBorderVisible: 0
 --- !u!1 &1262443705
 GameObject:
   m_ObjectHideFlags: 0
@@ -122082,7 +122081,6 @@ MonoBehaviour:
   _chartsParentTransform: {fileID: 192939696}
   _chartPrefab: {fileID: 848560613682987284, guid: bdeb5c7b81ff2d54cb8b042521e60df4,
     type: 3}
-  _charts: []
 --- !u!1001 &7507387334997736455
 PrefabInstance:
   m_ObjectHideFlags: 0

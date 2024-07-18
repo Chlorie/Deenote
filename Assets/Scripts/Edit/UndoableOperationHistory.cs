@@ -1,6 +1,5 @@
 using Deenote.Edit.Operations;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Deenote.Edit
 {

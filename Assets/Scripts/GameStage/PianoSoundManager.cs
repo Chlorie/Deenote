@@ -3,7 +3,6 @@ using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 

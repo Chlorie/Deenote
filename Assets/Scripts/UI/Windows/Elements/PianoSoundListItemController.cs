@@ -1,7 +1,6 @@
 using Deenote.GameStage;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,7 +32,7 @@ namespace Deenote.UI.Windows.Elements
             _durationInputField.onSubmit.AddListener(OnDurationChanged);
             _delayInputField.onSubmit.AddListener(OnDelayChanged);
             _removeButton.onClick.AddListener(() => _window.RemoveSound(this));
-            // TODO: idйг╦ии╤╣дю╢венрмЭак
+            // TODO: idФ≤╞Е╧╡Е∙╔Г └Ф²╔Г²─Ф┬▒Е©≤Д╨├
 
             _data = new(0, 0, 0, 0);
         }

@@ -16,7 +16,7 @@ namespace Deenote.Project
         /// <returns></returns>
         public static ProjectModel CreateNewProject(string musicFilePath)
         {
-            // TODO: ¶ÁÈ¡ÒôÆµÊ§°ÜµÄ´¦Àí
+            // TODO: è¯»å–éŸ³é¢‘å¤±è´¥çš„å¤„ç†
             var proj = new ProjectModel {
                 AudioData = File.ReadAllBytes(musicFilePath),
                 MusicName = Path.GetFileNameWithoutExtension(musicFilePath),

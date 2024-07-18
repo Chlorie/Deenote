@@ -1,7 +1,6 @@
 using Deenote.Localization;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Deenote.UI.MenuBar

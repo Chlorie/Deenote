@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.UI.Windows;
-using System.IO;
 using UnityEngine;
 
 namespace Deenote.Project
@@ -75,7 +74,7 @@ namespace Deenote.Project
 
             if (CurrentProject is null)
                 return;
-            // TODO: 好像涉及到谱面的调整，再看看
+            // TODO: 濂藉儚娑夊強鍒拌氨闈㈢殑璋冩暣锛屽啀鐪嬬湅
 
             if (_projectSavePath is null) {
                 await SaveAsInternalAsync();
@@ -102,7 +101,7 @@ namespace Deenote.Project
             if (res.IsCancelled)
                 return;
 
-            // TODO: 好像涉及到谱面的调整，再看看2
+            // TODO: 濂藉儚娑夊強鍒拌氨闈㈢殑璋冩暣锛屽啀鐪嬬湅2
 
             _projectSavePath = res.Path;
             MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_SaveProject_Saving"));

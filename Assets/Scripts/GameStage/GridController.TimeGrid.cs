@@ -28,7 +28,7 @@ namespace Deenote.GameStage
 
         private ProjectModel.TempoListProxy CurrentProjectTempos => MainSystem.ProjectManager.CurrentProject.Tempos;
 
-        // TODO: ĞèÒª´¦ÀíMinBeatLineIntervalÂğ£¿
+        // TODO: éœ€è¦å¤„ç†MinBeatLineIntervalå—ï¼Ÿ
         public void UpdateTimeGrids()
         {
             if (TimeGridSubBeatCount == 0) {
@@ -93,9 +93,9 @@ namespace Deenote.GameStage
             }
         }
 
-        // Note: ÓëÏÂÒ»¸ötempoÏÎ½ÓµÄÒ»ÅÄµÄ×ÓÅÄÏß²»°´ÕÕÓëÏÂÒ»¸ötempo.StartTimeµÄ¼ä¾àÆ½·Ö£¬Òò´Ë
-        // get×ÓÅÄÏßÊ¹ÓÃtempo.GetBeatTime(float);
-        // ÈôÒª»Ö¸´¾É°ædntµÄ·½Ê½£¬UpdateTimeGrid£¬Get/FloorTo/CeilToNearestTimeGridTime¶¼µÃ¸Ä
+        // Note: ä¸ä¸‹ä¸€ä¸ªtempoè¡”æ¥çš„ä¸€æ‹çš„å­æ‹çº¿ä¸æŒ‰ç…§ä¸ä¸‹ä¸€ä¸ªtempo.StartTimeçš„é—´è·å¹³åˆ†ï¼Œå› æ­¤
+        // getå­æ‹çº¿ä½¿ç”¨tempo.GetBeatTime(float);
+        // è‹¥è¦æ¢å¤æ—§ç‰ˆdntçš„æ–¹å¼ï¼ŒUpdateTimeGridï¼ŒGet/FloorTo/CeilToNearestTimeGridTimeéƒ½å¾—æ”¹
 
         /// <returns><see langword="null"/> if given time is earlier than first tempo or later than last beat line</returns>
         public float? GetNearestTimeGridTime(float time)
