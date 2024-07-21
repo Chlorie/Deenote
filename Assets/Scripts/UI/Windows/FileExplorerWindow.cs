@@ -85,7 +85,7 @@ namespace Deenote.UI.Windows
         private void Awake()
         {
             _backDirButton.onClick.AddListener(() => ResetFileList(Path.GetDirectoryName(CurrentDirectory)));
-            _currentDirectoryInputField.onSubmit.AddListener(path =>
+            _currentDirectoryInputField.onEndEdit.AddListener(path =>
             {
                 if (Directory.Exists(path)) {
                     ResetFileList(path);

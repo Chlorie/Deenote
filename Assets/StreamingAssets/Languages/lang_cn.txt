@@ -126,6 +126,9 @@ Window_Preferences_MouseSensitivity=Mouse Wheel Sensitivity
 Window_Preferences_MouseReverse=Reverse
 Window_Preferences_Language=Language
 Window_Preferences_AutoSave=Auto Save
+Window_Preferences_AutoSave_Off=关闭
+Window_Preferences_AutoSave_On=仅项目文件
+Window_Preferences_AutoSave_OnAndSaveJson=保存项目与Json文件
 Window_Preferences_IneffectiveProperties=Show Ineffective Properties
 
 ## About
@@ -169,17 +172,12 @@ Status_SaveProject_Completed=Save completed.
 
 # About & Other
 
-## About
+## About Developer
 
-About_Content="""
---2020.1.31--
-    这里夜轮。我出于某种原因捡起了这个项目，开始边学 C# 边试图修 Deenote。
-    我今年大三，而盐酸已经以优异的成绩大学毕业，他今年研一。
-    0.7.3 是在残像的帮助下写的。一并感谢。
-    我也不知道我会给这个项目带来什么，所以走一步算一步吧。
-    感谢你使用 Deenote。
+About_Developer_HCl=HCl
+About_Developer_HCl_Content="""
+Deenote By HCl
 
---2017.12.2--
 -必须要说的那些话-
     谢谢你使用我写的程序！
     有些事我在开头还是必须要提一下的：此应用只得被用于Deemo谱面自制，严禁用于任何商业用途。这个应用制作自制谱面只是用来观看的，但如果你从某些渠道得知了将谱面导入游戏的方法，<color=#ff7f7f>请不要</color>散布（甚至公开）破解或修改过的游戏文件。这样做的话后果自负。
@@ -203,11 +201,27 @@ About_Content="""
     感谢Cytunity和Deemo Note Memory（的制作者们）给我带来的灵感。
     感谢Schwarzer同学的dll。
     特别要感谢rkevin和ゆゆ提供的技术支持！
+
+- HCl
+- 2017-12-2
+"""
+
+About_Developer_NachtgeistW=夜轮
+About_Developer_NachtgeistW_Content="""
+    这里夜轮。我出于某种原因捡起了这个项目，开始边学 C# 边试图修 Deenote。
+    我今年大三，而盐酸已经以优异的成绩大学毕业，他今年研一。
+    0.7.3 是在残像的帮助下写的。一并感谢。
+    我也不知道我会给这个项目带来什么，所以走一步算一步吧。
+    感谢你使用 Deenote。
+
+- 夜轮
+- 2020-1-31
 """
 
 ## Tutorial
 
-Tutorial_Content="""
+Tutorials_Main=使用教程
+Tutorials_Content="""
 All the shortcuts:
 
 -Project-
@@ -258,6 +272,9 @@ All the shortcuts:
 """
 
 ## UpdateHistory
+
+Ver_Dnt_1_0=Deenote 1.0
+Upd_Dnt_1_0=Now developing...
 
 Ver_Dnt_0_7_3=Deenote 0.7.3
 Upd_Dnt_0_7_3=增加了保存选定分辨率的功能。<br/>换掉了歌曲标题的字体，现在数字和部分标点跟官方一样了。

@@ -3,56 +3,76 @@ using Deenote.UI.MenuBar.Components;
 using Deenote.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Deenote.UI.MenuBar
 {
-    public sealed class MenuItemController : MonoBehaviour, IPointerEnterHandler
+    public sealed class MenuItemController : MonoBehaviour
+        , ISelectHandler, IDeselectHandler
+        , IPointerEnterHandler, IPointerExitHandler
     {
+        private const float HorizontalOneSidePadding = 12f;
+
         [Header("UI")]
         [SerializeField] MenuBarController _menuBar;
-        [SerializeField] MenuItemToggle _toggle;
+        [SerializeField] MenuItemButton _button;
+        [SerializeField] LayoutElement _layoutElement;
+        [SerializeField] LocalizedText _titleText;
         [SerializeField] GameObject _menuDropDownParentGameObject;
+
+        public MenuBarController MenuBar => _menuBar;
+
+        public bool IsPointerIn { get; private set; }
 
         private void Awake()
         {
-            _toggle.onValueChanged.AddListener(OnToggle);
+            _titleText.OnTextUpdated += text => _layoutElement.preferredWidth = text.TmpText.preferredWidth + 2 * HorizontalOneSidePadding;
+            _button.InitController(this);
         }
 
-        private void OnToggle(bool value)
+        public void DeselectSelf()
         {
-            if (value) {
-                Debug.Log($"Toggle on:{_toggle.gameObject.GetComponentInChildren<LocalizedText>().TmpText.text}");
-                _menuDropDownParentGameObject.SetActive(true);
-                var colors = _toggle.colors;
-                colors.normalColor = colors.normalColor.WithAlpha(1f);
-                colors.selectedColor = colors.selectedColor.WithAlpha(1f);
-                _toggle.colors = colors;
-                _menuBar.IsHovering = true;
-            }
-            else {
-                Debug.Log($"Toggle off:{_toggle.gameObject.GetComponentInChildren<LocalizedText>().TmpText.text}");
-                _menuDropDownParentGameObject.SetActive(false);
-                var colors = _toggle.colors;
-                colors.normalColor = colors.normalColor.WithAlpha(0f);
-                colors.selectedColor = colors.selectedColor.WithAlpha(0f);
-                _toggle.colors = colors;
-                _menuBar.IsHovering = false;
-                // TODO: 手动取消选择后，toggle的状态是Selected，导致没有highlight
-            }
+            EventSystem.current.CheckNull()?.SetSelectedGameObject(null);
+            _button.OnDeselect(null);
+            MenuBar.IsHovering = false;
+            _menuDropDownParentGameObject.SetActive(false);
         }
 
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
         {
-            if (_menuBar.IsHovering && !_toggle.isOn) {
-                _toggle.Select();
-                _toggle.isOn = true;
+            IsPointerIn = true;
+            if (MenuBar.IsHovering) {
+                _button.OnPointerEnter_Base(eventData);
+                EventSystem.current.CheckNull()?.SetSelectedGameObject(gameObject);
+            }
+            else {
+                _button.OnPointerEnter_Base(eventData);
             }
         }
 
-        public void Collapse()
+        void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
         {
-            _toggle.isOn = false;
+            IsPointerIn = false;
+            _button.OnPointerExit_Base(eventData);
         }
 
+        void ISelectHandler.OnSelect(BaseEventData eventData)
+        {
+            _button.OnSelect(eventData);
+            MenuBar.IsHovering = true;
+            _menuDropDownParentGameObject.SetActive(true);
+        }
+
+        // This method is for conditions that
+        // user clicked on other position outside MenuItem.
+        // For manually deselecting, use DeselectSelf();
+        void IDeselectHandler.OnDeselect(BaseEventData eventData)
+        {
+            if (!IsPointerIn) {
+                _button.OnDeselect(eventData);
+                MenuBar.IsHovering = false;
+                _menuDropDownParentGameObject.SetActive(false);
+            }
+        }
     }
 }

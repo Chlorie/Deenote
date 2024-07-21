@@ -1,3 +1,6 @@
+using Deenote.Utilities;
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -7,61 +10,75 @@ namespace Deenote.Localization
     public sealed class LocalizedText : MonoBehaviour
     {
         [SerializeField] TMP_Text _text;
-        [SerializeField] string _textKey;
         [SerializeField] bool _isLocalized;
+        [SerializeField] string _textKey;
+
+        private List<string> _args = new();
 
         public TMP_Text TmpText => _text;
 
+        public event Action<LocalizedText> OnTextUpdated;
+
+        // I have to do this because there's a huge amount of assigned components in editor...
+        private LocalizableText LocalizableText
+        {
+            get => _isLocalized ? Localization.LocalizableText.Localized(_textKey) : Localization.LocalizableText.Raw(_textKey);
+            set => (_isLocalized, _textKey) = (value.IsLocalized, value.TextOrKey);
+        }
+
         private void Awake()
         {
-            MainSystem.Localization.RegisterLocalizedText(this);
+            MainSystem.Localization.OnLanguageChanged += NotifyLanguageUpdated;
         }
 
         private void Start()
         {
-            NotifyLanguageUpdated();
+            RefreshText();
         }
 
         private void OnDestroy()
         {
-            MainSystem.Localization.UnregisterLocalizedText(this);
-        }
-
-        public void NotifyLanguageUpdated()
-        {
-            if (_isLocalized) {
-                if (_textKey == null)
-                    _text.text = "";
-                else
-                    _text.text = MainSystem.Localization.GetLocalizedText(_textKey);
-            }
+            MainSystem.Localization.OnLanguageChanged -= NotifyLanguageUpdated;
         }
 
         public void SetRawText(string text)
         {
-            _isLocalized = false;
-            _text.text = text;
+            SetText(LocalizableText.Raw(text));
         }
 
-        public void SetLocalizedText(string textKey)
+        public void SetLocalizedText(string textKey, ReadOnlySpan<string> args = default)
         {
-            if (_isLocalized && _textKey == textKey) {
+            SetText(LocalizableText.Localized(textKey), args);
+        }
+
+        public void SetText(LocalizableText text, ReadOnlySpan<string> args = default)
+        {
+            if (LocalizableText == text && args.SequenceEqual(_args))
                 return;
-            }
 
-            _textKey = textKey;
-            _isLocalized = true;
-            NotifyLanguageUpdated();
+            LocalizableText = text;
+            _args.Clear();
+            foreach (var arg in args)
+                _args.Add(arg);
+
+            RefreshText();
         }
 
-        public void SetText(LocalizableText text)
+        private void RefreshText()
         {
-            if (text.IsLocalized) {
-                SetLocalizedText(text.TextOrKey);
+            string text = MainSystem.Localization.GetText(LocalizableText);
+
+            for (int i = 0; i < _args.Count; i++) {
+                text = text.Replace($"{{{i}}}", _args[i]);
             }
-            else {
-                SetRawText(text.TextOrKey);
-            }
+            _text.text = text;
+
+            OnTextUpdated?.Invoke(this);
+        }
+
+        public void NotifyLanguageUpdated()
+        {
+            RefreshText();
         }
     }
 }

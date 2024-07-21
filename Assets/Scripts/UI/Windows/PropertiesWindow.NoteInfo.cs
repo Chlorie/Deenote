@@ -31,16 +31,16 @@ namespace Deenote.UI.Windows
         private void AwakeNoteInfo()
         {
             _noteInfoGroupButton.onClick.AddListener(() => _noteInfoGroupGameObject.SetActive(!_noteInfoGroupGameObject.activeSelf));
-            _notePositionInputField.onSubmit.AddListener(OnNotePositionChanged);
-            _noteTimeInputField.onSubmit.AddListener(OnNoteTimeChanged);
-            _noteSizeInputField.onSubmit.AddListener(OnNoteSizeChanged);
-            _noteShiftInputField.onSubmit.AddListener(OnNoteShiftChanged);
-            _noteSpeedInputField.onSubmit.AddListener(OnNoteSpeedChanged);
-            _noteDurationInputField.onSubmit.AddListener(OnNoteDurationChanged);
+            _notePositionInputField.onEndEdit.AddListener(OnNotePositionChanged);
+            _noteTimeInputField.onEndEdit.AddListener(OnNoteTimeChanged);
+            _noteSizeInputField.onEndEdit.AddListener(OnNoteSizeChanged);
+            _noteShiftInputField.onEndEdit.AddListener(OnNoteShiftChanged);
+            _noteSpeedInputField.onEndEdit.AddListener(OnNoteSpeedChanged);
+            _noteDurationInputField.onEndEdit.AddListener(OnNoteDurationChanged);
             _noteVibrateToggle.onValueChanged.AddListener(OnNoteVibrateChanged);
             _noteSwipeToggle.onValueChanged.AddListener(OnNoteIsSwipeChanged);
-            _noteWarningTypeInputField.onSubmit.AddListener(OnNoteWarningTypeChanged);
-            _noteEventIdInputField.onSubmit.AddListener(OnNoteEventIdChanged);
+            _noteWarningTypeInputField.onEndEdit.AddListener(OnNoteWarningTypeChanged);
+            _noteEventIdInputField.onEndEdit.AddListener(OnNoteEventIdChanged);
             _noteIsLinkToggle.onValueChanged.AddListener(OnNoteIsLinkChanged);
             _noteSoundsButton.onClick.AddListener(() => MainSystem.PianoSoundEdit.Window.IsActivated = true);
         }

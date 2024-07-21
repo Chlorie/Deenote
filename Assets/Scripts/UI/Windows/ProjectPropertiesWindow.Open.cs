@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.UI.Windows.Elements;
-using Deenote.Utilities;
+using Deenote.Utilities.Robustness;
 using System.Diagnostics;
 
 namespace Deenote.UI.Windows
@@ -19,7 +19,8 @@ namespace Deenote.UI.Windows
         {
             Window.IsActivated = true;
 
-            _window.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties_Create"));
+            _window.TitleBar.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties_Create"));
+            InitializeProject(null);
 
             _newProjTcs = new UniTaskCompletionSource<MayBeNull<ProjectPropertiesChartController>>();
             var confirmedChart = await _newProjTcs.Task;
@@ -33,16 +34,19 @@ namespace Deenote.UI.Windows
                 MusicName = _musicNameInputField.text,
                 Composer = _composerInputField.text,
                 ChartDesigner = _chartDesignerInputField.text,
-                AudioData = _loadedBytes,
                 AudioClip = _loadedClip,
-                // TODO: SaveByRefPath?
+                SaveAsRefPath = !MainSystem.ProjectManager.IsAudioDataSaveInProject,
             };
+            if (proj.SaveAsRefPath)
+                proj.AudioFileRelativePath = _loadedAudioFilePath;
+            else
+                proj.AudioFileData = _loadedBytes;
 
             int loadChartIndex = -1;
             for (int i = 0; i < _charts.Count; i++) {
                 var ch = _charts[i];
                 proj.Charts.Add(ch.Chart);
-                if (confirmedChart.Value == ch)
+                if (ReferenceEquals(confirmedChart.Value, ch))
                     loadChartIndex = i;
             }
             Debug.Assert(loadChartIndex >= 0);
@@ -58,7 +62,7 @@ namespace Deenote.UI.Windows
         {
             Window.IsActivated = true;
 
-            _window.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties"));
+            _window.TitleBar.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties"));
             InitializeProject(project);
 
             _newProjTcs = new UniTaskCompletionSource<MayBeNull<ProjectPropertiesChartController>>();

@@ -1,11 +1,14 @@
 using Cysharp.Threading.Tasks;
+using Deenote.ApplicationManaging;
 using Deenote.Edit;
 using Deenote.GameStage;
+using Deenote.Inputting;
 using Deenote.Localization;
 using Deenote.Project;
 using Deenote.Project.Models.Datas;
 using Deenote.UI.MenuBar;
 using Deenote.UI.StatusBar;
+using Deenote.UI.ToolBar;
 using Deenote.UI.Windows;
 using UnityEngine;
 
@@ -20,13 +23,19 @@ namespace Deenote
         private static MainSystem _instance;
 
         [SerializeField] GlobalSettings _globalSettings;
+        private readonly ResolutionAdjuster _resolutionAdjuster = new();
 
         [Header("UI")]
         [SerializeField] MenuBarController _menuBarController;
+        [SerializeField] ToolBarController _toolBarController;
         [SerializeField] StatusBarController _statusBarController;
+
         [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
         [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
         [SerializeField] PianoSoundEditWindow _pianoSoundEditWindow;
+        [SerializeField] PreferencesWindow _preferenceWindow;
+        [SerializeField] PropertiesWindow _propertiesWindow;
+        [SerializeField] AboutWindow _aboutWindow;
 
         [SerializeField] FileExplorerWindow _fileExplorerWindow;
         [SerializeField] ProjectPropertiesWindow _projectPropertiesWindow;
@@ -34,24 +43,40 @@ namespace Deenote
 
         [Header("System")]
         [SerializeField] LocalizationSystem _localizationSystem;
+        [SerializeField] UnhandledExceptionHandler _unhandledExceptionHandler;
+        [SerializeField] VersionManager _versionManager;
+        [SerializeField] InputController _inputController;
+        [SerializeField] WindowsManager _windowsManager;
+
         [SerializeField] ProjectManager _projectManager;
         [SerializeField] GameStageController _gameStageController;
         [SerializeField] EditorController _editorController;
         [SerializeField] PianoSoundManager _pianoSoundManager;
 
         public static GlobalSettings GlobalSettings => _instance._globalSettings;
+        public static ResolutionAdjuster ResolutionAdjuster => _instance._resolutionAdjuster;
 
         public static MenuBarController MenuBar => _instance._menuBarController;
+        public static ToolBarController ToolBar => _instance._toolBarController;
         public static StatusBarController StatusBar => _instance._statusBarController;
+
         public static PerspectiveViewWindow PerspectiveView => _instance._perspectiveViewWindow;
         public static EditorPropertiesWindow EditorProperties => _instance._editorPropertiesWindow;
         public static PianoSoundEditWindow PianoSoundEdit => _instance._pianoSoundEditWindow;
+        public static PreferencesWindow PreferenceWindow => _instance._preferenceWindow;
+        public static PropertiesWindow PropertiesWindow => _instance._propertiesWindow;
+        public static AboutWindow AboutWindow => _instance._aboutWindow;
 
         public static FileExplorerWindow FileExplorer => _instance._fileExplorerWindow;
         public static ProjectPropertiesWindow ProjectProperties => _instance._projectPropertiesWindow;
         public static MessageBoxWindow MessageBox => _instance._messageBoxWindow;
 
         public static LocalizationSystem Localization => _instance._localizationSystem;
+        public static UnhandledExceptionHandler ExceptionHandler => _instance._unhandledExceptionHandler;
+        public static VersionManager VersionManager => _instance._versionManager;
+        public static InputController Input => _instance._inputController;
+        public static WindowsManager WindowsManager => _instance._windowsManager;
+
         public static ProjectManager ProjectManager => _instance._projectManager;
         public static GameStageController GameStage => _instance._gameStageController;
         public static EditorController Editor => _instance._editorController;
@@ -67,15 +92,13 @@ namespace Deenote
             _instance = this;
         }
 
+#if !UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod]
         private static void _QuitConfirm()
         {
-            Application.wantsToQuit += () =>
-            {
-                // TODO:
-                return default;
-            };
+            Application.wantsToQuit += () => ConfirmQuitAsync().GetAwaiter().GetResult();
         }
+#endif
 
         private static readonly LocalizableText[] _quitMessageButtons = new[] {
             LocalizableText.Localized("Message_Quit_Y"),
@@ -92,7 +115,6 @@ namespace Deenote
                 return false;
             }
             return true;
-
         }
 
         public static void QuitApplication()
@@ -105,6 +127,8 @@ namespace Deenote
 
         public static class Args
         {
+            public static Vector2 MainCanvasReferenceResolution => new(1440, 810);
+
             #region Value Clamp
 
             public const float StageMaxPosition = 2f;
@@ -120,13 +144,7 @@ namespace Deenote
             #region NoteCoord <-> World Position
 
             private const float PositionToXMultiplier = 1.63f;
-            private const float TimeToZMultiplier = 10f / 3f;
-
-            /// <summary>
-            /// Time from note just appears(alpha=0) to complete display(alpha=1)
-            /// </summary>
-            public const float StageNoteFadeInTime = 0.5f;
-
+            // private const float TimeToZMultiplier = 10f / 3f;
             public static float NoteAppearZ => OffsetTimeToZ(GameStage.StageNoteAheadTime);
 
             public static float PositionToX(float position) => position * PositionToXMultiplier;
@@ -137,9 +155,9 @@ namespace Deenote
             /// The actualTime - stageCurrentTime
             /// </param>
             /// <returns></returns>
-            public static float OffsetTimeToZ(float offsetTimeToStage) => offsetTimeToStage * TimeToZMultiplier * GameStage.NoteSpeed;
+            public static float OffsetTimeToZ(float offsetTimeToStage) => offsetTimeToStage * GameStage.Args.NoteTimeToZMultiplier * GameStage.NoteSpeed;
 
-            public static float ZToOffsetTime(float z) => z / TimeToZMultiplier / GameStage.NoteSpeed;
+            public static float ZToOffsetTime(float z) => z / GameStage.Args.NoteTimeToZMultiplier / GameStage.NoteSpeed;
 
             public static (float X, float Z) NoteCoordToWorldPosition(NoteCoord coord, float currentTime = 0f)
                 => (PositionToX(coord.Position), OffsetTimeToZ(coord.Time - currentTime));
@@ -152,11 +170,11 @@ namespace Deenote
             private const float NoteTimeCollisionThreshold = 0.001f;
             private const float NotePositionCollisionThreshold = 0.01f;
 
-            public static bool IsCollided(NoteData left, NoteData right)
-            {
-                return Mathf.Abs(left.Time - right.Time) <= NoteTimeCollisionThreshold
-                    && Mathf.Abs(left.Position - right.Position) <= NotePositionCollisionThreshold;
-            }
+            public static bool IsTimeCollided(NoteData left, NoteData right) => Mathf.Abs(right.Time - left.Time) <= NoteTimeCollisionThreshold;
+
+            public static bool IsPositionCollided(NoteData left, NoteData right) => Mathf.Abs(right.Position - left.Position) <= NotePositionCollisionThreshold;
+
+            public static bool IsCollided(NoteData left, NoteData right) => IsTimeCollided(left, right) && IsPositionCollided(left, right);
 
             #region Colors
 
@@ -176,8 +194,20 @@ namespace Deenote
 
             #endregion
 
+            #region Grids
+
+            public const float GridWidth = 0.002f;
+            public const float GridBorderWidth = 0.004f;
+
+            #endregion
+
+            public const string DeenotePreferFileExtension = ".dnt";
+            public const ushort DeenoteProjectFileHeader = 0xDEE0;
+            public const byte DeenoteProjectFileVersionMark = 1;
+            public const string DeenoteCurrentVersion = "1.0";
+
             public static readonly string[] SupportAudioFileExtensions = new[] { ".mp3", ".wav", };
-            public static readonly string[] SupportProjectFileExtensions = new[] { "dnt", ".dsproj", };
+            public static readonly string[] SupportProjectFileExtensions = new[] { DeenotePreferFileExtension, ".dsproj", };
             public static readonly string[] SupportChartFileExtensions = new[] { ".json", ".txt" };
         }
     }

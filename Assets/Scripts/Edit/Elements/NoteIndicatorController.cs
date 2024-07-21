@@ -21,9 +21,10 @@ namespace Deenote.Edit.Elements
             NotePrototype = note;
 
             var prefab = NotePrototype switch {
-                { IsSlide: true } => MainSystem.GameStage.SlideNoteSpritePrefab,
-                { HasSound: true } => MainSystem.GameStage.BlackNoteSpritePrefab,
-                _ => MainSystem.GameStage.NoSoundNoteSpritePrefab,
+                { IsSlide: true } => MainSystem.GameStage.Args.SlideNoteSpritePrefab,
+                { HasSound: true } => MainSystem.GameStage.Args.BlackNoteSpritePrefab,
+                _ when MainSystem.GameStage.IsPianoNotesDistinguished => MainSystem.GameStage.Args.NoSoundNoteSpritePrefab,
+                _ => MainSystem.GameStage.Args.BlackNoteSpritePrefab,
             };
             _noteSpriteRenderer.sprite = prefab.Sprite;
             _noteSpriteRenderer.gameObject.transform.localScale = new(prefab.Scale * NotePrototype.Size, prefab.Scale, prefab.Scale);

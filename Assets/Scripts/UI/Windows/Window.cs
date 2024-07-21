@@ -3,26 +3,35 @@ using Deenote.Localization;
 using System;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Windows
 {
-    public sealed class Window : MonoBehaviour
+    public sealed partial class Window : MonoBehaviour, IPointerDownHandler
     {
-        [SerializeField] TitleBar _titleBar;
+        [Header("UI")]
+        [SerializeField] WindowTitleBar _titleBar;
         [SerializeField] Button _closeButton;
+        [SerializeField] GameObject _contentGameObject;
         [SerializeField] GraphicRaycaster _graphicRaycaster;
 
-        private Action<bool> _onIsActivatedChanged;
+        public WindowTitleBar TitleBar => _titleBar;
 
-        public bool GraphicRaycasterEnabled
-        {
-            get => _graphicRaycaster.enabled;
-            set => _graphicRaycaster.enabled = value;
-        }
+        public Button CloseButton => _closeButton;
 
+        public GameObject Content => _contentGameObject;
+
+        [Header("Datas")]
+        [SerializeField]
+        private float _fixedRatio;
         [SerializeField]
         private bool __isActivated;
+        private Action<bool> _onIsActivatedChanged;
+
+        public float FixedRatio => _fixedRatio;
+        public bool IsFixedRatio => _fixedRatio > 0f;
+
         public bool IsActivated
         {
             get => __isActivated;
@@ -31,20 +40,22 @@ namespace Deenote.UI.Windows
                     return;
                 __isActivated = value;
                 gameObject.SetActive(__isActivated);
+                if (__isActivated) {
+                    transform.SetAsLastSibling();
+                }
                 _onIsActivatedChanged?.Invoke(__isActivated);
             }
         }
 
-        public UniTask OnCloseButtonClickAsync(CancellationToken cancellationToken) => _closeButton.OnClickAsync(cancellationToken);
-
-        public void SetTitle(LocalizableText title)
+        public Vector2 Size
         {
-            _titleBar.SetTitle(title);
+            get => ((RectTransform)transform).rect.size;
+            set => ((RectTransform)transform).sizeDelta = value;
         }
 
-        public void SetOnIsActivatedChanged(Action<bool> action)
+        public void SetOnIsActivatedChanged(Action<bool> onIsActivatedChanged)
         {
-            _onIsActivatedChanged = action;
+            _onIsActivatedChanged = onIsActivatedChanged;
         }
 
         private void Awake()
@@ -55,6 +66,11 @@ namespace Deenote.UI.Windows
         private void OnEnable()
         {
             transform.SetAsLastSibling();
+        }
+
+        void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
+        {
+            MainSystem.WindowsManager.FocusOn(this);
         }
     }
 }

@@ -7,7 +7,7 @@
             project = dataV1.project,
             audioType = ".wav"
         };
-        WavEncoder wavEncoder = new WavEncoder
+        WavEncoder_Legacy wavEncoder = new WavEncoder_Legacy
         {
             channel = dataV1.channel,
             frequency = dataV1.frequency,

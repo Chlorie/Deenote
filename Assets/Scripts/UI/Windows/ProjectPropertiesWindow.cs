@@ -30,8 +30,8 @@ namespace Deenote.UI.Windows
 
         private PooledObjectListView<ProjectPropertiesChartController> _charts;
 
-        private string _selectedMainAudioPath;
         private byte[] _loadedBytes;
+        private string _loadedAudioFilePath;
         private AudioClip _loadedClip;
 
         private void Awake()
@@ -44,16 +44,13 @@ namespace Deenote.UI.Windows
             }, 1));
 
             _audioFileButton.onClick.AddListener(LoadAudioFileAsync);
-        }
 
-        private void OnEnable()
-        {
-            InitializeProject(null);
-        }
-
-        private void OnDisable()
-        {
-            _newProjTcs?.TrySetResult(null);
+            _window.SetOnIsActivatedChanged(activated =>
+            {
+                if (!activated) {
+                    _newProjTcs?.TrySetResult(null);
+                }
+            });
         }
 
         private void SetChartLoadable(bool value)
@@ -80,11 +77,17 @@ namespace Deenote.UI.Windows
                 SetChartLoadable(false);
             }
             else {
-                _audioFileText.SetRawText(Path.GetFileName(project.AudioFileRelativePath));
+                if (project.SaveAsRefPath) {
+                    _audioFileText.SetRawText(Path.GetFileName(project.AudioFileRelativePath));
+                    _audioFileText.TmpText.alignment = TextAlignmentOptions.BaselineLeft;
+                }
+                else {
+                    _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad_Embeded");
+                    _audioFileText.TmpText.alignment = TextAlignmentOptions.CenterGeoAligned;
+                }
                 _musicNameInputField.text = project.MusicName;
                 _composerInputField.text = project.Composer;
                 _chartDesignerInputField.text = project.ChartDesigner;
-                _audioFileText.TmpText.alignment = TextAlignmentOptions.BaselineLeft;
 
                 _charts.SetCount(project.Charts.Count);
                 _charts[0].Initialize(project.Charts[0], true);
@@ -100,13 +103,14 @@ namespace Deenote.UI.Windows
 
         private async UniTaskVoid LoadAudioFileAsync()
         {
-            _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad_Loading");
             var res = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args.SupportAudioFileExtensions);
             if (res.IsCancelled)
                 return;
 
             SetChartLoadable(false);
 
+            _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad_Loading");
+            _audioFileText.TmpText.alignment = TextAlignmentOptions.CenterGeoAligned;
             using var fs = File.OpenRead(res.Path);
             if (!AudioUtils.TryLoad(fs, Path.GetExtension(res.Path), out var clip)) {
                 _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad_Failed");
@@ -116,9 +120,11 @@ namespace Deenote.UI.Windows
             _loadedBytes = new byte[fs.Length];
             fs.Seek(0, SeekOrigin.Begin);
             fs.Read(_loadedBytes);
+
+            _loadedAudioFilePath = res.Path;
             _loadedClip = clip;
-            _selectedMainAudioPath = res.Path;
             _audioFileText.SetRawText(Path.GetFileName(res.Path));
+            _audioFileText.TmpText.alignment = TextAlignmentOptions.BaselineLeft;
             if (string.IsNullOrEmpty(_musicNameInputField.text))
                 _musicNameInputField.text = Path.GetFileNameWithoutExtension(res.Path);
 

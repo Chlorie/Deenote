@@ -1,4 +1,3 @@
-using Deenote.Project;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
@@ -23,9 +22,10 @@ namespace Deenote
 
             Project = new ProjectModel {
                 AudioClip = clip ?? Resources.Load<AudioClip>("Test/12.Magnolia"),
-                MusicName = "tsuki-",
+                MusicName = "tsuki-木兰",
             };
             Project.Charts.Add(new ChartModel(ChartData.Load(Resources.Load<TextAsset>("Test/12.Magnolia.hard").text)) {
+                // Name = "<Cht> name",
                 Level = "10",
                 Difficulty = Difficulty.Hard,
             });

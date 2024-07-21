@@ -6,8 +6,6 @@ namespace Deenote.GameStage
 {
     partial class GameStageController
     {
-        // TODO: this prefab could be same as linePrefab in GridController
-        // Try to combine them?
         [Header("Link Line")]
         [SerializeField] LineRenderer _linkLinePrefab;
         [SerializeField] Transform _linkLineParentTransform;
@@ -35,7 +33,7 @@ namespace Deenote.GameStage
             {
                 var line = Instantiate(_linkLinePrefab, _linkLineParentTransform);
                 line.sortingOrder = -11;
-                line.widthMultiplier = 0.035f;
+                line.widthMultiplier = MainSystem.Args.GridWidth;
                 line.positionCount = 2;
                 line.SetSolidColor(MainSystem.Args.LinkLineColor);
                 return line;

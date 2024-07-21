@@ -58,8 +58,8 @@ namespace Deenote.UI.Windows.Elements
 
         private void Awake()
         {
-            _nameInputField.onSubmit.AddListener(val => Chart.Name = val);
-            _levelInputField.onSubmit.AddListener(val => Chart.Level = val);
+            _nameInputField.onEndEdit.AddListener(val => Chart.Name = val);
+            _levelInputField.onEndEdit.AddListener(val => Chart.Level = val);
             _difficultyDropDown.onValueChanged.AddListener(val => Chart.Difficulty = DifficultyExt.FromInt32(val));
 
             _loadButton.onClick.AddListener(() => _window.SelectChartToLoad(this));

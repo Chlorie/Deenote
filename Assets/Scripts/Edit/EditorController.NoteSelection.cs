@@ -64,12 +64,35 @@ namespace Deenote.Edit
                 }
             }
 
+            public void AddNote(IEnumerable<NoteModel> notes)
+            {
+                foreach (var note in notes) {
+                    if (note.IsSelected)
+                        continue;
+                    _selectedNotes.Add(note);
+                    note.IsSelected = true;
+                }
+            }
+
             public void DeselectNoteAt(Index index)
             {
                 var i = index.GetOffset(_selectedNotes.Count);
                 var note = _selectedNotes[i];
                 _selectedNotes.RemoveAt(i);
                 note.IsSelected = false;
+            }
+
+            /// <summary>
+            /// Deselect note if note was selected, else do nothing
+            /// </summary>
+            /// <param name="notes"></param>
+            public void DeselectNotes(IEnumerable<NoteModel> notes)
+            {
+                foreach (var note in notes) {
+                    if (_selectedNotes.Remove(note)) {
+                        note.IsSelected = false;
+                    }
+                }
             }
 
             public void StartNoteSelection(NoteCoord startCoord, bool toggleMode)

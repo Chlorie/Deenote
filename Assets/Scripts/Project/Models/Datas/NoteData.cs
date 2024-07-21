@@ -16,7 +16,7 @@ namespace Deenote.Project.Models.Datas
         [Obsolete("Unknown property, for json serialization only.")]
         [SerializeField]
         [JsonProperty("type")]
-        public NoteType Type;
+        public NoteType Type = NoteType.Hit;
 
         [SerializeField]
         [JsonProperty("sounds")]
@@ -86,7 +86,7 @@ namespace Deenote.Project.Models.Datas
         [SerializeField]
         [JsonProperty("eventId")]
         [DefaultValue("")]
-        public string EventId;
+        public string EventId = "";
 
         /// <summary>
         /// Another time property without underline prefix,
@@ -106,6 +106,10 @@ namespace Deenote.Project.Models.Datas
         [SerializeField]
         private NoteData _prevLinkNote;
 
+        /// <remarks>
+        /// Set this to <see langword="false"/> will unlink the previous and next link,
+        /// if you want to remain the link chain, use <see cref="Deenote.Utilities.ProjectUtils.UnlinkWithoutCutLinkChain(NoteData)"/>
+        /// </remarks>
         public bool IsSlide
         {
             get => _isSlide;
@@ -124,6 +128,10 @@ namespace Deenote.Project.Models.Datas
             }
         }
 
+        /// <remarks>
+        /// The setter does not guarantee that notes are link to each other,
+        /// please keep attention
+        /// </remarks>
         public NoteData PrevLink
         {
             get => _prevLinkNote;
@@ -134,6 +142,10 @@ namespace Deenote.Project.Models.Datas
             }
         }
 
+        /// <remarks>
+        /// The setter does not guarantee that notes are link to each other,
+        /// please keep attention
+        /// </remarks>
         public NoteData NextLink
         {
             get => _nextLinkNote;
@@ -154,7 +166,7 @@ namespace Deenote.Project.Models.Datas
 
         public NoteCoord PositionCoord
         {
-            get => new(Position, Time);
+            get => new(Time, Position);
             set => (Position, Time) = (value.Position, value.Time);
         }
 

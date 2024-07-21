@@ -5,8 +5,11 @@ using Deenote.Localization;
 using Deenote.Project;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
+using Deenote.UI.Windows.Components;
 using Deenote.Utilities;
+using Deenote.Utilities.Robustness;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +20,10 @@ namespace Deenote.UI.Windows
     public sealed partial class PropertiesWindow : MonoBehaviour
     {
         [SerializeField] Window _window;
+
+        public Window Window => _window;
+
+        [Header("Notify")]
         [SerializeField] ProjectManager _projectManager;
         [SerializeField] GameStageController _gameStageController;
         [SerializeField] EditorController _editorController;
@@ -26,42 +33,48 @@ namespace Deenote.UI.Windows
         [SerializeField] Button _projectInfoGroupButton;
         [SerializeField] GameObject _projectInfoGroupGameObject;
         [SerializeField] Button _projectAudioButton;
-        [SerializeField] TMP_Text _projectAudioText;
+        [SerializeField] LocalizedText _projectAudioText;
         [SerializeField] TMP_InputField _projectNameInputField;
         [SerializeField] TMP_InputField _projectComposerInputField;
         [SerializeField] TMP_InputField _projectChartDesignerInputField;
-        [SerializeField] TMP_Dropdown _projectLoadedChartDropdown;
+        [SerializeField] WindowDropdown _projectLoadedChartDropdown;
 
         [Header("Chart Info")]
         [SerializeField] Button _chartInfoGroupButton;
         [SerializeField] GameObject _chartInfoGroupGameObject;
         [SerializeField] TMP_InputField _chartNameInputField;
-        [SerializeField] TMP_Dropdown _chartDifficultyDropdown;
+        [SerializeField] WindowDropdown _chartDifficultyDropdown;
         [SerializeField] TMP_InputField _chartLevelInputField;
         [SerializeField] TMP_InputField _chartSpeedInputField;
         [SerializeField] TMP_InputField _chartRemapVMinInputField;
         [SerializeField] TMP_InputField _chartRemapVMaxInputField;
         [SerializeField] TMP_Text _selectedNotesText;
 
-
         private void Awake()
         {
             _projectInfoGroupButton.onClick.AddListener(() => _projectInfoGroupGameObject.SetActive(!_projectInfoGroupGameObject.activeSelf));
             _projectAudioButton.onClick.AddListener(OnAudioButtonClickedAsync);
-            _projectNameInputField.onSubmit.AddListener(OnProjectMusicNameChanged);
-            _projectComposerInputField.onSubmit.AddListener(OnProjectComposerChanged);
-            _projectChartDesignerInputField.onSubmit.AddListener(OnProjectChartDesignerChanged);
+            _projectNameInputField.onEndEdit.AddListener(OnProjectMusicNameChanged);
+            _projectComposerInputField.onEndEdit.AddListener(OnProjectComposerChanged);
+            _projectChartDesignerInputField.onEndEdit.AddListener(OnProjectChartDesignerChanged);
+            _projectLoadedChartDropdown.Dropdown.onValueChanged.AddListener(OnProjectLoadedChartChanged);
 
             _chartInfoGroupButton.onClick.AddListener(() => _chartInfoGroupGameObject.SetActive(!_chartInfoGroupGameObject.activeSelf));
-            _chartNameInputField.onSubmit.AddListener(OnChartNameChanged);
-            _chartDifficultyDropdown.onValueChanged.AddListener(OnChartDifficultyChanged);
-            _chartLevelInputField.onSubmit.AddListener(null);
-            _chartSpeedInputField.onSubmit.AddListener(null);
-            _chartRemapVMinInputField.onSubmit.AddListener(null);
-            _chartRemapVMaxInputField.onSubmit.AddListener(null);
-            // TODO: complete
+            _chartNameInputField.onEndEdit.AddListener(OnChartNameChanged);
+            _chartDifficultyDropdown.Dropdown.onValueChanged.AddListener(OnChartDifficultyChanged);
+            _chartLevelInputField.onEndEdit.AddListener(OnChartLevelChanged);
+            _chartSpeedInputField.onEndEdit.AddListener(OnChartSpeedChanged);
+            _chartRemapVMinInputField.onEndEdit.AddListener(OnChartRemapVMinChanged);
+            _chartRemapVMaxInputField.onEndEdit.AddListener(OnChartRemapVMaxChanged);
 
+            _projectLoadedChartDropdown.ClearOptions();
             AwakeNoteInfo();
+        }
+
+        private void Start()
+        {
+            _chartDifficultyDropdown.ResetOptions(DifficultyExt.DropdownOptions);
+            _chartDifficultyDropdown.Dropdown.SetValueWithoutNotify(_gameStageController.Chart.Difficulty.ToInt32());
         }
 
         #region UI Events
@@ -95,7 +108,7 @@ namespace Deenote.UI.Windows
                 var bytes = new byte[fs.Length];
                 fs.Seek(0, SeekOrigin.Begin);
                 fs.Read(bytes);
-                // TODO: ÕâÀïµÄbytes¿ÉÒÔ²»ÓÃÁË
+                // TODO: è¿™é‡Œçš„byteså¯ä»¥ä¸ç”¨äº† 
                 _editorController.EditProjectAudio(res.Path, bytes, clip);
             } finally {
                 fs?.Dispose();
@@ -117,6 +130,11 @@ namespace Deenote.UI.Windows
             _editorController.EditProjectChartDesigner(value);
         }
 
+        private void OnProjectLoadedChartChanged(int value)
+        {
+            _gameStageController.LoadChart(_projectManager.CurrentProject, value);
+        }
+
         private void OnChartNameChanged(string value)
         {
             _editorController.EditChartName(value);
@@ -127,11 +145,61 @@ namespace Deenote.UI.Windows
             _editorController.EditChartDifficulty(DifficultyExt.FromInt32(value));
         }
 
+        private void OnChartLevelChanged(string value)
+        {
+            _editorController.EditChartLevel(value);
+        }
+
+        private void OnChartSpeedChanged(string value)
+        {
+            if (float.TryParse(value, out var speed)) {
+                _editorController.EditChartSpeed(speed);
+            }
+            else {
+                NotifyChartSpeedChanged(_gameStageController.Chart.Data.Speed);
+            }
+        }
+
+        private void OnChartRemapVMinChanged(string value)
+        {
+            if (int.TryParse(value, out var rvMin)) {
+                _editorController.EditChartRemapVMin(rvMin);
+            }
+            else {
+                NotifyChartRemapVMinChanged(_gameStageController.Chart.Data.RemapMinVelocity);
+            }
+        }
+
+        private void OnChartRemapVMaxChanged(string value)
+        {
+            if (int.TryParse(value, out var rvMax)) {
+                _editorController.EditChartRemapVMax(rvMax);
+            }
+            else {
+                NotifyChartRemapVMaxChanged(_gameStageController.Chart.Data.RemapMaxVelocity);
+            }
+        }
+
         #endregion
 
         #region Notify
 
-        public void NotifyAudioFileChanged(string filePath) => _projectAudioText.text = Path.GetFileName(filePath);
+        public void NotifyProjectChanged(ProjectModel project)
+        {
+            NotifyAudioFileChanged(project.SaveAsRefPath ? project.AudioFileRelativePath : null);
+            NotifyProjectMusicNameChanged(project.MusicName);
+            NotifyProjectComposerChanged(project.Composer);
+            NotifyProjectChartDesignerChanged(project.ChartDesigner);
+            _projectLoadedChartDropdown.ResetOptions(project.Charts.Select(c => string.IsNullOrEmpty(c.Name) ? $"<{c.Difficulty.ToDisplayString()}>" : c.Name));
+        }
+
+        public void NotifyAudioFileChanged(MayBeNull<string> filePath)
+        {
+            if (filePath.HasValue)
+                _projectAudioText.SetRawText(Path.GetFileName(filePath.Value));
+            else
+                _projectAudioText.SetLocalizedText("Window_Properties_ProjectInfo_Audio_Embeded");
+        }
 
         public void NotifyProjectMusicNameChanged(string name) => _projectNameInputField.SetTextWithoutNotify(name);
 
@@ -139,9 +207,34 @@ namespace Deenote.UI.Windows
 
         public void NotifyProjectChartDesignerChanged(string charter) => _projectChartDesignerInputField.SetTextWithoutNotify(charter);
 
-        public void NotifyChartNameChanged(string name) => _chartNameInputField.SetTextWithoutNotify(name);
+        public void NotifyChartChanged(ProjectModel project, int chartIndex)
+        {
+            _projectLoadedChartDropdown.Dropdown.SetValueWithoutNotify(chartIndex);
 
-        public void NotifyChartDifficultyChanged(Difficulty difficulty) => _chartDifficultyDropdown.SetValueWithoutNotify(difficulty.ToInt32());
+            var chart = project.Charts[chartIndex];
+            NotifyChartNameChanged(chart.Name, chart.Difficulty);
+            NotifyChartDifficultyChanged(chart.Difficulty);
+            NotifyChartLevelChangd(chart.Level);
+            NotifyChartSpeedChanged(chart.Data.Speed);
+            NotifyChartRemapVMinChanged(chart.Data.RemapMinVelocity);
+            NotifyChartRemapVMaxChanged(chart.Data.RemapMaxVelocity);
+        }
+
+        public void NotifyChartNameChanged(string name, Difficulty fallbackDifficulty)
+        {
+            _chartNameInputField.SetTextWithoutNotify(name);
+            _projectLoadedChartDropdown.SetOption(_projectLoadedChartDropdown.Dropdown.value, LocalizableText.Raw(string.IsNullOrEmpty(name) ? $"<{fallbackDifficulty.ToDisplayString()}>" : name));
+        }
+
+        public void NotifyChartDifficultyChanged(Difficulty difficulty) => _chartDifficultyDropdown.Dropdown.SetValueWithoutNotify(difficulty.ToInt32());
+
+        public void NotifyChartLevelChangd(string level) => _chartLevelInputField.SetTextWithoutNotify(level);
+
+        public void NotifyChartSpeedChanged(float speed) => _chartSpeedInputField.SetTextWithoutNotify(speed.ToString("F1"));
+
+        public void NotifyChartRemapVMinChanged(int remapVMin) => _chartRemapVMinInputField.SetTextWithoutNotify(remapVMin.ToString());
+
+        public void NotifyChartRemapVMaxChanged(int remapVMax) => _chartRemapVMinInputField.SetTextWithoutNotify(remapVMax.ToString());
 
         #endregion
     }

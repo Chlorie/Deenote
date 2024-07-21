@@ -60,26 +60,30 @@ namespace Deenote.GameStage
             float stageCurrentTime = _stage.CurrentMusicTime;
             float stageMaxTime = stageCurrentTime + _stage.StageNoteAheadTime;
 
-            using var coords = _curveLineData.GetRenderValues(_stage.CurrentMusicTime, stageMaxTime);
-            var coordSpan = coords.Span;
-            if (coordSpan.Length == 0) {
+            using var coords_pooled = _curveLineData.GetRenderValues(stageCurrentTime, stageMaxTime);
+            var coords = coords_pooled.Span;
+            if (coords.Length == 0) {
                 _curveLineRenderer.gameObject.SetActive(false);
                 return;
             }
             _curveLineRenderer.gameObject.SetActive(true);
 
-            var worldPositions = new Vector3[coordSpan.Length];
+            var worldPositions = new Vector3[coords.Length];
             for (int i = 0; i < worldPositions.Length; i++) {
-                var coord = coordSpan[i];
-                var (x, z) = MainSystem.Args.NoteCoordToWorldPosition(coordSpan[i]);
-                worldPositions[i] = new Vector3(x, 0, z);
+                var (x, z) = MainSystem.Args.NoteCoordToWorldPosition(coords[i], stageCurrentTime);
+                worldPositions[i] = _stage.NormalizeGridPosition(new Vector3(x, 0, z));
             }
 
+            _curveLineRenderer.positionCount = worldPositions.Length;
             _curveLineRenderer.SetPositions(worldPositions);
+            var startAlphaUnclamped = (_stage.StageNoteAheadTime - (coords[0].Time - stageCurrentTime)) / MainSystem.Args.ZToOffsetTime(_stage.Args.NoteFadeInZRange);
+            var endAlphaUnclamped = (_stage.StageNoteAheadTime - (coords[^1].Time - stageCurrentTime)) / MainSystem.Args.ZToOffsetTime(_stage.Args.NoteFadeInZRange);
+            _curveLineRenderer.SetGradientColor(startAlphaUnclamped, endAlphaUnclamped);
         }
 
         private void AwakeCurve()
         {
+            _curveLineRenderer.widthMultiplier = MainSystem.Args.GridWidth;
             _curveLineRenderer.SetSolidColor(MainSystem.Args.CurveLineColor);
         }
 
@@ -120,7 +124,7 @@ namespace Deenote.GameStage
                     curve.a[i] = note.Position;
                 }
                 for (int i = 0; i < interpolationNotes.Count - 1; i++) {
-                    curve.b[i] = (curve.a[i + 1] - curve.a[i]) / (curve.x[i + 1] / curve.x[i]);
+                    curve.b[i] = (curve.a[i + 1] - curve.a[i]) / (curve.x[i + 1] - curve.x[i]);
                 }
                 Array.Clear(curve.c, 0, curve.c.Length);
                 Array.Clear(curve.d, 0, curve.d.Length);
@@ -147,7 +151,7 @@ namespace Deenote.GameStage
                 var z = (stackalloc double[count]);
 
                 for (int i = 0; i < count - 1; i++) {
-                    h[i] = i + 1 - curve.x[i + 1] - curve.x[i];
+                    h[i] = curve.x[i + 1] - curve.x[i];
                 }
                 for (int i = 1; i < count - 1; i++) {
                     alpha[i] = 3 * (curve.a[i + 1] - curve.a[i]) / h[i] - 3 * (curve.a[i] - curve.a[i - 1]) / h[i - 1];
@@ -157,7 +161,7 @@ namespace Deenote.GameStage
                 mu[0] = 0d;
                 z[0] = 0d;
                 for (int i = 1; i < n; i++) {
-                    l[i] = 2 * (curve.x[i - 1] - curve.x[i - 1]) - h[i - 1] * mu[i - 1];
+                    l[i] = 2 * (curve.x[i + 1] - curve.x[i - 1]) - h[i - 1] * mu[i - 1];
                     mu[i] = h[i] / l[i];
                     z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
                 }
@@ -205,11 +209,11 @@ namespace Deenote.GameStage
                 var coords = new PooledSpan<NoteCoord>(CubicCurveSegmentCount);
                 var span = coords.Span;
                 for (int i = 0; i < CubicCurveSegmentCount; i++) {
-                    float time = Mathf.Lerp(min, max, i / 400f);
+                    float time = Mathf.Lerp(min, max, (float)i / CubicCurveSegmentCount);
                     float pos = GetPosition(time).Value;
                     span[i] = NoteCoord.ClampPosition(time, pos);
                 }
-                return new(coords);
+                return coords.ToReadOnly();
             }
         }
     }

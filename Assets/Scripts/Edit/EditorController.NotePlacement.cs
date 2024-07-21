@@ -1,4 +1,5 @@
 using Deenote.Edit.Elements;
+using Deenote.Edit.Operations;
 using Deenote.Project.Comparers;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
@@ -17,15 +18,14 @@ namespace Deenote.Edit
         [SerializeField] NoteIndicatorController _noteIndicatorPrefab;
         private PooledObjectListView<NoteIndicatorController> _noteIndicatorList;
 
-        [SerializeField] private bool __isNoteIndicatorOn;
-        [SerializeField] private bool __snapToPositionGrid;
-        [SerializeField] private bool __snapToTimeGrid;
-
         [Header("Clip Board")]
         [SerializeField] private float _clipBoardBasePosition;
         [SerializeField] private List<NoteData> _clipBoardNotes;
-
         [SerializeField] private bool _isPasting;
+
+        [SerializeField] private bool __isNoteIndicatorOn;
+        [SerializeField] private bool __snapToPositionGrid;
+        [SerializeField] private bool __snapToTimeGrid;
 
         public bool IsNoteIndicatorOn
         {
@@ -36,7 +36,7 @@ namespace Deenote.Edit
 
                 __isNoteIndicatorOn = value;
                 if (__isNoteIndicatorOn) {
-                    UpdateNoteIndicator();
+                    RefreshNoteIndicator();
                 }
                 else {
                     _noteIndicatorList.Clear();
@@ -79,18 +79,18 @@ namespace Deenote.Edit
         public void PlaceNoteAt(NoteCoord coord, bool rememberPosition)
         {
             if (_isPasting) {
-                PasteNoteAt(coord, rememberPosition);
+                PasteNote();
             }
             else {
-                PlaceNoteAt(coord);
+                PlaceNote();
             }
 
-            NoteTimeComparer.AssertInOrder(_stage.Chart.Data.Notes);
+            NoteTimeComparer.AssertInOrder(_stage.Chart.Notes);
 
-            void PasteNoteAt(NoteCoord coord, bool rememberPosition)
+            void PasteNote()
             {
                 if (rememberPosition) {
-                    coord = _stage.Grids.Quantize(new(_clipBoardBasePosition, coord.Time), false, SnapToTimeGrid);
+                    coord = _stage.Grids.Quantize(new(coord.Time, _clipBoardBasePosition), false, SnapToTimeGrid);
                 }
                 else {
                     coord = _stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
@@ -102,22 +102,20 @@ namespace Deenote.Edit
                         _noteSelectionController.SelectNotes(notes);
                         OnNotesChanged(true, true);
                     })
-                    // Note: 旧Dnt在撤销时，会重新选中与撤销前谱面被选中id相同的note
-                    // 撤销后被选中的note基本为无意义note，还会影响已选note
-                    // 因此这里选择不对选择进行修改
-                    // TODO: 被删了的note也可能被选中，这种情况下会怎么样？
-                    .WithUndoneAction(() => OnNotesChanged(true, false)));
+                    .WithUndoneAction(notes =>
+                    {
+                        OnNoteSelectionChanging();
+                        _noteSelectionController.DeselectNotes(notes);
+                        OnNotesChanged(true, true);
+                    }));
                 _isPasting = false;
-                UpdateNoteIndicator();
+                RefreshNoteIndicator();
             }
 
-            void PlaceNoteAt(NoteCoord coord)
+            void PlaceNote()
             {
                 coord = _stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
                 _operationHistory.Do(_stage.Chart.Notes.AddNote(coord, _placeNoteTemplate)
-                    // TODO: dnt下键时会取消选择，但是undo时不会恢复
-                    // 由于完全没看懂怎么实现的所以先这样。
-                    // 效果理论上一致
                     .WithRedoneAction(() =>
                     {
                         OnNoteSelectionChanging();
@@ -128,28 +126,31 @@ namespace Deenote.Edit
             }
         }
 
-        // TODO: 编辑之后，需要手动检测一下Note的collision情况，除了这里，还有NotePlacement
         public void RemoveSelectedNotes()
         {
+            if (SelectedNotes.Count == 0) {
+                _operationHistory.Do(UndoableOperation.DoNothing);
+                return;
+            }
+
             // __selectedNotes.Sort(NoteTimeComparer.Instance);
             _operationHistory.Do(_stage.Chart.Notes.RemoveNotes(SelectedNotes)
-                // TODO: 目前删除时会取消选择，undo时不会恢复
-                // 考虑在RemoveNoteOperataion添加恢复时将被删note添加回_selectedNotes的逻辑
-                // PS: 如果_selectedNotes不为空，undo时保留已有notes。
                 .WithRedoneAction(() =>
                 {
                     OnNoteSelectionChanging();
                     _noteSelectionController.ClearSelection();
-                    OnNotesChanged(true, true);
+                    _propertiesWindow.NotifyNoteIsLinkChanged(false);
+                    OnNotesChanged(true, true, noteDataChangedExceptTime: true);
                 })
                 .WithUndoneAction((removedNotes) =>
                 {
                     OnNoteSelectionChanging();
-                    _noteSelectionController.SelectNotes(removedNotes);
-                    OnNotesChanged(true, true);
+                    _noteSelectionController.AddNote(removedNotes);
+                    _propertiesWindow.NotifyNoteIsLinkChanged(SelectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide) ? slide : null);
+                    OnNotesChanged(true, true, noteDataChangedExceptTime: true);
                 }));
 
-            NoteTimeComparer.AssertInOrder(_stage.Chart.Data.Notes);
+            NoteTimeComparer.AssertInOrder(_stage.Chart.Notes);
         }
 
         public void AddNotesSnappingToCurve(int count)
@@ -163,17 +164,22 @@ namespace Deenote.Edit
             list.Capacity = Mathf.Max(count, list.Capacity);
             for (int i = 0; i < count; i++) {
                 var time = startTime + (endTime - startTime) / (count + 1) * (i + 1);
-                var coord = _stage.Grids.Quantize(new(0f, time), true, false);
+                var coord = _stage.Grids.Quantize(new(time, 0f), true, false);
                 list.Add(new NoteData { PositionCoord = coord, });
             }
-            _operationHistory.Do(_stage.Chart.Notes.AddMultipleNotes(new NoteCoord(0f, startTime), list)
+            _operationHistory.Do(_stage.Chart.Notes.AddMultipleNotes(new NoteCoord(startTime, 0f), list)
                 .WithRedoneAction(notes =>
                 {
                     OnNoteSelectionChanging();
                     _noteSelectionController.SelectNotes(notes);
                     OnNotesChanged(true, true);
                 })
-                .WithUndoneAction(() => OnNotesChanged(true, false)));
+                .WithUndoneAction(notes =>
+                {
+                    OnNoteSelectionChanging();
+                    _noteSelectionController.DeselectNotes(notes);
+                    OnNotesChanged(true, true);
+                }));
 
             ListPool<NoteData>.Release(list);
         }
@@ -183,7 +189,7 @@ namespace Deenote.Edit
         /// <summary>
         /// Get which notes to display, does not update position here
         /// </summary>
-        private void UpdateNoteIndicator()
+        private void RefreshNoteIndicator()
         {
             if (!IsNoteIndicatorOn)
                 return;
@@ -254,8 +260,7 @@ namespace Deenote.Edit
             using var __sn_dict = DictionaryPool<NoteData, NoteData>.Get(out var slideNotes);
             foreach (var note in SelectedNotes) {
                 var data = note.Data.Clone();
-                data.Position -= baseNote.Position;
-                data.Time -= baseNote.Time;
+                data.PositionCoord -= baseNote.PositionCoord;
                 _clipBoardNotes.Add(data);
 
                 data.PrevLink = data.NextLink = null;
@@ -288,7 +293,7 @@ namespace Deenote.Edit
                 return;
 
             _isPasting = true;
-            UpdateNoteIndicator();
+            RefreshNoteIndicator();
         }
 
         #endregion

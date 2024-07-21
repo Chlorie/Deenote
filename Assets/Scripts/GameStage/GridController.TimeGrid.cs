@@ -28,13 +28,13 @@ namespace Deenote.GameStage
 
         private ProjectModel.TempoListProxy CurrentProjectTempos => MainSystem.ProjectManager.CurrentProject.Tempos;
 
-        // TODO: ÐèÒª´¦ÀíMinBeatLineIntervalÂð£¿
+        // Note: Distance between tempoLines >= MinBeatLineInterval
+        // Distance between beatLines and subBeatLines >= MinBeatLineIntterval / TimeGridSubBeatCount
         public void UpdateTimeGrids()
         {
             if (TimeGridSubBeatCount == 0) {
-                if (_timeGrids.Count > 0) {
-                    _timeGrids.Clear();
-                }
+                _timeGrids.Clear();
+                return;
             }
 
             using var grids = _timeGrids.Resetting();
@@ -46,19 +46,22 @@ namespace Deenote.GameStage
 
             float currentTime = MainSystem.GameStage.CurrentMusicTime;
             float appearTime = currentTime + MainSystem.GameStage.StageNoteAheadTime;
+            float minSubBeatLineInterval = MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount;
 
             for (; iTempo < CurrentProjectTempos.Count; iTempo++) {
                 Tempo tempo = CurrentProjectTempos[iTempo];
                 float nextTime = CurrentProjectTempos.GetNonOverflowTempoTime(iTempo + 1);
 
-                // If bpm is 0, just draw the tempo line
+                // If bpm is 0, draw the tempo line only
                 if (tempo.Bpm == 0f) {
                     if (tempo.StartTime > currentTime) {
                         if (tempo.StartTime >= appearTime)
                             return;
+                        if (tempo.StartTime > nextTime - MainSystem.Args.MinBeatLineInterval)
+                            goto RenderNextTempo;
                         grids.Add(out var line);
                         SetTimeGridKind(line, TimeGridKind.TempoLine);
-                        SetTimeGridTime(line, tempo.StartTime);
+                        SetTimeGridTime(line, tempo.StartTime - currentTime);
                     }
                     goto RenderNextTempo;
                 }
@@ -70,6 +73,8 @@ namespace Deenote.GameStage
                     if (beatTime > currentTime) {
                         if (beatTime >= appearTime)
                             return;
+                        if (beatTime > nextTime - minSubBeatLineInterval)
+                            goto RenderNextTempo;
                         grids.Add(out var line);
                         SetTimeGridKind(line, beatIndex == 0 ? TimeGridKind.TempoLine : TimeGridKind.BeatLine);
                         SetTimeGridTime(line, beatTime - currentTime);
@@ -80,7 +85,7 @@ namespace Deenote.GameStage
                         if (subBeatTime > currentTime) {
                             if (subBeatTime >= appearTime)
                                 return;
-                            if (subBeatTime >= nextTime)
+                            if (subBeatTime > nextTime - minSubBeatLineInterval)
                                 goto RenderNextTempo;
                             grids.Add(out var line);
                             SetTimeGridKind(line, TimeGridKind.SubBeatLine);
@@ -91,11 +96,17 @@ namespace Deenote.GameStage
             RenderNextTempo:
                 continue;
             }
+
+            if (MainSystem.GameStage.MusicLength < appearTime && CurrentProjectTempos[^1].Bpm != 0f) {
+                grids.Add(out var lastLine);
+                SetTimeGridKind(lastLine, TimeGridKind.TempoLine);
+                SetTimeGridTime(lastLine, MainSystem.GameStage.MusicLength - currentTime);
+            }
         }
 
-        // Note: ÓëÏÂÒ»¸ötempoÏÎ½ÓµÄÒ»ÅÄµÄ×ÓÅÄÏß²»°´ÕÕÓëÏÂÒ»¸ötempo.StartTimeµÄ¼ä¾àÆ½·Ö£¬Òò´Ë
-        // get×ÓÅÄÏßÊ¹ÓÃtempo.GetBeatTime(float);
-        // ÈôÒª»Ö¸´¾É°ædntµÄ·½Ê½£¬UpdateTimeGrid£¬Get/FloorTo/CeilToNearestTimeGridTime¶¼µÃ¸Ä
+        // Note: ä¸Žä¸‹ä¸€ä¸ªtempoè¡”æŽ¥çš„ä¸€æ‹çš„å­æ‹çº¿ä¸æŒ‰ç…§ä¸Žä¸‹ä¸€ä¸ªtempo.StartTimeçš„é—´è·å¹³åˆ†ï¼Œå› æ­¤
+        // getå­æ‹çº¿ä½¿ç”¨tempo.GetBeatTime(float);å³å¯
+        // è‹¥è¦æ¢å¤æ—§ç‰ˆdntçš„æ–¹å¼ï¼ŒUpdateTimeGridï¼ŒGet/FloorTo/CeilToNearestTimeGridTimeéƒ½å¾—æ”¹
 
         /// <returns><see langword="null"/> if given time is earlier than first tempo or later than last beat line</returns>
         public float? GetNearestTimeGridTime(float time)
@@ -109,24 +120,35 @@ namespace Deenote.GameStage
             }
 
             Tempo tempo = CurrentProjectTempos[tempoIndex];
+            if (tempoIndex == CurrentProjectTempos.Count - 1 && tempo.Bpm == 0f)
+                return null;
+
+            float nextTempoTime = CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1);
             int beatIndex = tempo.GetBeatIndex(time);
             float prevBeatTime = tempo.GetBeatTime(beatIndex);
 
             float prevBeatDelta = time - prevBeatTime;
             int subBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval);
-            float prevSubBeatTime = tempo.GetSubBeatTime(beatIndex + (float)subBeatIndex / TimeGridSubBeatCount);
-            float nextSubBeatTime = tempo.GetSubBeatTime(beatIndex + (float)(subBeatIndex + 1) / TimeGridSubBeatCount);
 
-            nextSubBeatTime = Mathf.Min(nextSubBeatTime, tempo.GetBeatTime(beatIndex + 1));
-            if (tempoIndex + 1 < CurrentProjectTempos.Count) {
-                nextSubBeatTime = Mathf.Min(nextSubBeatTime, CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
+            float prevSubBeatTime = GetPrevSubBeatTime();
+            float nextSubBeatTime = GetNextSubBeatTime();
+            float GetPrevSubBeatTime()
+            {
+                float prevSubBeatTime = tempo.GetSubBeatTime(beatIndex + (float)subBeatIndex / TimeGridSubBeatCount);
+                if (prevSubBeatTime > nextTempoTime - (MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount)) {
+                    subBeatIndex--;
+                    return tempo.GetSubBeatTime(beatIndex + (float)subBeatIndex / TimeGridSubBeatCount);
+                }
+                return prevSubBeatTime;
             }
-            else {
-                Debug.Assert(MainSystem.GameStage.MusicLength == CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
-                // If Min(nextSubBeat, nextBeat, nextTempo) is nextTempo, and nextTempo is end of Audio
-                // we dont want to move, so return null
-                if (MainSystem.GameStage.MusicLength < nextSubBeatTime)
-                    return null;
+            float GetNextSubBeatTime()
+            {
+                float nextSubBeatTime = tempo.GetSubBeatTime(beatIndex + (float)(subBeatIndex + 1) / TimeGridSubBeatCount);
+                if (nextSubBeatTime > nextTempoTime - (MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount)) {
+                    // Here next subBeatTime not rendered, so we use nextTempoTime
+                    return nextTempoTime;
+                }
+                return nextSubBeatTime;
             }
 
             float prevDelta = time - prevSubBeatTime;
@@ -135,7 +157,7 @@ namespace Deenote.GameStage
         }
 
         /// <returns><see langword="null"/> if given time is earlier than first tempo</returns>
-        public float? FloorToNearestNextTimeGridTime(float time)
+        public float? FloorToNextNearestTimeGridTime(float time)
         {
             if (TimeGridSubBeatCount == 0)
                 return null;
@@ -145,6 +167,10 @@ namespace Deenote.GameStage
                 return null;
 
             Tempo tempo = CurrentProjectTempos[tempoIndex];
+            if (tempoIndex == CurrentProjectTempos.Count - 1 && tempo.Bpm == 0f)
+                return null;
+
+            float nextTempoTime = CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1);
             int prevBeatIndex = tempo.GetCeilingBeatIndex(time) - 1;
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
@@ -152,11 +178,18 @@ namespace Deenote.GameStage
             int prevSubBeatIndex = Mathf.CeilToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval) - 1;
             float prevSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)prevSubBeatIndex / TimeGridSubBeatCount);
 
+            if (prevSubBeatTime > nextTempoTime - (float)(MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount)) {
+                // the diff of old and new prevSubBeatIndex should be minSubBeatLineInterval,
+                // so here we needn't while, maybe.
+                prevSubBeatIndex--;
+                return tempo.GetSubBeatTime(prevBeatIndex + (float)prevSubBeatIndex / TimeGridSubBeatCount);
+            }
+
             return prevSubBeatTime;
         }
 
         /// <returns><see langword="null"/> if given time is later than last line</returns>
-        public float? CeilToNearestNextTimeGridTime(float time)
+        public float? CeilToNextNearestTimeGridTime(float time)
         {
             if (TimeGridSubBeatCount == 0)
                 return null;
@@ -166,6 +199,10 @@ namespace Deenote.GameStage
                 return CurrentProjectTempos.Count > 0 ? CurrentProjectTempos[0].StartTime : null;
 
             Tempo tempo = CurrentProjectTempos[tempoIndex];
+            if (tempoIndex == CurrentProjectTempos.Count - 1 && tempo.Bpm == 0f)
+                return null;
+
+            float nextTempoTime = CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1);
             int prevBeatIndex = tempo.GetBeatIndex(time);
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
@@ -173,19 +210,26 @@ namespace Deenote.GameStage
             int nextSubBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval) + 1;
             float nextSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)nextSubBeatIndex / TimeGridSubBeatCount);
 
-            nextSubBeatTime = Mathf.Min(nextSubBeatTime, tempo.GetBeatTime(prevBeatIndex + 1));
-            if (tempoIndex + 1 < CurrentProjectTempos.Count) {
-                nextSubBeatTime = Mathf.Min(nextSubBeatTime, CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
-            }
-            else {
-                Debug.Assert(MainSystem.GameStage.MusicLength == CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
-                // If Min(nextSubBeat, nextBeat, nextTempo) is nextTempo, and nextTempo is end of Audio
-                // we dont want to move, so return null
-                if (MainSystem.GameStage.MusicLength < nextSubBeatTime)
-                    return null;
+            if (nextSubBeatTime > nextTempoTime - (MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount)) {
+                // `time` is between an unrendered beatTime and nextTempoTime,
+                // so the next nearest grid is next Tempo
+                return nextTempoTime;
             }
 
             return nextSubBeatTime;
+
+            //if (tempoIndex + 1 < CurrentProjectTempos.Count) {
+            //    nextSubBeatTime = Mathf.Min(nextSubBeatTime, CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
+            //}
+            //else {
+            //    Debug.Assert(MainSystem.GameStage.MusicLength == CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
+            //    // If Min(nextSubBeat, nextBeat, nextTempo) is nextTempo, and nextTempo is end of Audio
+            //    // we dont want to move, so return null
+            //    if (MainSystem.GameStage.MusicLength < nextSubBeatTime)
+            //        return null;
+            //}
+
+            //return nextSubBeatTime;
         }
 
         #region Pool & Unity
@@ -204,8 +248,11 @@ namespace Deenote.GameStage
         {
             var z = MainSystem.Args.OffsetTimeToZ(timeOffsetToStage);
             var x = MainSystem.Args.PositionToX(MainSystem.Args.StageMaxPosition);
-            line.SetPosition(0, new Vector3(-x, 0, z));
-            line.SetPosition(1, new Vector3(x, 0, z));
+            line.SetPosition(0, _stage.NormalizeGridPosition(new Vector3(-x, 0, z)));
+            line.SetPosition(1, _stage.NormalizeGridPosition(new Vector3(x, 0, z)));
+
+            float alpha = Mathf.Clamp01((_stage.StageNoteAheadTime - timeOffsetToStage) / MainSystem.Args.ZToOffsetTime(_stage.Args.NoteFadeInZRange));
+            line.SetGradientColor(alpha, alpha);
         }
 
         private void AwakeTimeGrid()
@@ -214,7 +261,7 @@ namespace Deenote.GameStage
             {
                 var line = Instantiate(_linePrefab, _timeGridParentTransform);
                 line.sortingOrder = -14;
-                line.widthMultiplier = 0.035f;
+                line.widthMultiplier = MainSystem.Args.GridWidth;
                 line.positionCount = 2;
                 return line;
             }));

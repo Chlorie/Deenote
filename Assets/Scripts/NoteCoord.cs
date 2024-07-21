@@ -1,25 +1,27 @@
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Deenote
 {
+    [DebuggerDisplay("Pos:{Position}, Time:{Time}")]
     public struct NoteCoord
     {
         public float Position;
         public float Time;
 
-        public NoteCoord(float position, float time)
+        public NoteCoord(float time, float position)
         {
             Position = position;
             Time = time;
         }
 
-        public static NoteCoord ClampPosition(NoteCoord coord) => ClampPosition(coord.Position, coord.Time);
+        public static NoteCoord ClampPosition(NoteCoord coord) => ClampPosition(coord.Time, coord.Position);
 
-        public static NoteCoord ClampPosition(float position, float time) => new(MainSystem.Args.ClampNotePosition(position), time);
-        public static NoteCoord Clamp(NoteCoord coord, float maxTime) => new(MainSystem.Args.ClampNotePosition(coord.Position), Mathf.Clamp(coord.Time, 0f, maxTime));
+        public static NoteCoord ClampPosition(float time, float position) => new(time, MainSystem.Args.ClampNotePosition(position));
+        public static NoteCoord Clamp(NoteCoord coord, float maxTime) => new(Mathf.Clamp(coord.Time, 0f, maxTime), MainSystem.Args.ClampNotePosition(coord.Position));
 
-        public static NoteCoord operator -(NoteCoord left, NoteCoord right) => new(left.Position - right.Position, left.Time - right.Time);
+        public static NoteCoord operator -(NoteCoord left, NoteCoord right) => new(left.Time - right.Time, left.Position - right.Position);
 
-        public static NoteCoord operator +(NoteCoord left, NoteCoord right) => new(left.Position + right.Position, left.Time + right.Time);
+        public static NoteCoord operator +(NoteCoord left, NoteCoord right) => new(left.Time + right.Time, left.Position + right.Position);
     }
 }

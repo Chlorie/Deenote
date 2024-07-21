@@ -16,7 +16,6 @@ namespace Deenote.UI.Windows.Elements
         [SerializeField] TMP_InputField _volumeInputField;
         [SerializeField] TMP_InputField _durationInputField;
         [SerializeField] TMP_InputField _delayInputField;
-        [SerializeField] TMP_Text _idText;
         [SerializeField] Button _removeButton;
 
         [Header("Data")]
@@ -28,12 +27,11 @@ namespace Deenote.UI.Windows.Elements
 
         private void Awake()
         {
-            _pitchInputField.onSubmit.AddListener(OnPitchChanged);
-            _volumeInputField.onSubmit.AddListener(OnVolumeChanged);
-            _durationInputField.onSubmit.AddListener(OnDurationChanged);
-            _delayInputField.onSubmit.AddListener(OnDelayChanged);
+            _pitchInputField.onEndEdit.AddListener(OnPitchChanged);
+            _volumeInputField.onEndEdit.AddListener(OnVolumeChanged);
+            _durationInputField.onEndEdit.AddListener(OnDurationChanged);
+            _delayInputField.onEndEdit.AddListener(OnDelayChanged);
             _removeButton.onClick.AddListener(() => _window.RemoveSound(this));
-            // TODO: id是干啥的来着我忘了
 
             _data = new(0, 0, 0, 0);
         }

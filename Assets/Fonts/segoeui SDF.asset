@@ -2734,7 +2734,8 @@ MonoBehaviour:
   m_FontFeatureTable:
     m_GlyphPairAdjustmentRecords: []
   fallbackFontAssets: []
-  m_FallbackFontAssetTable: []
+  m_FallbackFontAssetTable:
+  - {fileID: 11400000, guid: 2612412b88c5d2748a4b94d54e84bf98, type: 2}
   m_CreationSettings:
     sourceFontFileName: 
     sourceFontFileGUID: 1c25e6749f4ed9b43936c55b613e4226

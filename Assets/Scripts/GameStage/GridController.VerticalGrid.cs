@@ -10,6 +10,8 @@ namespace Deenote.GameStage
 
         [Header("Vertical Grid")]
         [SerializeField] GameObject _bordersGameObject;
+        [SerializeField] LineRenderer _leftBorderLine;
+        [SerializeField] LineRenderer _rightBorderLine;
         [SerializeField] Transform _verticalGridParentTransform;
 
         private PooledObjectListView<LineRenderer> _verticalGrids;
@@ -115,7 +117,7 @@ namespace Deenote.GameStage
             }
         }
 
-        private void UpdateVerticalGrids()
+        public void UpdateVerticalGrids()
         {
             switch (VerticalGridGeneration) {
                 case VerticalGridGenerationKind.ByCountAndOffset:
@@ -157,6 +159,9 @@ namespace Deenote.GameStage
                             SetVerticalGridPosition(_verticalGrids[i], GetVerticalGridPosition(i + 1));
                         }
                         _bordersGameObject.SetActive(true);
+                        SetVerticalGridPosition(_leftBorderLine, -MainSystem.Args.StageMaxPosition);
+                        SetVerticalGridPosition(_rightBorderLine, MainSystem.Args.StageMaxPosition);
+
                         break;
                     }
                 }
@@ -313,8 +318,12 @@ namespace Deenote.GameStage
         private void SetVerticalGridPosition(LineRenderer line, float position)
         {
             var x = MainSystem.Args.PositionToX(position);
-            line.SetPosition(0, new Vector3(x, 0, 0f));
-            line.SetPosition(1, new Vector3(x, 0, MainSystem.Args.NoteAppearZ));
+            var z = MainSystem.Args.OffsetTimeToZ(_stage.StageNoteAheadTime);
+            line.SetPosition(0, _stage.NormalizeGridPosition(new Vector3(x, 0, 0f)));
+            line.SetPosition(1, _stage.NormalizeGridPosition(new Vector3(x, 0, z)));
+
+            float startAlphaUnclamped = _stage.StageNoteAheadTime / MainSystem.Args.ZToOffsetTime(_stage.Args.NoteFadeInZRange);
+            line.SetGradientColor(startAlphaUnclamped, 0f);
         }
 
         private void AwakeVerticalGrid()
@@ -323,11 +332,18 @@ namespace Deenote.GameStage
             {
                 var line = Instantiate(_linePrefab, _verticalGridParentTransform);
                 line.sortingOrder = -14;
-                line.widthMultiplier = 0.035f;
+                line.widthMultiplier = MainSystem.Args.GridWidth;
                 line.positionCount = 2;
                 line.SetSolidColor(MainSystem.Args.SubBeatLineColor);
                 return line;
             }));
+
+            _leftBorderLine.widthMultiplier = MainSystem.Args.GridBorderWidth;
+            _leftBorderLine.SetPosition(0, _stage.NormalizeGridPosition(_leftBorderLine.GetPosition(0)));
+            _leftBorderLine.SetPosition(1, _stage.NormalizeGridPosition(_leftBorderLine.GetPosition(1)));
+            _rightBorderLine.widthMultiplier = MainSystem.Args.GridBorderWidth;
+            _rightBorderLine.SetPosition(0, _stage.NormalizeGridPosition(_rightBorderLine.GetPosition(0)));
+            _rightBorderLine.SetPosition(1, _stage.NormalizeGridPosition(_rightBorderLine.GetPosition(1)));
         }
 
         #endregion

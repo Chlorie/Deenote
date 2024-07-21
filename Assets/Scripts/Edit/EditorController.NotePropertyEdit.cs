@@ -2,6 +2,7 @@ using Deenote.Project.Comparers;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using System;
+using System.Diagnostics;
 using UnityEngine.Pool;
 
 namespace Deenote.Edit
@@ -16,9 +17,10 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.PositionCoord, (n, v) => n.PositionCoord = v)
+                .WithOptions(sortNotes: true, updateCollision: true)
                 .WithDoneAction(() =>
                 {
-                    // TODO: Ensure Notes Order
+                    NoteTimeComparer.AssertInOrder(_stage.Chart.Notes);
                     _propertiesWindow.NotifyNoteTimeChanged(SelectedNotes.IsSameForAll(n => n.Data.Time, out var time) ? time : null);
                     _propertiesWindow.NotifyNotePositionChanged(SelectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
                     OnNotesChanged(true, false, noteDataChangedExceptTime: false);
@@ -31,9 +33,10 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
+                .WithOptions(sortNotes: true, updateCollision: true)
                 .WithDoneAction(() =>
                 {
-                    // TODO: Ensure Notes Order
+                    NoteTimeComparer.AssertInOrder(_stage.Chart.Notes);
                     _propertiesWindow.NotifyNoteTimeChanged(SelectedNotes.IsSameForAll(n => n.Data.Time, out var time) ? time : null);
                     OnNotesChanged(true, false, noteDataChangedExceptTime: false);
                 }));
@@ -45,9 +48,10 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
+                .WithOptions(sortNotes: true, updateCollision: true)
                 .WithDoneAction(() =>
                 {
-                    // TODO: Ensure Notes Order
+                    NoteTimeComparer.AssertInOrder(_stage.Chart.Notes);
                     _propertiesWindow.NotifyNoteTimeChanged(SelectedNotes.IsSameForAll(n => n.Data.Time, out var time) ? time : null);
                     OnNotesChanged(true, false, noteDataChangedExceptTime: true);
                 }));
@@ -59,6 +63,7 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Position, (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
+                .WithOptions(updateCollision: true)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePositionChanged(SelectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
@@ -72,6 +77,7 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Position, (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
+                .WithOptions(updateCollision: true)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePositionChanged(SelectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
