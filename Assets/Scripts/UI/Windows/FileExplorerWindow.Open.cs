@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Deenote.Localization;
 using System.IO;
 
 namespace Deenote.UI.Windows

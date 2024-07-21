@@ -1,7 +1,6 @@
 using Deenote.GameStage;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

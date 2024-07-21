@@ -1,5 +1,4 @@
 using Deenote.Project.Models.Datas;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 

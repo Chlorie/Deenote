@@ -5,7 +5,6 @@ using Deenote.Utilities;
 using System.IO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Windows.Elements

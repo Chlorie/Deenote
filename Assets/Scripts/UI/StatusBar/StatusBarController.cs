@@ -1,9 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.Utilities;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.Pool;
 
