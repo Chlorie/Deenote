@@ -32,23 +32,25 @@ namespace Deenote.Project.Models
                 Tempo? insertContinuingTempo = null;
 
                 // If the given tempo time is to short, we only adjust startTime
-                if (endTime - tempo.StartTime >= MainSystem.Args.MinBeatLineInterval) {
-                    // If |tempo.StartTime - prevTempo.StartTime| <= MinBeatLineInterval,
-                    // we set prevTempo = tempo
-                    // If |otherInsertTime - nextTempo.StartTime| <= MinBeatLineInterval,
-                    // set otherInsertTime = nextTempo.StartTime, means we ignore this insertTime
-                    var nextTempoTime = removeEndIndex < tempos.Count ? tempos[removeEndIndex].StartTime : _projectModel.AudioClip.length;
+                if (!(endTime - tempo.StartTime >= MainSystem.Args.MinBeatLineInterval))
+                    return new InsertTempoOperation(_projectModel._tempos, removeStartIndex, removeEndIndex, tempo,
+                        insertEndTempo, insertContinuingTempo);
 
-                    var prevTempo = removeEndIndex < 1 ? default : tempos[removeEndIndex - 1];
-                    var continuingTempoTime = prevTempo.GetBeatTime(prevTempo.GetCeilingBeatIndex(endTime));
-                    if (continuingTempoTime <= nextTempoTime - MainSystem.Args.MinBeatLineInterval) {
-                        nextTempoTime = continuingTempoTime;
-                        insertContinuingTempo = new Tempo(prevTempo.Bpm,continuingTempoTime);
-                    }
+                // If |tempo.StartTime - prevTempo.StartTime| <= MinBeatLineInterval,
+                // we set prevTempo = tempo
+                // If |otherInsertTime - nextTempo.StartTime| <= MinBeatLineInterval,
+                // set otherInsertTime = nextTempo.StartTime, means we ignore this insertTime
+                var nextTempoTime = removeEndIndex < tempos.Count ? tempos[removeEndIndex].StartTime : _projectModel.AudioClip.length;
 
-                    if (endTime <= nextTempoTime - MainSystem.Args.MinBeatLineInterval) {
-                        insertEndTempo = new Tempo(bpm: 0f, endTime);
-                    }
+                var prevTempo = removeEndIndex < 1 ? default : tempos[removeEndIndex - 1];
+                var continuingTempoTime = prevTempo.GetBeatTime(prevTempo.GetCeilingBeatIndex(endTime));
+                if (continuingTempoTime <= nextTempoTime - MainSystem.Args.MinBeatLineInterval) {
+                    nextTempoTime = continuingTempoTime;
+                    insertContinuingTempo = new Tempo(prevTempo.Bpm,continuingTempoTime);
+                }
+
+                if (endTime <= nextTempoTime - MainSystem.Args.MinBeatLineInterval) {
+                    insertEndTempo = new Tempo(bpm: 0f, endTime);
                 }
 
                 return new InsertTempoOperation(_projectModel._tempos, removeStartIndex, removeEndIndex, tempo, insertEndTempo, insertContinuingTempo);
@@ -66,7 +68,7 @@ namespace Deenote.Project.Models
                 private readonly Tempo? _insertContinuingTempo;
                 private readonly Tempo[] _removeTempos;
 
-                private Action _onDone;
+                private Action? _onDone;
 
                 public InsertTempoOperation(List<Tempo> tempoList, int startIndex, int endIndex, Tempo insertStartTempo, Tempo? insertEndTempo, Tempo? insertContinuingTempo)
                 {

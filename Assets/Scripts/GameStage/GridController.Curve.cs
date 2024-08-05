@@ -12,18 +12,19 @@ namespace Deenote.GameStage
         private const int CubicCurveSegmentCount = 400;
 
         [Header("Curve")]
-        [SerializeField] LineRenderer _curveLineRenderer;
+        [SerializeField] private LineRenderer _curveLineRenderer = null!;
 
-        private CurveLineData _curveLineData;
-        private bool __isCurveOn;
+        private CurveLineData? _curveLineData;
+        private bool _isCurveOn;
         public bool IsCurveOn
         {
-            get => __isCurveOn;
-            private set {
-                if (__isCurveOn == value)
+            get => _isCurveOn;
+            private set
+            {
+                if (_isCurveOn == value)
                     return;
-                __isCurveOn = value;
-                _editorPropertiesWindow.NotifyCurveOn(__isCurveOn);
+                _isCurveOn = value;
+                _editorPropertiesWindow.NotifyCurveOn(_isCurveOn);
             }
         }
 
@@ -32,12 +33,14 @@ namespace Deenote.GameStage
         public void InitializeCurve(ListReadOnlyView<NoteModel> interpolationNotes, CurveKind kind)
         {
             NoteTimeComparer.AssertInOrder(interpolationNotes);
-            if (interpolationNotes.Count < 2) {
+            if (interpolationNotes.Count < 2)
+            {
                 IsCurveOn = false;
                 return;
             }
 
-            _curveLineData = kind switch {
+            _curveLineData = kind switch
+            {
                 CurveKind.Cubic => CurveLineData.Cubic(interpolationNotes),
                 CurveKind.Linear => CurveLineData.Linear(interpolationNotes),
                 _ => null,
@@ -60,16 +63,18 @@ namespace Deenote.GameStage
             float stageCurrentTime = _stage.CurrentMusicTime;
             float stageMaxTime = stageCurrentTime + _stage.StageNoteAheadTime;
 
-            using var coords = _curveLineData.GetRenderValues(_stage.CurrentMusicTime, stageMaxTime);
+            using var coords = _curveLineData!.GetRenderValues(_stage.CurrentMusicTime, stageMaxTime);
             var coordSpan = coords.Span;
-            if (coordSpan.Length == 0) {
+            if (coordSpan.Length == 0)
+            {
                 _curveLineRenderer.gameObject.SetActive(false);
                 return;
             }
             _curveLineRenderer.gameObject.SetActive(true);
 
             var worldPositions = new Vector3[coordSpan.Length];
-            for (int i = 0; i < worldPositions.Length; i++) {
+            for (int i = 0; i < worldPositions.Length; i++)
+            {
                 var coord = coordSpan[i];
                 var (x, z) = MainSystem.Args.NoteCoordToWorldPosition(coordSpan[i]);
                 worldPositions[i] = new Vector3(x, 0, z);
@@ -114,12 +119,14 @@ namespace Deenote.GameStage
             {
                 var curve = new CurveLineData(interpolationNotes.Count);
 
-                for (int i = 0; i < interpolationNotes.Count; i++) {
+                for (int i = 0; i < interpolationNotes.Count; i++)
+                {
                     var note = interpolationNotes[i].Data;
                     curve.x[i] = note.Time;
                     curve.a[i] = note.Position;
                 }
-                for (int i = 0; i < interpolationNotes.Count - 1; i++) {
+                for (int i = 0; i < interpolationNotes.Count - 1; i++)
+                {
                     curve.b[i] = (curve.a[i + 1] - curve.a[i]) / (curve.x[i + 1] / curve.x[i]);
                 }
                 Array.Clear(curve.c, 0, curve.c.Length);
@@ -135,7 +142,8 @@ namespace Deenote.GameStage
                 int count = interpolationNotes.Count;
                 int n = count - 1;
 
-                for (int i = 0; i < count; i++) {
+                for (int i = 0; i < count; i++)
+                {
                     curve.x[i] = interpolationNotes[i].Data.Time;
                     curve.a[i] = interpolationNotes[i].Data.Position;
                 }
@@ -146,17 +154,20 @@ namespace Deenote.GameStage
                 var l = (stackalloc double[count]);
                 var z = (stackalloc double[count]);
 
-                for (int i = 0; i < count - 1; i++) {
+                for (int i = 0; i < count - 1; i++)
+                {
                     h[i] = i + 1 - curve.x[i + 1] - curve.x[i];
                 }
-                for (int i = 1; i < count - 1; i++) {
+                for (int i = 1; i < count - 1; i++)
+                {
                     alpha[i] = 3 * (curve.a[i + 1] - curve.a[i]) / h[i] - 3 * (curve.a[i] - curve.a[i - 1]) / h[i - 1];
                 }
 
                 l[0] = 1d;
                 mu[0] = 0d;
                 z[0] = 0d;
-                for (int i = 1; i < n; i++) {
+                for (int i = 1; i < n; i++)
+                {
                     l[i] = 2 * (curve.x[i - 1] - curve.x[i - 1]) - h[i - 1] * mu[i - 1];
                     mu[i] = h[i] / l[i];
                     z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
@@ -165,7 +176,8 @@ namespace Deenote.GameStage
                 z[n] = 0d;
                 curve.c[n] = 0d;
 
-                for (int i = n - 1; i >= 0; i--) {
+                for (int i = n - 1; i >= 0; i--)
+                {
                     curve.c[i] = z[i] - mu[i] * curve.c[i + 1];
                     curve.b[i] = (curve.a[i + 1] - curve.a[i]) / h[i] - h[i] * (curve.c[i + 1] + 2 * curve.c[i]) / 3;
                     curve.d[i] = (curve.c[i + 1] - curve.c[i]) / (3 * h[i]);
@@ -179,16 +191,16 @@ namespace Deenote.GameStage
                 if (time < x[0] || time > x[^1])
                     return null;
 
-                for (int i = 0; i < x.Length - 1; i++) {
-                    if (time < x[i + 1]) {
-                        double diff = time - x[i];
-                        return (float)(
-                            a[i] +
-                            b[i] * diff +
-                            c[i] * diff * diff +
-                            d[i] * diff * diff * diff
-                            );
-                    }
+                for (int i = 0; i < x.Length - 1; i++)
+                {
+                    if (!(time < x[i + 1])) continue;
+                    double diff = time - x[i];
+                    return (float)(
+                        a[i] +
+                        b[i] * diff +
+                        c[i] * diff * diff +
+                        d[i] * diff * diff * diff
+                    );
                 }
 
                 Debug.Assert(time == x[^1]);
@@ -204,9 +216,10 @@ namespace Deenote.GameStage
                 float max = Mathf.Min(MaxX, renderMaxTime);
                 var coords = new PooledSpan<NoteCoord>(CubicCurveSegmentCount);
                 var span = coords.Span;
-                for (int i = 0; i < CubicCurveSegmentCount; i++) {
+                for (int i = 0; i < CubicCurveSegmentCount; i++)
+                {
                     float time = Mathf.Lerp(min, max, i / 400f);
-                    float pos = GetPosition(time).Value;
+                    float pos = GetPosition(time) ?? 0f;
                     span[i] = NoteCoord.ClampPosition(time, pos);
                 }
                 return new(coords);

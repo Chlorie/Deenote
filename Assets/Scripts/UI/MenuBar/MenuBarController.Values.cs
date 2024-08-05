@@ -6,12 +6,13 @@ namespace Deenote.UI.MenuBar
     partial class MenuBarController
     {
         [Header("Values")]
-        [SerializeField] Color _menuItemNormalColor;
-        [SerializeField] Color _menuItemHightlightedColor;
-        [SerializeField] Color _menuItemPressedColor;
-        [SerializeField] Color _menuItemSelectedColor;
+        [SerializeField] private Color _menuItemNormalColor;
+        [SerializeField] private Color _menuItemHightlightedColor;
+        [SerializeField] private Color _menuItemPressedColor;
+        [SerializeField] private Color _menuItemSelectedColor;
 
-        public ColorBlock UnselectedMenuItemColors => new ColorBlock {
+        public ColorBlock UnselectedMenuItemColors => new()
+        {
             normalColor = _menuItemNormalColor,
             highlightedColor = _menuItemHightlightedColor,
             pressedColor = _menuItemPressedColor,
@@ -19,7 +20,8 @@ namespace Deenote.UI.MenuBar
             colorMultiplier = 1f,
         };
 
-        public ColorBlock SelectedMenuItemColors => new ColorBlock {
+        public ColorBlock SelectedMenuItemColors => new()
+        {
             normalColor = _menuItemSelectedColor,
             highlightedColor = _menuItemHightlightedColor,
             pressedColor = _menuItemPressedColor,

@@ -50,7 +50,7 @@ namespace Deenote.UI.Windows
             Debug.Assert(deltaTime >= 0, $"actual delta time:{deltaTime}");
             _comboNumberText.text = _comboShadowText.text = combo.ToString();
 
-            // TODO:我觉得还需要调
+            // TODO:鎴戣寰楄繕闇�瑕佽皟
             // Number
             {
                 const float NumberGreyIncTime = 0.125f;

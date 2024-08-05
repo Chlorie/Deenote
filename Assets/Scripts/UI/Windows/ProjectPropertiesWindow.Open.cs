@@ -2,14 +2,13 @@ using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.UI.Windows.Elements;
-using Deenote.Utilities;
 using System.Diagnostics;
 
 namespace Deenote.UI.Windows
 {
     partial class ProjectPropertiesWindow
     {
-        private UniTaskCompletionSource<MayBeNull<ProjectPropertiesChartController>> _newProjTcs;
+        private UniTaskCompletionSource<ProjectPropertiesChartController?>? _newProjTcs;
 
         /// <summary>
         /// Open window for creating a new project
@@ -21,15 +20,16 @@ namespace Deenote.UI.Windows
 
             _window.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties_Create"));
 
-            _newProjTcs = new UniTaskCompletionSource<MayBeNull<ProjectPropertiesChartController>>();
+            _newProjTcs = new UniTaskCompletionSource<ProjectPropertiesChartController?>();
             var confirmedChart = await _newProjTcs.Task;
             _newProjTcs = null;
 
             Window.IsActivated = false;
-            if (!confirmedChart.HasValue)
+            if (confirmedChart is null)
                 return default;
 
-            var proj = new ProjectModel {
+            var proj = new ProjectModel
+            {
                 MusicName = _musicNameInputField.text,
                 Composer = _composerInputField.text,
                 ChartDesigner = _chartDesignerInputField.text,
@@ -39,10 +39,11 @@ namespace Deenote.UI.Windows
             };
 
             int loadChartIndex = -1;
-            for (int i = 0; i < _charts.Count; i++) {
+            for (int i = 0; i < _charts.Count; i++)
+            {
                 var ch = _charts[i];
                 proj.Charts.Add(ch.Chart);
-                if (confirmedChart.Value == ch)
+                if (confirmedChart == ch)
                     loadChartIndex = i;
             }
             Debug.Assert(loadChartIndex >= 0);
@@ -61,33 +62,28 @@ namespace Deenote.UI.Windows
             _window.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties"));
             InitializeProject(project);
 
-            _newProjTcs = new UniTaskCompletionSource<MayBeNull<ProjectPropertiesChartController>>();
+            _newProjTcs = new UniTaskCompletionSource<ProjectPropertiesChartController?>();
             var confirmedChart = await _newProjTcs.Task;
             _newProjTcs = null;
 
             Window.IsActivated = false;
-            if (!confirmedChart.HasValue)
+            if (confirmedChart is null)
                 return default;
 
-            int loadChartIndex = _charts.IndexOf(confirmedChart.Value);
+            int loadChartIndex = _charts.IndexOf(confirmedChart);
             return new Result(project, loadChartIndex);
         }
 
         public readonly struct Result
         {
-            private readonly ProjectModel _project;
-            private readonly int _chart;
-
-            public ProjectModel Project => _project;
-
-            public int ConfirmedChartIndex => _chart;
-
-            public bool IsCancelled => _project is null;
+            public ProjectModel Project { get; }
+            public int ConfirmedChartIndex { get; }
+            public bool IsCancelled => Project is null;
 
             public Result(ProjectModel project, int chartIndex)
             {
-                _project = project;
-                _chart = chartIndex;
+                Project = project;
+                ConfirmedChartIndex = chartIndex;
             }
         }
     }

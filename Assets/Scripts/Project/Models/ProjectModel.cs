@@ -24,11 +24,6 @@ namespace Deenote.Project.Models
         // NonSerialize
         public AudioClip AudioClip { get; set; }
 
-        public ProjectModel()
-        {
-            _tempos = new();
-        }
-
         public readonly partial struct TempoListProxy : IReadOnlyList<Tempo>
         {
             private readonly ProjectModel _projectModel;

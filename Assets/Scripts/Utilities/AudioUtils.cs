@@ -7,11 +7,12 @@ namespace Deenote.Utilities
     // Copied from Chlorie's version
     public static class AudioUtils
     {
-        public static bool TryLoad(Stream stream, string audioType, out AudioClip clip)
+        public static bool TryLoad(Stream stream, string audioType, out AudioClip? clip)
         {
             WaveStream reader;
             int initialSampleCount;
-            switch (audioType) {
+            switch (audioType)
+            {
                 case ".wav":
                     reader = new WaveFileReader(stream);
                     initialSampleCount = 0;
@@ -30,9 +31,12 @@ namespace Deenote.Utilities
             ISampleProvider provider = reader.ToSampleProvider();
             long length = reader.Length / (reader.WaveFormat.BitsPerSample / 8);
             float[] raw = new float[length];
-            try {
+            try
+            {
                 provider.Read(raw, 0, (int)length);
-            } catch (NAudio.MmException) {
+            }
+            catch (NAudio.MmException)
+            {
                 clip = null;
                 return false;
             }

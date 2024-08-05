@@ -11,12 +11,12 @@ namespace Deenote.Project
         [Header("Notify")]
         [SerializeField] PropertiesWindow _propertiesWindow;
 
-        private string _projectSavePath;
+        private string? _projectSavePath;
         public string CurrentProjectSavePath => _projectSavePath;
 
-        public ProjectModel CurrentProject { get; private set; }
+        public ProjectModel? CurrentProject { get; private set; }
 
-        private static readonly LocalizableText[] _newProjMsgBtnTxt = new[] {
+        private static readonly LocalizableText[] _newProjMsgBtnTxt = {
             LocalizableText.Localized("Message_NewProjectOnOpen_Y"),
             LocalizableText.Localized("Message_NewProjectOnOpen_N"),
         };
@@ -56,13 +56,13 @@ namespace Deenote.Project
             // stage.forceToPlaceNotes = true;
             MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_OpenProject_Loading"));
             var proj = await LoadAsync(result.Path);
-            if (!proj.HasValue) {
+            if (proj is null) {
                 // TODO: Open failed
                 return;
             }
 
             // TODO:Load AudioClip
-            CurrentProject = proj.Value;
+            CurrentProject = proj;
             _projectSavePath = result.Path;
             MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_OpenProject_Completed"), 3f).Forget();
             // stage.forceToPlaceNotes = false;
@@ -108,7 +108,6 @@ namespace Deenote.Project
             await SaveAsync(CurrentProject, _projectSavePath);
             MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
         }
-
 
         private void SavePlayerPrefs() { }
     }

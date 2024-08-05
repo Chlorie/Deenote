@@ -10,7 +10,7 @@ namespace Deenote.Components
         [Range(0f,180f)]
         [SerializeField] float _horizontalFOV = 120f;
 
-        // TODO:不需要时刻更新相机设置，更改为Awake
+        // TODO:涓嶉渶瑕佹椂鍒绘洿鏂扮浉鏈鸿缃紝鏇存敼涓篈wake
         private void Update()
         {
             UpdateFieldOfView();

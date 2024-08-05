@@ -1,22 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using UnityEngine;
 
 namespace Deenote.Localization
 {
+    [SuppressMessage("ReSharper", "LocalVariableHidesMember")]
     public sealed class LocalizationSystem : MonoBehaviour
     {
         private string _defaultLanguage;
         private Dictionary<string, string> _defaultLocalizedTexts;
 
-        private string _currentLanguage;
-        private Dictionary<string, string> _localizedTexts;
+        private string? _currentLanguage;
+        private Dictionary<string, string>? _localizedTexts;
 
         private List<LocalizedText> _aliveTexts = new();
 
-        private Dictionary<string, Dictionary<string, string>> _languages;
+        private Dictionary<string, Dictionary<string, string>> _languages = new();
 
         public IReadOnlyCollection<string> Languages => _languages.Keys;
 
@@ -30,7 +32,8 @@ namespace Deenote.Localization
             _localizedTexts = _languages[language];
             _currentLanguage = language;
 
-            foreach (var locText in _aliveTexts) {
+            foreach (var locText in _aliveTexts)
+            {
                 locText.NotifyLanguageUpdated();
             }
         }
@@ -52,17 +55,15 @@ namespace Deenote.Localization
         private void Awake()
         {
             _defaultLanguage = "English";
-            _aliveTexts = new();
 
             // Load all languages at start
             var folder = Path.Combine(Application.streamingAssetsPath, "Languages");
             var files = Directory.GetFiles(folder);
-            _languages = new();
-            foreach (var file in files) {
-                if (file.EndsWith(".txt")) {
-                    var (name, texts) = LoadLanguagePack(file);
-                    _languages.Add(name, texts);
-                }
+            foreach (var file in files)
+            {
+                if (!file.EndsWith(".txt")) continue;
+                var (name, texts) = LoadLanguagePack(file);
+                _languages.Add(name, texts);
             }
 
             _defaultLocalizedTexts = _languages[_defaultLanguage];
@@ -77,11 +78,8 @@ namespace Deenote.Localization
 
             var name = reader.ReadLine();
 
-            while (!reader.EndOfStream) {
-                string line = reader.ReadLine();
-                if (line is null)
-                    break;
-
+            while (!reader.EndOfStream && reader.ReadLine() is { } line)
+            {
                 // Comment
                 if (line.StartsWith('#'))
                     continue;
@@ -93,18 +91,20 @@ namespace Deenote.Localization
 
                 string key = line[..seperator];
                 string value;
-                if (line.AsSpan(seperator + 1).SequenceEqual("\"\"\"")) {
+                if (line.AsSpan(seperator + 1) == "\"\"\"")
+                {
                     StringBuilder sb = new();
-                    while (!reader.EndOfStream) {
+                    while (!reader.EndOfStream)
+                    {
                         line = reader.ReadLine();
-                        if (line == null || line == "\"\"\"") {
+                        if (line is null or "\"\"\"")
                             break;
-                        }
                         sb.AppendLine(line);
                     }
                     value = sb.ToString();
                 }
-                else {
+                else
+                {
                     value = line[(seperator + 1)..].Replace("<br/>", "\r\n");
                 }
 

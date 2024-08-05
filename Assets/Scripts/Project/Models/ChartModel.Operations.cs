@@ -191,7 +191,7 @@ namespace Deenote.Project.Models
                 private Action _onRedone;
                 private Action _onUndone;
 
-                // Unity ʲôʱ��֧�� C#12.jpg
+                // Unity 什么时候支持 C#12.jpg
                 public AddNoteOperation(int modelInsertIndex, int dataInsertIndex, ChartModel chartModel, NoteModel noteModel)
                 {
                     _modelInsertIndex = modelInsertIndex;

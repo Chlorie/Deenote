@@ -122,7 +122,7 @@ namespace Deenote.UI.Windows
 
         private void DetectKeys()
         {
-            // TODO:Èç¹ûÓĞÁ½¸öViewµÄ»°£¬¿¼ÂÇ°ÑÕâĞ©¶«Î÷ÈÓµ½Ò»¸öĞÂµÄµ¥ÀıÀàÀï£¬²»È»»áÖ´ĞĞÁ½´Î
+            // TODO:å¦‚æœæœ‰ä¸¤ä¸ªViewçš„è¯ï¼Œè€ƒè™‘æŠŠè¿™äº›ä¸œè¥¿æ‰”åˆ°ä¸€ä¸ªæ–°çš„å•ä¾‹ç±»é‡Œï¼Œä¸ç„¶ä¼šæ‰§è¡Œä¸¤æ¬¡
             // Operation
             if (UnityUtils.IsKeyDown(KeyCode.Z, ctrl: true))
                 _editorController.Undo();

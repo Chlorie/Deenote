@@ -18,7 +18,7 @@ namespace Deenote.Utilities.Robustness
 
         public PooledSpan(int length) : this(ArrayPool<T>.Shared, length) { }
 
-        public Span<T> Span => _length == 0 ? Span<T>.Empty : new(_array, 0, _length);
+        public Span<T> Span => _length == 0 ? Span<T>.Empty : new Span<T>(_array, 0, _length);
 
         public void Dispose()
         {
@@ -33,9 +33,9 @@ namespace Deenote.Utilities.Robustness
 
             public ReadOnlyView(PooledSpan<T> span) => _span = span;
 
-            public readonly ReadOnlySpan<T> Span => _span.Span;
+            public ReadOnlySpan<T> Span => _span.Span;
 
-            public readonly void Dispose() => _span.Dispose();
+            public void Dispose() => _span.Dispose();
         }
     }
 }

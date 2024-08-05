@@ -9,8 +9,8 @@ namespace Deenote.Edit
         public void EditProjectAudio(string filePath, byte[] bytes, AudioClip clip)
         {
             Debug.Assert(_projectManager.CurrentProject is not null);
+            var proj = _projectManager.CurrentProject!;
 
-            var proj = _projectManager.CurrentProject;
             proj.AudioFileRelativePath = Path.GetRelativePath(_projectManager.CurrentProjectSavePath, filePath);
             proj.AudioData = bytes;
             proj.AudioClip = clip;
@@ -39,7 +39,7 @@ namespace Deenote.Edit
         public void InsertTempo(Tempo tempo, float endTime)
         {
             _operationHistory.Do(_projectManager.CurrentProject.Tempos.InsertTempo(tempo, endTime)
-                .WithDoneAction(() => _stage.Grids.NotifyCurrentProjectTemposChanged()));
+                .WithDoneAction(_stage.Grids.NotifyCurrentProjectTemposChanged));
         }
 
         public void EditChartName(string name)

@@ -39,11 +39,9 @@ namespace Deenote.Utilities.Robustness
 
         public bool Remove(T item)
         {
-            if (_items.Remove(item)) {
-                _pool.Release(item);
-                return true;
-            }
-            return false;
+            if (!_items.Remove(item)) return false;
+            _pool.Release(item);
+            return true;
         }
 
         public void RemoveRange(Range range)
@@ -71,7 +69,6 @@ namespace Deenote.Utilities.Robustness
         {
             if (count <= 0) {
                 Clear();
-                return;
             }
             else if (count < _items.Count) {
                 for (int i = count; i < _items.Count; i++) {
@@ -95,7 +92,7 @@ namespace Deenote.Utilities.Robustness
             if (_items.Capacity < minCapacity) {
                 _items.Capacity = minCapacity;
             }
-            return Resetting(); ;
+            return Resetting();
         }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Deenote.Utilities.Robustness
 {
-    public readonly struct ListReadOnlyView<T> : IEnumerable<T>, IReadOnlyList<T>
+    public readonly struct ListReadOnlyView<T> : IReadOnlyList<T>
     {
         private readonly List<T> _list;
 

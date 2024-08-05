@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
-using Deenote.Utilities;
 using System.Collections.Generic;
 using System.IO;
 
@@ -12,24 +11,26 @@ namespace Deenote.Project
         /// <summary>
         /// Ref to <see cref="ProjectController.ConfirmButtonPressed"/>
         /// </summary>
-        /// <param name="result"></param>
+        /// <param name="musicFilePath">The music file.</param>
         /// <returns></returns>
         public static ProjectModel CreateNewProject(string musicFilePath)
         {
             // TODO: 读取音频失败的处理
-            var proj = new ProjectModel {
+            var proj = new ProjectModel
+            {
                 AudioData = File.ReadAllBytes(musicFilePath),
                 MusicName = Path.GetFileNameWithoutExtension(musicFilePath),
             };
             return proj;
         }
 
-        public static UniTask<MayBeNull<ProjectModel>> LoadAsync(string projectFilePath)
+        public static UniTask<ProjectModel?> LoadAsync(string projectFilePath)
             => UniTask.RunOnThreadPool(() => Load(projectFilePath));
 
-        public static MayBeNull<ProjectModel> Load(string projectFilePath)
+        public static ProjectModel? Load(string projectFilePath)
         {
-            if (projectFilePath.EndsWith(".dsproj")) {
+            if (projectFilePath.EndsWith(".dsproj"))
+            {
                 if (TryLoadFromDsproj(projectFilePath, out var dsprojProject))
                     return dsprojProject;
             }
@@ -69,19 +70,23 @@ namespace Deenote.Project
             writer.Write(project.Composer);
             writer.Write(project.ChartDesigner);
             writer.Write(project.SaveAsRefPath);
-            if (project.SaveAsRefPath) {
+            if (project.SaveAsRefPath)
+            {
                 writer.Write(project.AudioFileRelativePath);
             }
-            else {
+            else
+            {
                 writer.Write(project.AudioData.Length);
                 writer.Write(project.AudioData);
             }
             writer.Write(project.Charts.Count);
-            foreach (var chart in project.Charts) {
+            foreach (var chart in project.Charts)
+            {
                 WriteChart(writer, chart);
             }
             writer.Write(project.Tempos.Count);
-            foreach (var tempo in project.Tempos) {
+            foreach (var tempo in project.Tempos)
+            {
                 writer.Write(tempo.Bpm);
                 writer.Write(tempo.StartTime);
             }
@@ -89,27 +94,32 @@ namespace Deenote.Project
 
         private static ProjectModel ReadProject(BinaryReader reader)
         {
-            var project = new ProjectModel {
+            var project = new ProjectModel
+            {
                 MusicName = reader.ReadString(),
                 Composer = reader.ReadString(),
                 ChartDesigner = reader.ReadString(),
                 SaveAsRefPath = reader.ReadBoolean(),
             };
-            if (project.SaveAsRefPath) {
+            if (project.SaveAsRefPath)
+            {
                 project.AudioFileRelativePath = reader.ReadString();
             }
-            else {
+            else
+            {
                 var len = reader.ReadInt32();
                 project.AudioData = reader.ReadBytes(len);
             }
             var chartLen = reader.ReadInt32();
             project.Charts.Capacity = chartLen;
-            for (int i = 0; i < chartLen; i++) {
+            for (int i = 0; i < chartLen; i++)
+            {
                 project.Charts.Add(ReadChart(reader));
             }
             var tempoLen = reader.ReadInt32();
             var tempos = new List<Tempo>(tempoLen);
-            for (int i = 0; i < tempoLen; i++) {
+            for (int i = 0; i < tempoLen; i++)
+            {
                 var bpm = reader.ReadSingle();
                 var startTime = reader.ReadSingle();
                 tempos.Add(new Tempo(bpm, startTime));
@@ -132,7 +142,8 @@ namespace Deenote.Project
             var level = reader.ReadString();
             var data = ReadChartData(reader);
 
-            return new ChartModel(data) {
+            return new ChartModel(data)
+            {
                 Difficulty = diff,
                 Level = level,
             };
@@ -155,7 +166,8 @@ namespace Deenote.Project
 
         private static ChartData ReadChartData(BinaryReader reader)
         {
-            var chart = new ChartData() {
+            var chart = new ChartData()
+            {
                 Speed = reader.ReadInt32(),
                 MinVelocity = reader.ReadInt32(),
                 MaxVelocity = reader.ReadInt32(),
@@ -200,7 +212,8 @@ namespace Deenote.Project
         private static NoteData ReadNoteData(BinaryReader reader)
         {
 #pragma warning disable CS0618 // Serialization ignores Obsolete
-            var note = new NoteData {
+            var note = new NoteData
+            {
                 Type = (NoteData.NoteType)reader.ReadInt32(),
             };
             var soundsLen = reader.ReadInt32();

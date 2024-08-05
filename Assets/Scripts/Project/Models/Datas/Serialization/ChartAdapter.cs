@@ -31,7 +31,7 @@ namespace Deenote.Project.Models.Datas.Serialization
             // or else deserialization failed, idk why
             foreach (var lkTok in jobj["links"]) {
                 foreach (var refTok in lkTok["notes"]) {
-                    refTok["$ref"] = refTok[$"ref"].ToString();
+                    refTok["$ref"] = refTok["ref"].ToString();
                 }
             }
 

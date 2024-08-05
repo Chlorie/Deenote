@@ -102,10 +102,10 @@ namespace Deenote.Edit
                         _noteSelectionController.SelectNotes(notes);
                         OnNotesChanged(true, true);
                     })
-                    // Note: ¾ÉDntÔÚ³·ÏúÊ±£¬»áÖØÐÂÑ¡ÖÐÓë³·ÏúÇ°Æ×Ãæ±»Ñ¡ÖÐidÏàÍ¬µÄnote
-                    // ³·Ïúºó±»Ñ¡ÖÐµÄnote»ù±¾ÎªÎÞÒâÒånote£¬»¹»áÓ°ÏìÒÑÑ¡note
-                    // Òò´ËÕâÀïÑ¡Ôñ²»¶ÔÑ¡Ôñ½øÐÐÐÞ¸Ä
-                    // TODO: ±»É¾ÁËµÄnoteÒ²¿ÉÄÜ±»Ñ¡ÖÐ£¬ÕâÖÖÇé¿öÏÂ»áÔõÃ´Ñù£¿
+                    // Note: æ—§Dntåœ¨æ’¤é”€æ—¶ï¼Œä¼šé‡æ–°é€‰ä¸­ä¸Žæ’¤é”€å‰è°±é¢è¢«é€‰ä¸­idç›¸åŒçš„note
+                    // æ’¤é”€åŽè¢«é€‰ä¸­çš„noteåŸºæœ¬ä¸ºæ— æ„ä¹‰noteï¼Œè¿˜ä¼šå½±å“å·²é€‰note
+                    // å› æ­¤è¿™é‡Œé€‰æ‹©ä¸å¯¹é€‰æ‹©è¿›è¡Œä¿®æ”¹
+                    // TODO: è¢«åˆ äº†çš„noteä¹Ÿå¯èƒ½è¢«é€‰ä¸­ï¼Œè¿™ç§æƒ…å†µä¸‹ä¼šæ€Žä¹ˆæ ·ï¼Ÿ
                     .WithUndoneAction(() => OnNotesChanged(true, false)));
                 _isPasting = false;
                 UpdateNoteIndicator();
@@ -115,9 +115,9 @@ namespace Deenote.Edit
             {
                 coord = _stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
                 _operationHistory.Do(_stage.Chart.Notes.AddNote(coord, _placeNoteTemplate)
-                    // TODO: dntÏÂ¼üÊ±»áÈ¡ÏûÑ¡Ôñ£¬µ«ÊÇundoÊ±²»»á»Ö¸´
-                    // ÓÉÓÚÍêÈ«Ã»¿´¶®ÔõÃ´ÊµÏÖµÄËùÒÔÏÈÕâÑù¡£
-                    // Ð§¹ûÀíÂÛÉÏÒ»ÖÂ
+                    // TODO: dntä¸‹é”®æ—¶ä¼šå–æ¶ˆé€‰æ‹©ï¼Œä½†æ˜¯undoæ—¶ä¸ä¼šæ¢å¤
+                    // ç”±äºŽå®Œå…¨æ²¡çœ‹æ‡‚æ€Žä¹ˆå®žçŽ°çš„æ‰€ä»¥å…ˆè¿™æ ·ã€‚
+                    // æ•ˆæžœç†è®ºä¸Šä¸€è‡´
                     .WithRedoneAction(() =>
                     {
                         OnNoteSelectionChanging();
@@ -128,14 +128,14 @@ namespace Deenote.Edit
             }
         }
 
-        // TODO: ±à¼­Ö®ºó£¬ÐèÒªÊÖ¶¯¼ì²âÒ»ÏÂNoteµÄcollisionÇé¿ö£¬³ýÁËÕâÀï£¬»¹ÓÐNotePlacement
+        // TODO: ç¼–è¾‘ä¹‹åŽï¼Œéœ€è¦æ‰‹åŠ¨æ£€æµ‹ä¸€ä¸‹Noteçš„collisionæƒ…å†µï¼Œé™¤äº†è¿™é‡Œï¼Œè¿˜æœ‰NotePlacement
         public void RemoveSelectedNotes()
         {
             // __selectedNotes.Sort(NoteTimeComparer.Instance);
             _operationHistory.Do(_stage.Chart.Notes.RemoveNotes(SelectedNotes)
-                // TODO: Ä¿Ç°É¾³ýÊ±»áÈ¡ÏûÑ¡Ôñ£¬undoÊ±²»»á»Ö¸´
-                // ¿¼ÂÇÔÚRemoveNoteOperataionÌí¼Ó»Ö¸´Ê±½«±»É¾noteÌí¼Ó»Ø_selectedNotesµÄÂß¼­
-                // PS: Èç¹û_selectedNotes²»Îª¿Õ£¬undoÊ±±£ÁôÒÑÓÐnotes¡£
+                // TODO: ç›®å‰åˆ é™¤æ—¶ä¼šå–æ¶ˆé€‰æ‹©ï¼Œundoæ—¶ä¸ä¼šæ¢å¤
+                // è€ƒè™‘åœ¨RemoveNoteOperataionæ·»åŠ æ¢å¤æ—¶å°†è¢«åˆ noteæ·»åŠ å›ž_selectedNotesçš„é€»è¾‘
+                // PS: å¦‚æžœ_selectedNotesä¸ä¸ºç©ºï¼Œundoæ—¶ä¿ç•™å·²æœ‰notesã€‚
                 .WithRedoneAction(() =>
                 {
                     OnNoteSelectionChanging();

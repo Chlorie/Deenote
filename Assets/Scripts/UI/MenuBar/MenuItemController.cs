@@ -37,7 +37,7 @@ namespace Deenote.UI.MenuBar
                 colors.selectedColor = colors.selectedColor.WithAlpha(0f);
                 _toggle.colors = colors;
                 _menuBar.IsHovering = false;
-                // TODO: 手动取消选择后，toggle的状态是Selected，导致没有highlight
+                // TODO: 鎵嬪姩鍙栨秷閫夋嫨鍚庯紝toggle鐨勭姸鎬佹槸Selected锛屽鑷存病鏈塰ighlight
             }
         }
 
