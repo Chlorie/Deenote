@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace Deenote.UI.Windows
 {
     [RequireComponent(typeof(Window))]
-    public sealed partial class PerspectiveViewWindow : MonoBehaviour
+    public sealed partial class PerspectiveViewWindow : SingletonBehavior<PerspectiveViewWindow>
     {
         [SerializeField] Window _window;
         [SerializeField] GameStageController _gameStageController;
@@ -25,7 +25,7 @@ namespace Deenote.UI.Windows
         [SerializeField] Image _backgroundBreathingMaskImage;
         [SerializeField] TMP_Text _backgroundStaveText;
         [SerializeField] RawImage _cameraViewRawImage;
-        [SerializeField] Transform _cameraViewTransform;
+        [SerializeField] RectTransform _cameraViewTransform;
 
         [Header("Prefabs")]
         [SerializeField] Sprite _easyDifficultyIconSprite;
@@ -37,6 +37,16 @@ namespace Deenote.UI.Windows
         [SerializeField] Sprite _extraDifficultyIconSprite;
         [SerializeField] Color _extraLevelTextColor;
 
+        public Vector2 ViewSize
+        {
+            get
+            {
+                Vector3[] corners = new Vector3[4];
+                _cameraViewTransform.GetWorldCorners(corners);
+                return corners[2] - corners[0];
+            }
+        }
+
         private ChartModel _chart;
 
         private float _tryPlayResetTime;
@@ -44,10 +54,10 @@ namespace Deenote.UI.Windows
         private int _judgedNoteCount;
         private MouseActionState _mouseActionState;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _timeSlider.onValueChanged.AddListener(val => _gameStageController.CurrentMusicTime = val);
-
             _pauseButton.onClick.AddListener(OnPauseClicked);
         }
 
@@ -64,32 +74,39 @@ namespace Deenote.UI.Windows
 
         private void DetectMouseMove()
         {
-            if (TryGetCurrentMouseToNoteCoordInSelectionRange(out NoteCoord coord)) {
+            if (TryGetCurrentMouseToNoteCoordInSelectionRange(out NoteCoord coord))
+            {
                 if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                     _editorController.MoveNoteIndicator(coord, true);
                 else
                     _editorController.MoveNoteIndicator(coord, false);
             }
-            else {
+            else
+            {
                 _editorController.HideNoteIndicator();
             }
         }
 
         private void DetectLeftMouse()
         {
-            if (Input.GetMouseButtonDown(0)) {
+            if (Input.GetMouseButtonDown(0))
+            {
                 // This will cancel NotePlacing state
                 _mouseActionState = MouseActionState.NoteSelecting;
-                if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord)) {
+                if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord))
+                {
                     _editorController.StartNoteSelection(coord, toggleMode: UnityUtils.IsFunctionalKeyHolding(ctrl: true));
                 }
             }
-            else if (_mouseActionState is MouseActionState.NoteSelecting && Input.GetMouseButton(0)) {
-                if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord)) {
+            else if (_mouseActionState is MouseActionState.NoteSelecting && Input.GetMouseButton(0))
+            {
+                if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord))
+                {
                     _editorController.UpdateNoteSelection(coord);
                 }
             }
-            else if (_mouseActionState is MouseActionState.NoteSelecting && Input.GetMouseButtonUp(0)) {
+            else if (_mouseActionState is MouseActionState.NoteSelecting && Input.GetMouseButtonUp(0))
+            {
                 _mouseActionState = MouseActionState.None;
                 _editorController.EndNoteSelection();
             }
@@ -97,12 +114,15 @@ namespace Deenote.UI.Windows
 
         private void DetectRightMouse()
         {
-            if (_mouseActionState is not MouseActionState.NoteSelecting && Input.GetMouseButtonDown(1)) {
+            if (_mouseActionState is not MouseActionState.NoteSelecting && Input.GetMouseButtonDown(1))
+            {
                 _mouseActionState = MouseActionState.NotePlacing;
             }
-            else if (_mouseActionState is MouseActionState.NotePlacing && Input.GetMouseButtonUp(1)) {
+            else if (_mouseActionState is MouseActionState.NotePlacing && Input.GetMouseButtonUp(1))
+            {
                 _mouseActionState = MouseActionState.None;
-                if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord)) {
+                if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord))
+                {
                     if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                         _editorController.PlaceNoteAt(coord, true);
                     else
@@ -114,7 +134,8 @@ namespace Deenote.UI.Windows
         private void DetectMouseWheel()
         {
             float wheel = Input.GetAxis("Mouse ScrollWheel");
-            if (wheel != 0f) {
+            if (wheel != 0f)
+            {
                 float deltaTime = wheel * MainSystem.GlobalSettings.MouseScrollSensitivity;
                 _gameStageController.CurrentMusicTime -= deltaTime;
             }
@@ -192,11 +213,13 @@ namespace Deenote.UI.Windows
             // Stage
             if (UnityUtils.IsKeyDown(KeyCode.Return) || UnityUtils.IsKeyDown(KeyCode.KeypadEnter))
                 _gameStageController.TogglePlayingState();
-            if (UnityUtils.IsKeyDown(KeyCode.Space)) {
+            if (UnityUtils.IsKeyDown(KeyCode.Space))
+            {
                 _tryPlayResetTime = _gameStageController.CurrentMusicTime;
                 _gameStageController.Play();
             }
-            else if (UnityUtils.IsKeyUp(KeyCode.Space)) {
+            else if (UnityUtils.IsKeyUp(KeyCode.Space))
+            {
                 _gameStageController.CurrentMusicTime = _tryPlayResetTime;
                 _gameStageController.Pause();
             }
@@ -260,12 +283,14 @@ namespace Deenote.UI.Windows
 
         public void NotifyStageEffectUpdate(bool isOn)
         {
-            if (isOn) {
+            if (isOn)
+            {
                 const float BgPeriod = 2f;
                 var ratio = Mathf.Sin(Time.time * (2 * Mathf.PI / BgPeriod));
                 _backgroundBreathingMaskImage.color = new(1f, 1f, 1f, (ratio + 1f) / 2f);
             }
-            else {
+            else
+            {
                 _backgroundBreathingMaskImage.color = Color.white;
             }
         }
@@ -274,27 +299,31 @@ namespace Deenote.UI.Windows
 
         private bool TryGetCurrentMouseToNoteCoordInSelectionRange(out NoteCoord coord)
         {
-            var textureTransform = _cameraViewRawImage.rectTransform;
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(textureTransform, Input.mousePosition, null, out var localPoint)) {
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(_cameraViewTransform, Input.mousePosition, null, out var localPoint))
+            {
                 coord = default;
                 return false;
             }
 
             var viewPoint = new Vector2(
-                  localPoint.x / textureTransform.rect.width,
-                  localPoint.y / textureTransform.rect.height);
+                localPoint.x / _cameraViewTransform.rect.width,
+                localPoint.y / _cameraViewTransform.rect.height)
+                + _cameraViewTransform.pivot;
 
-            if (viewPoint is not { x: >= 0f and <= 1f, y: >= 0f and <= 1f }) {
+            if (viewPoint is not { x: >= 0f and <= 1f, y: >= 0f and <= 1f })
+            {
                 coord = default;
                 return false;
             }
 
-            if (!_gameStageController.TryConvertViewPointToNoteCoord(viewPoint, out coord)) {
+            if (!_gameStageController.TryConvertViewPointToNoteCoord(viewPoint, out coord))
+            {
                 return false;
             }
 
             // Ignore when press position is too far
-            if (coord.Position is > 4f or < -4f) {
+            if (coord.Position is > 4f or < -4f)
+            {
                 return false;
             }
 

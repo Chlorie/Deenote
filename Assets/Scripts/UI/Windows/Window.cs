@@ -13,7 +13,7 @@ namespace Deenote.UI.Windows
         [SerializeField] Button _closeButton;
         [SerializeField] GraphicRaycaster _graphicRaycaster;
 
-        private Action<bool> _onIsActivatedChanged;
+        private Action<bool>? _onIsActivatedChanged;
 
         public bool GraphicRaycasterEnabled
         {
