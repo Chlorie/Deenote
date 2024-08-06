@@ -7,7 +7,7 @@ namespace Deenote.Localization
     public sealed class LocalizedText : MonoBehaviour
     {
         [SerializeField] TMP_Text _text;
-        [SerializeField] string _textKey;
+        [SerializeField] string? _textKey;
         [SerializeField] bool _isLocalized;
 
         public TMP_Text TmpText => _text;
@@ -29,11 +29,10 @@ namespace Deenote.Localization
 
         public void NotifyLanguageUpdated()
         {
-            if (_isLocalized) {
-                if (_textKey == null)
-                    _text.text = "";
-                else
-                    _text.text = MainSystem.Localization.GetLocalizedText(_textKey);
+            if (_isLocalized)
+            {
+                _text.text = _textKey is null ? "" :
+                    MainSystem.Localization.GetLocalizedText(_textKey);
             }
         }
 
@@ -45,7 +44,8 @@ namespace Deenote.Localization
 
         public void SetLocalizedText(string textKey)
         {
-            if (_isLocalized && _textKey == textKey) {
+            if (_isLocalized && _textKey == textKey)
+            {
                 return;
             }
 
@@ -56,10 +56,12 @@ namespace Deenote.Localization
 
         public void SetText(LocalizableText text)
         {
-            if (text.IsLocalized) {
+            if (text.IsLocalized)
+            {
                 SetLocalizedText(text.TextOrKey);
             }
-            else {
+            else
+            {
                 SetRawText(text.TextOrKey);
             }
         }

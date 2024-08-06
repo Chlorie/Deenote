@@ -10,8 +10,8 @@ namespace Deenote.Localization
     [SuppressMessage("ReSharper", "LocalVariableHidesMember")]
     public sealed class LocalizationSystem : MonoBehaviour
     {
-        private string _defaultLanguage;
-        private Dictionary<string, string> _defaultLocalizedTexts;
+        private const string DefaultLanguage = "English";
+        private Dictionary<string, string>? _defaultLocalizedTexts;
 
         private string? _currentLanguage;
         private Dictionary<string, string>? _localizedTexts;
@@ -22,7 +22,7 @@ namespace Deenote.Localization
 
         public IReadOnlyCollection<string> Languages => _languages.Keys;
 
-        public string CurrentLanguage => _currentLanguage ??= _defaultLanguage;
+        public string CurrentLanguage => _currentLanguage ??= DefaultLanguage;
 
         public void SetLanguage(string language)
         {
@@ -42,7 +42,7 @@ namespace Deenote.Localization
         {
             if (_localizedTexts?.TryGetValue(key, out var val) == true)
                 return val;
-            else if (_defaultLocalizedTexts.TryGetValue(key, out val))
+            else if (_defaultLocalizedTexts?.TryGetValue(key, out val) ?? false)
                 return val;
             else
                 return key;
@@ -54,8 +54,6 @@ namespace Deenote.Localization
 
         private void Awake()
         {
-            _defaultLanguage = "English";
-
             // Load all languages at start
             var folder = Path.Combine(Application.streamingAssetsPath, "Languages");
             var files = Directory.GetFiles(folder);
@@ -66,7 +64,7 @@ namespace Deenote.Localization
                 _languages.Add(name, texts);
             }
 
-            _defaultLocalizedTexts = _languages[_defaultLanguage];
+            _defaultLocalizedTexts = _languages[DefaultLanguage];
         }
 
         private (string Name, Dictionary<string, string> Texts) LoadLanguagePack(string filePath)
@@ -108,7 +106,8 @@ namespace Deenote.Localization
                     value = line[(seperator + 1)..].Replace("<br/>", "\r\n");
                 }
 
-                dict.Add(key, value);
+                if (!dict.TryAdd(key, value))
+                    Debug.LogWarning($"Language pack {name} contains duplicated key: {key}");
             }
 
             return (name, dict);
