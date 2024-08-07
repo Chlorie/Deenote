@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Utilities.Robustness;
 using System;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -18,6 +19,24 @@ namespace Deenote.Utilities
 
         public static void AddListener(this UnityEvent ev, Func<UniTaskVoid> uniTaskFunc)
             => ev.AddListener(UniTask.UnityAction(uniTaskFunc));
+
+        /// <summary>
+        /// Cache a child component reference into the given reference.
+        /// If the given reference is already set, it will be returned unmodified,
+        /// otherwise the reference is updated with the child component.
+        /// </summary>
+        /// <remarks>This is used to simplify initializing component references in <see cref="GameObject"/>s.</remarks>
+        /// <typeparam name="T">Child component type.</typeparam>
+        /// <param name="component">The parent component.</param>
+        /// <param name="childComponentRef">A reference to the child component cache.</param>
+        /// <returns>The child component reference.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T MaybeGetComponent<T>(this Component component, ref T? childComponentRef) where T : Component
+        {
+            if (childComponentRef == null)
+                childComponentRef = component.GetComponent<T>();
+            return childComponentRef!;
+        }
 
         public static T CreateComponent<T>() where T : Component => GlobalGameObject.AddComponent<T>();
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Deenote.Utilities;
 using Deenote.UI.Windows;
+using Deenote.Utilities.Robustness;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -16,7 +17,7 @@ namespace Deenote.GameStage
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class PerspectiveLinesRenderer : SingletonBehavior<PerspectiveLinesRenderer>
     {
-        public void AddLineStrip(Span<Vector2> points, Color color, float width)
+        public void AddLineStrip(ListReadOnlyView<Vector2> points, Color color, float width)
         {
             Vector2 prev = points[0];
             foreach (var point in points)
@@ -33,7 +34,7 @@ namespace Deenote.GameStage
 
         public void AddLine(Vector2 p1, Vector2 p2, Color color, float width)
         {
-            Span<Vector2> points = stackalloc Vector2[2] { p1, p2 };
+            List<Vector2> points = new() { p1, p2 };
             AddLineStrip(points, color, width);
         }
 
@@ -134,6 +135,12 @@ namespace Deenote.GameStage
                 float x = 6.52f / _subDivisions * i - 3.26f;
                 AddLine(new Vector2(x, 0), new Vector2(x, 40f), _testColor, _testWidth);
             }
+            List<Vector2> points = new();
+            for (float i = 0; i <= 40f; i += 0.1f)
+            {
+                points.Add(new Vector2(MathF.Sin(i), i));
+            }
+            AddLineStrip(points, _testColor, _testWidth);
         }
 
         private void LateUpdate() => _meshFilter.mesh = GenerateMesh();

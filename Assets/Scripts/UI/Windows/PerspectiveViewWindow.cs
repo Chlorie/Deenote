@@ -71,7 +71,7 @@ namespace Deenote.UI.Windows
 
         private void ReplaceCameraRenderTexture(Vector2 newTargetSize)
         {
-            int width = (int)newTargetSize.x, height = (int)newTargetSize.y;
+            int width = Mathf.RoundToInt(newTargetSize.x), height = Mathf.RoundToInt(newTargetSize.y);
             if (width <= 0 || height <= 0) return;
             var texture = GameStageController.Instance.Camera.targetTexture;
             if (texture.width == width && texture.height == height) return;
