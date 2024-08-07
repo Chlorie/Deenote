@@ -1,3 +1,4 @@
+using Deenote.GameStage;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,7 +47,7 @@ namespace Deenote.UI.Windows
 
             var prevHitNoteIndex = combo - 1;
             _comboParentGameObject.SetActive(true);
-            var deltaTime = _gameStageController.CurrentMusicTime - _chart.Notes[prevHitNoteIndex].Data.Time;
+            var deltaTime = GameStageController.Instance.CurrentMusicTime - _chart.Notes[prevHitNoteIndex].Data.Time;
             Debug.Assert(deltaTime >= 0, $"actual delta time:{deltaTime}");
             _comboNumberText.text = _comboShadowText.text = combo.ToString();
 

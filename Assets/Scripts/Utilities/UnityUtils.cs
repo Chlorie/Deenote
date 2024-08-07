@@ -19,7 +19,13 @@ namespace Deenote.Utilities
         public static void AddListener(this UnityEvent ev, Func<UniTaskVoid> uniTaskFunc)
             => ev.AddListener(UniTask.UnityAction(uniTaskFunc));
 
-        public static ObjectPool<T> CreateObjectPool<T>(T prefab, Transform parentTransform = null, int defaultCapacity = 10, int maxSize = 10000) where T : Component
+        public static T CreateComponent<T>() where T : Component => GlobalGameObject.AddComponent<T>();
+
+        private static GameObject? _globalGameObject;
+        private static GameObject GlobalGameObject =>
+            _globalGameObject ??= new GameObject("GlobalObject") { hideFlags = HideFlags.HideAndDontSave };
+
+        public static ObjectPool<T> CreateObjectPool<T>(T prefab, Transform? parentTransform = null, int defaultCapacity = 10, int maxSize = 10000) where T : Component
             => CreateObjectPool(() => UnityEngine.Object.Instantiate(prefab, parentTransform), defaultCapacity, maxSize);
 
         public static ObjectPool<T> CreateObjectPool<T>(Func<T> createFunc, int defaultCapacity = 10, int maxSize = 10000) where T : Component
@@ -39,10 +45,12 @@ namespace Deenote.Utilities
             var gradient = lineRenderer.colorGradient;
             var keys = gradient.colorKeys;
             var akeys = gradient.alphaKeys;
-            foreach (ref var key in keys.AsSpan()) {
+            foreach (ref var key in keys.AsSpan())
+            {
                 key.color = color;
             }
-            foreach (ref var key in akeys.AsSpan()) {
+            foreach (ref var key in akeys.AsSpan())
+            {
                 key.alpha = color.a;
             }
             gradient.colorKeys = keys;
@@ -52,7 +60,8 @@ namespace Deenote.Utilities
 
         public static void SetSiblingIndicesInOrder<T>(this PooledObjectListView<T> list) where T : Component
         {
-            for(int i = 0; i < list.Count; i++) {
+            for (int i = 0; i < list.Count; i++)
+            {
                 list[i].transform.SetSiblingIndex(i);
             }
         }

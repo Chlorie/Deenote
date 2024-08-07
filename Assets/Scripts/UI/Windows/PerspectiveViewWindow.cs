@@ -1,3 +1,4 @@
+using System;
 using Deenote.Edit;
 using Deenote.GameStage;
 using Deenote.Project.Models;
@@ -12,7 +13,6 @@ namespace Deenote.UI.Windows
     public sealed partial class PerspectiveViewWindow : SingletonBehavior<PerspectiveViewWindow>
     {
         [SerializeField] Window _window;
-        [SerializeField] GameStageController _gameStageController;
         [SerializeField] EditorController _editorController;
 
         [Header("UI")]
@@ -37,16 +37,10 @@ namespace Deenote.UI.Windows
         [SerializeField] Sprite _extraDifficultyIconSprite;
         [SerializeField] Color _extraLevelTextColor;
 
-        public Vector2 ViewSize
-        {
-            get
-            {
-                Vector3[] corners = new Vector3[4];
-                _cameraViewTransform.GetWorldCorners(corners);
-                return corners[2] - corners[0];
-            }
-        }
+        public Vector2 ViewSize => _viewSize.Value;
+        public event Action<Vector2>? OnViewSizeChanged;
 
+        private FrameCachedNotifyingProperty<Vector2> _viewSize = null!;
         private ChartModel _chart;
 
         private float _tryPlayResetTime;
@@ -57,8 +51,34 @@ namespace Deenote.UI.Windows
         protected override void Awake()
         {
             base.Awake();
-            _timeSlider.onValueChanged.AddListener(val => _gameStageController.CurrentMusicTime = val);
+
+            Vector2 GetViewSize()
+            {
+                Vector3[] corners = new Vector3[4];
+                _cameraViewTransform.GetWorldCorners(corners);
+                return corners[2] - corners[0];
+            }
+
+            void ViewSizeChanged(Vector2 _, Vector2 newSize) => OnViewSizeChanged?.Invoke(newSize);
+
+            _viewSize = new FrameCachedNotifyingProperty<Vector2>(GetViewSize);
+            _viewSize.OnValueChanged += ViewSizeChanged;
+            OnViewSizeChanged += ReplaceCameraRenderTexture;
+
+            _timeSlider.onValueChanged.AddListener(val => GameStageController.Instance.CurrentMusicTime = val);
             _pauseButton.onClick.AddListener(OnPauseClicked);
+        }
+
+        private void ReplaceCameraRenderTexture(Vector2 newTargetSize)
+        {
+            int width = (int)newTargetSize.x, height = (int)newTargetSize.y;
+            if (width <= 0 || height <= 0) return;
+            var texture = GameStageController.Instance.Camera.targetTexture;
+            if (texture.width == width && texture.height == height) return;
+            texture.Release();
+            texture.width = width;
+            texture.height = height;
+            texture.Create();
         }
 
         private void Update()
@@ -121,28 +141,26 @@ namespace Deenote.UI.Windows
             else if (_mouseActionState is MouseActionState.NotePlacing && Input.GetMouseButtonUp(1))
             {
                 _mouseActionState = MouseActionState.None;
-                if (TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord))
-                {
-                    if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-                        _editorController.PlaceNoteAt(coord, true);
-                    else
-                        _editorController.PlaceNoteAt(coord, false);
-                }
+                if (!TryGetCurrentMouseToNoteCoordInSelectionRange(out var coord)) return;
+                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                    _editorController.PlaceNoteAt(coord, true);
+                else
+                    _editorController.PlaceNoteAt(coord, false);
             }
         }
 
         private void DetectMouseWheel()
         {
             float wheel = Input.GetAxis("Mouse ScrollWheel");
-            if (wheel != 0f)
-            {
-                float deltaTime = wheel * MainSystem.GlobalSettings.MouseScrollSensitivity;
-                _gameStageController.CurrentMusicTime -= deltaTime;
-            }
+            if (wheel == 0f) return;
+            float deltaTime = wheel * MainSystem.GlobalSettings.MouseScrollSensitivity;
+            GameStageController.Instance.CurrentMusicTime -= deltaTime;
         }
 
         private void DetectKeys()
         {
+            var gameStage = GameStageController.Instance;
+
             // TODO:如果有两个View的话，考虑把这些东西扔到一个新的单例类里，不然会执行两次
             // Operation
             if (UnityUtils.IsKeyDown(KeyCode.Z, ctrl: true))
@@ -158,7 +176,8 @@ namespace Deenote.UI.Windows
 
             // Edit
             if (UnityUtils.IsKeyDown(KeyCode.G))
-                _editorController.SnapToPositionGrid = _editorController.SnapToTimeGrid = !(_editorController.SnapToPositionGrid && _editorController.SnapToTimeGrid);
+                _editorController.SnapToPositionGrid = _editorController.SnapToTimeGrid =
+                    _editorController is not { SnapToPositionGrid: true, SnapToTimeGrid: true };
             if (UnityUtils.IsKeyDown(KeyCode.Delete))
                 _editorController.RemoveSelectedNotes();
             if (UnityUtils.IsKeyDown(KeyCode.A, ctrl: true))
@@ -170,7 +189,7 @@ namespace Deenote.UI.Windows
             if (UnityUtils.IsKeyDown(KeyCode.P))
                 _editorController.ToggleSoundOfSelectedNotes();
             if (UnityUtils.IsKeyDown(KeyCode.Q))
-                _editorController.EditSelectedNotesPositionCoord(c => _gameStageController.Grids.Quantize(c, true, true));
+                _editorController.EditSelectedNotesPositionCoord(c => gameStage.Grids.Quantize(c, true, true));
 
             // Adjust
             if (UnityUtils.IsKeyDown(KeyCode.W))
@@ -178,25 +197,25 @@ namespace Deenote.UI.Windows
             else if (UnityUtils.IsKeyDown(KeyCode.W, alt: true))
                 _editorController.EditSelectedNotesTime(t => t + 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.W, shift: true))
-                _editorController.EditSelectedNotesTime(t => _gameStageController.Grids.CeilToNearestNextTimeGridTime(t) ?? t);
+                _editorController.EditSelectedNotesTime(t => gameStage.Grids.CeilToNearestNextTimeGridTime(t) ?? t);
             if (UnityUtils.IsKeyDown(KeyCode.S))
                 _editorController.EditSelectedNotesTime(t => t - 0.001f);
             else if (UnityUtils.IsKeyDown(KeyCode.S, alt: true))
                 _editorController.EditSelectedNotesTime(t => t - 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.S, shift: true))
-                _editorController.EditSelectedNotesTime(t => _gameStageController.Grids.FloorToNearestNextTimeGridTime(t) ?? t);
+                _editorController.EditSelectedNotesTime(t => gameStage.Grids.FloorToNearestNextTimeGridTime(t) ?? t);
             if (UnityUtils.IsKeyDown(KeyCode.A))
                 _editorController.EditSelectedNotesPosition(p => p - 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.A, alt: true))
                 _editorController.EditSelectedNotesPosition(p => p - 0.1f);
             else if (UnityUtils.IsKeyDown(KeyCode.A, shift: true))
-                _editorController.EditSelectedNotesPosition(p => _gameStageController.Grids.FloorToNearestNextVerticalGridPosition(p) ?? p);
+                _editorController.EditSelectedNotesPosition(p => gameStage.Grids.FloorToNearestNextVerticalGridPosition(p) ?? p);
             if (UnityUtils.IsKeyDown(KeyCode.D))
                 _editorController.EditSelectedNotesPosition(p => p + 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.D, alt: true))
                 _editorController.EditSelectedNotesPosition(p => p + 0.1f);
             else if (UnityUtils.IsKeyDown(KeyCode.D, shift: true))
-                _editorController.EditSelectedNotesPosition(p => _gameStageController.Grids.CeilToNearestNextVerticalGridPosition(p) ?? p);
+                _editorController.EditSelectedNotesPosition(p => gameStage.Grids.CeilToNearestNextVerticalGridPosition(p) ?? p);
             if (UnityUtils.IsKeyDown(KeyCode.Z))
                 _editorController.EditSelectedNotesSize(s => s - 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.Z, shift: true))
@@ -212,48 +231,48 @@ namespace Deenote.UI.Windows
 
             // Stage
             if (UnityUtils.IsKeyDown(KeyCode.Return) || UnityUtils.IsKeyDown(KeyCode.KeypadEnter))
-                _gameStageController.TogglePlayingState();
+                gameStage.TogglePlayingState();
             if (UnityUtils.IsKeyDown(KeyCode.Space))
             {
-                _tryPlayResetTime = _gameStageController.CurrentMusicTime;
-                _gameStageController.Play();
+                _tryPlayResetTime = gameStage.CurrentMusicTime;
+                gameStage.Play();
             }
             else if (UnityUtils.IsKeyUp(KeyCode.Space))
             {
-                _gameStageController.CurrentMusicTime = _tryPlayResetTime;
-                _gameStageController.Pause();
+                gameStage.CurrentMusicTime = _tryPlayResetTime;
+                gameStage.Pause();
             }
             if (UnityUtils.IsKeyDown(KeyCode.Home))
-                _gameStageController.CurrentMusicTime = 0f;
+                gameStage.CurrentMusicTime = 0f;
             if (UnityUtils.IsKeyDown(KeyCode.End))
-                _gameStageController.CurrentMusicTime = _gameStageController.MusicLength;
+                gameStage.CurrentMusicTime = gameStage.MusicLength;
             if (UnityUtils.IsKeyDown(KeyCode.UpArrow, ctrl: true))
-                _gameStageController.NoteSpeed += 1;
+                gameStage.NoteSpeed += 1;
             if (UnityUtils.IsKeyDown(KeyCode.DownArrow, ctrl: true))
-                _gameStageController.NoteSpeed -= 1;
+                gameStage.NoteSpeed -= 1;
             if (UnityUtils.IsKeyDown(KeyCode.UpArrow, alt: true))
-                _gameStageController.MusicSpeed += 1;
+                gameStage.MusicSpeed += 1;
             if (UnityUtils.IsKeyDown(KeyCode.DownArrow, alt: true))
-                _gameStageController.MusicSpeed -= 1;
+                gameStage.MusicSpeed -= 1;
             if (UnityUtils.IsKeyDown(KeyCode.UpArrow))
-                _gameStageController.StagePlaySpeed = -2.5f;
+                gameStage.StagePlaySpeed = -2.5f;
             else if (UnityUtils.IsKeyDown(KeyCode.UpArrow, shift: true))
-                _gameStageController.StagePlaySpeed = -5.0f;
+                gameStage.StagePlaySpeed = -5.0f;
             else if (UnityUtils.IsKeyUp(KeyCode.UpArrow) || UnityUtils.IsKeyUp(KeyCode.UpArrow, shift: true))
-                _gameStageController.StagePlaySpeed = 0f;
+                gameStage.StagePlaySpeed = 0f;
             if (UnityUtils.IsKeyDown(KeyCode.DownArrow))
-                _gameStageController.StagePlaySpeed = 2.5f;
+                gameStage.StagePlaySpeed = 2.5f;
             else if (UnityUtils.IsKeyDown(KeyCode.DownArrow, shift: true))
-                _gameStageController.StagePlaySpeed = 5.0f;
+                gameStage.StagePlaySpeed = 5.0f;
             else if (UnityUtils.IsKeyUp(KeyCode.DownArrow) || UnityUtils.IsKeyUp(KeyCode.DownArrow, shift: true))
-                _gameStageController.StagePlaySpeed = 0f;
+                gameStage.StagePlaySpeed = 0f;
         }
 
         #endregion
 
         #region UI Events
 
-        private void OnPauseClicked() => _gameStageController.TogglePlayingState();
+        private void OnPauseClicked() => GameStageController.Instance.TogglePlayingState();
 
         #endregion
 
@@ -316,7 +335,7 @@ namespace Deenote.UI.Windows
                 return false;
             }
 
-            if (!_gameStageController.TryConvertViewPointToNoteCoord(viewPoint, out coord))
+            if (!GameStageController.Instance.TryConvertViewPointToNoteCoord(viewPoint, out coord))
             {
                 return false;
             }
