@@ -31932,8 +31932,8 @@ GameObject:
   m_Component:
   - component: {fileID: 526768657}
   - component: {fileID: 526768659}
-  - component: {fileID: 526768660}
   - component: {fileID: 526768658}
+  - component: {fileID: 526768660}
   m_Layer: 5
   m_Name: CameraView
   m_TagString: Untagged
@@ -31967,7 +31967,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 526768656}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
@@ -32004,11 +32004,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 526768656}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+  m_Script: {fileID: 11500000, guid: 03d2ad1d49cb0604a8fa04322c4a43de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AspectMode: 3
-  m_AspectRatio: 1.7777778
+  _aspectRatio: 1.7777778
 --- !u!1 &527493505
 GameObject:
   m_ObjectHideFlags: 0

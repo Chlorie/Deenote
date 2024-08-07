@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Deenote.Utilities;
@@ -86,8 +85,7 @@ namespace Deenote.GameStage
         protected override void Awake()
         {
             base.Awake();
-            // TODO: set sorting layer here
-            // _meshRenderer.sortingLayerName = "Default";
+            _meshRenderer.sortingLayerName = "Lines";
             // TODO: do not use hardcoded values
             _props = new MaterialPropertyBlock();
             _props.SetFloat(FadeInZ, 18.0f);
@@ -129,18 +127,6 @@ namespace Deenote.GameStage
             _props.SetFloat(SmoothingPx, _testSmoothingPx);
             _props.SetVector(ActualViewSize, new Vector4(viewSize.x, viewSize.y));
             _meshRenderer.SetPropertyBlock(_props);
-
-            for (int i = 0; i <= _subDivisions; i++)
-            {
-                float x = 6.52f / _subDivisions * i - 3.26f;
-                AddLine(new Vector2(x, 0), new Vector2(x, 40f), _testColor, _testWidth);
-            }
-            List<Vector2> points = new();
-            for (float i = 0; i <= 40f; i += 0.1f)
-            {
-                points.Add(new Vector2(MathF.Sin(i), i));
-            }
-            AddLineStrip(points, _testColor, _testWidth);
         }
 
         private void LateUpdate() => _meshFilter.mesh = GenerateMesh();

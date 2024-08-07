@@ -5,6 +5,7 @@ using Deenote.Project.Models;
 using Deenote.Utilities;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Windows
@@ -61,6 +62,10 @@ namespace Deenote.UI.Windows
 
             void ViewSizeChanged(Vector2 _, Vector2 newSize) => OnViewSizeChanged?.Invoke(newSize);
 
+            RenderTexture texture = new(1280, 720, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.None);
+            _cameraViewRawImage.texture = texture;
+            _cameraViewRawImage.enabled = true;
+            GameStageController.Instance.Camera.targetTexture = texture;
             _viewSize = new FrameCachedNotifyingProperty<Vector2>(GetViewSize);
             _viewSize.OnValueChanged += ViewSizeChanged;
             OnViewSizeChanged += ReplaceCameraRenderTexture;

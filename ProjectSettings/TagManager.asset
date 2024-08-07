@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Lines
+    uniqueID: 2577728807
+    locked: 0
+  - name: StageObjects
+    uniqueID: 3710603141
+    locked: 0
