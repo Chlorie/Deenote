@@ -1,17 +1,13 @@
 using Deenote.UI.Windows;
+using Deenote.Utilities;
 using UnityEngine;
 
 namespace Deenote.GameStage
 {
-    public sealed partial class GridController : MonoBehaviour
+    public sealed partial class GridController : SingletonBehavior<GridController>
     {
-        [SerializeField] GameStageController _stage;
-
         [Header("Notify")]
         [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
-
-        [Header("Prefabs")]
-        [SerializeField] LineRenderer _linePrefab;
 
         /// <returns>
         /// Note that if given time is earlier than first time grid,
@@ -28,17 +24,17 @@ namespace Deenote.GameStage
             return new(snappedPos, snappedTime);
         }
 
-        private void Awake()
-        {
-            AwakeTimeGrid();
-            AwakeVerticalGrid();
-            AwakeCurve();
-        }
-
         private void Start()
         {
             _verticalGridGenerationKind = VerticalGridGenerationKind.ByKeyCount;
             VerticalGridCount = 9;
+        }
+
+        private void Update()
+        {
+            DrawTimeGrids();
+            DrawVerticalGrids();
+            DrawCurve();
         }
 
         #region Notify

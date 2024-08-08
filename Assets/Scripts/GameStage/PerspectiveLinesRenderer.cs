@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Deenote.Utilities;
@@ -12,11 +13,29 @@ namespace Deenote.GameStage
     /// <summary>
     /// Render all lines in the perspective view.
     /// The lines should be submitted in <c>Update</c> calls.
+    /// The add line methods should be called in each frame when the line should be displayed,
+    /// since the list of lines to display is reset after each frame.
     /// </summary>
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class PerspectiveLinesRenderer : SingletonBehavior<PerspectiveLinesRenderer>
     {
+        // I need CollectionsMarshal.AsSpan!!!!!
         public void AddLineStrip(ListReadOnlyView<Vector2> points, Color color, float width)
+        {
+            Vector2 prev = points[0];
+            foreach (var point in points)
+            {
+                _vertices.Add(new VertexData
+                {
+                    Positions = new Vector4(point.x, point.y, prev.x, prev.y),
+                    Color = color,
+                    Width = width
+                });
+                prev = point;
+            }
+        }
+
+        public void AddLineStrip(ReadOnlySpan<Vector2> points, Color color, float width)
         {
             Vector2 prev = points[0];
             foreach (var point in points)
@@ -33,7 +52,7 @@ namespace Deenote.GameStage
 
         public void AddLine(Vector2 p1, Vector2 p2, Color color, float width)
         {
-            List<Vector2> points = new() { p1, p2 };
+            ReadOnlySpan<Vector2> points = stackalloc Vector2[] { p1, p2 };
             AddLineStrip(points, color, width);
         }
 
@@ -69,10 +88,6 @@ namespace Deenote.GameStage
 
         [SerializeField][HideInInspector] private MeshFilter _meshFilter = null!;
         [SerializeField][HideInInspector] private MeshRenderer _meshRenderer = null!;
-        [SerializeField] private Color _testColor = Color.white;
-        [SerializeField] private float _testWidth = 4.0f;
-        [SerializeField] private int _subDivisions = 8;
-        [SerializeField] private float _testSmoothingPx = 1.0f;
         private List<VertexData> _vertices = new();
         private MaterialPropertyBlock _props = null!;
 
@@ -124,7 +139,7 @@ namespace Deenote.GameStage
         private void Update()
         {
             var viewSize = PerspectiveViewWindow.Instance.ViewSize;
-            _props.SetFloat(SmoothingPx, _testSmoothingPx);
+            _props.SetFloat(SmoothingPx, 2.0f); // TODO: is it necessary for this to be configurable?
             _props.SetVector(ActualViewSize, new Vector4(viewSize.x, viewSize.y));
             _meshRenderer.SetPropertyBlock(_props);
         }

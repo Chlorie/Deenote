@@ -15,7 +15,7 @@ namespace Deenote.GameStage.Elements
         [Header("")]
         [SerializeField] AudioSource _effectSoundSource;
 
-        private LineRenderer _linkLineRender;
+        private (Vector2, Vector2)? _linkLine;
 
         public GameStageController Stage => MainSystem.GameStage;
 
@@ -31,18 +31,16 @@ namespace Deenote.GameStage.Elements
         public NoteState State
         {
             get => _state;
-            set {
+            set
+            {
                 if (value == _state)
                     return;
 
                 _state = value;
-                switch (_state) {
-                    case NoteState.Activated:
-                        // Blank
-                        break;
+                switch (_state)
+                {
                     case NoteState.Fall:
                         _noteSpriteRenderer.gameObject.SetActive(true);
-                        _linkLineRender?.gameObject.SetActive(true);
                         _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _circleHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _waveHitEffectSpriteRenderer.gameObject.SetActive(false);
@@ -50,7 +48,6 @@ namespace Deenote.GameStage.Elements
                         break;
                     case NoteState.HitEffect:
                         _noteSpriteRenderer.gameObject.SetActive(false);
-                        _linkLineRender?.gameObject.SetActive(false);
                         _explosionHitEffectSpriteRenderer.gameObject.SetActive(true);
                         _circleHitEffectSpriteRenderer.gameObject.SetActive(true);
                         _waveHitEffectSpriteRenderer.gameObject.SetActive(true);
@@ -58,13 +55,10 @@ namespace Deenote.GameStage.Elements
                         break;
                     case NoteState.Inactive:
                         _noteSpriteRenderer.gameObject.SetActive(false);
-                        _linkLineRender?.gameObject.SetActive(false);
                         _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _circleHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _waveHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _glowHitEffectSpriteRenderer.gameObject.SetActive(false);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -78,9 +72,10 @@ namespace Deenote.GameStage.Elements
             SyncNoteDataUpdate();
         }
 
-        private void OnDisable()
+        private void Update()
         {
-            SetLinkLine(false);
+            if (_linkLine is var (start, end))
+                PerspectiveLinesRenderer.Instance.AddLine(start, end, MainSystem.Args.LinkLineColor, 2.0f);
         }
 
         // GameStageController will select notes in stage when Update,
@@ -112,15 +107,16 @@ namespace Deenote.GameStage.Elements
         public void SyncNoteDataUpdate()
         {
             gameObject.transform.localPosition = gameObject.transform.localPosition.WithX(MainSystem.Args.PositionToX(_note.Data.Position));
-            var prefab = _note.Data switch {
+            var prefab = _note.Data switch
+            {
                 { IsSlide: true } => MainSystem.GameStage.SlideNoteSpritePrefab,
                 { HasSound: true } => MainSystem.GameStage.BlackNoteSpritePrefab,
                 _ => MainSystem.GameStage.NoSoundNoteSpritePrefab,
             };
             _noteSpriteRenderer.sprite = prefab.Sprite;
             _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(_note.Data.Size, 1f, 1f) * prefab.Scale;
+            _linkLine = null;
             _waveColor = prefab.WaveColor;
-            SetLinkLine(_note.Data.NextLink is not null);
         }
 
         private void UpdateDisplay(bool musicPlaying)
@@ -128,20 +124,26 @@ namespace Deenote.GameStage.Elements
             float currentTime = Stage.CurrentMusicTime;
             float timeOffset = _note.Data.Time - currentTime;
             // Falling
-            if (timeOffset > 0) {
+            if (timeOffset > 0)
+            {
                 State = NoteState.Fall;
                 OnFalling();
             }
             // Hit effect or released
-            else {
-                if (State != NoteState.HitEffect) {
-                    if (musicPlaying) {
+            else
+            {
+                _linkLine = null;
+                if (State != NoteState.HitEffect)
+                {
+                    if (musicPlaying)
+                    {
                         PlayNoteSounds();
                     }
                     State = NoteState.HitEffect;
                 }
                 OnHitEffect();
             }
+            return;
 
             void OnFalling()
             {
@@ -168,8 +170,7 @@ namespace Deenote.GameStage.Elements
 
                 var (fromX, fromZ) = MainSystem.Args.NoteCoordToWorldPosition(from.PositionCoord, Stage.CurrentMusicTime);
                 var (toX, toZ) = MainSystem.Args.NoteCoordToWorldPosition(to.PositionCoord, Stage.CurrentMusicTime);
-                _linkLineRender.SetPosition(0, new Vector3(fromX, 0, fromZ));
-                _linkLineRender.SetPosition(1, new Vector3(toX, 0, toZ));
+                _linkLine = (new Vector2(fromX, fromZ), new Vector2(toX, toZ));
             }
 
             void OnHitEffect()
@@ -185,7 +186,8 @@ namespace Deenote.GameStage.Elements
 
                 // Copied from Chlorie's
                 var time = -timeOffset;
-                if (time > prefabs.HitEffectTime) {
+                if (time > prefabs.HitEffectTime)
+                {
                     return;
                 }
 
@@ -193,12 +195,7 @@ namespace Deenote.GameStage.Elements
                 {
                     int frame = Mathf.FloorToInt(time / prefabs.ExplosionTime * (prefabs.Explosions.Length + 1));
                     // Here frame may be Explosions.Length
-                    if (frame < prefabs.Explosions.Length) {
-                        _explosionHitEffectSpriteRenderer.sprite = prefabs.Explosions[frame];
-                    }
-                    else {
-                        _explosionHitEffectSpriteRenderer.sprite = null;
-                    }
+                    _explosionHitEffectSpriteRenderer.sprite = frame < prefabs.Explosions.Length ? prefabs.Explosions[frame] : null;
                 }
 
                 // Circle
@@ -238,28 +235,17 @@ namespace Deenote.GameStage.Elements
 
         private void PlayNoteSounds()
         {
-            if (Stage.EffectVolume > 0f) {
+            if (Stage.EffectVolume > 0f)
+            {
                 if (Model.Data.IsSlide)
                     _effectSoundSource.PlayOneShot(Stage.EffectSoundAudioClip, Stage.EffectVolume / 200f);
                 else
                     _effectSoundSource.PlayOneShot(Stage.EffectSoundAudioClip, Stage.EffectVolume / 100f);
             }
 
-            if (Stage.MusicVolume > 0f && Model.Data.HasSound) {
+            if (Stage.MusicVolume > 0f && Model.Data.HasSound)
+            {
                 MainSystem.PianoSoundManager.PlaySoundsAsync(Model.Data.Sounds, Stage.PianoVolume / 100f, Stage.MusicSpeed / 10f).Forget();
-            }
-        }
-
-        private void SetLinkLine(bool show)
-        {
-            if (show) {
-                _linkLineRender ??= MainSystem.GameStage.GetLinkLine();
-            }
-            else {
-                if (_linkLineRender is not null) {
-                    MainSystem.GameStage.ReleaseLinkLine(_linkLineRender);
-                    _linkLineRender = null;
-                }
             }
         }
 

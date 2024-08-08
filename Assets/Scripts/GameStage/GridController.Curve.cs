@@ -1,6 +1,5 @@
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;
-using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
 using System;
 using UnityEngine;
@@ -11,10 +10,9 @@ namespace Deenote.GameStage
     {
         private const int CubicCurveSegmentCount = 400;
 
-        [Header("Curve")]
-        [SerializeField] private LineRenderer _curveLineRenderer = null!;
-
         private CurveLineData? _curveLineData;
+        private Vector2[] _curveCoords = new Vector2[CubicCurveSegmentCount];
+        private bool _shouldRenderCurve;
         private bool _isCurveOn;
         public bool IsCurveOn
         {
@@ -28,7 +26,7 @@ namespace Deenote.GameStage
             }
         }
 
-        public (float Start, float End)? CurveTime => IsCurveOn ? (_curveLineData.MinX, _curveLineData.MaxX) : null;
+        public (float Start, float End)? CurveTime => IsCurveOn ? (_curveLineData!.MinX, _curveLineData.MaxX) : null;
 
         public void InitializeCurve(ListReadOnlyView<NoteModel> interpolationNotes, CurveKind kind)
         {
@@ -49,43 +47,39 @@ namespace Deenote.GameStage
             UpdateCurveLine();
         }
 
-        public void HideCurve()
+        public void HideCurve() => IsCurveOn = false;
+
+        private void DrawCurve()
         {
-            IsCurveOn = false;
+            if (_isCurveOn && _shouldRenderCurve)
+                PerspectiveLinesRenderer.Instance.AddLineStrip(_curveCoords, MainSystem.Args.CurveLineColor, 2f);
         }
 
         // Copied from Chlorie's
         public void UpdateCurveLine()
         {
-            if (!IsCurveOn)
+            if (!_isCurveOn)
                 return;
 
-            float stageCurrentTime = _stage.CurrentMusicTime;
-            float stageMaxTime = stageCurrentTime + _stage.StageNoteAheadTime;
+            var stage = GameStageController.Instance;
+            float stageCurrentTime = stage.CurrentMusicTime;
+            float stageMaxTime = stageCurrentTime + stage.StageNoteAheadTime;
 
-            using var coords = _curveLineData!.GetRenderValues(_stage.CurrentMusicTime, stageMaxTime);
+            using var coords = _curveLineData!.GetRenderValues(stage.CurrentMusicTime, stageMaxTime);
             var coordSpan = coords.Span;
             if (coordSpan.Length == 0)
             {
-                _curveLineRenderer.gameObject.SetActive(false);
+                _shouldRenderCurve = false;
                 return;
             }
-            _curveLineRenderer.gameObject.SetActive(true);
+            _shouldRenderCurve = true;
 
-            var worldPositions = new Vector3[coordSpan.Length];
-            for (int i = 0; i < worldPositions.Length; i++)
+            Debug.Assert(coordSpan.Length == _curveCoords.Length && coordSpan.Length == CubicCurveSegmentCount);
+            for (int i = 0; i < CubicCurveSegmentCount; i++)
             {
-                var coord = coordSpan[i];
                 var (x, z) = MainSystem.Args.NoteCoordToWorldPosition(coordSpan[i]);
-                worldPositions[i] = new Vector3(x, 0, z);
+                _curveCoords[i] = new Vector2(x, z);
             }
-
-            _curveLineRenderer.SetPositions(worldPositions);
-        }
-
-        private void AwakeCurve()
-        {
-            _curveLineRenderer.SetSolidColor(MainSystem.Args.CurveLineColor);
         }
 
         public enum CurveKind

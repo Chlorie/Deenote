@@ -23,7 +23,6 @@ namespace Deenote.GameStage
         [SerializeField] EditorController _editorController;
         [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
         [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
-        [SerializeField] GridController _gridController;
 
         [Header("Prefabs")]
         [SerializeField] Transform _noteParentTransform;
@@ -67,7 +66,7 @@ namespace Deenote.GameStage
         [SerializeField, Range(0, 100)] private int __pianoVolume;
         [SerializeField, Range(0f, 100f)] private int __suddenPlusRange;
 
-        public GridController Grids => _gridController;
+        public GridController Grids => GridController.Instance;
 
         public ChartModel Chart => _chart;
 
@@ -640,7 +639,7 @@ namespace Deenote.GameStage
         private void OnStageNoteUpdated()
         {
             UpdateJudgeLineHitEffect();
-            _gridController.NotifyGameStageProgressChanged();
+            GridController.Instance.NotifyGameStageProgressChanged();
             _perspectiveViewWindow.NotifyGameStageProgressChanged(_nextHitNoteIndex);
         }
 
@@ -662,7 +661,6 @@ namespace Deenote.GameStage
             base.Awake();
             _stageNotes = new PooledObjectListView<StageNoteController>(
                 UnityUtils.CreateObjectPool(_notePrefab, _noteParentTransform));
-            AwakeLinkLine();
         }
 
         private void Start()

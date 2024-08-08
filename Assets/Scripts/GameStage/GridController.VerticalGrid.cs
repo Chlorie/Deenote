@@ -1,5 +1,4 @@
-using Deenote.Utilities;
-using Deenote.Utilities.Robustness;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Deenote.GameStage
@@ -8,14 +7,17 @@ namespace Deenote.GameStage
     {
         private const int MaxKeyCount = 41;
 
-        [Header("Vertical Grid")]
-        [SerializeField] GameObject _bordersGameObject;
-        [SerializeField] Transform _verticalGridParentTransform;
+        private enum VerticalGridKind
+        {
+            Default,
+            Border
+        }
 
-        private PooledObjectListView<LineRenderer> _verticalGrids;
+        private List<(float, VerticalGridKind)> _verticalGridData = new();
 
         private VerticalGridGenerationKind _verticalGridGenerationKind;
 
+        [Header("Vertical Grid")]
         [SerializeField, Range(0, 41)]
         private int __verticalGridCount;
         [SerializeField, Range(-1f, 1f)]
@@ -26,11 +28,14 @@ namespace Deenote.GameStage
         public VerticalGridGenerationKind VerticalGridGeneration
         {
             get => _verticalGridGenerationKind;
-            set {
+            set
+            {
                 if (_verticalGridGenerationKind == value)
                     return;
-                if (value == VerticalGridGenerationKind.ByCountAndOffset) {
-                    switch (__verticalGridCount) {
+                if (value == VerticalGridGenerationKind.ByCountAndOffset)
+                {
+                    switch (__verticalGridCount)
+                    {
                         case < 2:
                             __isVerticalBorderVisible = false;
                             __verticalGridOffset = 0f;
@@ -42,13 +47,14 @@ namespace Deenote.GameStage
                             break;
                         case > 2:
                             __isVerticalBorderVisible = true;
-                            __verticalGridCount = __verticalGridCount - 1;
+                            __verticalGridCount--;
                             __verticalGridOffset = 2 / __verticalGridCount;
                             break;
                     }
                 }
-                else { // ByKeyCount
-                    __verticalGridCount = __verticalGridCount + 1;
+                else
+                { // ByKeyCount
+                    __verticalGridCount++;
                 }
                 // We do not immediately update grids when generation kind changed
             }
@@ -57,7 +63,8 @@ namespace Deenote.GameStage
         public int VerticalGridCount
         {
             get => __verticalGridCount;
-            set {
+            set
+            {
                 value = Mathf.Clamp(value, 0, MaxKeyCount);
                 if (__verticalGridCount == value)
                     return;
@@ -71,13 +78,10 @@ namespace Deenote.GameStage
         public bool IsBorderVisible_Legacy
         {
             get => __isVerticalBorderVisible;
-            set {
+            set
+            {
                 Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
-                if (__isVerticalBorderVisible == value)
-                    return;
-
                 __isVerticalBorderVisible = value;
-                _bordersGameObject.SetActive(value);
             }
         }
 
@@ -87,7 +91,8 @@ namespace Deenote.GameStage
         public int VerticalGridCount_Legacy
         {
             get => __verticalGridCount;
-            set {
+            set
+            {
                 Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
                 value = Mathf.Clamp(value, 0, MaxKeyCount - 1);
                 if (__verticalGridCount == value)
@@ -104,7 +109,8 @@ namespace Deenote.GameStage
         public float VerticalGridOffset_Legacy
         {
             get => __verticalGridOffset;
-            set {
+            set
+            {
                 Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
                 value = Mathf.Clamp(value, -1f, 1f);
                 if (__verticalGridOffset == value)
@@ -115,11 +121,38 @@ namespace Deenote.GameStage
             }
         }
 
+        private void DrawVerticalGrids()
+        {
+            var lineRenderer = PerspectiveLinesRenderer.Instance;
+            float maxZ = MainSystem.Args.NoteAppearZ;
+            foreach (var (x, kind) in _verticalGridData)
+            {
+                lineRenderer.AddLine(new Vector2(x, 0), new Vector2(x, maxZ),
+                    MainSystem.Args.SubBeatLineColor, kind is VerticalGridKind.Border ? 4f : 2f);
+            }
+
+            if (!IsBorderVisible_Legacy ||
+                _verticalGridGenerationKind is not VerticalGridGenerationKind.ByCountAndOffset)
+                return;
+            // Legacy system
+            float maxX = MainSystem.Args.PositionToX(MainSystem.Args.StageMaxPosition);
+            lineRenderer.AddLine(new Vector2(-maxX, 0), new Vector2(-maxX, maxZ),
+                MainSystem.Args.SubBeatLineColor, 4f);
+            lineRenderer.AddLine(new Vector2(maxX, 0), new Vector2(maxX, maxZ),
+                MainSystem.Args.SubBeatLineColor, 4f);
+        }
+
         private void UpdateVerticalGrids()
         {
-            switch (VerticalGridGeneration) {
+            _verticalGridData.Clear();
+            switch (VerticalGridGeneration)
+            {
                 case VerticalGridGenerationKind.ByCountAndOffset:
-                    ByCountAndOffset();
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++)
+                    {
+                        float x = MainSystem.Args.PositionToX(GetVerticalGridPosition_Legacy(i));
+                        _verticalGridData.Add((x, VerticalGridKind.Default));
+                    }
                     break;
                 case VerticalGridGenerationKind.ByKeyCount:
                     ByKeyCount();
@@ -128,35 +161,29 @@ namespace Deenote.GameStage
                     Debug.Assert(false, $"Unknown enum value of {nameof(VerticalGridGenerationKind)}");
                     break;
             }
-
-            void ByCountAndOffset()
-            {
-                _verticalGrids.SetCount(VerticalGridCount_Legacy);
-                for (int i = 0; i < VerticalGridCount_Legacy; i++) {
-                    SetVerticalGridPosition(_verticalGrids[i], GetVerticalGridPosition_Legacy(i));
-                }
-            }
+            return;
 
             void ByKeyCount()
             {
-                switch (VerticalGridCount) {
-                    case <= 0: {
-                        _verticalGrids.Clear();
-                        _bordersGameObject.SetActive(false);
+                switch (VerticalGridCount)
+                {
+                    case <= 0:
+                        break;
+                    case 1:
+                    {
+                        _verticalGridData.Add((0f, VerticalGridKind.Default));
                         break;
                     }
-                    case 1: {
-                        _verticalGrids.SetCount(1);
-                        SetVerticalGridPosition(_verticalGrids[0], position: 0f);
-                        _bordersGameObject.SetActive(false);
-                        break;
-                    }
-                    default: {
-                        _verticalGrids.SetCount(VerticalGridCount - 2);
-                        for (int i = 0; i < VerticalGridCount - 2; i++) {
-                            SetVerticalGridPosition(_verticalGrids[i], GetVerticalGridPosition(i + 1));
+                    default:
+                    {
+                        for (int i = 0; i < VerticalGridCount - 2; i++)
+                        {
+                            float x = MainSystem.Args.PositionToX(GetVerticalGridPosition(i + 1));
+                            _verticalGridData.Add((x, VerticalGridKind.Default));
                         }
-                        _bordersGameObject.SetActive(true);
+                        float maxX = MainSystem.Args.PositionToX(MainSystem.Args.StageMaxPosition);
+                        _verticalGridData.Add((-maxX, VerticalGridKind.Border));
+                        _verticalGridData.Add((maxX, VerticalGridKind.Border));
                         break;
                     }
                 }
@@ -166,44 +193,50 @@ namespace Deenote.GameStage
         /// <returns><see langword="null"/> if gridCount == 0</returns>
         public float? GetNearestVerticalGridPosition(float position)
         {
-            switch (VerticalGridGeneration) {
-                case VerticalGridGenerationKind.ByCountAndOffset: {
+            switch (VerticalGridGeneration)
+            {
+                case VerticalGridGenerationKind.ByCountAndOffset:
+                {
                     if (VerticalGridCount_Legacy == 0)
                         return null;
 
                     float minDist = float.MaxValue;
                     float snapPos = default;
-                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++)
+                    {
                         float gridPos = GetVerticalGridPosition_Legacy(i);
                         float dist = Mathf.Abs(gridPos - position);
-                        if (dist < minDist) {
-                            minDist = dist;
-                            snapPos = gridPos;
-                        }
+                        if (!(dist < minDist)) continue;
+                        minDist = dist;
+                        snapPos = gridPos;
                     }
 
-                    if (IsBorderVisible_Legacy) {
-                        float dist = Mathf.Abs(position - (-MainSystem.Args.StageMaxPosition));
-                        if (dist < minDist) {
+                    if (IsBorderVisible_Legacy)
+                    {
+                        float dist = Mathf.Abs(position + MainSystem.Args.StageMaxPosition);
+                        if (dist < minDist)
+                        {
                             minDist = dist;
                             snapPos = -MainSystem.Args.StageMaxPosition;
                         }
                         dist = Mathf.Abs(position - MainSystem.Args.StageMaxPosition);
-                        if (dist < minDist) {
-                            minDist = dist;
+                        if (dist < minDist)
+                        {
                             snapPos = MainSystem.Args.StageMaxPosition;
                         }
                     }
 
                     return snapPos;
                 }
-                case VerticalGridGenerationKind.ByKeyCount: {
+                case VerticalGridGenerationKind.ByKeyCount:
+                {
                     if (VerticalGridCount == 0)
                         return null;
 
                     float minDist = float.MaxValue;
                     float snapPos = default;
-                    for (int i = 0; i < VerticalGridCount; i++) {
+                    for (int i = 0; i < VerticalGridCount; i++)
+                    {
                         float gridPos = GetVerticalGridPosition(i);
                         float dist = Mathf.Abs(gridPos - position);
                         if (minDist <= dist)
@@ -223,39 +256,37 @@ namespace Deenote.GameStage
 
         public float? FloorToNearestNextVerticalGridPosition(float position)
         {
-            switch (VerticalGridGeneration) {
-                case VerticalGridGenerationKind.ByCountAndOffset: {
+            switch (VerticalGridGeneration)
+            {
+                case VerticalGridGenerationKind.ByCountAndOffset:
+                {
                     if (VerticalGridCount_Legacy == 0)
                         return null;
 
-                    float minDist = float.MaxValue;
                     float? snapPos = null;
-                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++)
+                    {
                         float gridPos = GetVerticalGridPosition_Legacy(i);
-                        if (position > gridPos) {
-                            minDist = position - gridPos;
+                        if (position > gridPos)
                             snapPos = gridPos;
-                        }
                     }
 
-                    if (IsBorderVisible_Legacy) {
-                        if (position > -MainSystem.Args.StageMaxPosition) {
-                            minDist = position - (-MainSystem.Args.StageMaxPosition);
-                            snapPos = -MainSystem.Args.StageMaxPosition;
-                        }
-                    }
+                    if (IsBorderVisible_Legacy && position > -MainSystem.Args.StageMaxPosition)
+                        snapPos = -MainSystem.Args.StageMaxPosition;
 
                     return snapPos;
                 }
-                case VerticalGridGenerationKind.ByKeyCount: {
+                case VerticalGridGenerationKind.ByKeyCount:
+                {
                     if (VerticalGridCount == 0)
                         return null;
 
                     float pos = position;
-                    for (int i = 0; i < VerticalGridCount; i++) {
+                    for (int i = 0; i < VerticalGridCount; i++)
+                    {
                         float gridPos = GetVerticalGridPosition(i);
                         if (gridPos >= position)
-                            break;
+                            return pos;
                         pos = gridPos;
                     }
                     Debug.Assert(false, "Unreachable");
@@ -269,32 +300,30 @@ namespace Deenote.GameStage
 
         public float? CeilToNearestNextVerticalGridPosition(float position)
         {
-            switch (VerticalGridGeneration) {
-                case VerticalGridGenerationKind.ByCountAndOffset: {
+            switch (VerticalGridGeneration)
+            {
+                case VerticalGridGenerationKind.ByCountAndOffset:
+                {
                     if (VerticalGridCount_Legacy == 0)
                         return null;
 
-                    float minDist = float.MaxValue;
                     float? snapPos = null;
-                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++)
+                    {
                         float gridPos = GetVerticalGridPosition_Legacy(i);
-                        if (position < gridPos) {
-                            minDist = gridPos - position;
+                        if (position < gridPos)
                             snapPos = gridPos;
-                        }
                     }
 
-                    if (IsBorderVisible_Legacy) {
-                        if (position < MainSystem.Args.StageMaxPosition) {
-                            minDist = MainSystem.Args.StageMaxPosition - position;
-                            snapPos = MainSystem.Args.StageMaxPosition;
-                        }
-                    }
+                    if (IsBorderVisible_Legacy && position < MainSystem.Args.StageMaxPosition)
+                        snapPos = MainSystem.Args.StageMaxPosition;
 
                     return snapPos;
                 }
-                case VerticalGridGenerationKind.ByKeyCount: {
-                    for (int i = 0; i < VerticalGridCount; i++) {
+                case VerticalGridGenerationKind.ByKeyCount:
+                {
+                    for (int i = 0; i < VerticalGridCount; i++)
+                    {
                         float gridPos = GetVerticalGridPosition(i);
                         if (gridPos > position)
                             return gridPos;
@@ -315,19 +344,6 @@ namespace Deenote.GameStage
             var x = MainSystem.Args.PositionToX(position);
             line.SetPosition(0, new Vector3(x, 0, 0f));
             line.SetPosition(1, new Vector3(x, 0, MainSystem.Args.NoteAppearZ));
-        }
-
-        private void AwakeVerticalGrid()
-        {
-            _verticalGrids = new PooledObjectListView<LineRenderer>(UnityUtils.CreateObjectPool(() =>
-            {
-                var line = Instantiate(_linePrefab, _verticalGridParentTransform);
-                line.sortingOrder = -14;
-                line.widthMultiplier = 0.035f;
-                line.positionCount = 2;
-                line.SetSolidColor(MainSystem.Args.SubBeatLineColor);
-                return line;
-            }));
         }
 
         #endregion
