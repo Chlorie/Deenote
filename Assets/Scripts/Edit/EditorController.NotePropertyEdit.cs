@@ -1,13 +1,17 @@
 using Deenote.Project.Comparers;
+using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using System;
+using System.Diagnostics;
 using UnityEngine.Pool;
 
 namespace Deenote.Edit
 {
     partial class EditorController
     {
+        private static readonly PianoSoundValueData[] _defaultNoteSounds = new PianoSoundValueData[] { new PianoSoundValueData(0f, 0f, 72, 0) };
+
         #region Simple Properties
 
         public void EditSelectedNotesPositionCoord(Func<NoteCoord, NoteCoord> valueSelector)
@@ -16,9 +20,10 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.PositionCoord, (n, v) => n.PositionCoord = v)
+                .WithOptions(sortNotes: true, updateCollision: true)
                 .WithDoneAction(() =>
                 {
-                    // TODO: Ensure Notes Order
+                    NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
                     _propertiesWindow.NotifyNoteTimeChanged(SelectedNotes.IsSameForAll(n => n.Data.Time, out var time) ? time : null);
                     _propertiesWindow.NotifyNotePositionChanged(SelectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
                     OnNotesChanged(true, false, noteDataChangedExceptTime: false);
@@ -31,9 +36,10 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
+                .WithOptions(sortNotes: true, updateCollision: true)
                 .WithDoneAction(() =>
                 {
-                    // TODO: Ensure Notes Order
+                    NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
                     _propertiesWindow.NotifyNoteTimeChanged(SelectedNotes.IsSameForAll(n => n.Data.Time, out var time) ? time : null);
                     OnNotesChanged(true, false, noteDataChangedExceptTime: false);
                 }));
@@ -45,9 +51,10 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
+                .WithOptions(sortNotes: true, updateCollision: true)
                 .WithDoneAction(() =>
                 {
-                    // TODO: Ensure Notes Order
+                    NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
                     _propertiesWindow.NotifyNoteTimeChanged(SelectedNotes.IsSameForAll(n => n.Data.Time, out var time) ? time : null);
                     OnNotesChanged(true, false, noteDataChangedExceptTime: true);
                 }));
@@ -59,6 +66,7 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Position, (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
+                .WithOptions(updateCollision: true)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePositionChanged(SelectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
@@ -72,6 +80,7 @@ namespace Deenote.Edit
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Position, (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
+                .WithOptions(updateCollision: true)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePositionChanged(SelectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
@@ -247,31 +256,36 @@ namespace Deenote.Edit
                 }));
         }
 
-        public void ToggleSoundOfSelectedNotes()
+        public void SoundifySelectedNotes()
         {
-            // TODO: Un-undoable
-            using var _ = ListPool<NoteData>.Get(out var soundNotes);
+            if (SelectedNotes.Count == 0)
+                return;
+            using var _en = ListPool<NoteModel>.Get(out var editNotes);
 
-            foreach (var note in SelectedNotes) {
-                var data = note.Data;
-                if (!data.HasSound) {
-                    data.Sounds.Add(new PianoSoundData(0, 0f, 72, 0));
-                    continue;
-                }
+            foreach (var n in SelectedNotes) {
+                if (!n.Data.HasSound)
+                    editNotes.Add(n);
+            }
 
-                foreach (var sound in data.Sounds) {
-                    if (sound.Velocity > 0) {
-                        var soundNote = data.Clone();
-                        soundNote.Sounds.Add(sound);
-                        soundNotes.Add(soundNote);
-                    }
-                }
-            }
-            if (soundNotes.Count > 0) {
-                Stage.Chart.Data.Notes.AddRange(soundNotes);
-                // TODO: Should sort stably
-                Stage.Chart.Data.Notes.Sort(NoteTimeComparer.Instance);
-            }
+            _operationHistory.Do(Stage.Chart.Notes.EditNotesSounds(editNotes, _defaultNoteSounds)
+                .WithDoneAction(() =>
+                {
+                    _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds, out var sounds, PianoSoundListDataEqualityComparer.Instance) ? sounds : null);
+                    OnNotesChanged(false, false, noteDataChangedExceptTime: true);
+                }));
+        }
+
+        public void DesoundifySelectedNotes()
+        {
+            if (SelectedNotes.Count == 0)
+                return;
+
+            _operationHistory.Do(Stage.Chart.Notes.EditNotesSounds(SelectedNotes, Array.Empty<PianoSoundValueData>())
+                .WithDoneAction(() =>
+                {
+                    _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds, out var sounds, PianoSoundListDataEqualityComparer.Instance) ? sounds : null);
+                    OnNotesChanged(false, false, noteDataChangedExceptTime: true);
+                }));
         }
     }
 }

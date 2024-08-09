@@ -64,6 +64,16 @@ namespace Deenote.Edit
                 }
             }
 
+            public void AddNote(IEnumerable<NoteModel> notes)
+            {
+                foreach (var note in notes) {
+                    if (note.IsSelected)
+                        continue;
+                    _selectedNotes.Add(note);
+                    note.IsSelected = true;
+                }
+            }
+
             public void DeselectNoteAt(Index index)
             {
                 var i = index.GetOffset(_selectedNotes.Count);
@@ -72,11 +82,24 @@ namespace Deenote.Edit
                 note.IsSelected = false;
             }
 
+            /// <summary>
+            /// Deselect note if note was selected, else do nothing
+            /// </summary>
+            /// <param name="notes"></param>
+            public void DeselectNotes(IEnumerable<NoteModel> notes)
+            {
+                foreach (var note in notes) {
+                    if (_selectedNotes.Remove(note)) {
+                        note.IsSelected = false;
+                    }
+                }
+            }
+
             public void StartNoteSelection(NoteCoord startCoord, bool toggleMode)
             {
                 _noteSelectionIndicatorImageTransform.gameObject.SetActive(true);
 
-                startCoord = NoteCoord.Clamp(startCoord, _editor.Stage.MusicLength);
+                startCoord.Time = Mathf.Clamp(startCoord.Time, 0f, _editor.Stage.MusicLength);
                 _noteSelectionIndicatorStartCoord = startCoord;
                 _isSelecting = true;
 
@@ -90,7 +113,7 @@ namespace Deenote.Edit
 
                 Debug.Assert(_noteSelectionIndicatorImageTransform.gameObject.activeSelf);
 
-                endCoord = NoteCoord.Clamp(endCoord, _editor.Stage.MusicLength);
+                endCoord.Time = Mathf.Clamp(endCoord.Time, 0f, _editor.Stage.MusicLength);
 
                 UpdateNoteSelectionInternal(_noteSelectionIndicatorStartCoord, endCoord, NoteSelectionUpdateMode.Toggle);
             }
@@ -118,8 +141,8 @@ namespace Deenote.Edit
 
             private void UpdateNoteSelectionInternal(NoteCoord startCoord, NoteCoord endCoord, NoteSelectionUpdateMode mode)
             {
-                Debug.Assert(startCoord.Position is >= -2f and <= 2f);
-                Debug.Assert(endCoord.Position is >= -2f and <= 2f);
+                Debug.Assert(startCoord.Position is <= MainSystem.Args.NoteSelectionMaxPosition and >= -MainSystem.Args.NoteSelectionMaxPosition);
+                Debug.Assert(endCoord.Position is <= MainSystem.Args.NoteSelectionMaxPosition and >= -MainSystem.Args.NoteSelectionMaxPosition);
 
                 if (startCoord.Position > endCoord.Position) {
                     (startCoord.Position, endCoord.Position) = (endCoord.Position, startCoord.Position);

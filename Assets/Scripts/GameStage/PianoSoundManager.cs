@@ -38,24 +38,31 @@ namespace Deenote.GameStage
             player.volume = playVolume;
             player.PlayDelayed(playDelay_s);
 
-            if (duration != null) {
-                float playDuration = duration.Value * playSpeed;
-                await UniTask.Delay(TimeSpan.FromSeconds(playDelay_s + playDuration));
-
-                while (player.isPlaying && playVolume >= 0.01f) {
-                    playVolume = playVolume * Mathf.Pow(1e-6f, player.time - playDuration);
-                    player.volume = playVolume;
-                    await UniTask.NextFrame();
-                }
-                player.Stop();
-                _audioPlayerPool.Release(player);
+            // TODO: currently the duration parameter is not used, as if the pedal is held down
+            // all the time, like what it's like in the original game.
+            // Maybe consider some way to improve this if necessary.
+            while (player.isPlaying) {
+                await UniTask.NextFrame();
             }
-            else {
-                while (player.isPlaying) {
-                    await UniTask.NextFrame();
-                }
-                _audioPlayerPool.Release(player);
-            }
+            _audioPlayerPool.Release(player);
+            // if (duration != null) {
+            //     float playDuration = duration.Value * playSpeed;
+            //     await UniTask.Delay(TimeSpan.FromSeconds(playDelay_s + playDuration));
+            // 
+            //     while (player.isPlaying && playVolume >= 0.01f) {
+            //         playVolume = playVolume * Mathf.Pow(1e-6f, player.time - playDuration);
+            //         player.volume = playVolume;
+            //         await UniTask.NextFrame();
+            //     }
+            //     player.Stop();
+            //     _audioPlayerPool.Release(player);
+            // }
+            // else {
+            //     while (player.isPlaying) {
+            //         await UniTask.NextFrame();
+            //     }
+            //     _audioPlayerPool.Release(player);
+            // }
         }
 
         public UniTaskVoid PlaySoundAsync(PianoSoundData sound, float volume, float speed)
@@ -97,7 +104,7 @@ namespace Deenote.GameStage
 
             int index = nearestPitchIndex * 4 + nearestVolumeIndex;
             speedMultiplier = Mathf.Pow(2f, (pitch - _pitches[nearestPitchIndex]) / 12f);
-            playVolume = volume / _volumes[nearestVolumeIndex];
+            playVolume = (float)volume / _volumes[nearestVolumeIndex];
             return _soundClips[index];
         }
 

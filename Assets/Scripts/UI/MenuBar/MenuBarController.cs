@@ -1,37 +1,62 @@
 using Cysharp.Threading.Tasks;
+using Deenote.Localization;
+using Deenote.UI.Windows;
 using Deenote.Utilities;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Deenote.UI.MenuBar
 {
-    public sealed partial class MenuBarController : MonoBehaviour
+    public sealed class MenuBarController : MonoBehaviour
     {
-        [Header("UI")]
-        [SerializeField] ToggleGroup _toggleGroup;
-        [Header("FileMenu")]
-        [SerializeField] Button _newButton;
-        [SerializeField] Button _openButton;
-        [SerializeField] Button _saveButton;
-        [SerializeField] Button _saveAsButton;
-        [SerializeField] Button _quitButton;
+        [Header("File")]
+        [SerializeField] MenuDropdownItemController _newDropdownItem;
+        [SerializeField] MenuDropdownItemController _openDropdownItem;
+        [SerializeField] MenuDropdownItemController _saveDropdownItem;
+        [SerializeField] MenuDropdownItemController _saveAsDropdownItem;
+        [SerializeField] MenuDropdownItemController _quitDropdownItem;
         [Header("Edit")]
-        [SerializeField] Button _copyButton;
+        [SerializeField] MenuDropdownItemController _copyButton;
         [Header("View")]
-        [SerializeField] Button _perspectiveViewButton;
+        [SerializeField] MenuDropdownItemController _perspectiveViewDropdownItem;
+        [SerializeField] MenuDropdownItemController _propertiesViewDropdownItem;
+        [SerializeField] MenuDropdownItemController _editorPropertiesViewDropdownItem;
+        [SerializeField] MenuDropdownItemController _pianoSoundEditViewDropdownItem;
+        [SerializeField] MenuDropdownItemController _toolBarDropdownItem;
         [Header("Settings")]
-        [SerializeField] Button _settingsButton;
+        [SerializeField] MenuDropdownItemController _preferencesDropdownItem;
+        [SerializeField] MenuDropdownItemController _aboutDropdownItem;
+        [SerializeField] MenuDropdownItemController _updateHistoryDropdownItem;
+        [SerializeField] MenuDropdownItemController _tutorialsDropdownItem;
+        [SerializeField] MenuDropdownItemController _checkUpdateDropdownItem;
 
         public bool IsHovering { get; set; }
 
         private void Awake()
         {
-            _newButton.onClick.AddListener(MainSystem.ProjectManager.NewProjectAsync);
-            _openButton.onClick.AddListener(MainSystem.ProjectManager.OpenProjectAsync);
-            _saveButton.onClick.AddListener(MainSystem.ProjectManager.SaveProjectAsync);
-            _saveAsButton.onClick.AddListener(MainSystem.ProjectManager.SaveAsAsync);
-            _quitButton.onClick.AddListener(OnQuitAsync);
-            //TODO export
+            // File
+            _newDropdownItem.Button.onClick.AddListener(MainSystem.ProjectManager.CreateNewProjectAsync);
+            _openDropdownItem.Button.onClick.AddListener(MainSystem.ProjectManager.OpenProjectAsync);
+            _saveDropdownItem.Button.onClick.AddListener(MainSystem.ProjectManager.SaveProjectAsync);
+            _saveAsDropdownItem.Button.onClick.AddListener(MainSystem.ProjectManager.SaveAsAsync);
+            _quitDropdownItem.Button.onClick.AddListener(OnQuitAsync);
+            // TODO export
+
+            // Edit
+            _copyButton.Button.onClick.AddListener(() => _ = MainSystem.StatusBar.ShowToastAsync(LocalizableText.Raw("114"), 3f));
+
+            // View
+            _perspectiveViewDropdownItem.Button.onClick.AddListener(() => MainSystem.PerspectiveView.Window.IsActivated = true);
+            _propertiesViewDropdownItem.Button.onClick.AddListener(() => MainSystem.PropertiesWindow.Window.IsActivated = true);
+            _editorPropertiesViewDropdownItem.Button.onClick.AddListener(() => MainSystem.EditorProperties.Window.IsActivated = true);
+            _pianoSoundEditViewDropdownItem.Button.onClick.AddListener(() => MainSystem.PianoSoundEdit.Window.IsActivated = true);
+            _toolBarDropdownItem.Button.onClick.AddListener(() => MainSystem.ToolBar.IsActivated = !MainSystem.ToolBar.IsActivated);
+
+            // Settings
+            _preferencesDropdownItem.Button.onClick.AddListener(() => MainSystem.PreferenceWindow.Window.IsActivated = true);
+            _aboutDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.AboutDevelopers));
+            _tutorialsDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.Tutorials));
+            _updateHistoryDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.UpdateHistory));
+            _checkUpdateDropdownItem.Button.onClick.AddListener(() => _ = MainSystem.VersionManager.CheckForUpdateAsync(true, true));
         }
 
         private async UniTaskVoid OnQuitAsync()

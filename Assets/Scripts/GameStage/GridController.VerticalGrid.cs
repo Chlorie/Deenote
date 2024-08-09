@@ -142,7 +142,7 @@ namespace Deenote.GameStage
                 MainSystem.Args.SubBeatLineColor, 4f);
         }
 
-        private void UpdateVerticalGrids()
+        public void UpdateVerticalGrids()
         {
             _verticalGridData.Clear();
             switch (VerticalGridGeneration)

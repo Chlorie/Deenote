@@ -12,7 +12,7 @@ namespace Deenote.Project.Models
         public string ChartDesigner;
 
         public bool SaveAsRefPath;
-        public byte[] AudioData;
+        public byte[] AudioFileData;
         public string AudioFileRelativePath;
 
         public List<ChartModel> Charts { get; } = new();
@@ -43,6 +43,7 @@ namespace Deenote.Project.Models
                 return _projectModel._tempos[index].StartTime;
             }
 
+            /// <returns>Range: [-1, Count)</returns>
             public int GetTempoIndex(float time)
             {
                 int i;
@@ -53,6 +54,7 @@ namespace Deenote.Project.Models
                 return i - 1;
             }
 
+            /// <returns>Range: [0, Count]</returns>
             public int GetCeilingTempoIndex(float time)
             {
                 int i;
@@ -76,5 +78,5 @@ namespace Deenote.Project.Models
                 model._tempos = tempos;
             }
         }
-    }
+   }
 }

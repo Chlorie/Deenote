@@ -19,7 +19,7 @@ namespace Deenote.UI.Windows
         {
             Window.IsActivated = true;
 
-            _window.SetTitle(title);
+            _window.TitleBar.SetTitle(title);
             _contentText.SetText(content);
 
             using (var resettingButtons = _buttons.Resetting(buttonTexts.Length)) {
@@ -32,7 +32,7 @@ namespace Deenote.UI.Windows
 
             var cts = new CancellationTokenSource();
 
-            _buttonClickTasks.Add(_window.OnCloseButtonClickAsync(cts.Token));
+            _buttonClickTasks.Add(_window.CloseButton.OnClickAsync(cts.Token));
 
             foreach (var btn in _buttons) {
                 _buttonClickTasks.Add(btn.Button.OnClickAsync(cts.Token));

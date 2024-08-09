@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85f35b52a7efc314bb7ee67ba46cc422, type: 3}
+  m_Name: GameStageArgs
+  m_EditorClassIdentifier: 
+  NotePanelLength: 17.5
+  NoteTimeToZMultiplier: 3.73
+  NoteFadeInRangePercent: 0.6556875
+  JudgeLinePeriod: 3.5
+  BackgroundMaskMinAlpha: 0.3333333
+  BackgroundMaskMaxAlpha: 1
+  BackgroundMaskPeriod: 2
+  JudgeLineHitEffectAlphaDecTime: 0.5
+  NoteControllerPrefab: {fileID: 8088016575839004564, guid: 160a09d6b531cb34d876b0226dae8742,
+    type: 3}
+  EffectSoundAudioClip: {fileID: 8300000, guid: 13a0e647201f5094880b4da85ec719ee,
+    type: 3}
+  BlackNoteSpritePrefab:
+    Scale: 1.5
+    Sprite: {fileID: 21300000, guid: 6224246386e406342bc4fa979f9aa700, type: 3}
+    WaveColor: {r: 0, g: 0, b: 0, a: 1}
+  NoSoundNoteSpritePrefab:
+    Scale: 1
+    Sprite: {fileID: 21300000, guid: ec582d6d056eb65498a1162688fc5381, type: 3}
+    WaveColor: {r: 0, g: 0, b: 0, a: 1}
+  SlideNoteSpritePrefab:
+    Scale: 0.975
+    Sprite: {fileID: 21300000, guid: 89abba366329a32459d2e62fb3726c36, type: 3}
+    WaveColor: {r: 0.9058824, g: 0.882353, b: 0.5686275, a: 1}
+  HitEffectSpritePrefabs:
+    HitEffectTime: 0.8
+    Explosions:
+    - {fileID: 0}
+    - {fileID: 21300000, guid: ed9068d14eb67ad4f821824556344b7e, type: 3}
+    - {fileID: 21300000, guid: c292075024e561641a15e8eac0db54b7, type: 3}
+    - {fileID: 21300000, guid: 72abaf566cf4cc744b75b93067c548a0, type: 3}
+    - {fileID: 21300000, guid: 0e9b616af83966f4e8526670fd43f3f7, type: 3}
+    - {fileID: 21300000, guid: eebe800f67d10e74fb40956f9efe08f8, type: 3}
+    - {fileID: 21300000, guid: 75c762be84bf0844cb577939ca007ad7, type: 3}
+    - {fileID: 21300000, guid: 070f390214df9674891ecb7cc38c2499, type: 3}
+    - {fileID: 21300000, guid: 90bd11e1397b2664ab9cb01a43eaed22, type: 3}
+    - {fileID: 21300000, guid: fefe88a510564a14f8136fdeac3e6b50, type: 3}
+    - {fileID: 21300000, guid: b921b71d40deb684e8ab02211dad1076, type: 3}
+    - {fileID: 21300000, guid: eb95ab00f23c8e4469e52cc8d54e5652, type: 3}
+    - {fileID: 21300000, guid: fe90b7311d649fc449f19495c88e4012, type: 3}
+    - {fileID: 21300000, guid: 04f429c5cd380cf45b8b74bcdec8076a, type: 3}
+    - {fileID: 21300000, guid: d75f2082d9800c248b37e6ce95e7e329, type: 3}
+    - {fileID: 21300000, guid: 974f5c36021e1e0418986fe694e4dc8a, type: 3}
+    ExplosionScale: 1.6
+    ExplosionTime: 0.4
+    CircleScale: 2
+    CircleTime: 0.5
+    WaveScale: {x: 0.8, y: 1.2}
+    WaveMaxAlpha: 0.8
+    WaveGrowTime: 0.05
+    WaveFadeTime: 0.5
+    GlowColor: {r: 1, g: 1, b: 1, a: 1}
+    GlowScale: {x: 6, y: 12}
+    GlowGrowTime: 0.1333333
+    GlowFadeTime: 0.6666667

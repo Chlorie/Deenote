@@ -1,8 +1,11 @@
 using Deenote.Project.Models;
+using Deenote.Project.Models.Datas;
+using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
@@ -17,10 +20,9 @@ namespace Deenote.Project
             {
                 using var fs = File.OpenRead(filePath);
                 var obj = LegacyProjectSerialization.Formatter.Deserialize(fs);
-                project = obj switch
-                {
-                    LegacyProjectSerialization.SerializableProjectData v1 => ToVer3(v1),
-                    LegacyProjectSerialization.FullProjectDataV2 v2 => ToVer3(v2),
+                project = obj switch {
+                    LegacyProjectSerialization.SerializableProjectData v1 => LegacyProjectSerialization.ToVer3(v1),
+                    LegacyProjectSerialization.FullProjectDataV2 v2 => LegacyProjectSerialization.ToVer3(v2),
                     _ => null,
                 };
                 return project is not null;
@@ -31,48 +33,6 @@ namespace Deenote.Project
                 project = null;
                 return false;
             }
-        }
-
-        // Copy from Chlorie
-        private static LegacyProjectSerialization.FullProjectDataV2 ToVersion2(LegacyProjectSerialization.SerializableProjectData dataV1)
-        {
-            throw new NotImplementedException();
-            // var dataV2 = new LegacyProjectSerialization.FullProjectDataV2
-            // {
-            //     project = dataV1.project,
-            //     audioType = ".wav"
-            // };
-            // var wavEncoder = new WavEncoder
-            // {
-            //     channel = dataV1.channel,
-            //     frequency = dataV1.frequency,
-            //     length = dataV1.length,
-            //     sampleData = dataV1.sampleData
-            // };
-            // wavEncoder.EncodeToWav(out dataV2.audio);
-            // dataV2.project.songName = "converted audio.wav";
-            // return dataV2;
-        }
-
-        private static ProjectModel ToVer3(LegacyProjectSerialization.SerializableProjectData dataV1)
-        {
-            var proj = new ProjectModel
-            {
-                //Name = dataV1.project.name,
-                MusicName = dataV1.project.songName,
-                ChartDesigner = dataV1.project.songName,
-                SaveAsRefPath = false,
-            };
-
-            // TODO
-            return proj;
-        }
-
-        private static ProjectModel ToVer3(LegacyProjectSerialization.FullProjectDataV2 dataV2)
-        {
-            var proj = new ProjectModel { };
-            // TODO:
-            return proj;
         }
 
         private sealed class LegacyProjectSerialization : SerializationBinder
@@ -119,6 +79,115 @@ namespace Deenote.Project
 
                 return Type.GetType($"{typeName}, {assemblyName}")!;
             }
+
+            // Copy from Chlorie
+            public static FullProjectDataV2 ToVersion2(SerializableProjectData dataV1)
+            {
+                var dataV2 = new FullProjectDataV2 {
+                    project = dataV1.project,
+                    audioType = ".wav"
+                };
+                AudioUtils.EncodeToWav(dataV1.channel, dataV1.frequency, dataV1.length, dataV1.sampleData,
+                    out dataV2.audio);
+                dataV2.project.songName = "converted audio.wav";
+                return dataV2;
+            }
+
+            public static ProjectModel ToVer3(SerializableProjectData dataV1)
+            {
+                var proj = ToVer3(dataV1.project);
+                proj.Composer = "Unknown";
+                proj.SaveAsRefPath = false;
+
+                AudioUtils.EncodeToWav(dataV1.channel, dataV1.frequency, dataV1.length, dataV1.sampleData,
+                    out var audioFileData);
+                proj.AudioFileData = audioFileData;
+
+                return proj;
+            }
+
+            public static ProjectModel ToVer3(FullProjectDataV2 dataV2)
+            {
+                var proj = ToVer3(dataV2.project);
+                proj.Composer = "Unknown";
+                proj.SaveAsRefPath=false;
+                proj.AudioFileRelativePath = $"Embeded Audio{dataV2.audioType}";
+                proj.AudioFileData = dataV2.audio;
+                
+                return proj;
+            }
+
+            private static ProjectModel ToVer3(Project oldProject)
+            {
+                var project = new ProjectModel {
+                    MusicName = oldProject.name,
+                    ChartDesigner = oldProject.chartMaker,
+                };
+
+                Debug.Assert(oldProject.charts.Length == 4);
+                foreach (var oldChart in oldProject.charts) {
+                    if (oldChart.notes.Count == 0)
+                        continue;
+                    var chartModel = new ChartModel(ToVer3(oldChart)) {
+                        Difficulty = DifficultyExt.FromInt32(oldChart.difficulty),
+                        Level = oldChart.level,
+                    };
+                    project.Charts.Add(chartModel);
+                }
+
+                List<Tempo> tempos = oldProject.charts[0].beats
+                    .Select(time => new Tempo(bpm: 0f, time))
+                    .ToList();
+                ProjectModel.InitializeHelper.SetTempoList(project, tempos);
+
+                return project;
+            }
+
+            private static ChartData ToVer3(Chart oldChart)
+            {
+                var chart = new ChartData {
+                    Speed = oldChart.speed,
+                    RemapMinVelocity = 10,
+                    RemapMaxVelocity = 70,
+                };
+                chart.Notes.AddRange(oldChart.notes.Select(ToVer3));
+                for (int i = 0; i < chart.Notes.Count; i++) {
+                    var oldNote = oldChart.notes[i];
+                    var note = chart.Notes[i];
+                    if (oldNote.prevLink != -1)
+                        note.PrevLink = chart.Notes[oldNote.prevLink];
+                    if (oldNote.nextLink != -1)
+                        note.NextLink = chart.Notes[oldNote.nextLink];
+                }
+                return chart;
+            }
+
+            private static NoteData ToVer3(Note oldNote)
+            {
+                var note = new NoteData {
+                    Position = oldNote.position,
+                    Size = oldNote.size,
+                    Time = oldNote.time,
+                    Shift = oldNote.shift,
+                    IsSlide = oldNote.isLink,
+                };
+                note.Sounds.Capacity = oldNote.sounds.Capacity;
+                foreach (var sound in oldNote.sounds) {
+                    note.Sounds.Add(ToVer3(sound));
+                }
+                return note;
+            }
+
+            private static PianoSoundData ToVer3(PianoSound oldSound)
+            {
+                return new PianoSoundData(
+                    oldSound.delay,
+                    oldSound.duration,
+                    oldSound.pitch,
+                    oldSound.volume);
+            }
+
+            #region Types
 
             [Serializable]
             public class SerializableProjectData //Saves all the project data including the audio clip data
@@ -181,6 +250,8 @@ namespace Deenote.Project
                 public int pitch; //p
                 public int volume; //v
             }
+
+            #endregion
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Deenote.Edit.Operations
 
     public static class UndoableOperation
     {
-        public static readonly IUndoableOperation NoOperation = new NoOperationImpl();
+        public static readonly IUndoableOperation DoNothing = new NoOperationImpl();
 
         private sealed class NoOperationImpl : IUndoableOperation
         {

@@ -9,6 +9,7 @@ namespace Deenote.Utilities
     {
         private static readonly char[] _invalidFileNameChars = Path.GetInvalidFileNameChars();
         private static readonly char[] _invalidPathChars = Path.GetInvalidPathChars();
+
         public static bool IsValidFileName(string fileName)
             => fileName.IndexOfAny(_invalidFileNameChars) < 0;
 
@@ -17,12 +18,31 @@ namespace Deenote.Utilities
 
         public static bool EndsWithOneOf(this string str, ReadOnlySpan<string> ends)
         {
-            foreach (var end in ends)
-            {
+            foreach (var end in ends) {
                 if (str.EndsWith(end))
                     return true;
             }
             return false;
+        }
+
+        public static bool IncAndTryWrap(this ref float value, float delta, float max)
+        {
+            value += delta;
+            if (value <= max) return false;
+            value -= max;
+            return true;
+        }
+
+        public static bool SequenceEqual<T>(this ReadOnlySpan<T> span, List<T> list)
+        {
+            if (span.Length != list.Count)
+                return false;
+
+            for (int i = 0; i < span.Length; i++) {
+                if (!EqualityComparer<T>.Default.Equals(span[i], list[i]))
+                    return false;
+            }
+            return true;
         }
 
         public static void RemoveRange<T>(this List<T> list, Range range)
@@ -31,9 +51,14 @@ namespace Deenote.Utilities
             list.RemoveRange(offset, length);
         }
 
-        public static void RemoveAt<T>(this List<T> list, Index index)
+        public static void MoveTo<T>(this List<T> list, int fromIndex, int toIndex)
         {
-            list.RemoveAt(index.GetOffset(list.Count));
+            if (fromIndex == toIndex)
+                return;
+
+            var val = list[fromIndex];
+            list.RemoveAt(fromIndex);
+            list.Insert(toIndex, val);
         }
 
         public static T[] Array<T>(int length) => length == 0 ? System.Array.Empty<T>() : new T[length];
@@ -41,12 +66,11 @@ namespace Deenote.Utilities
         public static bool IsSameForAll<T, TValue>(this ListReadOnlyView<T> list,
             Func<T, TValue> valueGetter, out TValue? value, IEqualityComparer<TValue>? comparer = null)
         {
-            switch (list.Count)
-            {
-                case 0:
+            switch (list) {
+                case { Count: 0 } or { IsNull: true }:
                     value = default;
                     return true;
-                case 1:
+                case { Count: 1 }:
                     value = valueGetter(list[0]);
                     return true;
             }
@@ -54,13 +78,10 @@ namespace Deenote.Utilities
             value = valueGetter(list[0]);
             comparer ??= EqualityComparer<TValue>.Default;
 
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (!comparer.Equals(value, valueGetter(list[i])))
-                {
-                    value = default;
-                    return false;
-                }
+            for (int i = 0; i < list.Count; i++) {
+                if (comparer.Equals(value, valueGetter(list[i]))) continue;
+                value = default;
+                return false;
             }
 
             return true;

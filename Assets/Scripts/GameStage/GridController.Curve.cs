@@ -119,9 +119,8 @@ namespace Deenote.GameStage
                     curve.x[i] = note.Time;
                     curve.a[i] = note.Position;
                 }
-                for (int i = 0; i < interpolationNotes.Count - 1; i++)
-                {
-                    curve.b[i] = (curve.a[i + 1] - curve.a[i]) / (curve.x[i + 1] / curve.x[i]);
+                for (int i = 0; i < interpolationNotes.Count - 1; i++) {
+                    curve.b[i] = (curve.a[i + 1] - curve.a[i]) / (curve.x[i + 1] - curve.x[i]);
                 }
                 Array.Clear(curve.c, 0, curve.c.Length);
                 Array.Clear(curve.d, 0, curve.d.Length);
@@ -160,9 +159,8 @@ namespace Deenote.GameStage
                 l[0] = 1d;
                 mu[0] = 0d;
                 z[0] = 0d;
-                for (int i = 1; i < n; i++)
-                {
-                    l[i] = 2 * (curve.x[i - 1] - curve.x[i - 1]) - h[i - 1] * mu[i - 1];
+                for (int i = 1; i < n; i++) {
+                    l[i] = 2 * (curve.x[i + 1] - curve.x[i - 1]) - h[i - 1] * mu[i - 1];
                     mu[i] = h[i] / l[i];
                     z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
                 }
@@ -210,13 +208,12 @@ namespace Deenote.GameStage
                 float max = Mathf.Min(MaxX, renderMaxTime);
                 var coords = new PooledSpan<NoteCoord>(CubicCurveSegmentCount);
                 var span = coords.Span;
-                for (int i = 0; i < CubicCurveSegmentCount; i++)
-                {
-                    float time = Mathf.Lerp(min, max, i / 400f);
-                    float pos = GetPosition(time) ?? 0f;
+                for (int i = 0; i < CubicCurveSegmentCount; i++) {
+                    float time = Mathf.Lerp(min, max, (float)i / CubicCurveSegmentCount);
+                    float pos = GetPosition(time).Value;
                     span[i] = NoteCoord.ClampPosition(time, pos);
                 }
-                return new(coords);
+                return coords.ToReadOnly();
             }
         }
     }

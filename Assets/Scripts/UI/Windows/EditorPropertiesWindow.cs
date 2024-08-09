@@ -13,6 +13,10 @@ namespace Deenote.UI.Windows
     public sealed class EditorPropertiesWindow : MonoBehaviour
     {
         [SerializeField] Window _window;
+
+        public Window Window => _window;
+
+        [Header("Notify")]
         [SerializeField] ProjectManager _projectManager;
         [SerializeField] GameStageController _stage;
         [SerializeField] EditorController _editor;
@@ -83,27 +87,27 @@ namespace Deenote.UI.Windows
 
             _musicSpeedDecButton.onClick.AddListener(() => _stage.MusicSpeed--);
             _musicSpeedIncButton.onClick.AddListener(() => _stage.MusicSpeed++);
-            _musicSpeedInputField.onSubmit.AddListener(OnMusicSpeedChanged);
+            _musicSpeedInputField.onEndEdit.AddListener(OnMusicSpeedChanged);
             _musicSpeedHalfButton.onClick.AddListener(() => _stage.MusicSpeed = 5);
             _musicSpeedResetButton.onClick.AddListener(() => _stage.MusicSpeed = 10);
 
-            _effectVolumeInputField.onSubmit.AddListener(OnEffectVolumeChanged);
+            _effectVolumeInputField.onEndEdit.AddListener(OnEffectVolumeChanged);
             _effectVolumeSlider.onValueChanged.AddListener(OnEffectVolumeChanged);
-            _musicVolumeInputField.onSubmit.AddListener(OnMusicVolumeChanged);
+            _musicVolumeInputField.onEndEdit.AddListener(OnMusicVolumeChanged);
             _musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
-            _pianoVolumeInputField.onSubmit.AddListener(OnPianoVolumeChanged);
+            _pianoVolumeInputField.onEndEdit.AddListener(OnPianoVolumeChanged);
             _pianoVolumeSlider.onValueChanged.AddListener(OnPianoVolumeChanged);
 
             _showLinksToggle.onValueChanged.AddListener(OnShowLinksChanged);
 
-            _suddenPlusInputField.onSubmit.AddListener(OnSuddenPlusChanged);
+            _suddenPlusInputField.onEndEdit.AddListener(OnSuddenPlusChanged);
             _suddenPlusSlider.onValueChanged.AddListener(OnSuddenPlusChanged);
 
             // Placement
             _placementGroupButton.onClick.AddListener(() => _placementGroupGameObject.SetActive(!_placementGroupGameObject.activeSelf));
-            
+
             _showIndicatorToggle.onValueChanged.AddListener(OnShowIndicatorChanged);
-            
+
             _verticalGridInputField.onEndEdit.AddListener(OnVerticalGridCountChanged);
             _verticalGridSnapToggle.onValueChanged.AddListener(OnVerticalGridSnapChanged);
             _horizontalGridInputField.onEndEdit.AddListener(OnHorizontalGridCountChanged);
@@ -112,10 +116,10 @@ namespace Deenote.UI.Windows
             _cubicCurveButton.onClick.AddListener(OnInitializeCubicCurve);
             _linearCurveButton.onClick.AddListener(OnInitializeLinearCurve);
             _disableCurveButton.onClick.AddListener(OnDisableCurve);
-            _fillByAmountInputField.onSubmit.AddListener(OnFillAmountChanged);
+            _fillByAmountInputField.onEndEdit.AddListener(OnFillAmountChanged);
             _fillByAmountButton.onClick.AddListener(OnFillAmountedNotesToCurve);
             // TODO
-            _fillByGridButton.onClick.AddListener(null);
+            //_fillByGridButton.onClick.AddListener(null);
 
             // Bpm
             _bpmGroupButton.onClick.AddListener(() => _bpmGroupGameObject.SetActive(!_bpmGroupGameObject.activeSelf));
@@ -124,12 +128,7 @@ namespace Deenote.UI.Windows
             _bpmInputField.onEndEdit.AddListener(OnBpmChanged);
             _bpmFillButton.onClick.AddListener(OnBpmFill);
 
-            _window.SetOnIsActivatedChanged(isActivated =>
-            {
-                if (isActivated) {
-                    OnWindowActivated();
-                }
-            });
+            _window.SetOnIsActivatedChanged(isActivated => { if (isActivated) OnWindowActivated(); });
         }
 
         #region Player Events
@@ -310,7 +309,7 @@ namespace Deenote.UI.Windows
             NotifyVerticalGridCountChanged(_stage.Grids.VerticalGridCount);
             NotifyVerticalGridSnapChanged(_editor.SnapToPositionGrid);
             NotifyTimeGridSubBeatCountChanged(_stage.Grids.TimeGridSubBeatCount);
-            NotifyVerticalGridSnapChanged(_editor.SnapToTimeGrid);
+            NotifyTimeGridSnapChanged(_editor.SnapToTimeGrid);
             NotifyCurveOn(_stage.Grids.IsCurveOn);
         }
 
@@ -446,11 +445,10 @@ namespace Deenote.UI.Windows
 
             float start = selectedNotes[0].Data.Time;
             _bpmStartTimeInputField.text = start.ToString("F3");
-            if (selectedNotes.Count < 2)
-                return;
-
             float end = selectedNotes[^1].Data.Time;
             _bpmEndTimeInputField.text = end.ToString("F3");
+            if (selectedNotes.Count < 2)
+                return;
 
             float interval = end - start;
             if (interval < MainSystem.Args.MinBeatLineInterval)

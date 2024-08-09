@@ -18,7 +18,7 @@ namespace Deenote.Project.Models.Datas.Serialization
             public void AddReference(object context, string reference, object value) => throw new NotSupportedException();
             public string GetReference(object context, object value) => throw new NotSupportedException();
             public bool IsReferenced(object context, object value) => throw new NotSupportedException();
-            public object ResolveReference(object context, string reference) => default!;
+            public object ResolveReference(object context, string reference) => new DeV3Link.NoteRef { id = int.Parse(reference) };
         }
 
         public static ChartData ParseDeV3Json(string json)

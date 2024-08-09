@@ -21,13 +21,15 @@ namespace Deenote.GameStage
                 (true, false) => GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
                 (false, _) => coord.Position,
             };
-            return new(snappedPos, snappedTime);
+            return NoteCoord.ClampPosition(snappedTime, snappedPos);
         }
 
         private void Start()
         {
+            // TODO: Temp Start
             _verticalGridGenerationKind = VerticalGridGenerationKind.ByKeyCount;
             VerticalGridCount = 9;
+            TimeGridSubBeatCount = 1;
         }
 
         private void Update()

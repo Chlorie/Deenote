@@ -18,7 +18,8 @@ namespace Deenote.UI.Windows
         {
             Window.IsActivated = true;
 
-            _window.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties_Create"));
+            _window.TitleBar.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties_Create"));
+            await InitializeProject(null);
 
             _newProjTcs = new UniTaskCompletionSource<ProjectPropertiesChartController?>();
             var confirmedChart = await _newProjTcs.Task;
@@ -33,10 +34,13 @@ namespace Deenote.UI.Windows
                 MusicName = _musicNameInputField.text,
                 Composer = _composerInputField.text,
                 ChartDesigner = _chartDesignerInputField.text,
-                AudioData = _loadedBytes,
                 AudioClip = _loadedClip,
-                // TODO: SaveByRefPath?
+                SaveAsRefPath = !MainSystem.ProjectManager.IsAudioDataSaveInProject,
             };
+            if (proj.SaveAsRefPath)
+                proj.AudioFileRelativePath = _loadedAudioFilePath;
+            else
+                proj.AudioFileData = _loadedBytes;
 
             int loadChartIndex = -1;
             for (int i = 0; i < _charts.Count; i++)
@@ -59,8 +63,8 @@ namespace Deenote.UI.Windows
         {
             Window.IsActivated = true;
 
-            _window.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties"));
-            InitializeProject(project);
+            _window.TitleBar.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties"));
+            await InitializeProject(project);
 
             _newProjTcs = new UniTaskCompletionSource<ProjectPropertiesChartController?>();
             var confirmedChart = await _newProjTcs.Task;
@@ -70,6 +74,7 @@ namespace Deenote.UI.Windows
             if (confirmedChart is null)
                 return default;
 
+            project.AudioClip = _loadedClip;
             int loadChartIndex = _charts.IndexOf(confirmedChart);
             return new Result(project, loadChartIndex);
         }

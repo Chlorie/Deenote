@@ -17,6 +17,10 @@ namespace Deenote.Utilities
 
         public static Vector3 WithX(this in Vector3 vector, float x) => new(x, vector.y, vector.z);
 
+        public static Vector2 WithX(this in Vector2 vector, float x) => new(x, vector.y);
+
+        public static Vector2 WithY(this in Vector2 vector, float y) => new(vector.x, y);
+
         public static void AddListener(this UnityEvent ev, Func<UniTaskVoid> uniTaskFunc)
             => ev.AddListener(UniTask.UnityAction(uniTaskFunc));
 
@@ -59,6 +63,8 @@ namespace Deenote.Utilities
                 defaultCapacity: defaultCapacity,
                 maxSize: maxSize);
 
+        public static T? CheckNull<T>(this T? self) where T : UnityEngine.Object => self ? self : null;
+
         public static void SetSolidColor(this LineRenderer lineRenderer, Color color)
         {
             var gradient = lineRenderer.colorGradient;
@@ -77,10 +83,64 @@ namespace Deenote.Utilities
             lineRenderer.colorGradient = gradient;
         }
 
+        public static void SetGradientColor(this LineRenderer lineRenderer, float startAlphaUnclamped, float endAlphaUnclamped)
+        {
+            if (startAlphaUnclamped == endAlphaUnclamped) {
+                var g = lineRenderer.colorGradient;
+                g.alphaKeys = new GradientAlphaKey[1] { new(Mathf.Clamp01(startAlphaUnclamped), 0f) };
+                lineRenderer.colorGradient = g;
+                return;
+            }
+
+            GradientAlphaKey[] keys;
+            switch (startAlphaUnclamped, endAlphaUnclamped) {
+                case ( > 1f, >= 1f):
+                    keys = new GradientAlphaKey[1] { new(1f, 0f) };
+                    break;
+                case ( > 1f, >= 0f): {
+                    keys = new GradientAlphaKey[3] {
+                        new (alpha: 1f, 0f),
+                        new (alpha: 1f, Mathf.InverseLerp(startAlphaUnclamped, endAlphaUnclamped, 1f)),
+                        new (alpha: endAlphaUnclamped, 1f),
+                    };
+                    break;
+                }
+                case ( > 1f, _): {
+                    keys = new GradientAlphaKey[4] {
+                        new(alpha: 1f, 0f),
+                        new(alpha: 1f, Mathf.InverseLerp(startAlphaUnclamped, endAlphaUnclamped, 1f)),
+                        new(alpha: 0f, Mathf.InverseLerp(startAlphaUnclamped, endAlphaUnclamped, 0f)),
+                        new(alpha: 0f, 1f),
+                    };
+                    break;
+                }
+                case ( > 0f, >= 0f): {
+                    keys = new GradientAlphaKey[2] {
+                        new(alpha: startAlphaUnclamped, 0f),
+                        new(alpha: endAlphaUnclamped, 1f),
+                    };
+                    break;
+                }
+                case ( > 0f, _): {
+                    keys = new GradientAlphaKey[3] {
+                        new(alpha: startAlphaUnclamped, 0f),
+                        new(alpha: 0f, Mathf.InverseLerp(startAlphaUnclamped, endAlphaUnclamped, 0f)),
+                        new(alpha: 0f, 1f),
+                    };
+                    break;
+                }
+                default:
+                    keys = new GradientAlphaKey[1] { new(0f, 0f) };
+                    break;
+            }
+            var gradient = lineRenderer.colorGradient;
+            gradient.alphaKeys = keys;
+            lineRenderer.colorGradient = gradient;
+        }
+
         public static void SetSiblingIndicesInOrder<T>(this PooledObjectListView<T> list) where T : Component
         {
-            for (int i = 0; i < list.Count; i++)
-            {
+            for (int i = 0; i < list.Count; i++) {
                 list[i].transform.SetSiblingIndex(i);
             }
         }

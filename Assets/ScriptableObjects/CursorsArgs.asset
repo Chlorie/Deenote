@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d34a17b760de9646a647a3a0947af95, type: 3}
+  m_Name: CursorsArgs
+  m_EditorClassIdentifier: 
+  DefaultCursor: {fileID: 2800000, guid: 8dd04160516381b429cf873c4bb2b3f6, type: 3}
+  DefaultCursorHotspot: {x: 0, y: 0}
+  MoveCursor: {fileID: 2800000, guid: d86ebc7a2f13c7b488f9474868e7c029, type: 3}
+  MoveCursorHotspot: {x: 45, y: 45}
+  HorizontalCursor: {fileID: 2800000, guid: cb23a1fcad8b6da4d91a97fcf92b5a97, type: 3}
+  HorizontalCursorHotspot: {x: 45, y: 20}
+  VerticalCursor: {fileID: 2800000, guid: 0d0a73a3439fa3449b488c6b5035a500, type: 3}
+  VerticalCursorHotspot: {x: 20, y: 45}
+  DiagonalCursor: {fileID: 2800000, guid: 724d44c1d7316c9479ba8f995b647fa7, type: 3}
+  DiagonalCursorHotspot: {x: 33, y: 33}
+  AntiDiagonalCursor: {fileID: 2800000, guid: f75fd380c83d04b4f8db37f2a668151e, type: 3}
+  AntiDiagonalCursorHotspot: {x: 33, y: 33}

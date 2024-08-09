@@ -7,22 +7,26 @@ using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Deenote.GameStage
 {
     public sealed partial class GameStageController : SingletonBehavior<GameStageController>
     {
-        [field: SerializeField] public Camera Camera { get; private set; } = null!;
+        [field: SerializeField] public Camera PerspectiveCamera { get; private set; } = null!;
         [SerializeField] AudioSource _musicSource;
 
         [Header("Effect")]
-        [SerializeField] Transform _judgeLineBreathingEffectTransform;
-        [SerializeField] Transform _judgeLineHitEffectTransform;
+        [SerializeField] SpriteRenderer _judgeLineBreathingEffectSpriteRenderer;
+        [SerializeField] SpriteRenderer _judgeLineHitEffectSpriteRenderer;
+        [SerializeField] Image _backgroundBreathingMaskImage;
 
         [Header("Notify")]
         [SerializeField] EditorController _editorController;
         [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
         [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
+        [SerializeField] PropertiesWindow _propertiesWindow;
+        [SerializeField] PerspectiveViewController _perspectiveViewController;
 
         [Header("Prefabs")]
         [SerializeField] Transform _noteParentTransform;
@@ -47,6 +51,8 @@ namespace Deenote.GameStage
         /// </summary>
         [SerializeField] private int _nextDisappearNoteIndex;
 
+        public int HittedNoteCount => Mathf.Max(0, _nextHitNoteIndex - 1);
+
         [Header("Settings")]
         private ChartModel _chart;
 
@@ -58,19 +64,14 @@ namespace Deenote.GameStage
         /// If playing, this value should sync to _musicSource.velocity
         /// </remarks>
         [SerializeField] private float _manualPlaySpeedMultiplier;
-        [SerializeField] private bool __isStageEffectOn;
-        [SerializeField, Range(1, 19)] private int __noteSpeed;
-        [SerializeField, Range(1, 30)] private int __musicSpeed;
-        [SerializeField, Range(0, 100)] private int __effectVolume;
-        [SerializeField, Range(0, 100)] private int __musicVolume;
-        [SerializeField, Range(0, 100)] private int __pianoVolume;
-        [SerializeField, Range(0f, 100f)] private int __suddenPlusRange;
 
         public GridController Grids => GridController.Instance;
 
+        public PerspectiveViewController PerspectiveView => _perspectiveViewController;
+
         public ChartModel Chart => _chart;
 
-        private Plane NotePanelPlane => new(Vector3.up, 0f);
+        public bool IsActive => Chart is not null;
 
         public float StagePlaySpeed
         {
@@ -99,128 +100,7 @@ namespace Deenote.GameStage
 
         public float MusicLength => _musicSource.clip.length;
 
-        public bool IsStageEffectOn
-        {
-            get => __isStageEffectOn;
-            set
-            {
-                if (__isStageEffectOn == value)
-                    return;
-                __isStageEffectOn = value;
-                if (__isStageEffectOn is false)
-                    StopStageEffect();
-            }
-        }
-
-        public float StageNoteAheadTime => 9f / NoteSpeed * (100 - SuddenPlusRange) / 100f;
-
-        /// <summary>
-        /// Range [1, 19], display [0.5, 9.5]
-        /// </summary>
-        public int NoteSpeed
-        {
-            get => __noteSpeed;
-            set
-            {
-                value = Mathf.Clamp(value, 1, 19);
-
-                if (__noteSpeed == value)
-                    return;
-                __noteSpeed = value;
-                UpdateStageNotes();
-                _editorPropertiesWindow.NotifyNoteSpeedChanged(__noteSpeed);
-            }
-        }
-
-        /// <summary>
-        /// Range [1, 30], display [0.1, 3.0]
-        /// </summary>
-        public int MusicSpeed
-        {
-            get => __musicSpeed;
-            set
-            {
-                value = Mathf.Clamp(value, 1, 30);
-
-                if (__musicSpeed == value)
-                    return;
-                __musicSpeed = value;
-                _musicSource.pitch = value / 10f;
-                _editorPropertiesWindow.NotifyMusicSpeedChanged(__musicSpeed);
-            }
-        }
-
-        /// <summary>
-        /// Range [0, 100]
-        /// </summary>
-        public int EffectVolume
-        {
-            get => __effectVolume;
-            set
-            {
-                value = Mathf.Clamp(value, 0, 100);
-
-                if (__effectVolume == value)
-                    return;
-                __effectVolume = value;
-                _musicSource.volume = __effectVolume / 100f;
-                _editorPropertiesWindow.NotifyEffectVolumeChanged(__effectVolume);
-            }
-        }
-
-        /// <summary>
-        /// Range [0, 100]
-        /// </summary>
-        public int MusicVolume
-        {
-            get => __musicVolume;
-            set
-            {
-                value = Mathf.Clamp(value, 0, 100);
-
-                if (__musicVolume == value)
-                    return;
-                __musicVolume = value;
-                _musicSource.volume = __musicVolume / 100f;
-                _editorPropertiesWindow.NotifyMusicVolumeChanged(__musicVolume);
-            }
-        }
-
-        /// <summary>
-        /// Range [0, 100]
-        /// </summary>
-        public int PianoVolume
-        {
-            get => __pianoVolume;
-            set
-            {
-                value = Mathf.Clamp(value, 0, 100);
-
-                if (__pianoVolume == value)
-                    return;
-                __pianoVolume = value;
-                _musicSource.volume = __pianoVolume / 100f;
-                _editorPropertiesWindow.NotifyPianoVolumeChanged(__pianoVolume);
-            }
-        }
-
-        /// <summary>
-        /// Range [0, 100], means percent
-        /// </summary>
-        public int SuddenPlusRange
-        {
-            get => __suddenPlusRange;
-            set
-            {
-                value = Mathf.Clamp(value, 0, 100);
-
-                if (__suddenPlusRange == value)
-                    return;
-                __suddenPlusRange = value;
-                UpdateStageNotes();
-                _editorPropertiesWindow.NotifySuddenPlusRangeChanged(__suddenPlusRange);
-            }
-        }
+        public float StageNoteAheadTime => _args.NotePanelLength / NoteSpeed * _perspectiveViewController.SuddenPlusRangeToVisibleRangePercent(SuddenPlusRange);
 
         #region Music State
 
@@ -243,15 +123,15 @@ namespace Deenote.GameStage
             if (setStageNotes)
             {
                 UpdateStageNotesRelatively(forward: __syncMusicTime > prevTime);
+                ForceUpdateNotesDisplay();
             }
             if (notifyWindows)
             {
                 _perspectiveViewWindow.NotifyMusicTimeChanged(__syncMusicTime);
             }
-            ForceUpdateNotesDisplay();
         }
 
-        public void Play()
+        public void PlayMusic()
         {
             if (IsMusicPlaying)
                 return;
@@ -269,19 +149,25 @@ namespace Deenote.GameStage
             }
         }
 
-        public void Pause()
+        public void PauseMusic()
         {
             if (!IsMusicPlaying)
                 return;
             _musicSource.Pause();
         }
 
-        public void TogglePlayingState()
+        public void PauseStage()
+        {
+            PauseMusic();
+            _manualPlaySpeedMultiplier = 0f;
+        }
+
+        public void ToggleMusicPlayingState()
         {
             if (IsMusicPlaying)
-                Pause();
+                PauseMusic();
             else
-                Play();
+                PlayMusic();
         }
 
         #endregion
@@ -305,6 +191,7 @@ namespace Deenote.GameStage
             UpdateStageNotes();
             ForceUpdateNotesDisplay();
 
+            _propertiesWindow.NotifyChartChanged(project, chartIndex);
             _perspectiveViewWindow.NotifyChartChanged(project, chart);
 
             void CheckCollision()
@@ -315,14 +202,12 @@ namespace Deenote.GameStage
                     for (int j = i + 1; j < _chart.Notes.Count; j++)
                     {
                         var noteCmp = _chart.Notes[j];
-                        if (MainSystem.Args.IsCollided(note.Data, noteCmp.Data))
-                        {
-                            note.IsCollided = true;
-                            noteCmp.IsCollided = true;
-                        }
-                        else
-                        {
+                        if (!MainSystem.Args.IsTimeCollided(note.Data, noteCmp.Data))
                             break;
+
+                        if (MainSystem.Args.IsPositionCollided(note.Data, noteCmp.Data)) {
+                            note.CollisionCount++;
+                            noteCmp.CollisionCount++;
                         }
                     }
                 }
@@ -352,7 +237,7 @@ namespace Deenote.GameStage
         /// <remarks>
         /// This is optimized version of <see cref="UpdateStageNotes"/>,
         /// If we know the time of previous update, we can iterate from
-        /// cached indices to save times
+        /// cached indices
         /// </remarks>
         /// <param name="forward">
         /// <see langword="true"/> if current time is greater than time on previous update
@@ -370,7 +255,7 @@ namespace Deenote.GameStage
                 // Notes in _onStageNotes are sorted by time
                 // so inactive notes always appears at leading of list
                 var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
-                var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
+                var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
                 // Update _nextDisappear
                 // Remove inactive notes
                 int removeCount;
@@ -431,7 +316,7 @@ namespace Deenote.GameStage
             {
                 NoteTimeComparer.AssertInOrder(_stageNotes.Select(n => n.Model), "In backward");
                 var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
-                var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
+                var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
                 // Remove trailing inactive notes
                 int removeStart;
                 for (removeStart = _stageNotes.Count - 1; removeStart >= 0; removeStart--)
@@ -497,7 +382,7 @@ namespace Deenote.GameStage
             using (var stageNotes = _stageNotes.Resetting())
             {
                 var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
-                var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
+                var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
                 int i = 0;
                 for (; i < _chart.Notes.Count; i++)
                 {
@@ -534,49 +419,6 @@ namespace Deenote.GameStage
                 _nextAppearNoteIndex = i;
 
             }
-            #region Legacy
-            //if (_onStageNotes.Count > 0) {
-            //    foreach (var note in _onStageNotes)
-            //        _stageNotePool.Release(note);
-            //    _onStageNotes.Clear();
-            //}
-
-            //var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
-            //var disappearNoteTime = CurrentMusicTime - HitEffectSpritePrefabs.HitEffectTime;
-            //int i = 0;
-            //for (; i < _chart.Notes.Count; i++) {
-            //    var note = _chart.Notes[i];
-            //    if (note.Data.Time > disappearNoteTime) {
-            //        break;
-            //    }
-            //}
-            //_nextDisappearNoteIndex = i;
-
-            //for (; i < _chart.Notes.Count; i++) {
-            //    var note = _chart.Notes[i];
-            //    if (note.Data.Time > CurrentMusicTime) {
-            //        break;
-            //    }
-
-            //    var noteController = _stageNotePool.Get();
-            //    noteController.Initialize(note);
-            //    _onStageNotes.Add(noteController);
-            //}
-            //_nextHitNoteIndex = i;
-
-            //for (; i < _chart.Notes.Count; i++) {
-            //    var note = _chart.Notes[i];
-            //    if (note.Data.Time > appearNoteTime) {
-            //        break;
-            //    }
-
-            //    var noteController = _stageNotePool.Get();
-            //    noteController.Initialize(note);
-            //    _onStageNotes.Add(noteController);
-            //}
-            //_nextAppearNoteIndex = i;
-
-            #endregion
 
             OnStageNoteUpdated();
         }
@@ -587,11 +429,21 @@ namespace Deenote.GameStage
 
         private void UpdateStageEffect()
         {
-            const float JudgeLinePeriod = 3.5f;
-            var ratio = Mathf.Sin(Time.time * (2 * Mathf.PI / JudgeLinePeriod));
-            _judgeLineBreathingEffectTransform.localScale = new(2f, (ratio + 1f) / 4f, 1f);
+            var time = Time.time;
+            // Judgeline
+            {
+                var ratio = Mathf.Sin(time * (2f * Mathf.PI / _args.JudgeLinePeriod));
+                ratio = Mathf.InverseLerp(-1f, 1f, ratio);
+                _judgeLineBreathingEffectSpriteRenderer.color = Color.white.WithAlpha(ratio);
+            }
 
-            _perspectiveViewWindow.NotifyStageEffectUpdate(true);
+            // Background
+            {
+                var ratio = Mathf.Sin(time * (2f * Mathf.PI / _args.BackgroundMaskPeriod));
+                ratio = Mathf.InverseLerp(-1f, 1f, ratio);
+                _backgroundBreathingMaskImage.color = Color.white
+                    .WithAlpha(Mathf.Lerp(_args.BackgroundMaskMinAlpha, _args.BackgroundMaskMaxAlpha, ratio));
+            }
 
             // if (lightEffectState) stageLight.intensity = 2.5f + 2.5f * Mathf.Sin(2 * currentTime);
 
@@ -608,30 +460,30 @@ namespace Deenote.GameStage
 
         private void StopStageEffect()
         {
-            _judgeLineBreathingEffectTransform.localScale = new Vector3(2f, 0f, 1f);
-            _perspectiveViewWindow.NotifyStageEffectUpdate(false);
+            _judgeLineBreathingEffectSpriteRenderer.color = Color.clear;
+            _backgroundBreathingMaskImage.color = Color.white;
         }
 
         private void UpdateJudgeLineHitEffect()
         {
             var noteIndex = _nextHitNoteIndex - 1;
-            if (noteIndex < 0)
-                goto Reset;
+            if (noteIndex < 0) {
+                _judgeLineHitEffectSpriteRenderer.color = Color.clear;
+                return;
+            }
             var hitTime = _chart.Notes[_nextHitNoteIndex - 1].Data.Time;
             var deltaTime = CurrentMusicTime - hitTime;
             Debug.Assert(deltaTime >= 0);
 
-            const float EffectDecTime = 1f;
-            const float EffectMaxScale = 2f;
-            if (deltaTime < EffectDecTime)
-            {
-                var ratio = 1 - deltaTime / EffectDecTime;
-                _judgeLineHitEffectTransform.localScale = new(2f, ratio * EffectMaxScale, 1f);
-                return;
+            float alpha;
+            if (deltaTime < _args.JudgeLineHitEffectAlphaDecTime) {
+                float x = deltaTime / _args.JudgeLineHitEffectAlphaDecTime;
+                alpha = Mathf.Pow(1 - x, 0.5f);
             }
-
-        Reset:
-            _judgeLineHitEffectTransform.localScale = Vector3.zero;
+            else {
+                alpha = 0f;
+            }
+            _judgeLineHitEffectSpriteRenderer.color = Color.white.WithAlpha(alpha);
         }
 
         #endregion
@@ -643,19 +495,6 @@ namespace Deenote.GameStage
             _perspectiveViewWindow.NotifyGameStageProgressChanged(_nextHitNoteIndex);
         }
 
-        public bool TryConvertViewPointToNoteCoord(Vector3 viewPoint, out NoteCoord coord)
-        {
-            Ray ray = Camera.ViewportPointToRay(viewPoint);
-            if (NotePanelPlane.Raycast(ray, out var distance))
-            {
-                var hitp = ray.GetPoint(distance);
-                coord = new(MainSystem.Args.XToPosition(hitp.x), MainSystem.Args.ZToOffsetTime(hitp.z) + CurrentMusicTime);
-                return true;
-            }
-            coord = default;
-            return false;
-        }
-
         protected override void Awake()
         {
             base.Awake();
@@ -665,30 +504,34 @@ namespace Deenote.GameStage
 
         private void Start()
         {
+            IsPianoNotesDistinguished = true;
+
+            // TODO: Fake
             IsStageEffectOn = true;
-            LoadChart(Fake.Project, 0);
         }
 
         private void Update()
         {
             if (IsStageEffectOn) UpdateStageEffect();
 
-            if (IsMusicPlaying || _musicSource.time >= MusicLength)
-            { // Music playing or play to end
-                // Note that there's one frame when _musicSource.time == _musicSource.clip.length while audio playing,
-                // and SetMusicTime wont set _musicSource.Time to clip.length.
-                // So when _musicSource.time == clip.length, it means the music is playing to end,
-                // not manually set to end
-                SetMusicTime(_musicSource.time, syncMusicSource: false, setStageNotes: false);
-            }
-            else if (_manualPlaySpeedMultiplier is not 0f)
-            { // Manually playing
-                var newTime = CurrentMusicTime + Time.deltaTime * _manualPlaySpeedMultiplier;
-                SetMusicTime(newTime, setStageNotes: false);
-            }
+            if (IsActive) {
 
-            if (StagePlaySpeed != 0)
-                UpdateStageNotesRelatively(StagePlaySpeed > 0);
+                if (IsMusicPlaying || _musicSource.time >= MusicLength) { // Music playing or play to end
+
+                    // Note that there's one frame when _musicSource.time == _musicSource.clip.length while audio playing,
+                    // and SetMusicTime wont set _musicSource.Time to clip.length.
+                    // So when _musicSource.time == clip.length, it means the music is playing to end,
+                    // not manually set to end
+                    SetMusicTime(_musicSource.time, syncMusicSource: false, setStageNotes: false);
+                }
+                else if (_manualPlaySpeedMultiplier is not 0f) { // Manually playing
+                    var newTime = CurrentMusicTime + Time.deltaTime * _manualPlaySpeedMultiplier;
+                    SetMusicTime(newTime, setStageNotes: false);
+                }
+
+                if (StagePlaySpeed != 0)
+                    UpdateStageNotesRelatively(StagePlaySpeed > 0);
+            }
         }
     }
 }

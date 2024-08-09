@@ -1,3 +1,4 @@
+using Deenote.Edit.Operations;
 using Deenote.GameStage;
 using Deenote.Project;
 using Deenote.UI.Windows;
@@ -18,6 +19,7 @@ namespace Deenote.Edit
         [SerializeField] private PropertiesWindow _propertiesWindow = null!;
         [SerializeField] private EditorPropertiesWindow _editorPropertiesWindow = null!;
         [SerializeField] private PianoSoundEditWindow _pianoSoundEditWindow = null!;
+        [SerializeField] private PerspectiveViewWindow _perspectiveViewWindow = null!;
 
         [Header("Note Edit")]
         private UndoableOperationHistory _operationHistory = new(100);
@@ -31,6 +33,7 @@ namespace Deenote.Edit
 
         private void Start()
         {
+            // TODO: Temp
             SnapToPositionGrid = SnapToTimeGrid = true;
             IsNoteIndicatorOn = true;
         }
@@ -42,19 +45,30 @@ namespace Deenote.Edit
 
         private void OnNotesChanged(bool notesOrderChanged, bool selectionChanged, bool noteDataChangedExceptTime = false)
         {
-            // NoteTime maybe changed, so we always force update everytime
             GameStageController.Instance.ForceUpdateStageNotes(notesOrderChanged, noteDataChangedExceptTime);
 
-            //if (noteOrderChanged)
-            //    _stage.UpdateStageNotes(false);
-            //else
-            //    _stage.ForceUpdateNotesDisplay();
-
             if (selectionChanged) {
+                // Keep sync with NotifyProjectChanged()
+                // Stage is required to update when selection changed unless project changed
                 _editorPropertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
                 _propertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
                 _pianoSoundEditWindow.NotifySelectedNotesChanged(SelectedNotes);
             }
+        }
+
+        public void NotifyProjectChanged()
+        {
+            _operationHistory.Clear();
+
+            // _clipBoardNotes.Clear();
+            _isPasting = false;
+            RefreshNoteIndicator();
+            
+            _noteSelectionController.ClearSelection();
+            // Keep sync with OnNoteChanged()
+            _editorPropertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
+            _propertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
+            _pianoSoundEditWindow.NotifySelectedNotesChanged(SelectedNotes);
         }
 
         #region Undo

@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
@@ -9,26 +10,30 @@ namespace Deenote
 {
     public static class Fake
     {
-        public static ProjectModel Project;
+        private static ProjectModel? _project;
 
-        static Fake()
+        public static async UniTask<ProjectModel> GetProject()
         {
-            using var fs = File.OpenRead(Path.Combine(Application.streamingAssetsPath, "Magnolia.mp3"));
-            //var bytes = File.ReadAllBytes(Path.Combine(Application.streamingAssetsPath, "Magnolia.mp3"));
-            //var fs = new MemoryStream(bytes);
-            if (!AudioUtils.TryLoad(fs, ".mp3", out var clip)) {
+            if (_project is not null) return _project;
+
+            await using var fs = File.OpenRead(Path.Combine(Application.streamingAssetsPath, "Magnolia.mp3"));
+            var clip = await AudioUtils.LoadAsync(fs, ".mp3");
+            if (clip is null) {
                 Debug.Log("Load audio failed");
             }
 
-            Project = new ProjectModel {
+            _project = new ProjectModel {
                 AudioClip = clip ?? Resources.Load<AudioClip>("Test/12.Magnolia"),
-                MusicName = "tsuki-",
+                MusicName = "tsuki-木兰",
             };
-            Project.Charts.Add(new ChartModel(ChartData.Load(Resources.Load<TextAsset>("Test/12.Magnolia.hard").text)) {
-                Level = "10",
-                Difficulty = Difficulty.Hard,
-            });
-            ProjectModel.InitializeHelper.SetTempoList(Project, new List<Tempo> { new(160f, 1.5f) });
+            _project.Charts.Add(
+                new ChartModel(ChartData.Load(Resources.Load<TextAsset>("Test/12.Magnolia.hard").text)) {
+                    // Name = "<Cht> name",
+                    Level = "10",
+                    Difficulty = Difficulty.Hard,
+                });
+            ProjectModel.InitializeHelper.SetTempoList(_project, new List<Tempo> { new(160f, 1.5f) });
+            return _project;
         }
     }
 }

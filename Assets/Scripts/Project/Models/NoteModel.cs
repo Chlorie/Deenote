@@ -30,7 +30,10 @@ namespace Deenote.Project.Models
             }
         }
 
-        public bool IsCollided;
+        public int CollisionCount;
+
+        public bool IsCollided => CollisionCount > 0;
+
 
         public NoteModel(NoteData data)
         {

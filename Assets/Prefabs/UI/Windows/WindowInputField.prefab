@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -533,8 +533,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _text: {fileID: 8057581707352088130}
-  _textKey: 
   _isLocalized: 1
+  _textKey: 
 --- !u!114 &319173547282954855
 MonoBehaviour:
   m_ObjectHideFlags: 0

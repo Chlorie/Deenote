@@ -1,4 +1,5 @@
 using Deenote.Project.Comparers;
+using Deenote.Project.Models.Datas.Serialization;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -99,12 +100,17 @@ namespace Deenote.Project.Models.Datas
         public static bool TryLoad(string json, out ChartData chart)
         {
             try {
-                chart = Load(json);
-            } catch (Exception) {
-                chart = null;
-                return false;
-            }
-            return true;
+                chart = JsonConvert.DeserializeObject<ChartData>(json);
+                return true;
+            } catch (Exception) { }
+
+            try {
+                chart = ChartAdapter.ParseDeV3Json(json);
+                return true;
+            } catch (Exception) { }
+
+            chart = null;
+            return false;
         }
 
         public string ToJsonString()

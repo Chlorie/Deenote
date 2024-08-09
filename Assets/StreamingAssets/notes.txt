@@ -12,14 +12,16 @@
   - MenuBar
   - StatusBar
   - Windows
-    - PerspectiveView
+    - About [Not in Menu View]
     - EditorProperties
+    - PerspectiveView
     - PianoSoundEdit
+    - Preferences
     - Properties
   - Dialogs
     - FileExplorer
-    - ProjectProperties
     - MessageBox
+    - ProjectProperties
 
 # Code comments
 // Note
@@ -47,3 +49,12 @@
    -30
    |-background
    |  stave
+
+# UI Order
+
+   30 FullScreen
+   20 StatusBar
+ 11|  ToolBar
+   10 Windows
+
+   0  MenuBar

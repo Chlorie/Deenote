@@ -5,6 +5,8 @@ namespace Deenote.Utilities.Robustness
 {
     public readonly struct ListReadOnlyView<T> : IReadOnlyList<T>
     {
+        public static readonly ListReadOnlyView<T> Empty = new(new());
+
         private readonly List<T> _list;
 
         public T this[int index] => _list[index];

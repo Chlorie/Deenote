@@ -44,7 +44,8 @@ namespace Deenote.GameStage
             }
         }
 
-        // TODO: 需要处理MinBeatLineInterval吗？
+        // Note: Distance between tempoLines >= MinBeatLineInterval
+        // Distance between beatLines and subBeatLines >= MinBeatLineIntterval / TimeGridSubBeatCount
         public void UpdateTimeGrids()
         {
             _timeGridData.Clear();
@@ -54,6 +55,7 @@ namespace Deenote.GameStage
 
             float currentTime = MainSystem.GameStage.CurrentMusicTime;
             float appearTime = currentTime + MainSystem.GameStage.StageNoteAheadTime;
+            float minSubBeatLineInterval = MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount;
 
             bool ProcessTempoAt(int tempoIdx)
             {
@@ -88,7 +90,7 @@ namespace Deenote.GameStage
                         var subBeatTime = tempo.GetSubBeatTime(beatIndex + (float)i / TimeGridSubBeatCount);
                         if (subBeatTime <= currentTime) continue;
                         if (subBeatTime >= appearTime) return false;
-                        if (subBeatTime >= nextTime) return true;
+                        if (subBeatTime >= nextTime - minSubBeatLineInterval) return true;
                         float z = MainSystem.Args.OffsetTimeToZ(subBeatTime - currentTime);
                         _timeGridData.Add((z, TimeGridKind.SubBeatLine));
                     }
@@ -101,7 +103,7 @@ namespace Deenote.GameStage
         }
 
         // Note: 与下一个tempo衔接的一拍的子拍线不按照与下一个tempo.StartTime的间距平分，因此
-        // get子拍线使用tempo.GetBeatTime(float);
+        // get子拍线使用tempo.GetBeatTime(float);即可
         // 若要恢复旧版dnt的方式，UpdateTimeGrid，Get/FloorTo/CeilToNearestTimeGridTime都得改
 
         /// <returns><see langword="null"/> if given time is earlier than first tempo or later than last beat line</returns>
@@ -117,26 +119,35 @@ namespace Deenote.GameStage
             }
 
             Tempo tempo = CurrentProjectTempos[tempoIndex];
+            if (tempoIndex == CurrentProjectTempos.Count - 1 && tempo.Bpm == 0f)
+                return null;
+
+            float nextTempoTime = CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1);
             int beatIndex = tempo.GetBeatIndex(time);
             float prevBeatTime = tempo.GetBeatTime(beatIndex);
 
             float prevBeatDelta = time - prevBeatTime;
             int subBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval);
-            float prevSubBeatTime = tempo.GetSubBeatTime(beatIndex + (float)subBeatIndex / TimeGridSubBeatCount);
-            float nextSubBeatTime = tempo.GetSubBeatTime(beatIndex + (float)(subBeatIndex + 1) / TimeGridSubBeatCount);
 
-            nextSubBeatTime = Mathf.Min(nextSubBeatTime, tempo.GetBeatTime(beatIndex + 1));
-            if (tempoIndex + 1 < CurrentProjectTempos.Count)
+            float prevSubBeatTime = GetPrevSubBeatTime();
+            float nextSubBeatTime = GetNextSubBeatTime();
+            float GetPrevSubBeatTime()
             {
-                nextSubBeatTime = Mathf.Min(nextSubBeatTime, CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
+                float prevSubBeatTime = tempo.GetSubBeatTime(beatIndex + (float)subBeatIndex / TimeGridSubBeatCount);
+                if (prevSubBeatTime > nextTempoTime - (MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount)) {
+                    subBeatIndex--;
+                    return tempo.GetSubBeatTime(beatIndex + (float)subBeatIndex / TimeGridSubBeatCount);
+                }
+                return prevSubBeatTime;
             }
-            else
+            float GetNextSubBeatTime()
             {
-                Debug.Assert(MainSystem.GameStage.MusicLength == CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
-                // If Min(nextSubBeat, nextBeat, nextTempo) is nextTempo, and nextTempo is end of Audio
-                // we dont want to move, so return null
-                if (MainSystem.GameStage.MusicLength < nextSubBeatTime)
-                    return null;
+                float nextSubBeatTime = tempo.GetSubBeatTime(beatIndex + (float)(subBeatIndex + 1) / TimeGridSubBeatCount);
+                if (nextSubBeatTime > nextTempoTime - (MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount)) {
+                    // Here next subBeatTime not rendered, so we use nextTempoTime
+                    return nextTempoTime;
+                }
+                return nextSubBeatTime;
             }
 
             float prevDelta = time - prevSubBeatTime;
@@ -145,7 +156,7 @@ namespace Deenote.GameStage
         }
 
         /// <returns><see langword="null"/> if given time is earlier than first tempo</returns>
-        public float? FloorToNearestNextTimeGridTime(float time)
+        public float? FloorToNextNearestTimeGridTime(float time)
         {
             if (TimeGridSubBeatCount == 0)
                 return null;
@@ -155,6 +166,10 @@ namespace Deenote.GameStage
                 return null;
 
             Tempo tempo = CurrentProjectTempos[tempoIndex];
+            if (tempoIndex == CurrentProjectTempos.Count - 1 && tempo.Bpm == 0f)
+                return null;
+
+            float nextTempoTime = CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1);
             int prevBeatIndex = tempo.GetCeilingBeatIndex(time) - 1;
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
@@ -162,11 +177,18 @@ namespace Deenote.GameStage
             int prevSubBeatIndex = Mathf.CeilToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval) - 1;
             float prevSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)prevSubBeatIndex / TimeGridSubBeatCount);
 
+            if (prevSubBeatTime > nextTempoTime - (float)(MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount)) {
+                // the diff of old and new prevSubBeatIndex should be minSubBeatLineInterval,
+                // so here we needn't while, maybe.
+                prevSubBeatIndex--;
+                return tempo.GetSubBeatTime(prevBeatIndex + (float)prevSubBeatIndex / TimeGridSubBeatCount);
+            }
+
             return prevSubBeatTime;
         }
 
         /// <returns><see langword="null"/> if given time is later than last line</returns>
-        public float? CeilToNearestNextTimeGridTime(float time)
+        public float? CeilToNextNearestTimeGridTime(float time)
         {
             if (TimeGridSubBeatCount == 0)
                 return null;
@@ -176,6 +198,10 @@ namespace Deenote.GameStage
                 return CurrentProjectTempos.Count > 0 ? CurrentProjectTempos[0].StartTime : null;
 
             Tempo tempo = CurrentProjectTempos[tempoIndex];
+            if (tempoIndex == CurrentProjectTempos.Count - 1 && tempo.Bpm == 0f)
+                return null;
+
+            float nextTempoTime = CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1);
             int prevBeatIndex = tempo.GetBeatIndex(time);
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
@@ -183,21 +209,26 @@ namespace Deenote.GameStage
             int nextSubBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval) + 1;
             float nextSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)nextSubBeatIndex / TimeGridSubBeatCount);
 
-            nextSubBeatTime = Mathf.Min(nextSubBeatTime, tempo.GetBeatTime(prevBeatIndex + 1));
-            if (tempoIndex + 1 < CurrentProjectTempos.Count)
-            {
-                nextSubBeatTime = Mathf.Min(nextSubBeatTime, CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
-            }
-            else
-            {
-                Debug.Assert(MainSystem.GameStage.MusicLength == CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
-                // If Min(nextSubBeat, nextBeat, nextTempo) is nextTempo, and nextTempo is end of Audio
-                // we dont want to move, so return null
-                if (MainSystem.GameStage.MusicLength < nextSubBeatTime)
-                    return null;
+            if (nextSubBeatTime > nextTempoTime - (MainSystem.Args.MinBeatLineInterval / TimeGridSubBeatCount)) {
+                // `time` is between an unrendered beatTime and nextTempoTime,
+                // so the next nearest grid is next Tempo
+                return nextTempoTime;
             }
 
             return nextSubBeatTime;
+
+            //if (tempoIndex + 1 < CurrentProjectTempos.Count) {
+            //    nextSubBeatTime = Mathf.Min(nextSubBeatTime, CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
+            //}
+            //else {
+            //    Debug.Assert(MainSystem.GameStage.MusicLength == CurrentProjectTempos.GetNonOverflowTempoTime(tempoIndex + 1));
+            //    // If Min(nextSubBeat, nextBeat, nextTempo) is nextTempo, and nextTempo is end of Audio
+            //    // we dont want to move, so return null
+            //    if (MainSystem.GameStage.MusicLength < nextSubBeatTime)
+            //        return null;
+            //}
+
+            //return nextSubBeatTime;
         }
         
         private enum TimeGridKind

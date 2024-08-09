@@ -5,6 +5,7 @@ English
 #
 # Format 'key=value' defines a localized text, change the right part to change the display text
 # Use <br/> escape new line
+# Use {0} define parameters
 # Use 'key="""' start a multi-line text, a multiline text should end with a line that is '"""'
 #
 # An empty line or a line contains only white space is ignored
@@ -13,24 +14,44 @@ English
 # Menu
 
 Menu_File=File
-MenuDropDown_New=New Project
-MenuDropDown_Open=Open Project
-MenuDropDown_Save=Save Project
-MenuDropDown_SaveAs=Save As...
-MenuDropDown_Quit=Quit
+MenuDropDown_File_New=New Project
+MenuDropDown_File_Open=Open Project
+MenuDropDown_File_Save=Save Project
+MenuDropDown_File_SaveAs=Save As...
+MenuDropDown_File_Quit=Quit
 
 Menu_Edit=Edit
-MenuDropDown_Undo=Undo
-MenuDropDown_Redo=Redo
+MenuDropDown_Edit_Undo=Undo
+MenuDropDown_Edit_Redo=Redo
 
 Menu_View=View
-MenuDropDown_ProjectProperties=Project Properties
-MenuDropDown_Perspective=Perspective View
+MenuDropDown_View_Perspective=Perspective View
+MenuDropDown_View_Properties=Properties
+MenuDropDown_View_EditorProperties=Editor Properties
+MenuDropDown_View_PianoSoundEdit=Piano Sound Edit
+MenuDropDown_View_ToolBar=ToolBar
 
 Menu_Settings=Settings
-MenuDropDown_Preferences=Preferences
-MenuDropDown_Tutorial=Tutorial
-MenuDropDown_About=About
+MenuDropDown_Settings_Preferences=Preferences
+MenuDropDown_Settings_About=About
+MenuDropDown_Settings_Tutorials=Tutorials
+MenuDropDown_Settings_UpdateHistory=Update History
+MenuDropDown_Settings_CheckUpdate=Check Update
+
+# ToolBar
+
+ToolBar_Undo=Undo
+ToolBar_Redo=Redo
+ToolBar_Cut=Cut
+ToolBar_Copy=Copy
+ToolBar_Paste=Paste
+ToolBar_Link=Link
+ToolBar_Unlink=Unlink
+ToolBar_Sound=Sound
+ToolBar_Desound=Desound
+ToolBar_Quantize=Quantize
+ToolBar_Mirror=Mirror
+
 
 # Windows
 
@@ -42,13 +63,22 @@ Window_ProjectProperties_AudioFile=Audio Files
 Window_ProjectProperties_AudioFileLoad=Load Audio File...
 Window_ProjectProperties_AudioFileLoad_Loading=Loading...
 Window_ProjectProperties_AudioFileLoad_Failed=Load Failed.
+Window_ProjectProperties_AudioFileLoad_Embeded=Embeded Audio
 Window_ProjectProperties_MusicName=Music Name
+Window_ProjectProperties_MusicName_PlaceHolder=Enter the music name
 Window_ProjectProperties_Composer=Composer
+Window_ProjectProperties_Composer_PlaceHolder=Enter the composer name
 Window_ProjectProperties_ChartDesigner=Chart Designer
+Window_ProjectProperties_ChartDesigner_PlaceHolder=Enter the charter name
 Window_ProjectProperties_Charts=Charts
+Window_ProjectProperties_ChartName_PlaceHolder=Name(Optional)
 Window_ProjectProperties_ChartLoad=Load
 Window_ProjectProperties_ChartImport=Import
+Window_ProjectProperties_ChartImporting=Importing...
+Window_ProjectProperties_ChartImported=Imported
 Window_ProjectProperties_ChartExport=Export
+Window_ProjectProperties_ChartExporting=Exporting...
+Window_ProjectProperties_ChartExported=Exported
 Window_ProjectProperties_ChartRemove=Remove
 Window_ProjectProperties_ChartRemoveConfirm=Confirm?
 
@@ -68,6 +98,7 @@ WindowTitleBar_Perspective=Perspective View
 WindowTitleBar_Properties=Properties
 Window_Properties_ProjectInfo=Project Info
 Window_Properties_ProjectInfo_Audio=Audio
+Window_Properties_ProjectInfo_Audio_Embeded=Embeded Audio
 Window_Properties_ProjectInfo_Name=Music Name
 Window_Properties_ProjectInfo_Composer=Composer
 Window_Properties_ProjectInfo_Charter=Chart Designer
@@ -141,15 +172,23 @@ WindowTitleBar_Preferences=Preferences
 Window_Preferences_StageEffect=Stage Effect
 Window_Preferences_Fps=Show FPS
 Window_Preferences_VSync=VSync
-Window_Preferences_MouseSensitivity=Mouse Wheel Sensitivity
+Window_Preferences_MouseSensitivity=Mouse Scroll Sensitivity
 Window_Preferences_MouseReverse=Reverse
 Window_Preferences_Language=Language
 Window_Preferences_AutoSave=Auto Save
+Window_Preferences_AutoSave_Off=Off
+Window_Preferences_AutoSave_On=On
+Window_Preferences_AutoSave_OnAndSaveJson=On And Save Json
 Window_Preferences_IneffectiveProperties=Show Ineffective Properties
+Window_Preferences_PianoNotes=Distinguish Piano Notes
+Window_Preferences_ProjectAudioData=Save Audio Data In Project
 
 ## About
 
 WindowTitleBar_About=About
+Window_About_Developers=About Developers
+Window_About_Versions=Update History
+Window_About_Tutorials=Tutorials
 
 ## Warning Message
 
@@ -164,7 +203,8 @@ Message_Quit_Title=Are you sure that you want to quit?
 Message_Quit_Content=<color=#ff5555>Make sure that you have SAVED your project!</color>
 Message_Quit_Y=Quit
 Message_Quit_N=Cancel
-### Open new project when a project is open
+
+### Create new project when a project is open
 Message_NewProjectOnOpen_Title=Create new project
 Message_NewProjectOnOpen_Content="""
 Creating a new project will close the current project.
@@ -172,11 +212,34 @@ Creating a new project will close the current project.
 """
 Message_NewProjectOnOpen_Y=Create
 Message_NewProjectOnOpen_N=Cancel
+
+### Open new project when a project is open
+Message_OpenProjectOnOpen_Title=Open new project
+Message_OpenProjectOnOpen_Content="""
+Current project will be closed when you start a new project.
+<color=#ff5555>Make sure that you have SAVED your project!</color>
+"""
+Message_OpenProjectOnOpen_Y=Open
+Message_OpenProjectOnOpen_N=Cancel
+
+### Fail to open project file
+Message_OpenProjectFailed_Title=Open project file
+Message_OpenProjectFailed_Content=Failed to load project file, Please select another file.
+Message_OpenProjectFailed_Y=OK
+Message_OpenProjectFailed_N_Cancel
+
 ### Load another audio for current project
 Message_AudioLoadFailed_Title=Fail to load audio.
 Message_AudioLoadFailed_Content=Please select another audio file.
 Message_AudioLoadFailed_Y=Confirm
 Message_AudioLoadFailed_N=Cancel
+
+### New version
+Message_NewVersion_Title=New version detected.
+Message_NewVersion_Content=Current version: {0}<br/>Latest version: {1}
+Message_NewVersion_1=Go to release page
+Message_NewVersion_2=Go to download page
+Message_NewVersion_N=Update later
 
 ## Status
 
@@ -185,52 +248,82 @@ Status_OpenProject_Loading=Loading project...
 Status_OpenProject_Completed=Loading completed.
 Status_SaveProject_Saving=Saving...
 Status_SaveProject_Completed=Save completed.
+Status_ImportChart_Failed=Failed to import chart: {0}
+Status_Fps=FPS: {0}
+
+## Toast
+
+Toast_UnhandledException="""
+Unhandled exception detected.
+Full information has been output to exceptions.log.
+"""
+Toast_Version_NoInternet=No Internet connection.
+Toast_UpToDate=The program is up to date.
+
+# Misc
+
+Misc_UnhandledExceptionMessage=Unhandled exception: {0}, in {1}
 
 # About & Other
 
-## About
+## About Developer
 
-About_Content="""
+About_Developer_HCl=HCl
+About_Developer_HCl_Content="""
+Deenote By HCl
+
 *Bad English Alert*
---31 Jan 2020--
-    This is NachtgeistW, or you can call me Nightwheel. For some reasons, I forked this project and tried to learn C# while fixing deenote.
-    I'm a junior in a Chinese University. Origin developer HCl has graduated with excellent grades, now he is a graduate student.
-    Version 0.7.3 gets the help from Blurring Shadow. Thank you.
-    I don't know what I will bring for this project, so... don't expect.
-    Last of all. Thank you for using Deenote.
 
---2 Dec 2017--
 -Things that must be mentioned-
     Thank you for using my app!
-    Something I must mention in the beginning: This application can only be used to make fan made charts of Deemo, and it is strictly prohibited to use this app for any commercial purposes. This app is only for making fan made charts for fun, if you somehow know methods to import fan made charts into the game, DO NOT distribute the cracked/modified game to others (or even make it public). You¡¯ll probably have a bad time if you do so.
+    Something I must mention in the beginning: This application can only be used to make fan made charts of Deemo, and it is strictly prohibited to use this app for any commercial purposes. This app is only for making fan made charts for fun, if you somehow know methods to import fan made charts into the game, DO NOT distribute the cracked/modified game to others (or even make it public). You  ll probably have a bad time if you do so.
 
 -Random things-
     [Self-introduction?]
     I'm a rhythm game player known as HCl on the Internet. I'm 17 years old and currently studying Computational Mathematics in USTC (University of Science and Technology of China) for the third year.
     [About this app?]
     I'm making this app just for fun. Still a C#/Unity3D newbie so there may be tons of bugs in my code, but who cares? (No, everyone cares.) Since I'm still a student, and as you all know everyone is pretty busy in the third year in university, so I don't have much time to develop this thing. Don't push me please.
-    About the drag-and-drop file opener added in 0.5.6, I¡¯m using a dll coded and compiled by my friend Schwarzer (The one working on Lanotalium, an easy-to-use Lanota chart editor. That guy does awesome works, you really should check him out.) You know who to blame and what to do if that specific thing goes wrong. XD
+    About the drag-and-drop file opener added in 0.5.6, I  m using a dll coded and compiled by my friend Schwarzer (The one working on Lanotalium, an easy-to-use Lanota chart editor. That guy does awesome works, you really should check him out.) You know who to blame and what to do if that specific thing goes wrong. XD
     [Anything else?]
     Just enjoy yourself making some fun charts with this app. Hope you love it.
 
 -Known bugs-
-     Many bugs about UI and shortcut keys (for example if you try to open another project while you're still in the piano sound editing screen, the piano would probably stay there and it may cause some problems). It's not that I don't know how to fix but it's really a tedious job and it will take much time... Please give me enough time...
-     Some buttons may not work cause the functions are not yet implemented. Please wait...
+    Many bugs about UI and shortcut keys (for example if you try to open another project while you're still in the piano sound editing screen, the piano would probably stay there and it may cause some problems). It's not that I don't know how to fix but it's really a tedious job and it will take much time... Please give me enough time...
+    Some buttons may not work cause the functions are not yet implemented. Please wait...
 
 -If you've found more bugs or want to suggest some new features-
-     Feel free to start an issue on Deenote's github repository, the link is: https://github.com/Chlorie/Deenote/issues . You'd better not to contact me by QQ or E-mail or something...
+    Feel free to start an issue on Deenote's github repository, the link is: https://github.com/Chlorie/Deenote/issues . You'd better not to contact me by QQ or E-mail or something...
      
 -Special thanks-
-     Thanks to the developers of Cytunity and Deemo Note Memory for inspiration.
-     Thanks to Schwarzer for the drag-and-drop library he made!
-    Millions of thanks to rkevin and ¤æ¤æ for technical support! 
+    Thanks to the developers of Cytunity and Deemo Note Memory for inspiration.
+    Thanks to Schwarzer for the drag-and-drop library he made!
+    Millions of thanks to rkevin and     for technical support! 
+
+- HCl
+- 2 Dec 2017
 """
 
-## Tutorial
+About_Developer_NachtgeistW=NachtgeistW
+About_Developer_NachtgeistW_Content="""
+*Bad English Alert*
 
-Tutorial_Content="""
-All the shortcuts:
+    This is NachtgeistW, or you can call me Nightwheel. For some reasons, I forked this project and tried to learn C# while fixing deenote.
+    I'm a junior in a Chinese University. Origin developer HCl has graduated with excellent grades, now he is a graduate student.
+    Version 0.7.3 gets the help from Blurring Shadow. Thank you.
+    I don't know what I will bring for this project, so... don't expect.
+    Last of all. Thank you for using Deenote.
 
+- NachtgeistW
+- 31 Jan 2020
+"""
+
+## Tutorials
+
+Tutorials_Main=Tutorials
+Tutorials_Main_Content=<color=#800000ff>Full English tutorial coming soon</color>
+
+Tutorials_Shortcuts=Shortcuts
+Tutorials_Shortcuts_Content="""
 -Project-
 
 [Ctrl+N] Create a new project file
@@ -246,6 +339,7 @@ All the shortcuts:
 [Space] Instant play (Play while holding space, stop and go back to where you started playing when you release space)
 [Home] Jump to the start of the song
 [End] Jump to the end of the song
+[Esc] Exit full screen mode
 [Ctrl+Up/Down] Adjust note falling speed
 [Alt+Up/Down] Adjust music playing speed
 [Up/Down or Mouse wheel scroll] Scroll the chart backward/forward
@@ -260,6 +354,8 @@ All the shortcuts:
 [Ctrl+A] Select all notes
 [L] Link selected notes (Change to slide notes)
 [U] Unlink selected notes (Change back to click notes)
+[P] Add empty sound to no-sound selected notes (Change to piano notes)
+[Ctrl+P] Remove sounds (Change to no sound notes)
 [Q] Quantize selected notes to the grids
 [A/D] Adjust selected notes' position values left/right by 0.01
 [W/S] Adjust selected notes' time values up/down by 1ms
@@ -274,11 +370,12 @@ All the shortcuts:
 [Shift+I] Form a curve passing selected notes (linear interpolation)
 [Ctrl+I] Delete the curve
 [F] Fill notes on the curve
-
-<color=#800000ff>Full English tutorial coming soon</color>
 """
 
 ## UpdateHistory
+
+Ver_Dnt_1_0=Deenote 1.0
+Upd_Dnt_1_0=Now developing...
 
 Ver_Dnt_0_7_3=Deenote 0.7.3
 Upd_Dnt_0_7_3=Added function of saving selected resolution.<br/>Replace the font of song title, now numbers and some punctuations look official.
@@ -371,7 +468,7 @@ Ver_Dnt_0_5_7=Deenote 0.5.7
 Upd_Dnt_0_5_7="""
 Bug fix: File cannot be opened.
 Bug fix: Link lines cannot be toggled off.
-Deleted Schwarzer¡¯s famous words because I don¡¯t want to die. XD
+Deleted Schwarzer  s famous words because I don  t want to die. XD
 """
 
 Ver_Dnt_0_5_6=Deenote 0.5.6

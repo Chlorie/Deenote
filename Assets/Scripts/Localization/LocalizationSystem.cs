@@ -10,61 +10,70 @@ namespace Deenote.Localization
     [SuppressMessage("ReSharper", "LocalVariableHidesMember")]
     public sealed class LocalizationSystem : MonoBehaviour
     {
-        private const string DefaultLanguage = "English";
+        private string _defaultLanguage = "English";
         private Dictionary<string, string>? _defaultLocalizedTexts;
 
         private string? _currentLanguage;
         private Dictionary<string, string>? _localizedTexts;
 
-        private List<LocalizedText> _aliveTexts = new();
+        private List<string> _languages;
+        private List<Dictionary<string, string>> _allTextDictionaries;
 
-        private Dictionary<string, Dictionary<string, string>> _languages = new();
+        public event Action OnLanguageChanged;
 
-        public IReadOnlyCollection<string> Languages => _languages.Keys;
+        // We public List<string> because Unity's Dropdown requires a List
+        public List<string> Languages => _languages;
 
-        public string CurrentLanguage => _currentLanguage ??= DefaultLanguage;
-
-        public void SetLanguage(string language)
+        public string CurrentLanguage
         {
-            if (_currentLanguage == language)
-                return;
+            get => _currentLanguage ??= _defaultLanguage;
+            set {
+                if (_currentLanguage == value)
+                    return;
+                _currentLanguage = value;
 
-            _localizedTexts = _languages[language];
-            _currentLanguage = language;
+                if (!TryGetTextDictionary(_currentLanguage, out _localizedTexts)) {
+                    _currentLanguage = null;
+                }
 
-            foreach (var locText in _aliveTexts)
-            {
-                locText.NotifyLanguageUpdated();
+                OnLanguageChanged?.Invoke();
+                MainSystem.PreferenceWindow.NotifyLanguageChanged(value);
             }
         }
 
-        public string GetLocalizedText(string key)
+        public string GetText(LocalizableText text)
         {
-            if (_localizedTexts?.TryGetValue(key, out var val) == true)
+            if (!text.IsLocalized)
+                return text.TextOrKey;
+
+            if (_localizedTexts?.TryGetValue(text.TextOrKey, out var val) == true)
                 return val;
-            else if (_defaultLocalizedTexts?.TryGetValue(key, out val) ?? false)
+            else if (_defaultLocalizedTexts.TryGetValue(text.TextOrKey, out val))
                 return val;
             else
-                return key;
+                return text.TextOrKey;
         }
-
-        public void RegisterLocalizedText(LocalizedText text) => _aliveTexts.Add(text);
-
-        public void UnregisterLocalizedText(LocalizedText text) => _aliveTexts.Remove(text);
 
         private void Awake()
         {
+            _defaultLanguage = "English";
+
             // Load all languages at start
             var folder = Path.Combine(Application.streamingAssetsPath, "Languages");
             var files = Directory.GetFiles(folder);
-            foreach (var file in files)
-            {
-                if (!file.EndsWith(".txt")) continue;
-                var (name, texts) = LoadLanguagePack(file);
-                _languages.Add(name, texts);
+            _languages = new();
+            _allTextDictionaries = new();
+            foreach (var file in files) {
+                if (file.EndsWith(".txt")) {
+                    var (name, texts) = LoadLanguagePack(file);
+                    _languages.Add(name);
+                    _allTextDictionaries.Add(texts);
+                }
             }
 
-            _defaultLocalizedTexts = _languages[DefaultLanguage];
+            if (!TryGetTextDictionary(_defaultLanguage, out _defaultLocalizedTexts)) {
+                _defaultLocalizedTexts = new();
+            }
         }
 
         private (string Name, Dictionary<string, string> Texts) LoadLanguagePack(string filePath)
@@ -111,6 +120,17 @@ namespace Deenote.Localization
             }
 
             return (name, dict);
+        }
+
+        private bool TryGetTextDictionary(string languageName, out Dictionary<string, string> texts)
+        {
+            var index = _languages.IndexOf(languageName);
+            if (index < 0) {
+                texts = null;
+                return false;
+            }
+            texts = _allTextDictionaries[index];
+            return true;
         }
     }
 }
