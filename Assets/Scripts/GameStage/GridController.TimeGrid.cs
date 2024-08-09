@@ -30,8 +30,11 @@ namespace Deenote.GameStage
 
         // Note: Distance between tempoLines >= MinBeatLineInterval
         // Distance between beatLines and subBeatLines >= MinBeatLineIntterval / TimeGridSubBeatCount
-        public void UpdateTimeGrids()
+        private void UpdateTimeGrids()
         {
+            if (!_stage.IsActive)
+                return;
+
             if (TimeGridSubBeatCount == 0) {
                 _timeGrids.Clear();
                 return;
@@ -251,7 +254,7 @@ namespace Deenote.GameStage
             line.SetPosition(0, _stage.NormalizeGridPosition(new Vector3(-x, 0, z)));
             line.SetPosition(1, _stage.NormalizeGridPosition(new Vector3(x, 0, z)));
 
-            float alpha = Mathf.Clamp01((_stage.StageNoteAheadTime - timeOffsetToStage) / MainSystem.Args.ZToOffsetTime(_stage.Args.NoteFadeInZRange));
+            float alpha = Mathf.Clamp01((_stage.StageNoteAheadTime - timeOffsetToStage) / (_stage.StageNoteAheadTime * _stage.Args.NoteFadeInRangePercent));
             line.SetGradientColor(alpha, alpha);
         }
 

@@ -41,7 +41,7 @@ namespace Deenote.UI.Windows
 
         private void OnTimeSliderValueChanged(float value) => _gameStageController.CurrentMusicTime = value;
 
-        private void OnPauseClicked() => _gameStageController.TogglePlayingState();
+        private void OnPauseClicked() => _gameStageController.ToggleMusicPlayingState();
 
         #endregion
 
@@ -123,7 +123,6 @@ namespace Deenote.UI.Windows
                 return;
             }
 
-            _chart = chart;
             NotifyChartLevelChanged(chart.Level);
             NotifyChartDifficultyChanged(chart.Difficulty);
         }
@@ -143,7 +142,7 @@ namespace Deenote.UI.Windows
                 return;
             }
 
-            int noteCount = _chart.Notes.Count;
+            int noteCount = _gameStageController.Chart.Notes.Count;
             float accScore = (float)judgedNoteCount / noteCount;
             // comboActual = Sum(1..judgeNoteCount);
             // comboTotal = Sum(1..noteCount)
@@ -164,7 +163,7 @@ namespace Deenote.UI.Windows
 
             var prevHitNoteIndex = combo - 1;
             _comboParentGameObject.SetActive(true);
-            var deltaTime = _gameStageController.CurrentMusicTime - _chart.Notes[prevHitNoteIndex].Data.Time;
+            var deltaTime = _gameStageController.CurrentMusicTime - _gameStageController.Chart.Notes[prevHitNoteIndex].Data.Time;
             Debug.Assert(deltaTime >= 0, $"actual delta time:{deltaTime}");
             _comboNumberText.text = _comboShadowText.text = combo.ToString();
 

@@ -124,7 +124,7 @@ namespace Deenote.GameStage.Elements
             SetLinkLine(_note.Data.NextLink is not null);
         }
 
-        private void UpdateDisplay(bool musicPlaying)
+        private void UpdateDisplay(bool playSoundOnHit)
         {
             float currentTime = Stage.CurrentMusicTime;
             float timeDelta = _note.Data.Time - currentTime;
@@ -136,7 +136,7 @@ namespace Deenote.GameStage.Elements
             // Hit effect or released
             else {
                 if (State != NoteState.HitEffect) {
-                    if (musicPlaying) {
+                    if (playSoundOnHit) {
                         PlayNoteSounds();
                     }
                     State = NoteState.HitEffect;
@@ -148,7 +148,7 @@ namespace Deenote.GameStage.Elements
             {
                 // Color
                 float noteAppearTime = Stage.StageNoteAheadTime;
-                float noteFadeInTime = MainSystem.Args.ZToOffsetTime(MainSystem.GameStage.Args.NoteFadeInZRange);
+                float noteFadeInTime = MainSystem.GameStage.StageNoteAheadTime * MainSystem.GameStage.Args.NoteFadeInRangePercent;
                 float alpha = Mathf.Clamp01((noteAppearTime - timeDelta) / noteFadeInTime);
                 {
                     _noteSpriteRenderer.color =
@@ -258,7 +258,7 @@ namespace Deenote.GameStage.Elements
                     _effectSoundSource.PlayOneShot(Stage.Args.EffectSoundAudioClip, Stage.EffectVolume / 100f);
             }
 
-            if (Stage.MusicVolume > 0f && Model.Data.HasSound) {
+            if (Stage.PianoVolume > 0f && Model.Data.HasSound) {
                 MainSystem.PianoSoundManager.PlaySoundsAsync(Model.Data.Sounds, Stage.PianoVolume / 100f, Stage.MusicSpeed / 10f).Forget();
             }
         }

@@ -30,14 +30,11 @@ namespace Deenote.UI.Windows
 
             AwakeStageUI();
 
-            _window.SetOnIsActivatedChanged(activated =>
-            {
-                if (activated)
-                    OnWindowActivated();
-            });
+            _window.SetOnFirstActivating(OnFirstActivating);
+            _window.SetOnIsActivatedChanged(activated => { if (activated) OnWindowActivated(); });
         }
 
-        private void Start()
+        private void OnFirstActivating()
         {
             _aspectDropdown.ResetOptions(PerspectiveViewController.EnumExt.ViewAspectDropdownOptions);
             _aspectDropdown.Dropdown.SetValueWithoutNotify(PerspectiveViewController.EnumExt.ToDropdownIndex(_gameStageController.PerspectiveView.AspectRatio));
@@ -53,22 +50,20 @@ namespace Deenote.UI.Windows
 
         #endregion
 
-        #region Notify
-
-        public void NotifyAspectRatioChanged(PerspectiveViewController.ViewAspectRatio aspect)
-        {
-            var size = _window.Size;
-            size.x = ((RectTransform)_window.Content.transform).rect.size.x;
-            _window.Size = size;
-        }
-
-        #endregion
-
         private void OnWindowActivated()
         {
             NotifyChartChanged(
                 MainSystem.ProjectManager.CurrentProject,
                 MainSystem.GameStage.Chart);
         }
+
+        #region Notify
+
+        public void NotifyAspectRatioChanged(PerspectiveViewController.ViewAspectRatio aspectRatio)
+        {
+            _window.FixedAspectRatio = PerspectiveViewController.EnumExt.GetRatio(aspectRatio);
+        }
+
+        #endregion
     }
 }

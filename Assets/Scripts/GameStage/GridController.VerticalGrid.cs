@@ -322,7 +322,7 @@ namespace Deenote.GameStage
             line.SetPosition(0, _stage.NormalizeGridPosition(new Vector3(x, 0, 0f)));
             line.SetPosition(1, _stage.NormalizeGridPosition(new Vector3(x, 0, z)));
 
-            float startAlphaUnclamped = _stage.StageNoteAheadTime / MainSystem.Args.ZToOffsetTime(_stage.Args.NoteFadeInZRange);
+            float startAlphaUnclamped = _stage.StageNoteAheadTime / (_stage.StageNoteAheadTime * _stage.Args.NoteFadeInRangePercent);
             line.SetGradientColor(startAlphaUnclamped, 0f);
         }
 

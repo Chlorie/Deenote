@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class RightScrollViewController : MonoBehaviour
 {
@@ -16,7 +16,7 @@ public class RightScrollViewController : MonoBehaviour
     {
         FindObjectOfType<ProjectController>().SavePlayerPrefs();
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-        Process.GetCurrentProcess().Kill();
+        System.Diagnostics.Process.GetCurrentProcess().Kill();
 #endif
     }
     public void OnButtonClick(GameObject subPanel) => subPanel.SetActive(!(subPanel.activeSelf));

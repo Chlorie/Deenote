@@ -127,6 +127,7 @@ namespace Deenote.GameStage
                     return;
                 __suddenPlusRange = value;
                 UpdateStageNotes();
+                ForceUpdateNotesDisplay();
                 _gridController.UpdateVerticalGrids();
                 _editorPropertiesWindow.NotifySuddenPlusRangeChanged(__suddenPlusRange);
             }

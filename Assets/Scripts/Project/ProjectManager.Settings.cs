@@ -44,6 +44,7 @@ namespace Deenote.Project
         {
             switch (AutoSave) {
                 case AutoSaveOption.Off:
+                    _lastAutoSaveTime = 0f;
                     return;
                 case AutoSaveOption.On:
                     if (CurrentProject == null)

@@ -1,8 +1,12 @@
 using Cysharp.Threading.Tasks;
+using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
+using Deenote.UI.Windows.Components;
 using Deenote.Utilities;
+using Deenote.Utilities.Robustness;
 using System.IO;
+using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,21 +18,20 @@ namespace Deenote.UI.Windows.Elements
 
         [Header("UI")]
         [SerializeField] TMP_InputField _nameInputField;
+        [SerializeField] WindowDropdown _difficultyDropDown;
         [SerializeField] TMP_InputField _levelInputField;
-        [SerializeField] TMP_Dropdown _difficultyDropDown;
+        [SerializeField] TMP_Text _notesCountText;
         [SerializeField] Button _loadButton;
         [SerializeField] Button _importButton;
+        [SerializeField] LocalizedText _importText;
         [SerializeField] Button _exportButton;
+        [SerializeField] LocalizedText _exportText;
         [SerializeField] Button _removeButton;
-        [SerializeField] TMP_Text _removeText;
+        [SerializeField] LocalizedText _removeText;
 
         private ProjectPropertiesWindow _window;
-
-        private bool _isMainChart;
-
         private ChartModel __chartModel;
-
-        public string FilePath;
+        private bool _isRemoveConfirming;
 
         public Button LoadButton => _loadButton;
 
@@ -37,39 +40,48 @@ namespace Deenote.UI.Windows.Elements
         public void OnCreated(ProjectPropertiesWindow window)
         {
             _window = window;
+            _difficultyDropDown.ResetOptions(DifficultyExt.DropdownOptions);
         }
 
-        public void Initialize(ChartModel chart, bool isMainChart)
+        public void Initialize(MayBeNull<ChartModel> chart)
         {
-            __chartModel = chart ?? new(new()) {
+            __chartModel = chart.Value ?? new(new()) {
                 Name = "",
                 Difficulty = Difficulty.Hard,
-                Level = "",
+                Level = "1",
             };
 
             _nameInputField.text = __chartModel.Name;
+            _difficultyDropDown.Dropdown.SetValueWithoutNotify(__chartModel.Difficulty.ToInt32());
             _levelInputField.text = __chartModel.Level;
-            _difficultyDropDown.value = __chartModel.Difficulty.ToInt32();
-            _removeText.text = isMainChart ? "+" : "-";
+            _notesCountText.text = $"{__chartModel.Notes.Count} Note{(__chartModel.Notes.Count == 1 ? null : "s")}";
 
-            _isMainChart = isMainChart;
+            _importButton.interactable = true;
+            _importText.SetLocalizedText("Window_ProjectProperties_ChartImport");
+            _exportButton.interactable = true;
+            _exportText.SetLocalizedText("Window_ProjectProperties_ChartExport");
+            _removeText.SetLocalizedText("Window_ProjectProperties_ChartRemove");
+            _isRemoveConfirming = false;
         }
 
         private void Awake()
         {
             _nameInputField.onEndEdit.AddListener(val => Chart.Name = val);
             _levelInputField.onEndEdit.AddListener(val => Chart.Level = val);
-            _difficultyDropDown.onValueChanged.AddListener(val => Chart.Difficulty = DifficultyExt.FromInt32(val));
+            _difficultyDropDown.Dropdown.onValueChanged.AddListener(val => Chart.Difficulty = DifficultyExt.FromInt32(val));
 
             _loadButton.onClick.AddListener(() => _window.SelectChartToLoad(this));
             _importButton.onClick.AddListener(ImportChartAsync);
             _exportButton.onClick.AddListener(ExportChartAsync);
             _removeButton.onClick.AddListener(() =>
             {
-                if (_isMainChart)
-                    _window.AddNewChart();
-                else
+                if (_isRemoveConfirming) {
                     _window.RemoveChart(this);
+                }
+                else {
+                    _isRemoveConfirming = true;
+                    _removeText.SetLocalizedText("Window_ProjectProperties_ChartRemoveConfirm");
+                }
             });
         }
 
@@ -81,14 +93,21 @@ namespace Deenote.UI.Windows.Elements
             if (res.IsCancelled)
                 return;
 
-            // TODO: Loading message
+            _importText.SetLocalizedText("Window_ProjectProperties_ChartImporting");
+            _importButton.interactable = false;
 
             if (!ChartData.TryLoad(await File.ReadAllTextAsync(res.Path), out var chartData)) {
-                // TODO: Load chart failed
+                _importText.SetLocalizedText("Window_ProjectProperties_ChartImport");
+                var arg = Path.GetFileName(res.Path);
+                MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_ImportChart_Failed"), MemoryMarshal.CreateReadOnlySpan(ref arg, 1));
+                _importButton.interactable = true;
                 return;
             }
 
             Chart.Data = chartData;
+            _notesCountText.text = $"{__chartModel.Notes.Count} Note{(__chartModel.Notes.Count == 1 ? null : "s")}";
+            _importText.SetLocalizedText("Window_ProjectProperties_ChartImported");
+            _importButton.interactable = true;
         }
 
         private async UniTaskVoid ExportChartAsync()
@@ -97,9 +116,13 @@ namespace Deenote.UI.Windows.Elements
             if (res.IsCancelled)
                 return;
 
-            // TODO: Exporting message
+            _exportText.SetLocalizedText("Window_ProjectProperties_ChartExporting");
+            _exportButton.interactable = false;
+
             await File.WriteAllTextAsync(res.Path, Chart.Data.ToJsonString());
-            // TODO: Exported message
+
+            _exportText.SetLocalizedText("Window_ProjectProperties_ChartExported");
+            _exportButton.interactable = true;
         }
 
         #endregion

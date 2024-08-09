@@ -97,7 +97,7 @@ namespace Deenote.GameStage
 
             int index = nearestPitchIndex * 4 + nearestVolumeIndex;
             speedMultiplier = Mathf.Pow(2f, (pitch - _pitches[nearestPitchIndex]) / 12f);
-            playVolume = volume / _volumes[nearestVolumeIndex];
+            playVolume = (float)volume / _volumes[nearestVolumeIndex];
             return _soundClips[index];
         }
 

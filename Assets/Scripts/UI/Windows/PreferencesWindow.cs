@@ -31,7 +31,7 @@ namespace Deenote.UI.Windows
         {
             _stageEffectToggle.onValueChanged.AddListener(val => MainSystem.GameStage.IsStageEffectOn = val);
             _showFpsToggle.onValueChanged.AddListener(val => MainSystem.StatusBar.IsFpsShown = val);
-            _vSyncToggle.onValueChanged.AddListener(val => MainSystem.GlobalSettings.IsVSyncOn = val);
+            _vSyncToggle.onValueChanged.AddListener(val => MainSystem.IsVSyncOn = val);
             _mouseSensitivityInputField.onEndEdit.AddListener(OnMouseWheelSensitivityChanged);
             _mouseSensitivityReverseButton.onClick.AddListener(() => MainSystem.Input.MouseScrollSensitivity = -MainSystem.Input.MouseScrollSensitivity);
             _languageDropdown.Dropdown.onValueChanged.AddListener(index => MainSystem.Localization.CurrentLanguage = _languageDropdown.Options[index].TextOrKey);
@@ -40,10 +40,11 @@ namespace Deenote.UI.Windows
             _distinguishPianoNoteToggle.onValueChanged.AddListener(val => MainSystem.GameStage.IsPianoNotesDistinguished = val);
             _saveAudioDataInProjectToggle.onValueChanged.AddListener(val => MainSystem.ProjectManager.IsAudioDataSaveInProject = val);
 
+            _window.SetOnFirstActivating(OnFirstActivating);
             _window.SetOnIsActivatedChanged(activated => { if (activated) OnWindowActivated(); });
         }
 
-        private void Start()
+        private void OnFirstActivating()
         {
             _languageDropdown.ResetOptions(MainSystem.Localization.Languages);
             _languageDropdown.Dropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(opt => opt == MainSystem.Localization.CurrentLanguage));
@@ -69,7 +70,7 @@ namespace Deenote.UI.Windows
         {
             NotifyIsStageEffectOnChanged(MainSystem.GameStage.IsStageEffectOn);
             NotifyIsFpsShownChanged(MainSystem.StatusBar.IsFpsShown);
-            NotifyIsVSyncOnChanged(MainSystem.GlobalSettings.IsVSyncOn);
+            NotifyIsVSyncOnChanged(MainSystem.IsVSyncOn);
             NotifyMouseScrollSensitivityChanged(MainSystem.Input.MouseScrollSensitivity);
             NotifyLanguageChanged(MainSystem.Localization.CurrentLanguage);
             NotifyAutoSaveChanged(MainSystem.ProjectManager.AutoSave);

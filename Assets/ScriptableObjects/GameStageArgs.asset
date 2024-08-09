@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NotePanelLength: 17.5
   NoteTimeToZMultiplier: 3.73
-  NoteFadeInZRange: 42.8
+  NoteFadeInRangePercent: 0.6556875
   JudgeLinePeriod: 3.5
   BackgroundMaskMinAlpha: 0.3333333
   BackgroundMaskMaxAlpha: 1

@@ -11,10 +11,10 @@ namespace Deenote.GameStage
         private MouseButtons _pressedMouseButtons;
         private MouseActionState _mouseActionState;
 
-        private void OnMouseStageRelativePositionChanged(PointerEventData eventData)
+        private void UpdateNoteIndicatorPosition(Vector2 mousePosition)
         {
             // Move indicator
-            if (TryConvertScreenPointToNoteCoord(eventData.position, out var coord)) {
+            if (TryConvertScreenPointToNoteCoord(mousePosition, out var coord)) {
                 if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                     _editor.MoveNoteIndicator(coord, true);
                 else
@@ -27,7 +27,8 @@ namespace Deenote.GameStage
 
         void IPointerMoveHandler.OnPointerMove(PointerEventData eventData)
         {
-            OnMouseStageRelativePositionChanged(eventData);
+            if (!_stage.IsActive)
+                return;
 
             // Note selection
             if (_pressedMouseButtons.HasFlag(MouseButtons.Left) && _mouseActionState is MouseActionState.NoteSelecting) {
@@ -39,6 +40,9 @@ namespace Deenote.GameStage
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
+            if (!_stage.IsActive)
+                return;
+
             switch (eventData.button) {
                 case PointerEventData.InputButton.Left: {
                     _pressedMouseButtons.Add(MouseButtons.Left);
@@ -58,6 +62,9 @@ namespace Deenote.GameStage
 
         void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
         {
+            if (!_stage.IsActive)
+                return;
+
             switch (eventData.button) {
                 case PointerEventData.InputButton.Left: {
                     _pressedMouseButtons.Remove(MouseButtons.Left);
@@ -81,13 +88,14 @@ namespace Deenote.GameStage
 
         void IScrollHandler.OnScroll(PointerEventData eventData)
         {
+            if (!_stage.IsActive)
+                return;
+
             float scroll = eventData.scrollDelta.y;
             if (scroll != 0f) {
                 float deltaTime = scroll * 0.1f * MainSystem.Input.MouseScrollSensitivity;
                 _stage.CurrentMusicTime -= deltaTime;
             }
-
-            OnMouseStageRelativePositionChanged(eventData);
         }
 
         private bool TryConvertScreenPointToNoteCoord(Vector2 screenPoint, out NoteCoord coord)
@@ -114,7 +122,7 @@ namespace Deenote.GameStage
             if (coord.Time > _stage.CurrentMusicTime + _stage.StageNoteAheadTime)
                 return false;
 
-            if (coord.Position is > 4f or < -4f)
+            if (coord.Position is > MainSystem.Args.NoteSelectionMaxPosition or < -MainSystem.Args.NoteSelectionMaxPosition)
                 return false;
 
             return true;

@@ -1,11 +1,12 @@
 using Cysharp.Threading.Tasks;
+using Deenote.Localization;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
 using UnityEngine;
 
 namespace Deenote.UI.MenuBar
 {
-    public sealed  class MenuBarController : MonoBehaviour
+    public sealed class MenuBarController : MonoBehaviour
     {
         [Header("File")]
         [SerializeField] MenuDropdownItemController _newDropdownItem;
@@ -38,7 +39,10 @@ namespace Deenote.UI.MenuBar
             _saveDropdownItem.Button.onClick.AddListener(MainSystem.ProjectManager.SaveProjectAsync);
             _saveAsDropdownItem.Button.onClick.AddListener(MainSystem.ProjectManager.SaveAsAsync);
             _quitDropdownItem.Button.onClick.AddListener(OnQuitAsync);
-            //TODO export
+            // TODO export
+
+            // Edit
+            _copyButton.Button.onClick.AddListener(() => _ = MainSystem.StatusBar.ShowToastAsync(LocalizableText.Raw("114"), 3f));
 
             // View
             _perspectiveViewDropdownItem.Button.onClick.AddListener(() => MainSystem.PerspectiveView.Window.IsActivated = true);
@@ -52,7 +56,7 @@ namespace Deenote.UI.MenuBar
             _aboutDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.AboutDevelopers));
             _tutorialsDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.Tutorials));
             _updateHistoryDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.UpdateHistory));
-            _checkUpdateDropdownItem.Button.onClick.AddListener(async () => await MainSystem.VersionManager.CheckForUpdateAsync(true, true));
+            _checkUpdateDropdownItem.Button.onClick.AddListener(() => _ = MainSystem.VersionManager.CheckForUpdateAsync(true, true));
         }
 
         private async UniTaskVoid OnQuitAsync()

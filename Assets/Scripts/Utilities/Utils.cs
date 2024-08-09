@@ -76,11 +76,12 @@ namespace Deenote.Utilities
 
         public static bool IsSameForAll<T, TValue>(this ListReadOnlyView<T> list, Func<T, TValue> valueGetter, out TValue value, IEqualityComparer<TValue> comparer = null)
         {
-            switch (list.Count) {
-                case 0:
+            switch (list) {
+                case { IsNull: true }:
+                case { Count: 0 }:
                     value = default;
                     return true;
-                case 1:
+                case { Count: 1 }:
                     value = valueGetter(list[0]);
                     return true;
             }

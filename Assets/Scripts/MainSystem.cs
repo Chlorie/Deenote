@@ -12,17 +12,12 @@ using Deenote.UI.ToolBar;
 using Deenote.UI.Windows;
 using UnityEngine;
 
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-using System.Diagnostics;
-#endif
-
 namespace Deenote
 {
     public sealed partial class MainSystem : MonoBehaviour
     {
         private static MainSystem _instance;
 
-        [SerializeField] GlobalSettings _globalSettings;
         private readonly ResolutionAdjuster _resolutionAdjuster = new();
 
         [Header("UI")]
@@ -53,7 +48,6 @@ namespace Deenote
         [SerializeField] EditorController _editorController;
         [SerializeField] PianoSoundManager _pianoSoundManager;
 
-        public static GlobalSettings GlobalSettings => _instance._globalSettings;
         public static ResolutionAdjuster ResolutionAdjuster => _instance._resolutionAdjuster;
 
         public static MenuBarController MenuBar => _instance._menuBarController;
@@ -92,6 +86,14 @@ namespace Deenote
             _instance = this;
         }
 
+        private void OnApplicationFocus(bool focus)
+        {
+            if (!focus) {
+                if (GameStage.IsMusicPlaying)
+                    GameStage.PauseStage();
+            }
+        }
+
 #if !UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod]
         private static void _QuitConfirm()
@@ -121,13 +123,13 @@ namespace Deenote
         {
             // TODO:SavePlayerPrefs
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            Process.GetCurrentProcess().Kill();
+             System.Diagnostics.Process.GetCurrentProcess().Kill();
 #endif
         }
 
         public static class Args
         {
-            public static Vector2 MainCanvasReferenceResolution => new(1440, 810);
+            public const float NoteSelectionMaxPosition = 4f;
 
             #region Value Clamp
 

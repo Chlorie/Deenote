@@ -3,6 +3,7 @@ using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 
 namespace Deenote
@@ -16,7 +17,7 @@ namespace Deenote
             using var fs = File.OpenRead(Path.Combine(Application.streamingAssetsPath, "Magnolia.mp3"));
             //var bytes = File.ReadAllBytes(Path.Combine(Application.streamingAssetsPath, "Magnolia.mp3"));
             //var fs = new MemoryStream(bytes);
-            if (!AudioUtils.TryLoad(fs, ".mp3", out var clip)) {
+            if (!AudioUtils.LoadAsync(fs, ".mp3").GetAwaiter().GetResult().TryGetValue(out var clip)) {
                 Debug.Log("Load audio failed");
             }
 

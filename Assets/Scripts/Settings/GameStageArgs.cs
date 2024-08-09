@@ -4,15 +4,16 @@ using UnityEngine;
 
 namespace Deenote.Settings
 {
-    [CreateAssetMenu(fileName =nameof(GameStageArgs),menuName ="Settings/GameStageArgs")]
+    [CreateAssetMenu(fileName = nameof(GameStageArgs), menuName = $"Settings/{nameof(GameStageArgs)}")]
     public sealed class GameStageArgs : ScriptableObject
     {
         public float NotePanelLength;
         public float NoteTimeToZMultiplier;
-        public float NoteFadeInZRange;
-        // TODO: Use ZRange will cause notes unrecognizable when adjust sudden +,
+        [Range(0f, 1f)] public float NoteFadeInRangePercent;
+        //public float NoteFadeInZRange;=42.8
+        // Note: Use ZRange will cause low alpha notes when adjust sudden +,
         // suprised that the percent is such a large number...
-        // public float NoteFadeRangePercent = 0.7417582418;
+        // NoteFadeRangePercent = NoteFadeInZRange / (NoteTimeToZMultiplier * NotePanelLength);
 
         [Header("Effect")]
         public float JudgeLinePeriod;
@@ -67,4 +68,4 @@ namespace Deenote.Settings
         }
 
     }
-} 
+}

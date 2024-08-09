@@ -16,5 +16,11 @@ namespace Deenote.Utilities.Robustness
         public MayBeNull(T value) => _value = value;
 
         public static implicit operator MayBeNull<T>(T value) => new(value);
+    
+        public bool TryGetValue(out T value)
+        {
+            value = Value;
+            return HasValue;
+        }
     }
 }

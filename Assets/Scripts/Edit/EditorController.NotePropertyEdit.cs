@@ -1,4 +1,5 @@
 using Deenote.Project.Comparers;
+using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using System;
@@ -9,6 +10,8 @@ namespace Deenote.Edit
 {
     partial class EditorController
     {
+        private static readonly PianoSoundValueData[] _defaultNoteSounds = new PianoSoundValueData[] { new PianoSoundValueData(0f, 0f, 72, 0) };
+
         #region Simple Properties
 
         public void EditSelectedNotesPositionCoord(Func<NoteCoord, NoteCoord> valueSelector)
@@ -253,31 +256,36 @@ namespace Deenote.Edit
                 }));
         }
 
-        public void ToggleSoundOfSelectedNotes()
+        public void SoundifySelectedNotes()
         {
-            // TODO: Un-undoable
-            using var _ = ListPool<NoteData>.Get(out var soundNotes);
+            if (SelectedNotes.Count == 0)
+                return;
+            using var _en = ListPool<NoteModel>.Get(out var editNotes);
 
-            foreach (var note in SelectedNotes) {
-                var data = note.Data;
-                if (!data.HasSound) {
-                    data.Sounds.Add(new PianoSoundData(0, 0f, 72, 0));
-                    continue;
-                }
+            foreach (var n in SelectedNotes) {
+                if (!n.Data.HasSound)
+                    editNotes.Add(n);
+            }
 
-                foreach (var sound in data.Sounds) {
-                    if (sound.Velocity > 0) {
-                        var soundNote = data.Clone();
-                        soundNote.Sounds.Add(sound);
-                        soundNotes.Add(soundNote);
-                    }
-                }
-            }
-            if (soundNotes.Count > 0) {
-                _stage.Chart.Data.Notes.AddRange(soundNotes);
-                // TODO: Should sort stably
-                _stage.Chart.Data.Notes.Sort(NoteTimeComparer.Instance);
-            }
+            _operationHistory.Do(_stage.Chart.Notes.EditNotesSounds(editNotes, _defaultNoteSounds)
+                .WithDoneAction(() =>
+                {
+                    _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds, out var sounds, PianoSoundListDataEqualityComparer.Instance) ? sounds : null);
+                    OnNotesChanged(false, false, noteDataChangedExceptTime: true);
+                }));
+        }
+
+        public void DesoundifySelectedNotes()
+        {
+            if (SelectedNotes.Count == 0)
+                return;
+
+            _operationHistory.Do(_stage.Chart.Notes.EditNotesSounds(SelectedNotes, Array.Empty<PianoSoundValueData>())
+                .WithDoneAction(() =>
+                {
+                    _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds, out var sounds, PianoSoundListDataEqualityComparer.Instance) ? sounds : null);
+                    OnNotesChanged(false, false, noteDataChangedExceptTime: true);
+                }));
         }
     }
 }

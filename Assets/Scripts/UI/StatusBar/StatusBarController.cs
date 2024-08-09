@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.Utilities;
+using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -49,10 +50,10 @@ namespace Deenote.UI.StatusBar
                 _messageText.SetText(default);
         }
 
-        public void SetStatusMessage(LocalizableText message)
+        public void SetStatusMessage(LocalizableText message, ReadOnlySpan<string> args = default)
         {
             unchecked { _messageToken++; }
-            _messageText.SetText(message);
+            _messageText.SetText(message, args);
         }
 
         public async UniTaskVoid ShowToastAsync(LocalizableText message, float duration_s)

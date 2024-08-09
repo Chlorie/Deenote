@@ -18,6 +18,7 @@ namespace Deenote
         public static NoteCoord ClampPosition(NoteCoord coord) => ClampPosition(coord.Time, coord.Position);
 
         public static NoteCoord ClampPosition(float time, float position) => new(time, MainSystem.Args.ClampNotePosition(position));
+        
         public static NoteCoord Clamp(NoteCoord coord, float maxTime) => new(Mathf.Clamp(coord.Time, 0f, maxTime), MainSystem.Args.ClampNotePosition(coord.Position));
 
         public static NoteCoord operator -(NoteCoord left, NoteCoord right) => new(left.Time - right.Time, left.Position - right.Position);

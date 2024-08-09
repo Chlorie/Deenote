@@ -99,7 +99,7 @@ namespace Deenote.Edit
             {
                 _noteSelectionIndicatorImageTransform.gameObject.SetActive(true);
 
-                startCoord = NoteCoord.Clamp(startCoord, _editor._stage.MusicLength);
+                startCoord.Time = Mathf.Clamp(startCoord.Time, 0f, _editor._stage.MusicLength);
                 _noteSelectionIndicatorStartCoord = startCoord;
                 _isSelecting = true;
 
@@ -113,7 +113,7 @@ namespace Deenote.Edit
 
                 Debug.Assert(_noteSelectionIndicatorImageTransform.gameObject.activeSelf);
 
-                endCoord = NoteCoord.Clamp(endCoord, _editor._stage.MusicLength);
+                endCoord.Time = Mathf.Clamp(endCoord.Time, 0f, _editor._stage.MusicLength);
 
                 UpdateNoteSelectionInternal(_noteSelectionIndicatorStartCoord, endCoord, NoteSelectionUpdateMode.Toggle);
             }
@@ -141,8 +141,8 @@ namespace Deenote.Edit
 
             private void UpdateNoteSelectionInternal(NoteCoord startCoord, NoteCoord endCoord, NoteSelectionUpdateMode mode)
             {
-                Debug.Assert(startCoord.Position is >= -2f and <= 2f);
-                Debug.Assert(endCoord.Position is >= -2f and <= 2f);
+                Debug.Assert(startCoord.Position is <= MainSystem.Args.NoteSelectionMaxPosition and >= -MainSystem.Args.NoteSelectionMaxPosition);
+                Debug.Assert(endCoord.Position is <= MainSystem.Args.NoteSelectionMaxPosition and >= -MainSystem.Args.NoteSelectionMaxPosition);
 
                 if (startCoord.Position > endCoord.Position) {
                     (startCoord.Position, endCoord.Position) = (endCoord.Position, startCoord.Position);

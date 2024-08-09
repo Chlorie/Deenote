@@ -119,7 +119,7 @@ namespace Deenote.UI.Windows
             _fillByAmountInputField.onEndEdit.AddListener(OnFillAmountChanged);
             _fillByAmountButton.onClick.AddListener(OnFillAmountedNotesToCurve);
             // TODO
-            _fillByGridButton.onClick.AddListener(null);
+            //_fillByGridButton.onClick.AddListener(null);
 
             // Bpm
             _bpmGroupButton.onClick.AddListener(() => _bpmGroupGameObject.SetActive(!_bpmGroupGameObject.activeSelf));
@@ -128,12 +128,7 @@ namespace Deenote.UI.Windows
             _bpmInputField.onEndEdit.AddListener(OnBpmChanged);
             _bpmFillButton.onClick.AddListener(OnBpmFill);
 
-            _window.SetOnIsActivatedChanged(isActivated =>
-            {
-                if (isActivated) {
-                    OnWindowActivated();
-                }
-            });
+            _window.SetOnIsActivatedChanged(isActivated => { if (isActivated) OnWindowActivated(); });
         }
 
         #region Player Events

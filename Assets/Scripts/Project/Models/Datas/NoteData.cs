@@ -12,7 +12,13 @@ namespace Deenote.Project.Models.Datas
     {
         #region Serialize Members
 
-        [Obsolete("Unknown property, for json serialization only.")]
+        /// <remarks>
+        /// I found the enum defination while decompiling DEEMO, so I can sure
+        /// it contains the 2 values, but looks like that it makes no effect on
+        /// note display.
+        /// And in DEEMO II, the property has been removed.
+        /// </remarks>
+        [Obsolete("Obselete property, for json serialization only.")]
         [SerializeField]
         [JsonProperty("type")]
         public NoteType Type = NoteType.Hit;

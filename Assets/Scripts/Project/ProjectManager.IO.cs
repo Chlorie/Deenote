@@ -3,7 +3,9 @@ using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities.Robustness;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using UnityEngine.Pool;
 
 namespace Deenote.Project
 {
@@ -130,9 +132,18 @@ namespace Deenote.Project
                 writer.Write(chart.MaxVelocity);
                 writer.Write(chart.RemapMinVelocity);
                 writer.Write(chart.RemapMaxVelocity);
+
+                using var _n_dict = DictionaryPool<NoteData, int>.Get(out var linkNotes);
                 writer.Write(chart.Notes.Count);
-                foreach (var note in chart.Notes)
-                    WriteNoteData(writer, note);
+                for (int i = 0; i < chart.Notes.Count; i++) {
+                    NoteData note = chart.Notes[i];
+                    if (note.IsSlide && note.NextLink is not null)
+                        linkNotes.Add(note, i);
+                }
+                foreach (var note in chart.Notes) {
+                    WriteNoteData(writer, note, linkNotes);
+                }
+
                 writer.Write(chart.SpeedLines.Count);
                 foreach (var line in chart.SpeedLines)
                     WriteSpeedLineData(writer, line);
@@ -147,10 +158,12 @@ namespace Deenote.Project
                     RemapMinVelocity = reader.ReadInt32(),
                     RemapMaxVelocity = reader.ReadInt32(),
                 };
+              
                 var notesLen = reader.ReadInt32();
                 chart.Notes.Capacity = notesLen;
                 for (int i = 0; i < notesLen; i++)
-                    chart.Notes.Add(ReadNoteData(reader));
+                    chart.Notes.Add(ReadNoteData(reader, chart.Notes));
+               
                 var linesLen = reader.ReadInt32();
                 chart.SpeedLines.Capacity = linesLen;
                 for (int i = 0; i < linesLen; i++)
@@ -159,10 +172,8 @@ namespace Deenote.Project
                 return chart;
             }
 
-            private static void WriteNoteData(BinaryWriter writer, NoteData note)
+            private static void WriteNoteData(BinaryWriter writer, NoteData note, Dictionary<NoteData, int> linkDict)
             {
-#pragma warning disable CS0618 // Serialization ignores Obsolete
-                writer.Write((int)note.Type);
                 writer.Write(note.Sounds.Count);
                 foreach (var sound in note.Sounds)
                     WriteSoundData(writer, sound);
@@ -176,18 +187,16 @@ namespace Deenote.Project
                 writer.Write(note.IsSwipe);
                 writer.Write((int)note.WarningType);
                 writer.Write(note.EventId);
-                // Value of TimeDuplicate is same as Time
                 writer.Write(note.IsSlide);
-                // TODO:How to serialize link data?
-#pragma warning restore CS0618
+                if (note.PrevLink != null)
+                    writer.Write(linkDict[note.PrevLink]);
+                else
+                    writer.Write(-1);
             }
 
-            private static NoteData ReadNoteData(BinaryReader reader)
+            private static NoteData ReadNoteData(BinaryReader reader, List<NoteData> readedNotes)
             {
-#pragma warning disable CS0618 // Serialization ignores Obsolete
-                var note = new NoteData {
-                    Type = (NoteData.NoteType)reader.ReadInt32(),
-                };
+                var note = new NoteData();
                 var soundsLen = reader.ReadInt32();
                 note.Sounds.Capacity = soundsLen;
                 for (int i = 0; i < soundsLen; i++)
@@ -203,8 +212,13 @@ namespace Deenote.Project
                 note.WarningType = (WarningType)reader.ReadInt32();
                 note.EventId = reader.ReadString();
                 note.IsSlide = reader.ReadBoolean();
-                // TODO: How to deserialize link data?
-#pragma warning restore CS0618
+                var prev = reader.ReadInt32();
+                if (prev != -1) {
+                    var prevNote = readedNotes[prev];
+                    Debug.Assert(prevNote.IsSlide);
+                    prevNote.NextLink = note;
+                    note.PrevLink = prevNote;
+                }
                 return note;
             }
 

@@ -54,9 +54,13 @@ namespace Deenote.Inputting
             if (UnityUtils.IsKeyDown(KeyCode.U))
                 MainSystem.Editor.UnlinkSelectedNotes();
             if (UnityUtils.IsKeyDown(KeyCode.P))
-                MainSystem.Editor.ToggleSoundOfSelectedNotes();
+                MainSystem.Editor.SoundifySelectedNotes();
+            else if (UnityUtils.IsKeyDown(KeyCode.P, ctrl: true))
+                MainSystem.Editor.DesoundifySelectedNotes();
             if (UnityUtils.IsKeyDown(KeyCode.Q))
                 MainSystem.Editor.EditSelectedNotesPositionCoord(c => MainSystem.GameStage.Grids.Quantize(c, true, true));
+            if (UnityUtils.IsKeyDown(KeyCode.M))
+                MainSystem.Editor.EditSelectedNotesPosition(p => -p);
 
             // Adjust
             if (UnityUtils.IsKeyDown(KeyCode.W))
@@ -91,21 +95,19 @@ namespace Deenote.Inputting
                 MainSystem.Editor.EditSelectedNotesSize(s => s + 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.X))
                 MainSystem.Editor.EditSelectedNotesSize(s => s + 0.1f);
-            if (UnityUtils.IsKeyDown(KeyCode.M))
-                MainSystem.Editor.EditSelectedNotesPosition(p => -p);
             // Curve
             // IF
 
             // Stage
             if (UnityUtils.IsKeyDown(KeyCode.Return) || UnityUtils.IsKeyDown(KeyCode.KeypadEnter))
-                MainSystem.GameStage.TogglePlayingState();
+                MainSystem.GameStage.ToggleMusicPlayingState();
             if (UnityUtils.IsKeyDown(KeyCode.Space)) {
                 _tryPlayResetTime = MainSystem.GameStage.CurrentMusicTime;
-                MainSystem.GameStage.Play();
+                MainSystem.GameStage.PlayMusic();
             }
             else if (UnityUtils.IsKeyUp(KeyCode.Space)) {
                 MainSystem.GameStage.CurrentMusicTime = _tryPlayResetTime;
-                MainSystem.GameStage.Pause();
+                MainSystem.GameStage.PauseMusic();
             }
             if (UnityUtils.IsKeyDown(KeyCode.Home))
                 MainSystem.GameStage.CurrentMusicTime = 0f;

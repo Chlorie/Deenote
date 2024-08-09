@@ -71,6 +71,8 @@ namespace Deenote.GameStage
 
         public ChartModel Chart => _chart;
 
+        public bool IsActive => Chart is not null;
+
         public float StagePlaySpeed
         {
             get => IsMusicPlaying ? _musicSource.pitch : _manualPlaySpeedMultiplier;
@@ -95,7 +97,7 @@ namespace Deenote.GameStage
 
         public float MusicLength => _musicSource.clip.length;
 
-        public float StageNoteAheadTime => _args.NotePanelLength / NoteSpeed * (100 - SuddenPlusRange) / 100f;
+        public float StageNoteAheadTime => _args.NotePanelLength / NoteSpeed * _perspectiveViewController.SuddenPlusRangeToVisibleRangePercent(SuddenPlusRange);
 
         #region Music State
 
@@ -115,14 +117,14 @@ namespace Deenote.GameStage
             }
             if (setStageNotes) {
                 UpdateStageNotesRelatively(forward: __syncMusicTime > prevTime);
+                ForceUpdateNotesDisplay();
             }
             if (notifyWindows) {
                 _perspectiveViewWindow.NotifyMusicTimeChanged(__syncMusicTime);
             }
-            ForceUpdateNotesDisplay();
         }
 
-        public void Play()
+        public void PlayMusic()
         {
             if (IsMusicPlaying)
                 return;
@@ -138,19 +140,25 @@ namespace Deenote.GameStage
             }
         }
 
-        public void Pause()
+        public void PauseMusic()
         {
             if (!IsMusicPlaying)
                 return;
             _musicSource.Pause();
         }
 
-        public void TogglePlayingState()
+        public void PauseStage()
+        {
+            PauseMusic();
+            _manualPlaySpeedMultiplier = 0f;
+        }
+
+        public void ToggleMusicPlayingState()
         {
             if (IsMusicPlaying)
-                Pause();
+                PauseMusic();
             else
-                Play();
+                PlayMusic();
         }
 
         #endregion
@@ -216,7 +224,7 @@ namespace Deenote.GameStage
         /// <remarks>
         /// This is optimized version of <see cref="UpdateStageNotes"/>,
         /// If we know the time of previous update, we can iterate from
-        /// cached indices to save times
+        /// cached indices
         /// </remarks>
         /// <param name="forward">
         /// <see langword="true"/> if current time is greater than time on previous update
@@ -470,20 +478,24 @@ namespace Deenote.GameStage
         {
             if (IsStageEffectOn) UpdateStageEffect();
 
-            if (IsMusicPlaying || _musicSource.time >= MusicLength) { // Music playing or play to end
-                // Note that there's one frame when _musicSource.time == _musicSource.clip.length while audio playing,
-                // and SetMusicTime wont set _musicSource.Time to clip.length.
-                // So when _musicSource.time == clip.length, it means the music is playing to end,
-                // not manually set to end
-                SetMusicTime(_musicSource.time, syncMusicSource: false, setStageNotes: false);
-            }
-            else if (_manualPlaySpeedMultiplier is not 0f) { // Manually playing
-                var newTime = CurrentMusicTime + Time.deltaTime * _manualPlaySpeedMultiplier;
-                SetMusicTime(newTime, setStageNotes: false);
-            }
+            if (IsActive) {
 
-            if (StagePlaySpeed != 0)
-                UpdateStageNotesRelatively(StagePlaySpeed > 0);
+                if (IsMusicPlaying || _musicSource.time >= MusicLength) { // Music playing or play to end
+
+                    // Note that there's one frame when _musicSource.time == _musicSource.clip.length while audio playing,
+                    // and SetMusicTime wont set _musicSource.Time to clip.length.
+                    // So when _musicSource.time == clip.length, it means the music is playing to end,
+                    // not manually set to end
+                    SetMusicTime(_musicSource.time, syncMusicSource: false, setStageNotes: false);
+                }
+                else if (_manualPlaySpeedMultiplier is not 0f) { // Manually playing
+                    var newTime = CurrentMusicTime + Time.deltaTime * _manualPlaySpeedMultiplier;
+                    SetMusicTime(newTime, setStageNotes: false);
+                }
+
+                if (StagePlaySpeed != 0)
+                    UpdateStageNotesRelatively(StagePlaySpeed > 0);
+            }
         }
     }
 }

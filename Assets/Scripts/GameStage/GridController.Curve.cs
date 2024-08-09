@@ -76,8 +76,8 @@ namespace Deenote.GameStage
 
             _curveLineRenderer.positionCount = worldPositions.Length;
             _curveLineRenderer.SetPositions(worldPositions);
-            var startAlphaUnclamped = (_stage.StageNoteAheadTime - (coords[0].Time - stageCurrentTime)) / MainSystem.Args.ZToOffsetTime(_stage.Args.NoteFadeInZRange);
-            var endAlphaUnclamped = (_stage.StageNoteAheadTime - (coords[^1].Time - stageCurrentTime)) / MainSystem.Args.ZToOffsetTime(_stage.Args.NoteFadeInZRange);
+            var startAlphaUnclamped = (_stage.StageNoteAheadTime - (coords[0].Time - stageCurrentTime)) / (_stage.StageNoteAheadTime * _stage.Args.NoteFadeInRangePercent);
+            var endAlphaUnclamped = (_stage.StageNoteAheadTime - (coords[^1].Time - stageCurrentTime)) / (_stage.StageNoteAheadTime * _stage.Args.NoteFadeInRangePercent);
             _curveLineRenderer.SetGradientColor(startAlphaUnclamped, endAlphaUnclamped);
         }
 

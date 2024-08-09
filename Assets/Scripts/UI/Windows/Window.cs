@@ -1,7 +1,4 @@
-using Cysharp.Threading.Tasks;
-using Deenote.Localization;
 using System;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -28,9 +25,25 @@ namespace Deenote.UI.Windows
         [SerializeField]
         private bool __isActivated;
         private Action<bool> _onIsActivatedChanged;
+        private Action _onFirstActivating;
 
-        public float FixedRatio => _fixedRatio;
-        public bool IsFixedRatio => _fixedRatio > 0f;
+        private bool _isInitialized;
+
+        public float FixedAspectRatio
+        {
+            get => _fixedRatio;
+            set {
+                if (_fixedRatio == value)
+                    return;
+                _fixedRatio = value;
+                if (_fixedRatio <= 0f)
+                    return;
+
+                // Reset size in fixed aspect ratio
+                Size = Size;
+            }
+        }
+        public bool IsFixedAspectRatio => _fixedRatio > 0f;
 
         public bool IsActivated
         {
@@ -40,22 +53,29 @@ namespace Deenote.UI.Windows
                     return;
                 __isActivated = value;
                 gameObject.SetActive(__isActivated);
-                if (__isActivated) {
-                    transform.SetAsLastSibling();
-                }
-                _onIsActivatedChanged?.Invoke(__isActivated);
+                // Notifiers invoked in Unity Message
             }
         }
 
         public Vector2 Size
         {
             get => ((RectTransform)transform).rect.size;
-            set => ((RectTransform)transform).sizeDelta = value;
+            set {
+                if (IsFixedAspectRatio) {
+                    value.x = (value.y - WindowTitleBar.Height) * FixedAspectRatio;
+                }
+                ((RectTransform)transform).sizeDelta = value;
+            }
         }
 
         public void SetOnIsActivatedChanged(Action<bool> onIsActivatedChanged)
         {
             _onIsActivatedChanged = onIsActivatedChanged;
+        }
+
+        public void SetOnFirstActivating(Action action)
+        {
+            _onFirstActivating = action;
         }
 
         private void Awake()
@@ -65,7 +85,18 @@ namespace Deenote.UI.Windows
 
         private void OnEnable()
         {
+            if (!_isInitialized) {
+                _isInitialized = true;
+                _onFirstActivating?.Invoke();
+            }
+
             transform.SetAsLastSibling();
+            _onIsActivatedChanged?.Invoke(true);
+        }
+
+        private void OnDisable()
+        {
+            _onIsActivatedChanged?.Invoke(false);
         }
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)

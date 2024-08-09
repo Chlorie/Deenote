@@ -48,6 +48,7 @@ ToolBar_Paste=Paste
 ToolBar_Link=Link
 ToolBar_Unlink=Unlink
 ToolBar_Sound=Sound
+ToolBar_Desound=Desound
 ToolBar_Quantize=Quantize
 ToolBar_Mirror=Mirror
 
@@ -64,12 +65,20 @@ Window_ProjectProperties_AudioFileLoad_Loading=Loading...
 Window_ProjectProperties_AudioFileLoad_Failed=Load Failed.
 Window_ProjectProperties_AudioFileLoad_Embeded=Embeded Audio
 Window_ProjectProperties_MusicName=Music Name
+Window_ProjectProperties_MusicName_PlaceHolder=Enter the music name
 Window_ProjectProperties_Composer=Composer
+Window_ProjectProperties_Composer_PlaceHolder=Enter the composer name
 Window_ProjectProperties_ChartDesigner=Chart Designer
+Window_ProjectProperties_ChartDesigner_PlaceHolder=Enter the charter name
 Window_ProjectProperties_Charts=Charts
+Window_ProjectProperties_ChartName_PlaceHolder=Name(Optional)
 Window_ProjectProperties_ChartLoad=Load
 Window_ProjectProperties_ChartImport=Import
+Window_ProjectProperties_ChartImporting=Importing...
+Window_ProjectProperties_ChartImported=Imported
 Window_ProjectProperties_ChartExport=Export
+Window_ProjectProperties_ChartExporting=Exporting...
+Window_ProjectProperties_ChartExported=Exported
 Window_ProjectProperties_ChartRemove=Remove
 Window_ProjectProperties_ChartRemoveConfirm=Confirm?
 
@@ -239,6 +248,7 @@ Status_OpenProject_Loading=Loading project...
 Status_OpenProject_Completed=Loading completed.
 Status_SaveProject_Saving=Saving...
 Status_SaveProject_Completed=Save completed.
+Status_ImportChart_Failed=Failed to import chart: {0}
 Status_Fps=FPS: {0}
 
 ## Toast
@@ -329,6 +339,7 @@ Tutorials_Shortcuts_Content="""
 [Space] Instant play (Play while holding space, stop and go back to where you started playing when you release space)
 [Home] Jump to the start of the song
 [End] Jump to the end of the song
+[Esc] Exit full screen mode
 [Ctrl+Up/Down] Adjust note falling speed
 [Alt+Up/Down] Adjust music playing speed
 [Up/Down or Mouse wheel scroll] Scroll the chart backward/forward
@@ -343,6 +354,8 @@ Tutorials_Shortcuts_Content="""
 [Ctrl+A] Select all notes
 [L] Link selected notes (Change to slide notes)
 [U] Unlink selected notes (Change back to click notes)
+[P] Add empty sound to no-sound selected notes (Change to piano notes)
+[Ctrl+P] Remove sounds (Change to no sound notes)
 [Q] Quantize selected notes to the grids
 [A/D] Adjust selected notes' position values left/right by 0.01
 [W/S] Adjust selected notes' time values up/down by 1ms

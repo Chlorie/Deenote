@@ -15,8 +15,6 @@ namespace Deenote.GameStage
         [SerializeField] ResolutionAdjuster _resolutionAdjuster;
 
         [Header("")]
-        // TODO: Maybe ARF is not required if we directly adjust the window size
-        [SerializeField] AspectRatioFitter _aspectRatioFitter;
         [SerializeField] RawImage _cameraViewRawImage;
         [Header("Full Screen")]
         [SerializeField] Transform _windowScreenParentTransform;
@@ -47,7 +45,6 @@ namespace Deenote.GameStage
                         _backgroundCamera.targetTexture = _viewRenderTexture4_3;
                         _cameraViewRawImage.texture = _viewRenderTexture4_3;
                         _viewCamera.rect = new Rect(0, 0, 1, 3f / 4f); // Keep view camera's aspect ratio
-                        _aspectRatioFitter.aspectRatio = 4f / 3f;
                         break;
                     case ViewAspectRatio.SixteenNine or _:
                         __aspectRatio = ViewAspectRatio.SixteenNine;
@@ -55,7 +52,6 @@ namespace Deenote.GameStage
                         _backgroundCamera.targetTexture = _viewRenderTexture16_9;
                         _cameraViewRawImage.texture = _viewRenderTexture16_9;
                         _viewCamera.rect = new Rect(0, 0, 1, 1);
-                        _aspectRatioFitter.aspectRatio = 16f / 9f;
                         break;
                 }
 
@@ -79,6 +75,27 @@ namespace Deenote.GameStage
                 transform.SetParent(_windowScreenParentTransform, false);
                 MainSystem.ResolutionAdjuster.RecoverResolution();
             }
+        }
+
+        private void Update()
+        {
+            if (_stage.IsActive) {
+                UpdateNoteIndicatorPosition((Vector2)Input.mousePosition);
+            }
+        }
+
+        public float SuddenPlusRangeToVisibleRangePercent(int suddenPlusRange)
+        {
+            var cameraPos = _viewCamera.transform.position;
+            float h = cameraPos.y;
+            float z = cameraPos.z;
+            float panelLength = _stage.Args.NotePanelLength * _stage.Args.NoteTimeToZMultiplier;
+
+            float ratio = suddenPlusRange / 100f;
+            float theta = ratio * (Mathf.Atan((panelLength + z) / h) - Mathf.Atan(z / h));
+            float tanTheta = Mathf.Tan(theta);
+            float visibleLength = h * (panelLength + z - h * tanTheta) / (h + (panelLength + z) * tanTheta) - z;
+            return visibleLength / panelLength;
         }
 
         public enum ViewAspectRatio

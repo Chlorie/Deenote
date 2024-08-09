@@ -38,12 +38,12 @@ namespace Deenote.Project
             LocalizableText.Localized("Message_OpenProjectFailed_N"),
         };
 
-        private void Start()
-        {
-            // TODO: Fake
-            CurrentProject = Fake.Project;
-            OnProjectChanged(0);
-        }
+        //private void Start()
+        //{
+        //    // TODO: Fake
+        //    CurrentProject = Fake.Project;
+        //    OnProjectChanged(0);
+        //}
 
         private void Update()
         {

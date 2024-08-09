@@ -94,7 +94,7 @@ namespace Deenote.UI.Windows
                     return;
 
                 fs = File.OpenRead(res.Path);
-                if (!AudioUtils.TryLoad(fs, Path.GetExtension(res.Path), out var clip)) {
+                if (!(await AudioUtils.LoadAsync(fs, Path.GetExtension(res.Path))).TryGetValue(out var clip)) {
                     var btn = await MainSystem.MessageBox.ShowAsync(
                         LocalizableText.Localized("Message_AudioLoadFailed_Title"),
                         LocalizableText.Localized("Message_AudioLoadFailed_Content"),
@@ -108,7 +108,6 @@ namespace Deenote.UI.Windows
                 var bytes = new byte[fs.Length];
                 fs.Seek(0, SeekOrigin.Begin);
                 fs.Read(bytes);
-                // TODO: 这里的bytes可以不用了 
                 _editorController.EditProjectAudio(res.Path, bytes, clip);
             } finally {
                 fs?.Dispose();
