@@ -1,6 +1,5 @@
 using Deenote.GameStage;
 using Deenote.Project.Models.Datas;
-using Deenote.Utilities;
 using UnityEngine;
 
 namespace Deenote.Edit.Elements
@@ -26,7 +25,7 @@ namespace Deenote.Edit.Elements
             _noteSpriteRenderer.sprite = prefab.Sprite;
             _noteSpriteRenderer.gameObject.transform.localScale = new(prefab.Scale * _notePrototype.Size, prefab.Scale, prefab.Scale);
             UpdateLinkLineVisibility(MainSystem.GameStage.IsShowLinkLines);
-            if (_notePrototype.NextLink is not null)
+            if (note.NextLink is not null)
             {
                 var (toX, toZ) = MainSystem.Args.NoteCoordToWorldPosition(note.NextLink.PositionCoord - _notePrototype.PositionCoord);
                 _linkLine = (Vector2.zero, new Vector2(toX, toZ));

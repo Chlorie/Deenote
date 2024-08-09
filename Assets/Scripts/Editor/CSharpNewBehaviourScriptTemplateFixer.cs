@@ -29,7 +29,8 @@ namespace Deenote.Unity.Editor
             var dir = Path.GetDirectoryName(filePath);
 
             // start with 'Assets/Scripts/'
-            if (dir.Length > 15) {
+            if (dir.Length > 15)
+            {
                 var relatedPath = dir[15..];
                 sb.Append(ToValidNamespace(relatedPath));
             }
@@ -41,13 +42,10 @@ namespace Deenote.Unity.Editor
                 Span<char> chars = stackalloc char[relatedPath.Length + 1];
                 chars[0] = '.';
                 int index = 1;
-                foreach (var c in relatedPath) {
-                    if (c is ' ')
-                        continue;
-                    else if (c == Path.DirectorySeparatorChar)
-                        chars[index++] = '.';
-                    else
-                        chars[index++] = c;
+                foreach (var c in relatedPath)
+                {
+                    if (c is ' ') continue;
+                    chars[index++] = c == Path.DirectorySeparatorChar ? '.' : c;
                 }
                 return chars[..index].ToString();
             }

@@ -11,22 +11,21 @@ namespace Deenote.Edit
     /// </summary>
     public sealed partial class EditorController : MonoBehaviour
     {
-        [SerializeField] ProjectManager _projectManager;
-        [SerializeField] GameStageController _stage;
+        [SerializeField] private ProjectManager _projectManager = null!;
+        private GameStageController Stage => GameStageController.Instance;
 
         [Header("Notify")]
-        [SerializeField] PropertiesWindow _propertiesWindow;
-        [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
-        [SerializeField] PianoSoundEditWindow _pianoSoundEditWindow;
+        [SerializeField] private PropertiesWindow _propertiesWindow = null!;
+        [SerializeField] private EditorPropertiesWindow _editorPropertiesWindow = null!;
+        [SerializeField] private PianoSoundEditWindow _pianoSoundEditWindow = null!;
 
         [Header("Note Edit")]
-        private UndoableOperationHistory _operationHistory;
+        private UndoableOperationHistory _operationHistory = new(100);
 
         public bool HasUnsavedChange => _operationHistory.CanUndo;
 
         private void Awake()
         {
-            _operationHistory = new(100);
             AwakeNotePlacement();
         }
 
@@ -44,7 +43,7 @@ namespace Deenote.Edit
         private void OnNotesChanged(bool notesOrderChanged, bool selectionChanged, bool noteDataChangedExceptTime = false)
         {
             // NoteTime maybe changed, so we always force update everytime
-            _stage.ForceUpdateStageNotes(notesOrderChanged, noteDataChangedExceptTime);
+            GameStageController.Instance.ForceUpdateStageNotes(notesOrderChanged, noteDataChangedExceptTime);
 
             //if (noteOrderChanged)
             //    _stage.UpdateStageNotes(false);

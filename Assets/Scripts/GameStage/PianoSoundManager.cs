@@ -13,14 +13,14 @@ namespace Deenote.GameStage
         public const int MaxPitch = 127;
         public const int MinPitch = 0;
 
-        private static readonly int[] _pitches = new[] { 24, 38, 43, 48, 53, 57, 60, 64, 67, 71, 74, 77, 81, 84, 89, 95 };
-        private static readonly int[] _volumes = new[] { 38, 63, 111, 127 };
+        private static readonly int[] _pitches = { 24, 38, 43, 48, 53, 57, 60, 64, 67, 71, 74, 77, 81, 84, 89, 95 };
+        private static readonly int[] _volumes = { 38, 63, 111, 127 };
 
-        [SerializeField] AudioSource _audioPlayerPrefab;
-        [SerializeField] Transform _audioPlayerParentTransform;
-        private ObjectPool<AudioSource> _audioPlayerPool;
+        [SerializeField] private AudioSource _audioPlayerPrefab = null!;
+        [SerializeField] private Transform _audioPlayerParentTransform = null!;
+        private ObjectPool<AudioSource> _audioPlayerPool = null!;
 
-        [SerializeField] AudioClip[] _soundClips;
+        [SerializeField] private AudioClip[] _soundClips = null!;
 
         // Mirrored from Chlorie's
         public async UniTaskVoid PlaySoundAsync(int pitch, int volume, float? duration, float delay, float speed)

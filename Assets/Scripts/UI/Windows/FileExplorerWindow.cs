@@ -11,39 +11,39 @@ namespace Deenote.UI.Windows
     [RequireComponent(typeof(Window))]
     public sealed partial class FileExplorerWindow : MonoBehaviour
     {
-        [SerializeField] Window _window;
+        [SerializeField] private Window _window = null!;
         public Window Window => _window;
 
         [Header("UI")]
-        [SerializeField] Button _backDirButton;
+        [SerializeField] private Button _backDirButton = null!;
         /// <remarks>
         /// Keep text property sync with <see cref="__currentDirectory"/>
         /// </remarks>
-        [SerializeField] TMP_InputField _currentDirectoryInputField;
-        [SerializeField] Button _confirmButton;
-        [SerializeField] Button _cancelButton;
-        [SerializeField] TMP_InputField _fileNameInputField;
-        [SerializeField] TMP_Text _fileExtensionText;
-        [SerializeField] Transform _fileItemParentTransform;
+        [SerializeField] private TMP_InputField _currentDirectoryInputField = null!;
+        [SerializeField] private Button _confirmButton = null!;
+        [SerializeField] private Button _cancelButton = null!;
+        [SerializeField] private TMP_InputField _fileNameInputField = null!;
+        [SerializeField] private TMP_Text _fileExtensionText = null!;
+        [SerializeField] private Transform _fileItemParentTransform = null!;
 
         [Header("Prefabs")]
-        [SerializeField] FileExplorerListItemController _fileItemPrefab;
+        [SerializeField] private FileExplorerListItemController _fileItemPrefab = null!;
 
         private PooledObjectListView<FileExplorerListItemController> _fileItems;
 
         // null: filter directory
         // []: no filter
-        private string[] _extensionFilters;
-        private string _selectedFilePath;
+        private string[]? _extensionFilters;
+        private string? _selectedFilePath;
 
-        private string __currentDirectory;
-        private string CurrentDirectory
+        private string? __currentDirectory;
+        private string? CurrentDirectory
         {
             get => __currentDirectory;
-            set => _currentDirectoryInputField.text = __currentDirectory = value;
+            set => _currentDirectoryInputField.text = (__currentDirectory = value) ?? "";
         }
 
-        private void ResetFileList(string directory)
+        private void ResetFileList(string? directory)
         {
             if (directory is not null)
                 CurrentDirectory = directory;
@@ -91,7 +91,7 @@ namespace Deenote.UI.Windows
                     ResetFileList(path);
                 }
                 else {
-                    _currentDirectoryInputField.text = CurrentDirectory;
+                    _currentDirectoryInputField.text = CurrentDirectory ?? "";
                 }
             });
             _fileNameInputField.onValueChanged.AddListener(fileName =>

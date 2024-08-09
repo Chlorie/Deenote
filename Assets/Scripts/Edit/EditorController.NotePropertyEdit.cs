@@ -15,7 +15,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.PositionCoord, (n, v) => n.PositionCoord = v)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.PositionCoord, (n, v) => n.PositionCoord = v)
                 .WithDoneAction(() =>
                 {
                     // TODO: Ensure Notes Order
@@ -30,7 +30,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
                 .WithDoneAction(() =>
                 {
                     // TODO: Ensure Notes Order
@@ -44,7 +44,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
                 .WithDoneAction(() =>
                 {
                     // TODO: Ensure Notes Order
@@ -58,7 +58,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Position, (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Position, (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePositionChanged(SelectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
@@ -71,7 +71,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Position, (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Position, (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePositionChanged(SelectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
@@ -84,7 +84,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Size, (n, v) => n.Size = MainSystem.Args.ClampNoteSize(v))
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, valueSelector, n => n.Size, (n, v) => n.Size = MainSystem.Args.ClampNoteSize(v))
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteSizeChanged(SelectedNotes.IsSameForAll(n => n.Data.Size, out var size) ? size : null);
@@ -97,7 +97,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Size, (n, v) => n.Size = MainSystem.Args.ClampNoteSize(v))
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Size, (n, v) => n.Size = MainSystem.Args.ClampNoteSize(v))
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteSizeChanged(SelectedNotes.IsSameForAll(n => n.Data.Size, out var size) ? size : null);
@@ -110,7 +110,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Shift, (n, v) => n.Shift = v)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Shift, (n, v) => n.Shift = v)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteShiftChanged(SelectedNotes.IsSameForAll(n => n.Data.Shift, out var shift) ? shift : null);
@@ -123,7 +123,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Speed, (n, v) => n.Speed = v)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Speed, (n, v) => n.Speed = v)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteSpeedChanged(SelectedNotes.IsSameForAll(n => n.Data.Speed, out var speed) ? speed : null);
@@ -136,7 +136,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Duration, (n, v) => n.Duration = v)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Duration, (n, v) => n.Duration = v)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteDurationChanged(SelectedNotes.IsSameForAll(n => n.Data.Duration, out var duration) ? duration : null);
@@ -149,7 +149,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Vibrate, (n, v) => n.Vibrate = v)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.Vibrate, (n, v) => n.Vibrate = v)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteVibrateChanged(SelectedNotes.IsSameForAll(n => n.Data.Vibrate, out var vibrate) ? vibrate : null);
@@ -162,7 +162,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.IsSwipe, (n, v) => n.IsSwipe = v)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.IsSwipe, (n, v) => n.IsSwipe = v)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteIsSwipeChanged(SelectedNotes.IsSameForAll(n => n.Data.IsSwipe, out var swipe) ? swipe : null);
@@ -175,7 +175,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.WarningType, (n, v) => n.WarningType = v)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.WarningType, (n, v) => n.WarningType = v)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteWarningTypeChanged(SelectedNotes.IsSameForAll(n => n.Data.WarningType, out var wType) ? wType : null);
@@ -188,7 +188,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.EventId, (n, v) => n.EventId = v)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotes(SelectedNotes, newValue, n => n.EventId, (n, v) => n.EventId = v)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteEventIdChanged(SelectedNotes.IsSameForAll(n => n.Data.EventId, out var evId) ? evId : null);
@@ -203,7 +203,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.EditNotesSounds(SelectedNotes, values)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotesSounds(SelectedNotes, values)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds, out var sounds, PianoSoundListDataEqualityComparer.Instance) ? sounds : null);
@@ -216,7 +216,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.LinkNotes(SelectedNotes)
+            _operationHistory.Do(Stage.Chart.Notes.LinkNotes(SelectedNotes)
                 .WithRedoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteIsLinkChanged(true);
@@ -234,7 +234,7 @@ namespace Deenote.Edit
             if (SelectedNotes.Count == 0)
                 return;
 
-            _operationHistory.Do(_stage.Chart.Notes.UnlinkNotes(SelectedNotes)
+            _operationHistory.Do(Stage.Chart.Notes.UnlinkNotes(SelectedNotes)
                 .WithRedoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteIsLinkChanged(false);
@@ -268,9 +268,9 @@ namespace Deenote.Edit
                 }
             }
             if (soundNotes.Count > 0) {
-                _stage.Chart.Data.Notes.AddRange(soundNotes);
+                Stage.Chart.Data.Notes.AddRange(soundNotes);
                 // TODO: Should sort stably
-                _stage.Chart.Data.Notes.Sort(NoteTimeComparer.Instance);
+                Stage.Chart.Data.Notes.Sort(NoteTimeComparer.Instance);
             }
         }
     }

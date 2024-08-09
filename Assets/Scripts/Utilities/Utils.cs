@@ -17,7 +17,8 @@ namespace Deenote.Utilities
 
         public static bool EndsWithOneOf(this string str, ReadOnlySpan<string> ends)
         {
-            foreach (var end in ends) {
+            foreach (var end in ends)
+            {
                 if (str.EndsWith(end))
                     return true;
             }
@@ -30,22 +31,18 @@ namespace Deenote.Utilities
             list.RemoveRange(offset, length);
         }
 
-        public static void RemoveAt<T>(this List<T> list,Index index)
+        public static void RemoveAt<T>(this List<T> list, Index index)
         {
             list.RemoveAt(index.GetOffset(list.Count));
         }
 
-        public static T[] Array<T>(int length)
-        {
-            if (length == 0)
-                return System.Array.Empty<T>();
-            else
-                return new T[length];
-        }
+        public static T[] Array<T>(int length) => length == 0 ? System.Array.Empty<T>() : new T[length];
 
-        public static bool IsSameForAll<T, TValue>(this ListReadOnlyView<T> list, Func<T, TValue> valueGetter, out TValue value, IEqualityComparer<TValue> comparer = null)
+        public static bool IsSameForAll<T, TValue>(this ListReadOnlyView<T> list,
+            Func<T, TValue> valueGetter, out TValue? value, IEqualityComparer<TValue>? comparer = null)
         {
-            switch (list.Count) {
+            switch (list.Count)
+            {
                 case 0:
                     value = default;
                     return true;
@@ -57,8 +54,10 @@ namespace Deenote.Utilities
             value = valueGetter(list[0]);
             comparer ??= EqualityComparer<TValue>.Default;
 
-            for (int i = 0; i < list.Count; i++) {
-                if (!comparer.Equals(value, valueGetter(list[i]))) {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (!comparer.Equals(value, valueGetter(list[i])))
+                {
                     value = default;
                     return false;
                 }

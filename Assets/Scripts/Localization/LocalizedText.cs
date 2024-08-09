@@ -6,9 +6,9 @@ namespace Deenote.Localization
     [RequireComponent(typeof(TMP_Text))]
     public sealed class LocalizedText : MonoBehaviour
     {
-        [SerializeField] TMP_Text _text;
-        [SerializeField] string? _textKey;
-        [SerializeField] bool _isLocalized;
+        [SerializeField] private TMP_Text _text = null!;
+        [SerializeField] private string? _textKey;
+        [SerializeField] private bool _isLocalized;
 
         public TMP_Text TmpText => _text;
 

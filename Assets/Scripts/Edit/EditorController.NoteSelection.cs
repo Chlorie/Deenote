@@ -17,7 +17,7 @@ namespace Deenote.Edit
         public void SelectAllNotes()
         {
             OnNoteSelectionChanging();
-            _noteSelectionController.SelectNotes(_stage.Chart.Notes);
+            _noteSelectionController.SelectNotes(Stage.Chart.Notes);
             OnNotesChanged(false, true);
         }
 
@@ -76,7 +76,7 @@ namespace Deenote.Edit
             {
                 _noteSelectionIndicatorImageTransform.gameObject.SetActive(true);
 
-                startCoord = NoteCoord.Clamp(startCoord, _editor._stage.MusicLength);
+                startCoord = NoteCoord.Clamp(startCoord, _editor.Stage.MusicLength);
                 _noteSelectionIndicatorStartCoord = startCoord;
                 _isSelecting = true;
 
@@ -90,7 +90,7 @@ namespace Deenote.Edit
 
                 Debug.Assert(_noteSelectionIndicatorImageTransform.gameObject.activeSelf);
 
-                endCoord = NoteCoord.Clamp(endCoord, _editor._stage.MusicLength);
+                endCoord = NoteCoord.Clamp(endCoord, _editor.Stage.MusicLength);
 
                 UpdateNoteSelectionInternal(_noteSelectionIndicatorStartCoord, endCoord, NoteSelectionUpdateMode.Toggle);
             }
@@ -128,8 +128,8 @@ namespace Deenote.Edit
                     (startCoord.Time, endCoord.Time) = (endCoord.Time, startCoord.Time);
                 }
 
-                (float xMin, float zMin) = MainSystem.Args.NoteCoordToWorldPosition(startCoord, _editor._stage.CurrentMusicTime);
-                (float xMax, float zMax) = MainSystem.Args.NoteCoordToWorldPosition(endCoord, _editor._stage.CurrentMusicTime);
+                (float xMin, float zMin) = MainSystem.Args.NoteCoordToWorldPosition(startCoord, _editor.Stage.CurrentMusicTime);
+                (float xMax, float zMax) = MainSystem.Args.NoteCoordToWorldPosition(endCoord, _editor.Stage.CurrentMusicTime);
 
                 _noteSelectionIndicatorImageTransform.offsetMin = new(xMin, zMin);
                 _noteSelectionIndicatorImageTransform.offsetMax = new(xMax, zMax);
@@ -137,7 +137,7 @@ namespace Deenote.Edit
                 // Optimizable
                 _selectedNotes.Clear();
 
-                foreach (var note in _editor._stage.Chart.Notes) {
+                foreach (var note in _editor.Stage.Chart.Notes) {
                     float notePos = note.Data.Position;
                     float halfNoteSize = note.Data.Size / 2;
                     float noteTime = note.Data.Time;

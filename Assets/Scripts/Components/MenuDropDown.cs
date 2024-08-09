@@ -4,16 +4,8 @@ namespace Deenote.Components
 {
     public sealed class MenuDropDown : MonoBehaviour
     {
-        [SerializeField] GameObject _contentPanel;
+        [SerializeField] private GameObject _contentPanel = null!;
 
-        public void OnToggle()
-        {
-            if (_contentPanel.activeSelf) {
-                _contentPanel.SetActive(false);
-            }
-            else {
-                _contentPanel.SetActive(true);
-            }
-        }
+        public void OnToggle() => _contentPanel.SetActive(!_contentPanel.activeSelf);
     }
 }

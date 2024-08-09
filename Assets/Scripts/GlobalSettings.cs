@@ -16,7 +16,7 @@ namespace Deenote
         public float MouseScrollSensitivity { get; set; }
 
         [field: SerializeField]
-        public string Language { get; set; } // ?
+        public string Language { get; set; } = "en"; // ?
 
         [field: SerializeField]
         public AutoSaveOption AutoSave { get; set; }

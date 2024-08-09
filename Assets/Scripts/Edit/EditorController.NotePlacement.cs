@@ -12,9 +12,9 @@ namespace Deenote.Edit
     partial class EditorController
     {
         [Header("Note Placement")]
-        [SerializeField] NoteData _placeNoteTemplate;
-        [SerializeField] Transform _noteIndicatorParentTransform; // Also note panel
-        [SerializeField] NoteIndicatorController _noteIndicatorPrefab;
+        [SerializeField] private NoteData _placeNoteTemplate = null!;
+        [SerializeField] private Transform _noteIndicatorParentTransform = null!; // Also note panel
+        [SerializeField] private NoteIndicatorController _noteIndicatorPrefab = null!;
         private PooledObjectListView<NoteIndicatorController> _noteIndicatorList;
 
         [SerializeField] private bool __isNoteIndicatorOn;
@@ -23,7 +23,7 @@ namespace Deenote.Edit
 
         [Header("Clip Board")]
         [SerializeField] private float _clipBoardBasePosition;
-        [SerializeField] private List<NoteData> _clipBoardNotes;
+        [SerializeField] private List<NoteData> _clipBoardNotes = new();
 
         [SerializeField] private bool _isPasting;
 
@@ -73,7 +73,6 @@ namespace Deenote.Edit
             _placeNoteTemplate = new NoteData { Size = 1f };
             _noteIndicatorList = new PooledObjectListView<NoteIndicatorController>(
                 UnityUtils.CreateObjectPool(_noteIndicatorPrefab, _noteIndicatorParentTransform, 1));
-            _clipBoardNotes = new();
         }
 
         public void PlaceNoteAt(NoteCoord coord, bool rememberPosition)
@@ -85,17 +84,17 @@ namespace Deenote.Edit
                 PlaceNoteAt(coord);
             }
 
-            NoteTimeComparer.AssertInOrder(_stage.Chart.Data.Notes);
+            NoteTimeComparer.AssertInOrder(Stage.Chart.Data.Notes);
 
             void PasteNoteAt(NoteCoord coord, bool rememberPosition)
             {
                 if (rememberPosition) {
-                    coord = _stage.Grids.Quantize(new(_clipBoardBasePosition, coord.Time), false, SnapToTimeGrid);
+                    coord = Stage.Grids.Quantize(new(_clipBoardBasePosition, coord.Time), false, SnapToTimeGrid);
                 }
                 else {
-                    coord = _stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
+                    coord = Stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
                 }
-                _operationHistory.Do(_stage.Chart.Notes.AddMultipleNotes(coord, _clipBoardNotes)
+                _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(coord, _clipBoardNotes)
                     .WithRedoneAction(notes =>
                     {
                         OnNoteSelectionChanging();
@@ -113,8 +112,8 @@ namespace Deenote.Edit
 
             void PlaceNoteAt(NoteCoord coord)
             {
-                coord = _stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
-                _operationHistory.Do(_stage.Chart.Notes.AddNote(coord, _placeNoteTemplate)
+                coord = Stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
+                _operationHistory.Do(Stage.Chart.Notes.AddNote(coord, _placeNoteTemplate)
                     // TODO: dnt下键时会取消选择，但是undo时不会恢复
                     // 由于完全没看懂怎么实现的所以先这样。
                     // 效果理论上一致
@@ -132,7 +131,7 @@ namespace Deenote.Edit
         public void RemoveSelectedNotes()
         {
             // __selectedNotes.Sort(NoteTimeComparer.Instance);
-            _operationHistory.Do(_stage.Chart.Notes.RemoveNotes(SelectedNotes)
+            _operationHistory.Do(Stage.Chart.Notes.RemoveNotes(SelectedNotes)
                 // TODO: 目前删除时会取消选择，undo时不会恢复
                 // 考虑在RemoveNoteOperataion添加恢复时将被删note添加回_selectedNotes的逻辑
                 // PS: 如果_selectedNotes不为空，undo时保留已有notes。
@@ -149,12 +148,12 @@ namespace Deenote.Edit
                     OnNotesChanged(true, true);
                 }));
 
-            NoteTimeComparer.AssertInOrder(_stage.Chart.Data.Notes);
+            NoteTimeComparer.AssertInOrder(Stage.Chart.Data.Notes);
         }
 
         public void AddNotesSnappingToCurve(int count)
         {
-            var curveTime = _stage.Grids.CurveTime;
+            var curveTime = Stage.Grids.CurveTime;
             if (curveTime is null)
                 return;
             var (startTime, endTime) = curveTime.Value;
@@ -163,10 +162,10 @@ namespace Deenote.Edit
             list.Capacity = Mathf.Max(count, list.Capacity);
             for (int i = 0; i < count; i++) {
                 var time = startTime + (endTime - startTime) / (count + 1) * (i + 1);
-                var coord = _stage.Grids.Quantize(new(0f, time), true, false);
+                var coord = Stage.Grids.Quantize(new(0f, time), true, false);
                 list.Add(new NoteData { PositionCoord = coord, });
             }
-            _operationHistory.Do(_stage.Chart.Notes.AddMultipleNotes(new NoteCoord(0f, startTime), list)
+            _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(new NoteCoord(0f, startTime), list)
                 .WithRedoneAction(notes =>
                 {
                     OnNoteSelectionChanging();
@@ -211,10 +210,10 @@ namespace Deenote.Edit
                 var coord = mousePosition;
                 if (rememberPosition) {
                     coord.Position = _clipBoardBasePosition;
-                    coord = _stage.Grids.Quantize(coord, false, SnapToTimeGrid);
+                    coord = Stage.Grids.Quantize(coord, false, SnapToTimeGrid);
                 }
                 else {
-                    coord = _stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
+                    coord = Stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
                 }
 
                 Debug.Assert(_noteIndicatorList.Count == _clipBoardNotes.Count);
@@ -225,7 +224,7 @@ namespace Deenote.Edit
                 }
             }
             else {
-                var qPos = _stage.Grids.Quantize(NoteCoord.ClampPosition(mousePosition), SnapToPositionGrid, SnapToTimeGrid);
+                var qPos = Stage.Grids.Quantize(NoteCoord.ClampPosition(mousePosition), SnapToPositionGrid, SnapToTimeGrid);
                 _noteIndicatorList[0].MoveTo(qPos);
             }
         }

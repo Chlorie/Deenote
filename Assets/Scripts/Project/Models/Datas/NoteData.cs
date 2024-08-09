@@ -2,6 +2,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UnityEngine;
 
 namespace Deenote.Project.Models.Datas
@@ -19,10 +21,11 @@ namespace Deenote.Project.Models.Datas
 
         [SerializeField]
         [JsonProperty("sounds")]
-        private List<PianoSoundData> _sounds;
+        private List<PianoSoundData>? _sounds;
+        [AllowNull]
         public List<PianoSoundData> Sounds
         {
-            get => _sounds ??= new();
+            get => _sounds ??= new List<PianoSoundData>();
             init => _sounds = value;
         }
 
@@ -94,24 +97,26 @@ namespace Deenote.Project.Models.Datas
         /// </summary>
         [Obsolete("For deserialization only, use Time instead", true)]
         [JsonProperty("time")]
-        public float TimeDuplicate { get => Time; set { } }
+        public float TimeDuplicate { get => Time; set => Time = value; }
 
         #endregion
 
         [SerializeField]
         private bool _isSlide;
         [SerializeField]
-        private NoteData _nextLinkNote;
+        private NoteData? _nextLinkNote;
         [SerializeField]
-        private NoteData _prevLinkNote;
+        private NoteData? _prevLinkNote;
 
         public bool IsSlide
         {
             get => _isSlide;
-            set {
+            set
+            {
                 if (value == _isSlide)
                     return;
-                if (!value) {
+                if (!value)
+                {
                     if (_prevLinkNote is not null)
                         _prevLinkNote.NextLink = null;
                     if (_nextLinkNote is not null)
@@ -119,24 +124,25 @@ namespace Deenote.Project.Models.Datas
                 }
                 _prevLinkNote = _nextLinkNote = null;
                 _isSlide = value;
-                return;
             }
         }
 
-        public NoteData PrevLink
+        public NoteData? PrevLink
         {
             get => _prevLinkNote;
-            set {
+            set
+            {
                 if (value != null)
                     _isSlide = true;
                 _prevLinkNote = value;
             }
         }
 
-        public NoteData NextLink
+        public NoteData? NextLink
         {
             get => _nextLinkNote;
-            set {
+            set
+            {
                 if (value != null)
                     _isSlide = true;
                 _nextLinkNote = value;
@@ -159,15 +165,15 @@ namespace Deenote.Project.Models.Datas
 
         public NoteData Clone(bool cloneSounds = true)
         {
-            List<PianoSoundData> sounds = null;
-            if (cloneSounds) {
+            List<PianoSoundData>? sounds = null;
+            if (cloneSounds)
+            {
                 sounds = new List<PianoSoundData>(Sounds.Count);
-                foreach (var s in Sounds) {
-                    sounds.Add(s.Clone());
-                }
+                sounds.AddRange(Sounds.Select(s => s.Clone()));
             }
 #pragma warning disable CS0618 // Clone all
-            return new NoteData {
+            return new NoteData
+            {
                 Type = Type,
                 Sounds = sounds,
                 Position = Position,

@@ -1,6 +1,7 @@
 using Deenote.Project.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -10,46 +11,53 @@ namespace Deenote.Project
 {
     partial class ProjectManager
     {
-        private static bool TryLoadFromDsproj(string filePath, out ProjectModel project)
+        private static bool TryLoadFromDsproj(string filePath, [NotNullWhen(true)] out ProjectModel? project)
         {
-            try {
+            try
+            {
                 using var fs = File.OpenRead(filePath);
                 var obj = LegacyProjectSerialization.Formatter.Deserialize(fs);
-                project = obj switch {
+                project = obj switch
+                {
                     LegacyProjectSerialization.SerializableProjectData v1 => ToVer3(v1),
                     LegacyProjectSerialization.FullProjectDataV2 v2 => ToVer3(v2),
                     _ => null,
                 };
                 return project is not null;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Debug.LogError(ex.Message);
                 project = null;
-                return false; ;
+                return false;
             }
-
         }
 
         // Copy from Chlorie
         private static LegacyProjectSerialization.FullProjectDataV2 ToVersion2(LegacyProjectSerialization.SerializableProjectData dataV1)
         {
-            var dataV2 = new LegacyProjectSerialization.FullProjectDataV2 {
-                project = dataV1.project,
-                audioType = ".wav"
-            };
-            var wavEncoder = new WavEncoder {
-                channel = dataV1.channel,
-                frequency = dataV1.frequency,
-                length = dataV1.length,
-                sampleData = dataV1.sampleData
-            };
-            wavEncoder.EncodeToWav(out dataV2.audio);
-            dataV2.project.songName = "converted audio.wav";
-            return dataV2;
+            throw new NotImplementedException();
+            // var dataV2 = new LegacyProjectSerialization.FullProjectDataV2
+            // {
+            //     project = dataV1.project,
+            //     audioType = ".wav"
+            // };
+            // var wavEncoder = new WavEncoder
+            // {
+            //     channel = dataV1.channel,
+            //     frequency = dataV1.frequency,
+            //     length = dataV1.length,
+            //     sampleData = dataV1.sampleData
+            // };
+            // wavEncoder.EncodeToWav(out dataV2.audio);
+            // dataV2.project.songName = "converted audio.wav";
+            // return dataV2;
         }
 
         private static ProjectModel ToVer3(LegacyProjectSerialization.SerializableProjectData dataV1)
         {
-            var proj = new ProjectModel {
+            var proj = new ProjectModel
+            {
                 //Name = dataV1.project.name,
                 MusicName = dataV1.project.songName,
                 ChartDesigner = dataV1.project.songName,
@@ -69,7 +77,8 @@ namespace Deenote.Project
 
         private sealed class LegacyProjectSerialization : SerializationBinder
         {
-            public static readonly BinaryFormatter Formatter = new() {
+            public static readonly BinaryFormatter Formatter = new()
+            {
                 Binder = new LegacyProjectSerialization(),
             };
 
@@ -77,8 +86,10 @@ namespace Deenote.Project
 
             public override Type BindToType(string assemblyName, string typeName)
             {
-                if (assemblyName.StartsWith("Assembly-CSharp")) {
-                    return typeName switch {
+                if (assemblyName.StartsWith("Assembly-CSharp"))
+                {
+                    return typeName switch
+                    {
                         "FullProjectDataV2" => typeof(FullProjectDataV2),
                         "SerializableProjectData" => typeof(SerializableProjectData),
                         "Project" => typeof(Project),
@@ -89,13 +100,16 @@ namespace Deenote.Project
                     };
                 }
 
-                if (typeName.StartsWith("System.Collections.Generic.List`1")) {
+                if (typeName.StartsWith("System.Collections.Generic.List`1"))
+                {
                     var typeFullName = typeName.AsSpan("System.Collections.Generic.List`1".Length + 2);
                     var comma = typeFullName.IndexOf(',');
                     var assName = typeFullName[(comma + 2)..];
-                    if (assName.StartsWith("Assembly-CSharp")) {
+                    if (assName.StartsWith("Assembly-CSharp"))
+                    {
                         var tyName = typeFullName[..comma];
-                        return tyName.ToString() switch {
+                        return tyName.ToString() switch
+                        {
                             "Note" => typeof(List<Note>),
                             "PianoSound" => typeof(List<PianoSound>),
                             _ => throw new InvalidOperationException("Unknown type"),
@@ -103,7 +117,7 @@ namespace Deenote.Project
                     }
                 }
 
-                return Type.GetType($"{typeName}, {assemblyName}");
+                return Type.GetType($"{typeName}, {assemblyName}")!;
             }
 
             [Serializable]

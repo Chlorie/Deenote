@@ -7,16 +7,17 @@ namespace Deenote.Components
     [RequireComponent(typeof(GridLayoutGroup))]
     public class AutoScalingGrid : MonoBehaviour
     {
-        [SerializeField] GridLayoutGroup _layoutGroup;
+        [SerializeField] private GridLayoutGroup _layoutGroup = null!;
 
         // TODO: 
         private void Update()
         {
-            switch (_layoutGroup.constraint) {
+            switch (_layoutGroup.constraint)
+            {
                 case GridLayoutGroup.Constraint.Flexible:
                     return;
                 case GridLayoutGroup.Constraint.FixedColumnCount:
-                    var width = (transform as RectTransform).rect.width;
+                    var width = (transform as RectTransform)!.rect.width;
                     var cellSize = _layoutGroup.cellSize;
                     var elemTotalWidth = width - _layoutGroup.padding.horizontal - _layoutGroup.spacing.x * (_layoutGroup.constraintCount - 1);
                     cellSize.x = elemTotalWidth / _layoutGroup.constraintCount;

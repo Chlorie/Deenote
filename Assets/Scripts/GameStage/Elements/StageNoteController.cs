@@ -6,14 +6,14 @@ namespace Deenote.GameStage.Elements
 {
     public sealed class StageNoteController : MonoBehaviour
     {
-        [SerializeField] SpriteRenderer _noteSpriteRenderer;
-        [SerializeField] SpriteRenderer _explosionHitEffectSpriteRenderer;
-        [SerializeField] SpriteRenderer _circleHitEffectSpriteRenderer;
-        [SerializeField] SpriteRenderer _waveHitEffectSpriteRenderer;
-        [SerializeField] SpriteRenderer _glowHitEffectSpriteRenderer;
+        [SerializeField] private SpriteRenderer _noteSpriteRenderer = null!;
+        [SerializeField] private SpriteRenderer _explosionHitEffectSpriteRenderer = null!;
+        [SerializeField] private SpriteRenderer _circleHitEffectSpriteRenderer = null!;
+        [SerializeField] private SpriteRenderer _waveHitEffectSpriteRenderer = null!;
+        [SerializeField] private SpriteRenderer _glowHitEffectSpriteRenderer = null!;
 
         [Header("")]
-        [SerializeField] AudioSource _effectSoundSource;
+        [SerializeField] private AudioSource _effectSoundSource = null!;
 
         private (Vector2, Vector2)? _linkLine;
 
@@ -23,7 +23,7 @@ namespace Deenote.GameStage.Elements
 
         [Header("Datas")]
         [SerializeField]
-        private NoteModel _note;
+        private NoteModel _note = null!;
         public NoteModel Model => _note;
 
         [SerializeField]
@@ -151,7 +151,7 @@ namespace Deenote.GameStage.Elements
                 float alpha = Mathf.Clamp01((Stage.StageNoteAheadTime - timeOffset) / MainSystem.Args.StageNoteFadeInTime);
                 _noteSpriteRenderer.color =
                     Model.IsSelected ? MainSystem.Args.NoteSelectedColor.WithAlpha(alpha) :
-                    Model.IsCollided && !Model.Data.IsSlide ? MainSystem.Args.NoteCollidedColor.WithAlpha(alpha) :
+                    Model is { IsCollided: true, Data.IsSlide: false } ? MainSystem.Args.NoteCollidedColor.WithAlpha(alpha) :
                     Color.white.WithAlpha(alpha);
 
                 // Position
@@ -213,7 +213,6 @@ namespace Deenote.GameStage.Elements
                     float ratio = time <= prefabs.WaveGrowTime
                         ? time / prefabs.WaveGrowTime
                         : 1 - (time - prefabs.WaveGrowTime) / prefabs.WaveFadeTime;
-                    float height = ratio * prefabs.WaveScale;
                     float alpha = Mathf.Pow(ratio, 0.5f);
                     _waveHitEffectSpriteRenderer.transform.localScale = _note.Data.Size * prefabs.WaveScale * new Vector3(1, ratio, ratio);
                     _waveHitEffectSpriteRenderer.color = _waveColor.WithAlpha(alpha);

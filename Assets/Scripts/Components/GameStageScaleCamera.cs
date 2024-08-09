@@ -6,9 +6,9 @@ namespace Deenote.Components
     [ExecuteAlways]
     public sealed class GameStageScaleCamera : MonoBehaviour
     {
-        [SerializeField] Camera _camera;
-        [Range(0f,180f)]
-        [SerializeField] float _horizontalFOV = 120f;
+        [SerializeField] private Camera _camera = null!;
+        [Range(0f, 180f)]
+        [SerializeField] private float _horizontalFOV = 120f;
 
         // TODO:不需要时刻更新相机设置，更改为Awake
         private void Update()

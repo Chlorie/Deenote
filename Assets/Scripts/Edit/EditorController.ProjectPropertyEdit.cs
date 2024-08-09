@@ -39,18 +39,18 @@ namespace Deenote.Edit
         public void InsertTempo(Tempo tempo, float endTime)
         {
             _operationHistory.Do(_projectManager.CurrentProject.Tempos.InsertTempo(tempo, endTime)
-                .WithDoneAction(_stage.Grids.NotifyCurrentProjectTemposChanged));
+                .WithDoneAction(Stage.Grids.NotifyCurrentProjectTemposChanged));
         }
 
         public void EditChartName(string name)
         {
-            _stage.Chart.Name = name;
+            Stage.Chart.Name = name;
             _propertiesWindow.NotifyChartNameChanged(name);
         }
 
         public void EditChartDifficulty(Difficulty difficulty)
         {
-            _stage.Chart.Difficulty = difficulty;
+            Stage.Chart.Difficulty = difficulty;
             _propertiesWindow.NotifyChartDifficultyChanged(difficulty);
         }
     }
