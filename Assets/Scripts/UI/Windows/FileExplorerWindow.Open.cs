@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Deenote.UI.Windows
@@ -15,7 +14,7 @@ namespace Deenote.UI.Windows
         /// list the last explored dir if <see langword="null" />
         /// </param>
         /// <returns></returns>
-        public async UniTask<Result> OpenSelectFileAsync(string[] extensionFilters, string initialDirectory = null)
+        public async UniTask<Result> OpenSelectFileAsync(string[] extensionFilters, string? initialDirectory = null)
         {
             if (await OpenAsync(extensionFilters, initialDirectory))
                 return new(_selectedFilePath);
@@ -23,7 +22,7 @@ namespace Deenote.UI.Windows
                 return default;
         }
 
-        public async UniTask<Result> OpenSelectDirectoryAsync(string initialDirectory = null)
+        public async UniTask<Result> OpenSelectDirectoryAsync(string? initialDirectory = null)
         {
             if (await OpenAsync(null, initialDirectory))
                 return new(CurrentDirectory);
@@ -37,18 +36,19 @@ namespace Deenote.UI.Windows
         /// <param name="fileExtension">The extension of inputted file</param>
         /// <param name="initialDirectory"></param>
         /// <returns></returns>
-        public async UniTask<Result> OpenInputFileAsync(string fileExtension = null, string initialDirectory = null)
+        public async UniTask<Result> OpenInputFileAsync(string? fileExtension = null, string? initialDirectory = null)
         {
             if (await OpenAsync(null, initialDirectory, true, fileExtension))
-                return new(Path.Combine(CurrentDirectory, $"{_fileNameInputField.text}{fileExtension}"));
+                return new(Path.Combine(CurrentDirectory!, $"{_fileNameInputField.text}{fileExtension}"));
             else
                 return default;
         }
 
-        private async UniTask<bool> OpenAsync(string[] extensionFilters, string initialDirectory = null,
-            bool inputMode = false, string inputModeFileExtension = null)
+        private async UniTask<bool> OpenAsync(string[]? extensionFilters, string? initialDirectory = null,
+            bool inputMode = false, string? inputModeFileExtension = null)
         {
             Window.IsActivated = true;
+            MainSystem.WindowsManager.FocusOn(Window);
 
             using var confirmHandler = _confirmButton.GetAsyncClickEventHandler();
             using var cancelHandler = _cancelButton.GetAsyncClickEventHandler();

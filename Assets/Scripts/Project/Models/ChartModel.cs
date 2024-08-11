@@ -2,19 +2,19 @@ using Deenote.Project.Comparers;
 using Deenote.Project.Models.Datas;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Deenote.Project.Models
 {
     public sealed partial class ChartModel
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         public Difficulty Difficulty { get; set; }
 
-        public string Level { get; set; }
+        public string Level { get; set; } = "";
 
-        private ChartData _data;
+        private ChartData _data = null!;
         public ChartData Data
         {
             get => _data;
@@ -33,7 +33,7 @@ namespace Deenote.Project.Models
         }
 
         // NonSerialize
-        private List<NoteModel> _visibleNotes;
+        private List<NoteModel> _visibleNotes = null!;
         public NoteModelListProxy Notes => new(this);
 
         public ChartModel(ChartData data)
@@ -51,6 +51,7 @@ namespace Deenote.Project.Models
 
             public int Count => _chartModel._visibleNotes.Count;
 
+            [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
             public int Search(NoteModel note)
             {
                 var index = _chartModel._visibleNotes.BinarySearch(note, NoteTimeComparer.Instance);

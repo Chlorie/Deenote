@@ -14,11 +14,11 @@ namespace Deenote.Project.Comparers
         public int Compare(NoteData x, NoteData y) => Comparer<float>.Default.Compare(x.Time, y.Time);
 
         [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
-        public static void AssertInOrder(IEnumerable<NoteModel> notes, string additionMessage = null)
+        public static void AssertInOrder(IEnumerable<NoteModel> notes, string? additionMessage = null)
             => AssertInOrder(notes.Select(n => n.Data), additionMessage);
 
         [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
-        public static void AssertInOrder(IEnumerable<NoteData> notes, string additionMessage = null)
+        public static void AssertInOrder(IEnumerable<NoteData> notes, string? additionMessage = null)
         {
             using var enumerator = notes.GetEnumerator();
             if (!enumerator.MoveNext())
@@ -27,7 +27,7 @@ namespace Deenote.Project.Comparers
 
             while (enumerator.MoveNext()) {
                 var curr = enumerator.Current;
-                if (curr.Time < prev.Time) {
+                if (curr!.Time < prev!.Time) {
                     Debug.Assert(false, $"Notes not in order: {additionMessage}");
                 }
                 prev = curr;

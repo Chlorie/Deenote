@@ -21,9 +21,9 @@ namespace Deenote.Project.Models.Datas.Serialization
             public object ResolveReference(object context, string reference) => new DeV3Link.NoteRef { id = int.Parse(reference) };
         }
 
-        public static ChartData ParseDeV3Json(string json)
+        public static ChartData? ParseDeV3Json(string json)
         {
-            JObject jobj = JsonConvert.DeserializeObject<JObject>(json);
+            JObject? jobj = JsonConvert.DeserializeObject<JObject>(json);
             if (jobj is null)
                 return null;
 

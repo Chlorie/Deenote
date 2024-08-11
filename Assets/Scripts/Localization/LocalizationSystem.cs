@@ -11,15 +11,15 @@ namespace Deenote.Localization
     public sealed class LocalizationSystem : MonoBehaviour
     {
         private string _defaultLanguage = "English";
-        private Dictionary<string, string>? _defaultLocalizedTexts;
+        private Dictionary<string, string> _defaultLocalizedTexts = null!;
 
         private string? _currentLanguage;
         private Dictionary<string, string>? _localizedTexts;
 
-        private List<string> _languages;
-        private List<Dictionary<string, string>> _allTextDictionaries;
+        private List<string> _languages = new();
+        private List<Dictionary<string, string>> _allTextDictionaries = new();
 
-        public event Action OnLanguageChanged;
+        public event Action? OnLanguageChanged;
 
         // We public List<string> because Unity's Dropdown requires a List
         public List<string> Languages => _languages;
@@ -61,8 +61,6 @@ namespace Deenote.Localization
             // Load all languages at start
             var folder = Path.Combine(Application.streamingAssetsPath, "Languages");
             var files = Directory.GetFiles(folder);
-            _languages = new();
-            _allTextDictionaries = new();
             foreach (var file in files) {
                 if (file.EndsWith(".txt")) {
                     var (name, texts) = LoadLanguagePack(file);
@@ -71,9 +69,8 @@ namespace Deenote.Localization
                 }
             }
 
-            if (!TryGetTextDictionary(_defaultLanguage, out _defaultLocalizedTexts)) {
-                _defaultLocalizedTexts = new();
-            }
+            TryGetTextDictionary(_defaultLanguage, out var defTexts);
+            _defaultLocalizedTexts = defTexts ?? new Dictionary<string, string>();
         }
 
         private (string Name, Dictionary<string, string> Texts) LoadLanguagePack(string filePath)
@@ -85,8 +82,7 @@ namespace Deenote.Localization
 
             var name = reader.ReadLine();
 
-            while (!reader.EndOfStream && reader.ReadLine() is { } line)
-            {
+            while (!reader.EndOfStream && reader.ReadLine() is { } line) {
                 // Comment
                 if (line.StartsWith('#'))
                     continue;
@@ -98,11 +94,9 @@ namespace Deenote.Localization
 
                 string key = line[..seperator];
                 string value;
-                if (line.AsSpan(seperator + 1) == "\"\"\"")
-                {
+                if (line.AsSpan(seperator + 1) == "\"\"\"") {
                     StringBuilder sb = new();
-                    while (!reader.EndOfStream)
-                    {
+                    while (!reader.EndOfStream) {
                         line = reader.ReadLine();
                         if (line is null or "\"\"\"")
                             break;
@@ -110,8 +104,7 @@ namespace Deenote.Localization
                     }
                     value = sb.ToString();
                 }
-                else
-                {
+                else {
                     value = line[(seperator + 1)..].Replace("<br/>", "\r\n");
                 }
 
@@ -122,7 +115,7 @@ namespace Deenote.Localization
             return (name, dict);
         }
 
-        private bool TryGetTextDictionary(string languageName, out Dictionary<string, string> texts)
+        private bool TryGetTextDictionary(string languageName, [NotNullWhen(true)] out Dictionary<string, string>? texts)
         {
             var index = _languages.IndexOf(languageName);
             if (index < 0) {

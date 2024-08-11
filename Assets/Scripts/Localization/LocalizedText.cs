@@ -10,19 +10,19 @@ namespace Deenote.Localization
     public sealed class LocalizedText : MonoBehaviour
     {
         [SerializeField] private TMP_Text _text = null!;
-        [SerializeField] private string? _textKey;
+        [SerializeField] private string _textKey = "";
         [SerializeField] private bool _isLocalized;
 
         private List<string> _args = new();
 
         public TMP_Text TmpText => _text;
 
-        public event Action<LocalizedText> OnTextUpdated;
+        public event Action<LocalizedText>? OnTextUpdated;
 
         // I have to do this because there's a huge amount of assigned components in editor...
         private LocalizableText LocalizableText
         {
-            get => _isLocalized ? Localization.LocalizableText.Localized(_textKey) : Localization.LocalizableText.Raw(_textKey);
+            get => _isLocalized ? LocalizableText.Localized(_textKey) : LocalizableText.Raw(_textKey);
             set => (_isLocalized, _textKey) = (value.IsLocalized, value.TextOrKey);
         }
 

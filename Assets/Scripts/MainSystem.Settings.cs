@@ -2,20 +2,20 @@ using UnityEngine;
 
 namespace Deenote
 {
-    partial class MainSystem : MonoBehaviour
+    partial class MainSystem
     {
         [Header("Settings")]
         [SerializeField] bool __isVSyncOn;
 
         public static bool IsVSyncOn
         {
-            get => _instance. __isVSyncOn;
+            get => Instance. __isVSyncOn;
             set {
-                if (_instance.__isVSyncOn == value)
+                if (Instance.__isVSyncOn == value)
                     return;
-                _instance.__isVSyncOn = value;
-                QualitySettings.vSyncCount = _instance.__isVSyncOn ? 1 : 0;
-                PreferenceWindow.NotifyIsVSyncOnChanged(_instance.__isVSyncOn);
+                Instance.__isVSyncOn = value;
+                QualitySettings.vSyncCount = Instance.__isVSyncOn ? 1 : 0;
+                PreferenceWindow.NotifyIsVSyncOnChanged(Instance.__isVSyncOn);
             }
         }
     }

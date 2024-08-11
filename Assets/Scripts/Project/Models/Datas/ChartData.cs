@@ -3,6 +3,7 @@ using Deenote.Project.Models.Datas.Serialization;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace Deenote.Project.Models.Datas
@@ -94,20 +95,20 @@ namespace Deenote.Project.Models.Datas
 
         public static ChartData Load(string json)
         {
-            return JsonConvert.DeserializeObject<ChartData>(json);
+            return JsonConvert.DeserializeObject<ChartData>(json)!;
         }
 
-        public static bool TryLoad(string json, out ChartData chart)
+        public static bool TryLoad(string json, [NotNullWhen(true)] out ChartData? chart)
         {
             try {
                 chart = JsonConvert.DeserializeObject<ChartData>(json);
-                return true;
-            } catch (Exception) { }
+                if (chart is not null) return true;
+            } catch (Exception) { /* ignored */ }
 
             try {
                 chart = ChartAdapter.ParseDeV3Json(json);
-                return true;
-            } catch (Exception) { }
+                if (chart is not null) return true;
+            } catch (Exception) { /* ignored */ }
 
             chart = null;
             return false;

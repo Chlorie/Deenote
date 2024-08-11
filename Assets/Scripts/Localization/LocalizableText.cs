@@ -18,7 +18,7 @@ namespace Deenote.Localization
 
         public static LocalizableText Localized(string textKey) => new(true, textKey);
 
-        public override bool Equals(object obj) => obj is LocalizableText text && (this == text);
+        public override bool Equals(object? obj) => obj is LocalizableText text && this == text;
         public override int GetHashCode() => HashCode.Combine(IsLocalized, TextOrKey);
 
         public static bool operator ==(LocalizableText left, LocalizableText right) => left.IsLocalized == right.IsLocalized && left.TextOrKey == right.TextOrKey;

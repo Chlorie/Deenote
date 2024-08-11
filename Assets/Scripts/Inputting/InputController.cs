@@ -11,6 +11,7 @@ namespace Deenote.Inputting
         {
             get => __mouseScrollSensitivity;
             set {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (__mouseScrollSensitivity == value)
                     return;
                 __mouseScrollSensitivity = value;
@@ -20,10 +21,7 @@ namespace Deenote.Inputting
 
         private float _tryPlayResetTime;
 
-        private void Update()
-        {
-            DetectKeys();
-        }
+        private void Update() => DetectKeys();
 
         private void DetectKeys()
         {

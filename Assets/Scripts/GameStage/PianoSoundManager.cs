@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
-using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -14,7 +13,7 @@ namespace Deenote.GameStage
         public const int MinPitch = 0;
 
         private static readonly int[] _pitches = { 24, 38, 43, 48, 53, 57, 60, 64, 67, 71, 74, 77, 81, 84, 89, 95 };
-        private static readonly int[] _volumes = { 38, 63, 111, 127 };
+        private static readonly int[] _velocities = { 38, 63, 111, 127 };
 
         [SerializeField] private AudioSource _audioPlayerPrefab = null!;
         [SerializeField] private Transform _audioPlayerParentTransform = null!;
@@ -23,12 +22,12 @@ namespace Deenote.GameStage
         [SerializeField] private AudioClip[] _soundClips = null!;
 
         // Mirrored from Chlorie's
-        public async UniTaskVoid PlaySoundAsync(int pitch, int volume, float? duration, float delay, float speed)
+        public async UniTaskVoid PlaySoundAsync(int pitch, int velocity, float? duration, float delay, float speed)
         {
-            if (volume == 0 || duration == 0)
+            if (velocity == 0 || duration == 0)
                 return;
 
-            var clip = GetSoundClip(pitch, volume, out var speedMultiplier, out var playVolume);
+            var clip = GetSoundClip(pitch, velocity, out var speedMultiplier, out var playVolume);
             float playSpeed = speed * speedMultiplier;
             float playDelay_s = delay / speed;
 
@@ -65,6 +64,7 @@ namespace Deenote.GameStage
             // }
         }
 
+        // TODO: split playback volume and velocity
         public UniTaskVoid PlaySoundAsync(PianoSoundData sound, float volume, float speed)
             => PlaySoundAsync(sound.Pitch, (int)(sound.Velocity * volume), sound.Duration, sound.Delay, speed);
 
@@ -77,9 +77,9 @@ namespace Deenote.GameStage
         }
 
         // Mirrored from Chlorie's
-        private AudioClip GetSoundClip(int pitch, int volume, out float speedMultiplier, out float playVolume)
+        private AudioClip GetSoundClip(int pitch, int velocity, out float speedMultiplier, out float playVelocity)
         {
-            Debug.Assert(volume != 0);
+            Debug.Assert(velocity != 0);
 
             int pitchDiff = MaxPitch;
             int nearestPitchIndex = 0;
@@ -91,20 +91,20 @@ namespace Deenote.GameStage
                 }
             }
 
-            float volRatio = MaxPitch + 1f;
-            int nearestVolumeIndex = 0;
+            float velRatio = MaxPitch + 1f;
+            int nearestVelIdx = 0;
             for (int i = 0; i < 4; i++) {
-                int v = _volumes[i];
-                float ratio = v > volume ? (float)v / volume : (float)volume / v;
-                if (ratio < volRatio) {
-                    volRatio = ratio;
-                    nearestVolumeIndex = i;
+                int v = _velocities[i];
+                float ratio = v > velocity ? (float)v / velocity : (float)velocity / v;
+                if (ratio < velRatio) {
+                    velRatio = ratio;
+                    nearestVelIdx = i;
                 }
             }
 
-            int index = nearestPitchIndex * 4 + nearestVolumeIndex;
+            int index = nearestPitchIndex * 4 + nearestVelIdx;
             speedMultiplier = Mathf.Pow(2f, (pitch - _pitches[nearestPitchIndex]) / 12f);
-            playVolume = (float)volume / _volumes[nearestVolumeIndex];
+            playVelocity = (float)velocity / _velocities[nearestVelIdx];
             return _soundClips[index];
         }
 

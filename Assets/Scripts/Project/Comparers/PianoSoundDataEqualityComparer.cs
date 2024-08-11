@@ -1,6 +1,7 @@
 using Deenote.Project.Models.Datas;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Deenote.Project.Comparers
 {
@@ -8,6 +9,7 @@ namespace Deenote.Project.Comparers
     {
         public static readonly PianoSoundDataEqualityComparer Instance = new();
 
+        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         public bool Equals(PianoSoundData x, PianoSoundData y)
             => x.Pitch == y.Pitch
             && x.Duration == y.Duration

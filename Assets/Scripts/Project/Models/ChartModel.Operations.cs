@@ -220,8 +220,8 @@ namespace Deenote.Project.Models
                 private readonly ChartModel _chartModel;
                 private readonly NoteModel _note;
 
-                private Action _onRedone;
-                private Action _onUndone;
+                private Action? _onRedone;
+                private Action? _onUndone;
 
                 private ListReadOnlyView<NoteModel> _collidedNotes;
 
@@ -291,8 +291,8 @@ namespace Deenote.Project.Models
                 private readonly ChartModel _chartModel;
                 private readonly NoteModel[] _notes;
 
-                private Action<NoteModel[]> _onRedone;
-                private Action<NoteModel[]> _onUndone;
+                private Action<NoteModel[]>? _onRedone;
+                private Action<NoteModel[]>? _onUndone;
 
                 private readonly ListReadOnlyView<NoteModel>[] _collidedNotes;
 
@@ -373,8 +373,8 @@ namespace Deenote.Project.Models
 
                 private readonly UnlinkNotesOperation _unlinkOperation;
 
-                private Action _onRedone;
-                private Action<NoteModel[]> _onUndone;
+                private Action? _onRedone;
+                private Action<NoteModel[]>? _onUndone;
                 private readonly ListReadOnlyView<NoteModel>[] _collidedNotes;
 
                 public RemoveNotesOperation((int ModelIndex, int DataIndex)[] removeIndices, ChartModel chartModel)
@@ -456,15 +456,15 @@ namespace Deenote.Project.Models
                 //private readonly (NoteModel Note, (bool IsSlide, NoteData Prev, NoteData Next) OldValue, (NoteData Prev, NoteData Next) NewValue)[] _contexts;
 
                 private readonly NoteModel[] _notes;
-                private readonly (bool IsSlide, NoteData Prev, NoteData Next)[] _oldValues;
+                private readonly (bool IsSlide, NoteData? Prev, NoteData? Next)[] _oldValues;
 
-                private Action _onRedone;
-                private Action _onUndone;
+                private Action? _onRedone;
+                private Action? _onUndone;
 
                 public LinkNotesOperation(NoteModel[] notes)
                 {
                     _notes = notes;
-                    _oldValues = Utils.Array<(bool IsSlide, NoteData Prev, NoteData Next)>(_notes.Length);
+                    _oldValues = Utils.Array<(bool IsSlide, NoteData? Prev, NoteData? Next)>(_notes.Length);
 
                     for (int i = 0; i < _notes.Length; i++) {
                         var data = _notes[i].Data;
@@ -527,15 +527,15 @@ namespace Deenote.Project.Models
             public sealed class UnlinkNotesOperation : IUndoableOperation
             {
                 private readonly NoteModel[] _notes;
-                private readonly (bool IsSlide, NoteData Prev, NoteData Next)[] _oldValues;
+                private readonly (bool IsSlide, NoteData? Prev, NoteData? Next)[] _oldValues;
 
-                private Action _onRedone;
-                private Action _onUndone;
+                private Action? _onRedone;
+                private Action? _onUndone;
 
                 public UnlinkNotesOperation(NoteModel[] contexts)
                 {
                     _notes = contexts;
-                    _oldValues = Utils.Array<(bool IsSlide, NoteData Prev, NoteData Next)>(_notes.Length);
+                    _oldValues = Utils.Array<(bool IsSlide, NoteData? Prev, NoteData? Next)>(_notes.Length);
 
                     for (int i = 0; i < _notes.Length; i++) {
                         var data = _notes[i].Data;
@@ -594,14 +594,14 @@ namespace Deenote.Project.Models
                 private readonly Action<NoteData, T> _valueSetter;
                 private readonly ChartModel _chartModel;
 
-                private Action _onDone;
+                private Action? _onDone;
 
                 private bool _isRequireSortNotes;
                 private bool _isRequireUpdateCollision;
-                private int[] _beforeNoteIndices;
-                private int[] _afterNoteIndices;
-                private ListReadOnlyView<NoteModel>[] _beforeCollidedNotes;
-                private ListReadOnlyView<NoteModel>[] _afterCollidedNotes;
+                private int[]? _beforeNoteIndices;
+                private int[]? _afterNoteIndices;
+                private ListReadOnlyView<NoteModel>[]? _beforeCollidedNotes;
+                private ListReadOnlyView<NoteModel>[]? _afterCollidedNotes;
                 private (bool? IsInsertBefore, NoteData BeforeRefNote, NoteData AfterRefNote)[] _linkChangeDatas;
 
                 public EditNotesPropertyOperation((NoteModel, T OldValue)[] contexts, T newValue, Action<NoteData, T> edit, ChartModel chartModel)
@@ -890,7 +890,7 @@ namespace Deenote.Project.Models
                 private readonly (NoteModel Note, PianoSoundValueData[] OldValues)[] _contexts;
                 private readonly PianoSoundValueData[] _newValue;
 
-                private Action _onDone;
+                private Action? _onDone;
 
                 public EditNotesSoundsOperation((NoteModel Note, PianoSoundValueData[] OldValues)[] contexts, PianoSoundValueData[] newValue)
                 {

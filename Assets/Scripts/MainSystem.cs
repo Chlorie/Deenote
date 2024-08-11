@@ -10,14 +10,13 @@ using Deenote.UI.MenuBar;
 using Deenote.UI.StatusBar;
 using Deenote.UI.ToolBar;
 using Deenote.UI.Windows;
+using Deenote.Utilities;
 using UnityEngine;
 
 namespace Deenote
 {
-    public sealed partial class MainSystem : MonoBehaviour
+    public sealed partial class MainSystem : SingletonBehavior<MainSystem>
     {
-        private static MainSystem _instance;
-
         private readonly ResolutionAdjuster _resolutionAdjuster = new();
 
         [Header("UI")]
@@ -48,49 +47,38 @@ namespace Deenote
         [SerializeField] EditorController _editorController;
         [SerializeField] PianoSoundManager _pianoSoundManager;
 
-        public static ResolutionAdjuster ResolutionAdjuster => _instance._resolutionAdjuster;
+        public static ResolutionAdjuster ResolutionAdjuster => Instance._resolutionAdjuster;
 
-        public static MenuBarController MenuBar => _instance._menuBarController;
-        public static ToolBarController ToolBar => _instance._toolBarController;
-        public static StatusBarController StatusBar => _instance._statusBarController;
+        public static MenuBarController MenuBar => Instance._menuBarController;
+        public static ToolBarController ToolBar => Instance._toolBarController;
+        public static StatusBarController StatusBar => Instance._statusBarController;
 
-        public static PerspectiveViewWindow PerspectiveView => _instance._perspectiveViewWindow;
-        public static EditorPropertiesWindow EditorProperties => _instance._editorPropertiesWindow;
-        public static PianoSoundEditWindow PianoSoundEdit => _instance._pianoSoundEditWindow;
-        public static PreferencesWindow PreferenceWindow => _instance._preferenceWindow;
-        public static PropertiesWindow PropertiesWindow => _instance._propertiesWindow;
-        public static AboutWindow AboutWindow => _instance._aboutWindow;
+        public static PerspectiveViewWindow PerspectiveView => Instance._perspectiveViewWindow;
+        public static EditorPropertiesWindow EditorProperties => Instance._editorPropertiesWindow;
+        public static PianoSoundEditWindow PianoSoundEdit => Instance._pianoSoundEditWindow;
+        public static PreferencesWindow PreferenceWindow => Instance._preferenceWindow;
+        public static PropertiesWindow PropertiesWindow => Instance._propertiesWindow;
+        public static AboutWindow AboutWindow => Instance._aboutWindow;
 
-        public static FileExplorerWindow FileExplorer => _instance._fileExplorerWindow;
-        public static ProjectPropertiesWindow ProjectProperties => _instance._projectPropertiesWindow;
-        public static MessageBoxWindow MessageBox => _instance._messageBoxWindow;
+        public static FileExplorerWindow FileExplorer => Instance._fileExplorerWindow;
+        public static ProjectPropertiesWindow ProjectProperties => Instance._projectPropertiesWindow;
+        public static MessageBoxWindow MessageBox => Instance._messageBoxWindow;
 
-        public static LocalizationSystem Localization => _instance._localizationSystem;
-        public static UnhandledExceptionHandler ExceptionHandler => _instance._unhandledExceptionHandler;
-        public static VersionManager VersionManager => _instance._versionManager;
-        public static InputController Input => _instance._inputController;
-        public static WindowsManager WindowsManager => _instance._windowsManager;
+        public static LocalizationSystem Localization => Instance._localizationSystem;
+        public static UnhandledExceptionHandler ExceptionHandler => Instance._unhandledExceptionHandler;
+        public static VersionManager VersionManager => Instance._versionManager;
+        public static InputController Input => Instance._inputController;
+        public static WindowsManager WindowsManager => Instance._windowsManager;
 
-        public static ProjectManager ProjectManager => _instance._projectManager;
-        public static GameStageController GameStage => _instance._gameStageController;
-        public static EditorController Editor => _instance._editorController;
-        public static PianoSoundManager PianoSoundManager => _instance._pianoSoundManager;
-
-        /// <remarks>
-        /// This method invokes before all other custom Awake methods
-        /// </remarks>
-        private void Awake()
-        {
-            if (_instance != null)
-                throw new System.InvalidOperationException($"Only 1 instance of {nameof(MainSystem)} may exist");
-            _instance = this;
-        }
-
+        public static ProjectManager ProjectManager => Instance._projectManager;
+        public static GameStageController GameStage => Instance._gameStageController;
+        public static EditorController Editor => Instance._editorController;
+        public static PianoSoundManager PianoSoundManager => Instance._pianoSoundManager;
+        
         private void OnApplicationFocus(bool focus)
         {
-            if (!focus) {
-                if (GameStage.IsMusicPlaying)
-                    GameStage.PauseStage();
+            if (!focus && GameStage.IsMusicPlaying) {
+                GameStage.PauseStage();
             }
         }
 
@@ -113,10 +101,7 @@ namespace Deenote
                 LocalizableText.Localized("Message_Quit_Title"),
                 LocalizableText.Localized("Message_Quit_Content"),
                 _quitMessageButtons);
-            if (res != 0) {
-                return false;
-            }
-            return true;
+            return res == 0;
         }
 
         public static void QuitApplication()
@@ -208,9 +193,9 @@ namespace Deenote
             public const byte DeenoteProjectFileVersionMark = 1;
             public const string DeenoteCurrentVersion = "1.0";
 
-            public static readonly string[] SupportAudioFileExtensions = new[] { ".mp3", ".wav", };
-            public static readonly string[] SupportProjectFileExtensions = new[] { DeenotePreferFileExtension, ".dsproj", };
-            public static readonly string[] SupportChartFileExtensions = new[] { ".json", ".txt" };
+            public static readonly string[] SupportAudioFileExtensions = { ".mp3", ".wav", };
+            public static readonly string[] SupportProjectFileExtensions = { DeenotePreferFileExtension, ".dsproj", };
+            public static readonly string[] SupportChartFileExtensions = { ".json", ".txt" };
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Deenote.Project.Models.Datas
         public IEnumerable<NoteData> Notes
         {
             get {
-                NoteData current = _head;
+                NoteData? current = _head;
                 while (current is not null) {
                     yield return current;
                     current = current.NextLink;
