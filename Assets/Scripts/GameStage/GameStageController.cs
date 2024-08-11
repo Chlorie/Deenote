@@ -13,7 +13,6 @@ namespace Deenote.GameStage
 {
     public sealed partial class GameStageController : SingletonBehavior<GameStageController>
     {
-        [field: SerializeField] public Camera PerspectiveCamera { get; private set; } = null!;
         [SerializeField] AudioSource _musicSource;
 
         [Header("Effect")]

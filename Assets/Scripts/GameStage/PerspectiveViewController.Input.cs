@@ -7,7 +7,6 @@ namespace Deenote.GameStage
 {
     partial class PerspectiveViewController : IPointerMoveHandler, IPointerDownHandler, IPointerUpHandler, IScrollHandler
     {
-
         private MouseButtons _pressedMouseButtons;
         private MouseActionState _mouseActionState;
 
@@ -108,7 +107,7 @@ namespace Deenote.GameStage
 
             var viewPoint = new Vector2(
                 localPoint.x / transform.rect.width,
-                localPoint.y / (transform.rect.height * _viewCamera.rect.height));
+                localPoint.y / (transform.rect.height * ViewCamera.rect.height));
 
             if (viewPoint is not { x: >= 0f and <= 1f, y: >= 0f and <= 1f }) {
                 coord = default;
@@ -130,7 +129,7 @@ namespace Deenote.GameStage
 
         private bool TryConvertViewPointToNoteCoord(Vector3 viewPoint, out NoteCoord coord)
         {
-            Ray ray = _viewCamera.ViewportPointToRay(viewPoint);
+            Ray ray = ViewCamera.ViewportPointToRay(viewPoint);
             if (_stage.NotePanelPlane.Raycast(ray, out var distance)) {
                 var hitp = ray.GetPoint(distance);
                 coord = new(MainSystem.Args.ZToOffsetTime(hitp.z) + _stage.CurrentMusicTime, MainSystem.Args.XToPosition(hitp.x));

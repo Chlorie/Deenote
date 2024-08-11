@@ -4,50 +4,68 @@ using UnityEngine;
 
 namespace Deenote.Utilities
 {
-    public class FrameCachedProperty<T>
+    public abstract class FrameCachedProperty
     {
-        public FrameCachedProperty(Func<T> getter) => _getter = getter;
-
-        public T Value
-        {
-            get
-            {
-                TryUpdateValue();
-                return _cache!;
-            }
-        }
-
-        private Func<T> _getter;
-        private T? _cache;
-        private int _lastUpdateFrame = -1;
-
-        protected virtual void OnValueUpdated(T? oldValue, T newValue) { }
-
-        private void TryUpdateValue()
+        public void UpdateValue()
         {
             int currentFrame = Time.frameCount;
             if (currentFrame == _lastUpdateFrame) return;
             _lastUpdateFrame = currentFrame;
+            DoUpdateValue();
+        }
+
+        protected static FrameCachedPropertyPoller Poller =>
+            poller ??= UnityUtils.CreateComponent<FrameCachedPropertyPoller>();
+
+        protected abstract void DoUpdateValue();
+
+        private static FrameCachedPropertyPoller? poller;
+        private int _lastUpdateFrame = -1;
+    }
+
+    public class FrameCachedProperty<T> : FrameCachedProperty
+    {
+        public FrameCachedProperty(Func<T> getter, bool autoUpdate = false)
+        {
+            _getter = getter;
+            if (autoUpdate)
+                Poller.AddProperty(this);
+        }
+
+        public T Value
+        {
+            get {
+                UpdateValue();
+                return _cache!;
+            }
+        }
+
+        protected virtual void OnValueUpdated(T? oldValue, T newValue) { }
+
+        protected override void DoUpdateValue()
+        {
             T? oldValue = _cache;
             _cache = _getter();
             OnValueUpdated(oldValue, _cache!);
         }
+
+        private Func<T> _getter;
+        private T? _cache;
     }
 
     public class FrameCachedNotifyingProperty<T> : FrameCachedProperty<T>
     {
-        public FrameCachedNotifyingProperty(Func<T> getter) : this(getter, EqualityComparer<T>.Default) { }
-        public FrameCachedNotifyingProperty(Func<T> getter, IEqualityComparer<T> comparer) : base(getter) => _comparer = comparer;
+        public FrameCachedNotifyingProperty(Func<T> getter, bool autoUpdate = false)
+            : this(getter, EqualityComparer<T>.Default, autoUpdate) { }
+        public FrameCachedNotifyingProperty(Func<T> getter, IEqualityComparer<T> comparer, bool autoUpdate = false)
+            : base(getter, autoUpdate) => _comparer = comparer;
 
         public delegate void ValueChangedHandler(T? oldValue, T newValue);
         public event ValueChangedHandler? OnValueChanged;
 
-        private IEqualityComparer<T> _comparer;
-
         protected override void OnValueUpdated(T? oldValue, T newValue)
         {
-            if (oldValue is null)
-            {
+            if (oldValue is null) {
                 if (newValue is null)
                     return;
             }
@@ -55,5 +73,7 @@ namespace Deenote.Utilities
                 return;
             OnValueChanged?.Invoke(oldValue, newValue);
         }
+
+        private IEqualityComparer<T> _comparer;
     }
 }

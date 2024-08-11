@@ -24,8 +24,8 @@ namespace Deenote.UI.Windows
         private float _fixedRatio;
         [SerializeField]
         private bool __isActivated;
-        private Action<bool> _onIsActivatedChanged;
-        private Action _onFirstActivating;
+        private Action<bool>? _onIsActivatedChanged;
+        private Action? _onFirstActivating;
 
         private bool _isInitialized;
 
@@ -33,14 +33,13 @@ namespace Deenote.UI.Windows
         {
             get => _fixedRatio;
             set {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (_fixedRatio == value)
                     return;
                 _fixedRatio = value;
-                if (_fixedRatio <= 0f)
-                    return;
-
                 // Reset size in fixed aspect ratio
-                Size = Size;
+                if (_fixedRatio > 0f)
+                    Size = Size;
             }
         }
         public bool IsFixedAspectRatio => _fixedRatio > 0f;

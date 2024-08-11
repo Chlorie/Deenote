@@ -24,6 +24,19 @@ namespace Deenote.Utilities
         public static void AddListener(this UnityEvent ev, Func<UniTaskVoid> uniTaskFunc)
             => ev.AddListener(UniTask.UnityAction(uniTaskFunc));
 
+        public static Vector2Int RoundToInt(this Vector2 vector) => new(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y));
+
+        public static void Resize(this RenderTexture texture, Vector2Int newSize)
+        {
+            int width = newSize.x, height = newSize.y;
+            if (width <= 0 || height <= 0) return;
+            if (texture.width == width && texture.height == height) return;
+            texture.Release();
+            texture.width = width;
+            texture.height = height;
+            texture.Create();
+        }
+
         /// <summary>
         /// Cache a child component reference into the given reference.
         /// If the given reference is already set, it will be returned unmodified,
@@ -64,79 +77,6 @@ namespace Deenote.Utilities
                 maxSize: maxSize);
 
         public static T? CheckNull<T>(this T? self) where T : UnityEngine.Object => self ? self : null;
-
-        public static void SetSolidColor(this LineRenderer lineRenderer, Color color)
-        {
-            var gradient = lineRenderer.colorGradient;
-            var keys = gradient.colorKeys;
-            var akeys = gradient.alphaKeys;
-            foreach (ref var key in keys.AsSpan())
-            {
-                key.color = color;
-            }
-            foreach (ref var key in akeys.AsSpan())
-            {
-                key.alpha = color.a;
-            }
-            gradient.colorKeys = keys;
-            gradient.alphaKeys = akeys;
-            lineRenderer.colorGradient = gradient;
-        }
-
-        public static void SetGradientColor(this LineRenderer lineRenderer, float startAlphaUnclamped, float endAlphaUnclamped)
-        {
-            if (startAlphaUnclamped == endAlphaUnclamped) {
-                var g = lineRenderer.colorGradient;
-                g.alphaKeys = new GradientAlphaKey[1] { new(Mathf.Clamp01(startAlphaUnclamped), 0f) };
-                lineRenderer.colorGradient = g;
-                return;
-            }
-
-            GradientAlphaKey[] keys;
-            switch (startAlphaUnclamped, endAlphaUnclamped) {
-                case ( > 1f, >= 1f):
-                    keys = new GradientAlphaKey[1] { new(1f, 0f) };
-                    break;
-                case ( > 1f, >= 0f): {
-                    keys = new GradientAlphaKey[3] {
-                        new (alpha: 1f, 0f),
-                        new (alpha: 1f, Mathf.InverseLerp(startAlphaUnclamped, endAlphaUnclamped, 1f)),
-                        new (alpha: endAlphaUnclamped, 1f),
-                    };
-                    break;
-                }
-                case ( > 1f, _): {
-                    keys = new GradientAlphaKey[4] {
-                        new(alpha: 1f, 0f),
-                        new(alpha: 1f, Mathf.InverseLerp(startAlphaUnclamped, endAlphaUnclamped, 1f)),
-                        new(alpha: 0f, Mathf.InverseLerp(startAlphaUnclamped, endAlphaUnclamped, 0f)),
-                        new(alpha: 0f, 1f),
-                    };
-                    break;
-                }
-                case ( > 0f, >= 0f): {
-                    keys = new GradientAlphaKey[2] {
-                        new(alpha: startAlphaUnclamped, 0f),
-                        new(alpha: endAlphaUnclamped, 1f),
-                    };
-                    break;
-                }
-                case ( > 0f, _): {
-                    keys = new GradientAlphaKey[3] {
-                        new(alpha: startAlphaUnclamped, 0f),
-                        new(alpha: 0f, Mathf.InverseLerp(startAlphaUnclamped, endAlphaUnclamped, 0f)),
-                        new(alpha: 0f, 1f),
-                    };
-                    break;
-                }
-                default:
-                    keys = new GradientAlphaKey[1] { new(0f, 0f) };
-                    break;
-            }
-            var gradient = lineRenderer.colorGradient;
-            gradient.alphaKeys = keys;
-            lineRenderer.colorGradient = gradient;
-        }
 
         public static void SetSiblingIndicesInOrder<T>(this PooledObjectListView<T> list) where T : Component
         {

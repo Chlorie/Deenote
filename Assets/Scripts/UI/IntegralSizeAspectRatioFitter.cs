@@ -17,6 +17,15 @@ namespace Deenote.UI
         public void SetLayoutHorizontal() { }
         public void SetLayoutVertical() { }
 
+        public float AspectRatio
+        {
+            get => _aspectRatio;
+            set {
+                _aspectRatio = value;
+                UpdateLayout();
+            }
+        }
+
         [SerializeField] private float _aspectRatio = 1.0f;
         private RectTransform? _rectTransform;
         private DrivenRectTransformTracker _tracker;
@@ -27,7 +36,7 @@ namespace Deenote.UI
 
         private void OnValidate()
         {
-            _aspectRatio = Mathf.Clamp(_aspectRatio, 0.001f, 1000.0f);
+            AspectRatio = Mathf.Clamp(AspectRatio, 0.001f, 1000.0f);
             _layoutUpdateDelayed = true;
         }
 
@@ -70,10 +79,10 @@ namespace Deenote.UI
             Vector2 sizeDelta = Vector2.zero;
             Vector2 parentSize = parent.rect.size;
             Vector2 delta = parentSize * (rect.anchorMax - rect.anchorMin);
-            if (parentSize.y * _aspectRatio >= parentSize.x)
-                sizeDelta.y = parentSize.x / _aspectRatio - delta.y;
+            if (parentSize.y * AspectRatio >= parentSize.x)
+                sizeDelta.y = parentSize.x / AspectRatio - delta.y;
             else
-                sizeDelta.x = parentSize.y * _aspectRatio - delta.x;
+                sizeDelta.x = parentSize.y * AspectRatio - delta.x;
 
             // Truncate to integers
             Vector2 fitSize = parentSize + delta;

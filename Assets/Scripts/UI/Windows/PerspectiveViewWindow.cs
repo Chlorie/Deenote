@@ -26,7 +26,6 @@ namespace Deenote.UI.Windows
         [Header("UI")]
         [SerializeField] Image _backgroundBreathingMaskImage;
         [SerializeField] RawImage _cameraViewRawImage;
-        [SerializeField] RectTransform _cameraViewTransform;
         [SerializeField] Button _fullScreenButton;
         [SerializeField] WindowDropdown _aspectDropdown;
 
@@ -44,6 +43,8 @@ namespace Deenote.UI.Windows
         public event Action<Vector2>? OnViewSizeChanged;
 
         private FrameCachedNotifyingProperty<Vector2> _viewSize = null!;
+        private RectTransform _cameraViewTransform = null!;
+        private IntegralSizeAspectRatioFitter _imageAspectFitter = null!;
 
         private float _tryPlayResetTime;
 
@@ -62,13 +63,16 @@ namespace Deenote.UI.Windows
 
             void ViewSizeChanged(Vector2 _, Vector2 newSize) => OnViewSizeChanged?.Invoke(newSize);
 
+            _cameraViewTransform = _cameraViewRawImage.rectTransform;
             RenderTexture texture = new(1280, 720, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.None);
             _cameraViewRawImage.texture = texture;
             _cameraViewRawImage.enabled = true;
-            GameStageController.Instance.PerspectiveCamera.targetTexture = texture;
-            _viewSize = new FrameCachedNotifyingProperty<Vector2>(GetViewSize);
+            var controller = PerspectiveViewController.Instance;
+            controller.ViewCamera.targetTexture = controller.BackgroundCamera.targetTexture = texture;
+            _viewSize = new FrameCachedNotifyingProperty<Vector2>(GetViewSize, autoUpdate: true);
             _viewSize.OnValueChanged += ViewSizeChanged;
-            OnViewSizeChanged += ReplaceCameraRenderTexture;
+            OnViewSizeChanged += ResizeCameraTexture;
+            _imageAspectFitter = _cameraViewRawImage.GetComponent<IntegralSizeAspectRatioFitter>();
             _fullScreenButton.onClick.AddListener(() => _gameStageController.PerspectiveView.SetFullScreenState(true));
             _aspectDropdown.Dropdown.onValueChanged.AddListener(OnAspectChanged);
 
@@ -78,30 +82,26 @@ namespace Deenote.UI.Windows
             _window.SetOnIsActivatedChanged(activated => { if (activated) OnWindowActivated(); });
         }
 
-        private void ReplaceCameraRenderTexture(Vector2 newTargetSize)
+        private void ResizeCameraTexture(Vector2 size)
         {
-            int width = Mathf.RoundToInt(newTargetSize.x), height = Mathf.RoundToInt(newTargetSize.y);
-            if (width <= 0 || height <= 0) return;
-            var texture = GameStageController.Instance.PerspectiveCamera.targetTexture;
-            if (texture.width == width && texture.height == height) return;
-            texture.Release();
-            texture.width = width;
-            texture.height = height;
-            texture.Create();
+            var viewCamera = PerspectiveViewController.Instance.ViewCamera;
+            viewCamera.targetTexture.Resize(size.RoundToInt());
+            float rectHeight = 9f / 16f * size.x / size.y;
+            viewCamera.rect = new Rect(0, 0, 1, rectHeight);
         }
 
         private void OnFirstActivating()
         {
-            _aspectDropdown.ResetOptions(PerspectiveViewController.EnumExt.ViewAspectDropdownOptions);
-            _aspectDropdown.Dropdown.SetValueWithoutNotify(PerspectiveViewController.EnumExt.ToDropdownIndex(_gameStageController.PerspectiveView.AspectRatio));
+            _aspectDropdown.ResetOptions(ViewAspectRatioExt.ViewAspectDropdownOptions);
+            _aspectDropdown.Dropdown.SetValueWithoutNotify(PerspectiveViewController.Instance.AspectRatio.ToDropdownIndex());
         }
 
         #region Event
 
         private void OnAspectChanged(int value)
         {
-            var aspectRatio = PerspectiveViewController.EnumExt.FromDropdownIndex(value);
-            _gameStageController.PerspectiveView.AspectRatio = aspectRatio;
+            var aspectRatio = ViewAspectRatioExt.FromDropdownIndex(value);
+            PerspectiveViewController.Instance.AspectRatio = aspectRatio;
         }
 
         #endregion
@@ -115,9 +115,9 @@ namespace Deenote.UI.Windows
 
         #region Notify
 
-        public void NotifyAspectRatioChanged(PerspectiveViewController.ViewAspectRatio aspectRatio)
+        public void NotifyAspectRatioChanged(ViewAspectRatio aspectRatio)
         {
-            _window.FixedAspectRatio = PerspectiveViewController.EnumExt.GetRatio(aspectRatio);
+            _window.FixedAspectRatio = _imageAspectFitter.AspectRatio = aspectRatio.GetRatio();
         }
 
         #endregion

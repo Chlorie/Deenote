@@ -1,74 +1,52 @@
-using Deenote.ApplicationManaging;
 using Deenote.Edit;
 using Deenote.UI.Windows;
+using Deenote.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Deenote.GameStage
 {
-    public sealed partial class PerspectiveViewController : MonoBehaviour
+    public sealed partial class PerspectiveViewController : SingletonBehavior<PerspectiveViewController>
     {
         [Header("Notify")]
         [SerializeField] EditorController _editor;
         [SerializeField] GameStageController _stage;
         [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
-        [SerializeField] ResolutionAdjuster _resolutionAdjuster;
 
         [Header("")]
         [SerializeField] RawImage _cameraViewRawImage;
         [Header("Full Screen")]
         [SerializeField] Transform _windowScreenParentTransform;
         [SerializeField] Transform _fullScreenParentTransform;
-        [Header("Aspect Ratio Adjust")]
-        [SerializeField] Camera _viewCamera;
-        [SerializeField] Camera _backgroundCamera;
-        [SerializeField] RenderTexture _viewRenderTexture4_3;
-        [SerializeField] RenderTexture _viewRenderTexture16_9;
 
-        private bool _isFullScreen;
+        [field: Header("Aspect Ratio Adjust")]
+        [field: SerializeField] public Camera ViewCamera { get; private set; } = null!;
+        [field: SerializeField] public Camera BackgroundCamera { get; private set; } = null!;
+
+        public bool IsFullScreen { get; private set; }
+
         private ViewAspectRatio __aspectRatio;
-
-        public bool IsFullScreen => _isFullScreen;
-
         public ViewAspectRatio AspectRatio
         {
             get => __aspectRatio;
             set {
                 if (__aspectRatio == value)
                     return;
-
                 __aspectRatio = value;
-                switch (__aspectRatio) {
-                    case ViewAspectRatio.FourThree:
-                        __aspectRatio = ViewAspectRatio.FourThree;
-                        _viewCamera.targetTexture = _viewRenderTexture4_3;
-                        _backgroundCamera.targetTexture = _viewRenderTexture4_3;
-                        _cameraViewRawImage.texture = _viewRenderTexture4_3;
-                        _viewCamera.rect = new Rect(0, 0, 1, 3f / 4f); // Keep view camera's aspect ratio
-                        break;
-                    case ViewAspectRatio.SixteenNine or _:
-                        __aspectRatio = ViewAspectRatio.SixteenNine;
-                        _viewCamera.targetTexture = _viewRenderTexture16_9;
-                        _backgroundCamera.targetTexture = _viewRenderTexture16_9;
-                        _cameraViewRawImage.texture = _viewRenderTexture16_9;
-                        _viewCamera.rect = new Rect(0, 0, 1, 1);
-                        break;
-                }
-
                 _perspectiveViewWindow.NotifyAspectRatioChanged(__aspectRatio);
             }
         }
 
         public void SetFullScreenState(bool full)
         {
-            if (_isFullScreen == full)
+            if (IsFullScreen == full)
                 return;
 
-            _isFullScreen = full;
-            if (_isFullScreen) {
+            IsFullScreen = full;
+            if (IsFullScreen) {
                 _fullScreenParentTransform.gameObject.SetActive(true);
                 transform.SetParent(_fullScreenParentTransform, false);
-                MainSystem.ResolutionAdjuster.SetAspectRatio(EnumExt.GetRatio(AspectRatio), true);
+                MainSystem.ResolutionAdjuster.SetAspectRatio(AspectRatio.GetRatio(), true);
             }
             else {
                 _fullScreenParentTransform.gameObject.SetActive(false);
@@ -80,13 +58,13 @@ namespace Deenote.GameStage
         private void Update()
         {
             if (_stage.IsActive) {
-                UpdateNoteIndicatorPosition((Vector2)Input.mousePosition);
+                UpdateNoteIndicatorPosition(Input.mousePosition);
             }
         }
 
         public float SuddenPlusRangeToVisibleRangePercent(int suddenPlusRange)
         {
-            var cameraPos = _viewCamera.transform.position;
+            var cameraPos = ViewCamera.transform.position;
             float h = cameraPos.y;
             float z = cameraPos.z;
             float panelLength = _stage.Args.NotePanelLength * _stage.Args.NoteTimeToZMultiplier;
@@ -97,29 +75,26 @@ namespace Deenote.GameStage
             float visibleLength = h * (panelLength + z - h * tanTheta) / (h + (panelLength + z) * tanTheta) - z;
             return visibleLength / panelLength;
         }
+    }
 
-        public enum ViewAspectRatio
-        {
-            SixteenNine,
-            FourThree,
-        }
+    public enum ViewAspectRatio
+    {
+        SixteenNine,
+        FourThree
+    }
 
-        public static class EnumExt
-        {
-            public static readonly string[] ViewAspectDropdownOptions = new[] {
-                "16:9",
-                "4:3",
-            };
+    public static class ViewAspectRatioExt
+    {
+        public static readonly string[] ViewAspectDropdownOptions = { "16:9", "4:3" };
 
-            public static int ToDropdownIndex(ViewAspectRatio aspect) => (int)aspect;
+        public static int ToDropdownIndex(this ViewAspectRatio aspect) => (int)aspect;
 
-            public static ViewAspectRatio FromDropdownIndex(int index) => (ViewAspectRatio)index;
+        public static ViewAspectRatio FromDropdownIndex(int index) => (ViewAspectRatio)index;
 
-            public static float GetRatio(ViewAspectRatio viewAspectRatio) => viewAspectRatio switch {
-                ViewAspectRatio.SixteenNine => 16f / 9f,
-                ViewAspectRatio.FourThree => 4f / 3f,
-                _ => 16f / 9f,
-            };
-        }
+        public static float GetRatio(this ViewAspectRatio viewAspectRatio) => viewAspectRatio switch {
+            ViewAspectRatio.SixteenNine => 16f / 9f,
+            ViewAspectRatio.FourThree => 4f / 3f,
+            _ => 16f / 9f,
+        };
     }
 }
