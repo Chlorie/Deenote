@@ -3,6 +3,7 @@ using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.UI.Windows.Elements;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Deenote.UI.Windows
 {
@@ -29,8 +30,7 @@ namespace Deenote.UI.Windows
             if (confirmedChart is null)
                 return default;
 
-            var proj = new ProjectModel
-            {
+            var proj = new ProjectModel {
                 MusicName = _musicNameInputField.text,
                 Composer = _composerInputField.text,
                 ChartDesigner = _chartDesignerInputField.text,
@@ -43,8 +43,7 @@ namespace Deenote.UI.Windows
                 proj.AudioFileData = _loadedBytes;
 
             int loadChartIndex = -1;
-            for (int i = 0; i < _charts.Count; i++)
-            {
+            for (int i = 0; i < _charts.Count; i++) {
                 var ch = _charts[i];
                 proj.Charts.Add(ch.Chart);
                 if (confirmedChart == ch)
@@ -52,6 +51,12 @@ namespace Deenote.UI.Windows
             }
             Debug.Assert(loadChartIndex >= 0);
             return new Result(proj, loadChartIndex);
+        }
+
+        private ValueTask<int> TestAsync()
+        {
+            return TestImpl(this);
+            static UniTask<int> TestImpl(ProjectPropertiesWindow self) => UniTask.FromResult(self._charts.Count);
         }
 
         /// <summary>

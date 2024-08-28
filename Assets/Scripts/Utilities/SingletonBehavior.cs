@@ -6,8 +6,7 @@ namespace Deenote.Utilities
     {
         public static T Instance
         {
-            get
-            {
+            get {
 #if DEBUG
                 if (_instance is null)
                     Debug.LogError($"The reference to {typeof(T).Name} is still null. " +
@@ -23,8 +22,7 @@ namespace Deenote.Utilities
 #if DEBUG
             if (_instance is null)
                 _instance = instance;
-            else
-            {
+            else {
                 Destroy(instance);
                 Debug.LogError($"Unexpected multiple instances of {typeof(T).Name}.");
             }
@@ -33,6 +31,12 @@ namespace Deenote.Utilities
 #endif
         }
 
+        private static T? _instance;
+    }
+
+    public class PersistentSingletonBehavior<T> : MonoBehaviour where T : PersistentSingletonBehavior<T>
+    {
+        public static T Instance => _instance ??= UnityUtils.CreatePersistentComponent<T>();
         private static T? _instance;
     }
 }

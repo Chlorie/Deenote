@@ -14,12 +14,8 @@ namespace Deenote.Utilities
             DoUpdateValue();
         }
 
-        protected static FrameCachedPropertyPoller Poller =>
-            poller ??= UnityUtils.CreateComponent<FrameCachedPropertyPoller>();
-
         protected abstract void DoUpdateValue();
 
-        private static FrameCachedPropertyPoller? poller;
         private int _lastUpdateFrame = -1;
     }
 
@@ -29,7 +25,7 @@ namespace Deenote.Utilities
         {
             _getter = getter;
             if (autoUpdate)
-                Poller.AddProperty(this);
+                FrameCachedPropertyPoller.Instance.AddProperty(this);
         }
 
         public T Value

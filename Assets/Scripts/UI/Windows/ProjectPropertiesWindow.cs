@@ -152,7 +152,7 @@ namespace Deenote.UI.Windows
 
             _loadedBytes = new byte[fs.Length];
             fs.Seek(0, SeekOrigin.Begin);
-            fs.Read(_loadedBytes);
+            _ = fs.Read(_loadedBytes);
 
             _loadedAudioFilePath = res.Path;
             _loadedClip = clip;

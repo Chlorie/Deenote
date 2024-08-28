@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Deenote.Utilities
 {
-    public class FrameCachedPropertyPoller : MonoBehaviour
+    public class FrameCachedPropertyPoller : PersistentSingletonBehavior<FrameCachedPropertyPoller>
     {
         public void AddProperty(FrameCachedProperty property) =>
             _properties.Add(new WeakReference<FrameCachedProperty>(property));

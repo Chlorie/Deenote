@@ -50,16 +50,26 @@ namespace Deenote.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T MaybeGetComponent<T>(this Component component, ref T? childComponentRef) where T : Component
         {
-            if (childComponentRef == null)
-                childComponentRef = component.GetComponent<T>();
+            childComponentRef ??= component.GetComponent<T>();
+#if DEBUG
+            if (childComponentRef is null)
+                Debug.LogError($"Missing component {typeof(T).Name} in {component}");
+#endif
             return childComponentRef!;
         }
 
-        public static T CreateComponent<T>() where T : Component => GlobalGameObject.AddComponent<T>();
+        public static T CreatePersistentComponent<T>() where T : Component => GlobalGameObject.AddComponent<T>();
 
         private static GameObject? _globalGameObject;
-        private static GameObject GlobalGameObject =>
-            _globalGameObject ??= new GameObject("GlobalObject") { hideFlags = HideFlags.HideAndDontSave };
+        private static GameObject GlobalGameObject
+        {
+            get {
+                if (_globalGameObject is not null) return _globalGameObject;
+                _globalGameObject = new GameObject("GlobalObject") { hideFlags = HideFlags.HideAndDontSave };
+                UnityEngine.Object.DontDestroyOnLoad(_globalGameObject);
+                return _globalGameObject;
+            }
+        }
 
         public static ObjectPool<T> CreateObjectPool<T>(T prefab, Transform? parentTransform = null, int defaultCapacity = 10, int maxSize = 10000) where T : Component
             => CreateObjectPool(() => UnityEngine.Object.Instantiate(prefab, parentTransform), defaultCapacity, maxSize);
@@ -76,7 +86,14 @@ namespace Deenote.Utilities
                 defaultCapacity: defaultCapacity,
                 maxSize: maxSize);
 
-        public static T? CheckNull<T>(this T? self) where T : UnityEngine.Object => self ? self : null;
+        /// <summary>
+        /// Converts Unity fake <see langword="null"/>s into real <see langword="null"/>s,
+        /// so that they can be used with null-coalescing operators.
+        /// </summary>
+        /// <typeparam name="T">The component type.</typeparam>
+        /// <param name="self">The component.</param>
+        /// <returns>A valid Unity object or an actual <see langword="null"/>.</returns>
+        public static T? CheckNull<T>(this T? self) where T : UnityEngine.Object => self != null ? self : null;
 
         public static void SetSiblingIndicesInOrder<T>(this PooledObjectListView<T> list) where T : Component
         {

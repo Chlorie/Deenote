@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using NAudio.Wave;
-using System;
 using System.IO;
 using System.Threading;
 using UnityEngine;
@@ -60,92 +59,69 @@ namespace Deenote.Utilities
         }
 
         public static void EncodeToWav(int channel, int frequency, int length, float[] sampleData, out byte[] wavData)
-        {
-            var encoder = new WavEncoder(channel, frequency, length, sampleData);
-            encoder.EncodeToWav(out wavData);
-        }
+            => wavData = new WavEncoder(channel, frequency, length, sampleData).EncodeToWav();
 
-        // Copied from Chlorie
         private readonly struct WavEncoder
         {
-            private readonly float[] sampleData;
-            private readonly int frequency;
-            private readonly int channel;
-            private readonly int length; //Length is in samples
-
             public WavEncoder(int channel, int frequency, int length, float[] sampleData)
             {
-                this.channel = channel;
-                this.frequency = frequency;
-                this.length = length;
-                this.sampleData = sampleData;
+                _channel = channel;
+                _frequency = frequency;
+                _length = length;
+                _sampleData = sampleData;
             }
 
-            // Code below mostly by darktable, modified by myself for my own use
-            private const int HEADER_SIZE = 44;
-
-            public void EncodeToWav(out byte[] wav)
+            public byte[] EncodeToWav()
             {
-                MemoryStream memStream = CreateEmpty();
+                using MemoryStream memStream = CreateEmpty();
                 ConvertAndWrite(memStream);
                 WriteHeader(memStream);
-                wav = memStream.GetBuffer();
-                memStream.Close();
+                return memStream.GetBuffer();
             }
+
+            private readonly float[] _sampleData;
+            private readonly int _frequency;
+            private readonly int _channel;
+            private readonly int _length; // Length is in samples
+            private const int HeaderSize = 44;
+
             private MemoryStream CreateEmpty()
             {
-                MemoryStream memStream = new MemoryStream();
-                byte emptyByte = new byte();
-                for (int i = 0; i < HEADER_SIZE; i++) memStream.WriteByte(emptyByte); // Preparing the header
+                MemoryStream memStream = new();
+                memStream.Write(stackalloc byte[HeaderSize]);
                 return memStream;
             }
+
             private void ConvertAndWrite(MemoryStream memStream)
             {
-                short[] intData = new System.Int16[sampleData.Length];
-                // Converting in 2 float[] steps to short[], then short[] to byte[]
-                byte[] bytesData = new byte[sampleData.Length * 2];
-                // bytesData array is twice the size of dataSource array because a float converted in short is 2 bytes.
-                int rescaleFactor = 32767; // To convert float to short
-                for (int i = 0; i < sampleData.Length; i++) {
-                    intData[i] = (short)(sampleData[i] * rescaleFactor);
-                    byte[] byteArr = new byte[2];
-                    byteArr = BitConverter.GetBytes(intData[i]);
-                    byteArr.CopyTo(bytesData, i * 2);
-                }
-                memStream.Write(bytesData, 0, bytesData.Length);
+                BinaryWriter writer = new(memStream);
+                const int rescaleFactor = 32767; // To convert float to short
+                for (int i = 0; i < _sampleData.Length; i++)
+                    writer.Write((short)(_sampleData[i] * rescaleFactor));
             }
+
             private void WriteHeader(MemoryStream memStream)
             {
-                memStream.Seek(0, SeekOrigin.Begin);
-                byte[] riff = System.Text.Encoding.UTF8.GetBytes("RIFF");
-                memStream.Write(riff, 0, 4);
-                byte[] chunkSize = BitConverter.GetBytes(memStream.Length - 8);
-                memStream.Write(chunkSize, 0, 4);
-                byte[] wave = System.Text.Encoding.UTF8.GetBytes("WAVE");
-                memStream.Write(wave, 0, 4);
-                byte[] fmt = System.Text.Encoding.UTF8.GetBytes("fmt ");
-                memStream.Write(fmt, 0, 4);
-                byte[] subChunk1 = BitConverter.GetBytes(16);
-                memStream.Write(subChunk1, 0, 4);
-                // ushort two = 2;
-                ushort one = 1;
-                byte[] audioFormat = BitConverter.GetBytes(one);
-                memStream.Write(audioFormat, 0, 2);
-                byte[] numChannels = BitConverter.GetBytes(channel);
-                memStream.Write(numChannels, 0, 2);
-                byte[] sampleRate = BitConverter.GetBytes(frequency);
-                memStream.Write(sampleRate, 0, 4);
-                byte[] byteRate = BitConverter.GetBytes(frequency * channel * 2); // sampleRate * bytesPerSample * number of channels, here 44100*2*2
-                memStream.Write(byteRate, 0, 4);
-                ushort blockAlign = (ushort)(channel * 2);
-                memStream.Write(BitConverter.GetBytes(blockAlign), 0, 2);
-                ushort bps = 16;
-                byte[] bitsPerSample = BitConverter.GetBytes(bps);
-                memStream.Write(bitsPerSample, 0, 2);
-                byte[] datastring = System.Text.Encoding.UTF8.GetBytes("data");
-                memStream.Write(datastring, 0, 4);
-                byte[] subChunk2 = BitConverter.GetBytes(length * channel * 2);
-                memStream.Write(subChunk2, 0, 4);
+                // Unity's support of C# 11 is incomplete thus I can't use UTF8 literals
+                var utf8 = System.Text.Encoding.UTF8;
+                BinaryWriter writer = new(memStream);
+                writer.Seek(0, SeekOrigin.Begin);
+                // Master RIFF chunk
+                writer.Write(utf8.GetBytes("RIFF"));
+                writer.Write((uint)memStream.Length - 8);
+                writer.Write(utf8.GetBytes("WAVE"));
+                // Data format description
+                writer.Write(utf8.GetBytes("fmt "));
+                writer.Write(16); // 16 bytes = 2 ushorts + 2 ints + 2 ushorts
+                writer.Write((ushort)1); // 1 for PCM integer
+                writer.Write((ushort)_channel);
+                writer.Write(_frequency);
+                writer.Write(_frequency * _channel * sizeof(short)); // Bytes per second
+                writer.Write((ushort)_channel * sizeof(short)); // Bytes per block
+                writer.Write((ushort)sizeof(short)); // Bits per sample
+                // Data chunk
+                writer.Write(utf8.GetBytes("data"));
+                writer.Write(_length * _channel * 2); // Length of data
             }
         }
     }

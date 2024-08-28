@@ -21,7 +21,7 @@ namespace Deenote.Project
         /// <summary>
         /// Is <see langword="null"/> if current project hasn't been saved.
         /// </summary>
-        public string CurrentProjectSaveDirectory { get; private set; }
+        public string? CurrentProjectSaveDirectory { get; private set; }
 
         public ProjectModel? CurrentProject { get; private set; }
 
@@ -29,11 +29,11 @@ namespace Deenote.Project
             LocalizableText.Localized("Message_NewProjectOnOpen_Y"),
             LocalizableText.Localized("Message_NewProjectOnOpen_N"),
         };
-        private static readonly LocalizableText[] _openProjMsgBtnTxt = new[] {
+        private static readonly LocalizableText[] _openProjMsgBtnTxt = {
             LocalizableText.Localized("Message_OpenProjectOnOpen_Y"),
             LocalizableText.Localized("Message_OpenProjectOnOpen_N"),
         };
-        private static readonly LocalizableText[] _openProjFailMsgBtnTxt = new[] {
+        private static readonly LocalizableText[] _openProjFailMsgBtnTxt = {
             LocalizableText.Localized("Message_OpenProjectFailed_Y"),
             LocalizableText.Localized("Message_OpenProjectFailed_N"),
         };
@@ -75,28 +75,32 @@ namespace Deenote.Project
         {
             if (CurrentProject is not null) {
                 var clicked = await MainSystem.MessageBox.ShowAsync(
-                 LocalizableText.Localized("Message_OpenProjectOnOpen_Title"),
-                 LocalizableText.Localized("Message_OpenProjectOnOpen_Content"),
-                 _openProjMsgBtnTxt);
+                    LocalizableText.Localized("Message_OpenProjectOnOpen_Title"),
+                    LocalizableText.Localized("Message_OpenProjectOnOpen_Content"),
+                    _openProjMsgBtnTxt);
                 if (clicked != 0)
                     return;
             }
 
-        SelectFile:
-            var result = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args.SupportProjectFileExtensions);
-            if (result.IsCancelled)
-                return;
-
-            MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_OpenProject_Loading"));
-            var proj = await LoadAsync(result.Path);
-            if (proj is null) {
-                var clicked = await MainSystem.MessageBox.ShowAsync(
-                    LocalizableText.Localized("Message_OpenProjectFailed_Title"),
-                    LocalizableText.Localized("Message_OpenProjectFailed_Content"),
-                    _openProjFailMsgBtnTxt);
-                if (clicked != 0)
+            FileExplorerWindow.Result result;
+            ProjectModel? proj;
+            while (true) {
+                result = await MainSystem.FileExplorer.OpenSelectFileAsync(
+                    MainSystem.Args.SupportProjectFileExtensions);
+                if (result.IsCancelled)
                     return;
-                goto SelectFile;
+
+                MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_OpenProject_Loading"));
+                if ((proj = await LoadAsync(result.Path)) is null) {
+                    var clicked = await MainSystem.MessageBox.ShowAsync(
+                        LocalizableText.Localized("Message_OpenProjectFailed_Title"),
+                        LocalizableText.Localized("Message_OpenProjectFailed_Content"),
+                        _openProjFailMsgBtnTxt);
+                    if (clicked != 0)
+                        return;
+                    continue;
+                }
+                break;
             }
 
             var res = await MainSystem.ProjectProperties.OpenLoadProjectAsync(proj);

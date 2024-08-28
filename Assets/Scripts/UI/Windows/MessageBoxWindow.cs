@@ -9,8 +9,8 @@ namespace Deenote.UI.Windows
     [RequireComponent(typeof(Window))]
     public sealed partial class MessageBoxWindow : MonoBehaviour
     {
-        [SerializeField] Window _window;
-        public Window Window => _window;
+        private Window? _window;
+        public Window Window => this.MaybeGetComponent(ref _window);
 
         [Header("UI")]
         [SerializeField] LocalizedText _contentText;

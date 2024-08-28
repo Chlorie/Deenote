@@ -56,7 +56,7 @@ namespace Deenote.UI.MenuBar
             _aboutDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.AboutDevelopers));
             _tutorialsDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.Tutorials));
             _updateHistoryDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.UpdateHistory));
-            _checkUpdateDropdownItem.Button.onClick.AddListener(() => _ = MainSystem.VersionManager.CheckForUpdateAsync(true, true));
+            _checkUpdateDropdownItem.Button.onClick.AddListener(() => _ = MainSystem.VersionChecker.CheckUpdateAsync(true, true));
         }
 
         private async UniTaskVoid OnQuitAsync()

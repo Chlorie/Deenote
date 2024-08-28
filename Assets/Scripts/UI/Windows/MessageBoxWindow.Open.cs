@@ -3,11 +3,10 @@ using Deenote.Localization;
 using Deenote.Utilities;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEngine;
 
 namespace Deenote.UI.Windows
 {
-    partial class MessageBoxWindow : MonoBehaviour
+    partial class MessageBoxWindow
     {
         private readonly List<UniTask> _buttonClickTasks = new();
         //private readonly List<MessageBoxButtonController> _buttons = new();
@@ -19,7 +18,7 @@ namespace Deenote.UI.Windows
         {
             Window.IsActivated = true;
 
-            _window.TitleBar.SetTitle(title);
+            Window.TitleBar.SetTitle(title);
             _contentText.SetText(content);
 
             using (var resettingButtons = _buttons.Resetting(buttonTexts.Length)) {
@@ -32,7 +31,7 @@ namespace Deenote.UI.Windows
 
             var cts = new CancellationTokenSource();
 
-            _buttonClickTasks.Add(_window.CloseButton.OnClickAsync(cts.Token));
+            _buttonClickTasks.Add(Window.CloseButton.OnClickAsync(cts.Token));
 
             foreach (var btn in _buttons) {
                 _buttonClickTasks.Add(btn.Button.OnClickAsync(cts.Token));

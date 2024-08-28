@@ -16,8 +16,7 @@ namespace Deenote.Project
     {
         private static bool TryLoadFromDsproj(string filePath, [NotNullWhen(true)] out ProjectModel? project)
         {
-            try
-            {
+            try {
                 using var fs = File.OpenRead(filePath);
                 var obj = LegacyProjectSerialization.Formatter.Deserialize(fs);
                 project = obj switch {
@@ -26,9 +25,7 @@ namespace Deenote.Project
                     _ => null,
                 };
                 return project is not null;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Debug.LogError(ex.Message);
                 project = null;
                 return false;
@@ -37,8 +34,7 @@ namespace Deenote.Project
 
         private sealed class LegacyProjectSerialization : SerializationBinder
         {
-            public static readonly BinaryFormatter Formatter = new()
-            {
+            public static readonly BinaryFormatter Formatter = new() {
                 Binder = new LegacyProjectSerialization(),
             };
 
@@ -46,10 +42,8 @@ namespace Deenote.Project
 
             public override Type BindToType(string assemblyName, string typeName)
             {
-                if (assemblyName.StartsWith("Assembly-CSharp"))
-                {
-                    return typeName switch
-                    {
+                if (assemblyName.StartsWith("Assembly-CSharp")) {
+                    return typeName switch {
                         "FullProjectDataV2" => typeof(FullProjectDataV2),
                         "SerializableProjectData" => typeof(SerializableProjectData),
                         "Project" => typeof(Project),
@@ -60,16 +54,13 @@ namespace Deenote.Project
                     };
                 }
 
-                if (typeName.StartsWith("System.Collections.Generic.List`1"))
-                {
+                if (typeName.StartsWith("System.Collections.Generic.List`1")) {
                     var typeFullName = typeName.AsSpan("System.Collections.Generic.List`1".Length + 2);
                     var comma = typeFullName.IndexOf(',');
                     var assName = typeFullName[(comma + 2)..];
-                    if (assName.StartsWith("Assembly-CSharp"))
-                    {
+                    if (assName.StartsWith("Assembly-CSharp")) {
                         var tyName = typeFullName[..comma];
-                        return tyName.ToString() switch
-                        {
+                        return tyName.ToString() switch {
                             "Note" => typeof(List<Note>),
                             "PianoSound" => typeof(List<PianoSound>),
                             _ => throw new InvalidOperationException("Unknown type"),
@@ -110,10 +101,10 @@ namespace Deenote.Project
             {
                 var proj = ToVer3(dataV2.project);
                 proj.Composer = "Unknown";
-                proj.SaveAsRefPath=false;
-                proj.AudioFileRelativePath = $"Embeded Audio{dataV2.audioType}";
+                proj.SaveAsRefPath = false;
+                proj.AudioFileRelativePath = $"Embedded Audio{dataV2.audioType}";
                 proj.AudioFileData = dataV2.audio;
-                
+
                 return proj;
             }
 
@@ -170,8 +161,8 @@ namespace Deenote.Project
                     Time = oldNote.time,
                     Shift = oldNote.shift,
                     IsSlide = oldNote.isLink,
+                    Sounds = { Capacity = oldNote.sounds.Capacity }
                 };
-                note.Sounds.Capacity = oldNote.sounds.Capacity;
                 foreach (var sound in oldNote.sounds) {
                     note.Sounds.Add(ToVer3(sound));
                 }

@@ -30,7 +30,7 @@ namespace Deenote.ApplicationManaging
         {
             var ex = (Exception)e.ExceptionObject;
             HandleMessage(CreateLogMessage(ex), ex.StackTrace);
-
+            return;
 
             static string CreateLogMessage(Exception exception)
             {
@@ -49,7 +49,7 @@ namespace Deenote.ApplicationManaging
         {
             using var sw = new StreamWriter(LogFile, append: true);
             var msg = MainSystem.Localization.GetText(LocalizableText.Localized("Misc_UnhandledExceptionMessage"));
-            sw.WriteLine(string.Format(msg, message, stackTrace));
+            sw.WriteLine(msg, message, stackTrace);
 
             _ = MainSystem.StatusBar.ShowToastAsync(LocalizableText.Localized("Toast_UnhandledException"), 3f);
         }

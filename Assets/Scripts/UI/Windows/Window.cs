@@ -5,18 +5,15 @@ using UnityEngine.UI;
 
 namespace Deenote.UI.Windows
 {
-    public sealed partial class Window : MonoBehaviour, IPointerDownHandler
+    public sealed class Window : MonoBehaviour, IPointerDownHandler
     {
         [Header("UI")]
         [SerializeField] WindowTitleBar _titleBar;
         [SerializeField] Button _closeButton;
         [SerializeField] GameObject _contentGameObject;
-        [SerializeField] GraphicRaycaster _graphicRaycaster;
 
         public WindowTitleBar TitleBar => _titleBar;
-
         public Button CloseButton => _closeButton;
-
         public GameObject Content => _contentGameObject;
 
         [Header("Datas")]

@@ -16,13 +16,12 @@ namespace Deenote.Localization
         private string? _currentLanguage;
         private Dictionary<string, string>? _localizedTexts;
 
-        private List<string> _languages = new();
         private List<Dictionary<string, string>> _allTextDictionaries = new();
 
         public event Action? OnLanguageChanged;
 
         // We public List<string> because Unity's Dropdown requires a List
-        public List<string> Languages => _languages;
+        public List<string> Languages { get; } = new();
 
         public string CurrentLanguage
         {
@@ -64,7 +63,7 @@ namespace Deenote.Localization
             foreach (var file in files) {
                 if (file.EndsWith(".txt")) {
                     var (name, texts) = LoadLanguagePack(file);
-                    _languages.Add(name);
+                    Languages.Add(name);
                     _allTextDictionaries.Add(texts);
                 }
             }
@@ -78,8 +77,7 @@ namespace Deenote.Localization
             using var fs = File.OpenRead(filePath);
             using var reader = new StreamReader(fs);
 
-            var dict = new Dictionary<string, string>();
-
+            Dictionary<string, string> dict = new();
             var name = reader.ReadLine();
 
             while (!reader.EndOfStream && reader.ReadLine() is { } line) {
@@ -94,7 +92,8 @@ namespace Deenote.Localization
 
                 string key = line[..seperator];
                 string value;
-                if (line.AsSpan(seperator + 1) == "\"\"\"") {
+                // ReSharper disable once ReplaceSequenceEqualWithConstantPattern
+                if (line.AsSpan(seperator + 1).SequenceEqual("\"\"\"")) {
                     StringBuilder sb = new();
                     while (!reader.EndOfStream) {
                         line = reader.ReadLine();
@@ -117,7 +116,7 @@ namespace Deenote.Localization
 
         private bool TryGetTextDictionary(string languageName, [NotNullWhen(true)] out Dictionary<string, string>? texts)
         {
-            var index = _languages.IndexOf(languageName);
+            var index = Languages.IndexOf(languageName);
             if (index < 0) {
                 texts = null;
                 return false;

@@ -38,7 +38,7 @@ namespace Deenote
         [Header("System")]
         [SerializeField] LocalizationSystem _localizationSystem;
         [SerializeField] UnhandledExceptionHandler _unhandledExceptionHandler;
-        [SerializeField] VersionManager _versionManager;
+        [SerializeField] VersionChecker _versionChecker;
         [SerializeField] InputController _inputController;
         [SerializeField] WindowsManager _windowsManager;
 
@@ -66,7 +66,7 @@ namespace Deenote
 
         public static LocalizationSystem Localization => Instance._localizationSystem;
         public static UnhandledExceptionHandler ExceptionHandler => Instance._unhandledExceptionHandler;
-        public static VersionManager VersionManager => Instance._versionManager;
+        public static VersionChecker VersionChecker => Instance._versionChecker;
         public static InputController Input => Instance._inputController;
         public static WindowsManager WindowsManager => Instance._windowsManager;
 
@@ -74,7 +74,7 @@ namespace Deenote
         public static GameStageController GameStage => Instance._gameStageController;
         public static EditorController Editor => Instance._editorController;
         public static PianoSoundManager PianoSoundManager => Instance._pianoSoundManager;
-        
+
         private void OnApplicationFocus(bool focus)
         {
             if (!focus && GameStage.IsMusicPlaying) {
@@ -107,8 +107,10 @@ namespace Deenote
         public static void QuitApplication()
         {
             // TODO:SavePlayerPrefs
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-             System.Diagnostics.Process.GetCurrentProcess().Kill();
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
 #endif
         }
 
@@ -181,17 +183,9 @@ namespace Deenote
 
             #endregion
 
-            #region Grids
-
-            public const float GridWidth = 0.002f;
-            public const float GridBorderWidth = 0.004f;
-
-            #endregion
-
             public const string DeenotePreferFileExtension = ".dnt";
             public const ushort DeenoteProjectFileHeader = 0xDEE0;
             public const byte DeenoteProjectFileVersionMark = 1;
-            public const string DeenoteCurrentVersion = "1.0";
 
             public static readonly string[] SupportAudioFileExtensions = { ".mp3", ".wav", };
             public static readonly string[] SupportProjectFileExtensions = { DeenotePreferFileExtension, ".dsproj", };
