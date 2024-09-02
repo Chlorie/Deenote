@@ -22,7 +22,6 @@ namespace Deenote.UI.Windows
         [SerializeField] EditorController _editor;
 
         [Header("UI")]
-
         [Header("Player")]
         [SerializeField] Button _playerGroupButton;
         [SerializeField] GameObject _playerGroupGameObject;
@@ -80,7 +79,8 @@ namespace Deenote.UI.Windows
         private void Awake()
         {
             // Player
-            _playerGroupButton.onClick.AddListener(() => _playerGroupGameObject.SetActive(!_playerGroupGameObject.activeSelf));
+            _playerGroupButton.onClick.AddListener(() =>
+                _playerGroupGameObject.SetActive(!_playerGroupGameObject.activeSelf));
 
             _noteSpeedDecButton.onClick.AddListener(() => _stage.NoteSpeed--);
             _noteSpeedIncButton.onClick.AddListener(() => _stage.NoteSpeed++);
@@ -104,7 +104,8 @@ namespace Deenote.UI.Windows
             _suddenPlusSlider.onValueChanged.AddListener(OnSuddenPlusChanged);
 
             // Placement
-            _placementGroupButton.onClick.AddListener(() => _placementGroupGameObject.SetActive(!_placementGroupGameObject.activeSelf));
+            _placementGroupButton.onClick.AddListener(() =>
+                _placementGroupGameObject.SetActive(!_placementGroupGameObject.activeSelf));
 
             _showIndicatorToggle.onValueChanged.AddListener(OnShowIndicatorChanged);
 
@@ -128,7 +129,10 @@ namespace Deenote.UI.Windows
             _bpmInputField.onEndEdit.AddListener(OnBpmChanged);
             _bpmFillButton.onClick.AddListener(OnBpmFill);
 
-            _window.SetOnIsActivatedChanged(isActivated => { if (isActivated) OnWindowActivated(); });
+            _window.SetOnIsActivatedChanged(isActivated =>
+            {
+                if (isActivated) OnWindowActivated();
+            });
         }
 
         #region Player Events

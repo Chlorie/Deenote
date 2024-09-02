@@ -37,6 +37,7 @@ namespace Deenote.UI.Windows
         private List<NoteData> _editingNotes;
 
         private bool __isDirty;
+
         public bool IsDirty
         {
             get => __isDirty;

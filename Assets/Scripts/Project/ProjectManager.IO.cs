@@ -15,8 +15,7 @@ namespace Deenote.Project
 
         private static ProjectModel? Load(string projectFilePath)
         {
-            if (projectFilePath.EndsWith(".dsproj"))
-            {
+            if (projectFilePath.EndsWith(".dsproj")) {
                 if (TryLoadFromDsproj(projectFilePath, out var dsprojProject))
                     return dsprojProject;
             }
@@ -119,10 +118,7 @@ namespace Deenote.Project
                 var level = reader.ReadString();
                 var data = ReadChartData(reader);
 
-                return new ChartModel(data) {
-                    Difficulty = diff,
-                    Level = level,
-                };
+                return new ChartModel(data) { Difficulty = diff, Level = level, };
             }
 
             private static void WriteChartData(BinaryWriter writer, ChartData chart)
@@ -133,7 +129,7 @@ namespace Deenote.Project
                 writer.Write(chart.RemapMinVelocity);
                 writer.Write(chart.RemapMaxVelocity);
 
-                using var _n_dict = DictionaryPool<NoteData, int>.Get(out var linkNotes);
+                using var nDict = DictionaryPool<NoteData, int>.Get(out var linkNotes);
                 writer.Write(chart.Notes.Count);
                 for (int i = 0; i < chart.Notes.Count; i++) {
                     NoteData note = chart.Notes[i];
@@ -158,12 +154,12 @@ namespace Deenote.Project
                     RemapMinVelocity = reader.ReadInt32(),
                     RemapMaxVelocity = reader.ReadInt32(),
                 };
-              
+
                 var notesLen = reader.ReadInt32();
                 chart.Notes.Capacity = notesLen;
                 for (int i = 0; i < notesLen; i++)
                     chart.Notes.Add(ReadNoteData(reader, chart.Notes));
-               
+
                 var linesLen = reader.ReadInt32();
                 chart.SpeedLines.Capacity = linesLen;
                 for (int i = 0; i < linesLen; i++)
@@ -255,7 +251,6 @@ namespace Deenote.Project
                 var warningType = (WarningType)reader.ReadInt32();
                 return new SpeedLine(speed, startTime, endTime, warningType);
             }
-
         }
     }
 }

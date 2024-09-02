@@ -12,9 +12,9 @@ namespace Deenote.Project.Comparers
         [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         public bool Equals(PianoSoundData x, PianoSoundData y)
             => x.Pitch == y.Pitch
-            && x.Duration == y.Duration
-            && x.Delay == y.Delay
-            && x.Velocity == y.Velocity;
+               && x.Duration == y.Duration
+               && x.Delay == y.Delay
+               && x.Velocity == y.Velocity;
 
         public int GetHashCode(PianoSoundData obj)
         {

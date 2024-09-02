@@ -28,6 +28,7 @@ namespace Deenote.Project.Models.Datas
         [SerializeField]
         [JsonProperty("sounds")]
         private List<PianoSoundData>? _sounds;
+
         [AllowNull]
         public List<PianoSoundData> Sounds
         {
@@ -121,12 +122,10 @@ namespace Deenote.Project.Models.Datas
         public bool IsSlide
         {
             get => _isSlide;
-            set
-            {
+            set {
                 if (value == _isSlide)
                     return;
-                if (!value)
-                {
+                if (!value) {
                     if (_prevLinkNote is not null)
                         _prevLinkNote.NextLink = null;
                     if (_nextLinkNote is not null)
@@ -144,8 +143,7 @@ namespace Deenote.Project.Models.Datas
         public NoteData? PrevLink
         {
             get => _prevLinkNote;
-            set
-            {
+            set {
                 if (value != null)
                     _isSlide = true;
                 _prevLinkNote = value;
@@ -159,8 +157,7 @@ namespace Deenote.Project.Models.Datas
         public NoteData? NextLink
         {
             get => _nextLinkNote;
-            set
-            {
+            set {
                 if (value != null)
                     _isSlide = true;
                 _nextLinkNote = value;
@@ -173,7 +170,8 @@ namespace Deenote.Project.Models.Datas
 
         public float EndTime => Time + Duration;
 
-        public bool IsVisible => Position is >= -MainSystem.Args.StageMaxPosition and <= MainSystem.Args.StageMaxPosition;
+        public bool IsVisible =>
+            Position is >= -MainSystem.Args.StageMaxPosition and <= MainSystem.Args.StageMaxPosition;
 
         public NoteCoord PositionCoord
         {
@@ -184,14 +182,12 @@ namespace Deenote.Project.Models.Datas
         public NoteData Clone(bool cloneSounds = true)
         {
             List<PianoSoundData>? sounds = null;
-            if (cloneSounds)
-            {
+            if (cloneSounds) {
                 sounds = new List<PianoSoundData>(Sounds.Count);
                 sounds.AddRange(Sounds.Select(s => s.Clone()));
             }
 #pragma warning disable CS0618 // Clone all
-            return new NoteData
-            {
+            return new NoteData {
                 Type = Type,
                 Sounds = sounds,
                 Position = Position,

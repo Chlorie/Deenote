@@ -30,7 +30,8 @@ namespace Deenote.UI.Windows
 
         private void AwakeNoteInfo()
         {
-            _noteInfoGroupButton.onClick.AddListener(() => _noteInfoGroupGameObject.SetActive(!_noteInfoGroupGameObject.activeSelf));
+            _noteInfoGroupButton.onClick.AddListener(() =>
+                _noteInfoGroupGameObject.SetActive(!_noteInfoGroupGameObject.activeSelf));
             _notePositionInputField.onEndEdit.AddListener(OnNotePositionChanged);
             _noteTimeInputField.onEndEdit.AddListener(OnNoteTimeChanged);
             _noteSizeInputField.onEndEdit.AddListener(OnNoteSizeChanged);
@@ -175,17 +176,32 @@ namespace Deenote.UI.Windows
 
                 default: {
                     NotifyNoteTimeChanged(selectedNotes.IsSameForAll(n => n.Data.Time, out var time) ? time : null);
-                    NotifyNotePositionChanged(selectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
+                    NotifyNotePositionChanged(
+                        selectedNotes.IsSameForAll(n => n.Data.Position, out var pos) ? pos : null);
                     NotifyNoteSizeChanged(selectedNotes.IsSameForAll(n => n.Data.Size, out var size) ? size : null);
                     NotifyNoteShiftChanged(selectedNotes.IsSameForAll(n => n.Data.Shift, out var shift) ? shift : null);
                     NotifyNoteSpeedChanged(selectedNotes.IsSameForAll(n => n.Data.Speed, out var speed) ? speed : null);
-                    NotifyNoteDurationChanged(selectedNotes.IsSameForAll(n => n.Data.Duration, out var duration) ? duration : null);
-                    NotifyNoteVibrateChanged(selectedNotes.IsSameForAll(n => n.Data.Vibrate, out var vibrate) ? vibrate : null);
-                    NotifyNoteIsSwipeChanged(selectedNotes.IsSameForAll(n => n.Data.IsSwipe, out var swipe) ? swipe : null);
-                    NotifyNoteWarningTypeChanged(selectedNotes.IsSameForAll(n => n.Data.WarningType, out var wType) ? wType : null);
-                    NotifyNoteEventIdChanged(selectedNotes.IsSameForAll(n => n.Data.EventId, out var evId) ? evId : null);
-                    NotifyNoteIsLinkChanged(selectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide) ? slide : null);
-                    NotifyNotePianoSoundsChanged(selectedNotes.IsSameForAll(n => n.Data.Sounds, out var sounds, PianoSoundListDataEqualityComparer.Instance) ? sounds : null);
+                    NotifyNoteDurationChanged(selectedNotes.IsSameForAll(n => n.Data.Duration, out var duration)
+                        ? duration
+                        : null);
+                    NotifyNoteVibrateChanged(selectedNotes.IsSameForAll(n => n.Data.Vibrate, out var vibrate)
+                        ? vibrate
+                        : null);
+                    NotifyNoteIsSwipeChanged(selectedNotes.IsSameForAll(n => n.Data.IsSwipe, out var swipe)
+                        ? swipe
+                        : null);
+                    NotifyNoteWarningTypeChanged(selectedNotes.IsSameForAll(n => n.Data.WarningType, out var wType)
+                        ? wType
+                        : null);
+                    NotifyNoteEventIdChanged(
+                        selectedNotes.IsSameForAll(n => n.Data.EventId, out var evId) ? evId : null);
+                    NotifyNoteIsLinkChanged(selectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide)
+                        ? slide
+                        : null);
+                    NotifyNotePianoSoundsChanged(selectedNotes.IsSameForAll(n => n.Data.Sounds, out var sounds,
+                        PianoSoundListDataEqualityComparer.Instance)
+                        ? sounds
+                        : null);
 
                     SetControlsInteractable(true);
                     break;

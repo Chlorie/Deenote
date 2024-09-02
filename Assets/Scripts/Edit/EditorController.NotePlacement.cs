@@ -146,7 +146,8 @@ namespace Deenote.Edit
                 {
                     OnNoteSelectionChanging();
                     _noteSelectionController.AddNote(removedNotes);
-                    _propertiesWindow.NotifyNoteIsLinkChanged(SelectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide) ? slide : null);
+                    _propertiesWindow.NotifyNoteIsLinkChanged(
+                        SelectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide) ? slide : null);
                     OnNotesChanged(true, true, noteDataChangedExceptTime: true);
                 }));
 
@@ -231,7 +232,8 @@ namespace Deenote.Edit
                 }
             }
             else {
-                var qPos = Stage.Grids.Quantize(NoteCoord.ClampPosition(mousePosition), SnapToPositionGrid, SnapToTimeGrid);
+                var qPos = Stage.Grids.Quantize(NoteCoord.ClampPosition(mousePosition), SnapToPositionGrid,
+                    SnapToTimeGrid);
                 _noteIndicatorList[0].MoveTo(qPos);
             }
         }

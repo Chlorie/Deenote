@@ -18,6 +18,7 @@ namespace Deenote.Project
         [SerializeField] GameStageController _stage;
 
         private string _currentProjectFileName;
+
         /// <summary>
         /// Is <see langword="null"/> if current project hasn't been saved.
         /// </summary>
@@ -68,7 +69,8 @@ namespace Deenote.Project
             CurrentProjectSaveDirectory = null;
             CurrentProject = result.Project;
             OnProjectChanged(result.ConfirmedChartIndex);
-            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_NewProject_Completed"), 3f).Forget();
+            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_NewProject_Completed"), 3f)
+                .Forget();
         }
 
         public async UniTaskVoid OpenProjectAsync()
@@ -112,7 +114,8 @@ namespace Deenote.Project
             _currentProjectFileName = Path.GetFileName(result.Path);
             CurrentProject = res.Project;
             OnProjectChanged(res.ConfirmedChartIndex);
-            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_OpenProject_Completed"), 3f).Forget();
+            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_OpenProject_Completed"), 3f)
+                .Forget();
         }
 
         public async UniTaskVoid SaveProjectAsync()
@@ -131,7 +134,8 @@ namespace Deenote.Project
             else {
                 MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_SaveProject_Saving"));
                 await SaveAsync(CurrentProject, Path.Combine(CurrentProjectSaveDirectory, _currentProjectFileName));
-                MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
+                MainSystem.StatusBar
+                    .SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
             }
         }
 
@@ -151,7 +155,8 @@ namespace Deenote.Project
 
             if (CurrentProjectSaveDirectory is null && CurrentProject.SaveAsRefPath) {
                 CurrentProjectSaveDirectory = Path.GetDirectoryName(res.Path);
-                CurrentProject.AudioFileRelativePath = Path.GetRelativePath(CurrentProjectSaveDirectory, CurrentProject.AudioFileRelativePath);
+                CurrentProject.AudioFileRelativePath = Path.GetRelativePath(CurrentProjectSaveDirectory,
+                    CurrentProject.AudioFileRelativePath);
                 _currentProjectFileName = Path.GetFileName(res.Path);
             }
             else {
@@ -161,7 +166,8 @@ namespace Deenote.Project
 
             MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_SaveProject_Saving"));
             await SaveAsync(CurrentProject, res.Path);
-            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
+            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f)
+                .Forget();
         }
 
         private void SavePlayerPrefs() { }

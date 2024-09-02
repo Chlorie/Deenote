@@ -12,7 +12,8 @@ namespace Deenote.Edit
             var proj = _projectManager.CurrentProject!;
 
             proj.AudioFileRelativePath = _projectManager.CurrentProjectSaveDirectory is null
-                ? filePath : Path.GetRelativePath(_projectManager.CurrentProjectSaveDirectory, filePath);
+                ? filePath
+                : Path.GetRelativePath(_projectManager.CurrentProjectSaveDirectory, filePath);
             proj.AudioFileData = bytes;
             proj.AudioClip = clip;
 

@@ -54,12 +54,14 @@ namespace Deenote.UI.Windows
             using var cancelHandler = _cancelButton.GetAsyncClickEventHandler();
             var clickTask = UniTask.WhenAny(confirmHandler.OnClickAsync(), cancelHandler.OnClickAsync());
 
-            if (extensionFilters is null) { // select directory
+            if (extensionFilters is null) {
+                // select directory
                 _confirmButton.interactable = true;
                 _extensionFilters = null;
                 _fileNameInputField.gameObject.SetActive(false);
             }
-            else { // Select file
+            else {
+                // Select file
                 _confirmButton.interactable = false;
                 _extensionFilters = extensionFilters;
                 _fileNameInputField.gameObject.SetActive(true);

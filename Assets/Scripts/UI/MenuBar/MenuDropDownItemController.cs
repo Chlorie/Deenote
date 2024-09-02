@@ -25,7 +25,8 @@ namespace Deenote.UI.MenuBar
             _descriptionText.OnTextUpdated += text =>
             {
                 var shortcutWidth = _shortcutText == null ? 0f : _shortcutText.preferredWidth;
-                _layoutElement.preferredWidth = text.TmpText.preferredWidth + shortcutWidth + 4f * HorizontalOneSidePadding;
+                _layoutElement.preferredWidth =
+                    text.TmpText.preferredWidth + shortcutWidth + 4f * HorizontalOneSidePadding;
             };
         }
     }

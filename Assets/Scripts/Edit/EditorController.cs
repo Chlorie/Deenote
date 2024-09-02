@@ -43,7 +43,8 @@ namespace Deenote.Edit
             _pianoSoundEditWindow.NotifySelectedNotesChanging(SelectedNotes);
         }
 
-        private void OnNotesChanged(bool notesOrderChanged, bool selectionChanged, bool noteDataChangedExceptTime = false)
+        private void OnNotesChanged(bool notesOrderChanged, bool selectionChanged,
+            bool noteDataChangedExceptTime = false)
         {
             GameStageController.Instance.ForceUpdateStageNotes(notesOrderChanged, noteDataChangedExceptTime);
 
@@ -63,7 +64,7 @@ namespace Deenote.Edit
             // _clipBoardNotes.Clear();
             _isPasting = false;
             RefreshNoteIndicator();
-            
+
             _noteSelectionController.ClearSelection();
             // Keep sync with OnNoteChanged()
             _editorPropertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);

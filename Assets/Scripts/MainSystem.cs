@@ -37,8 +37,6 @@ namespace Deenote
 
         [Header("System")]
         [SerializeField] LocalizationSystem _localizationSystem;
-        [SerializeField] UnhandledExceptionHandler _unhandledExceptionHandler;
-        [SerializeField] VersionChecker _versionChecker;
         [SerializeField] InputController _inputController;
         [SerializeField] WindowsManager _windowsManager;
 
@@ -65,8 +63,6 @@ namespace Deenote
         public static MessageBoxWindow MessageBox => Instance._messageBoxWindow;
 
         public static LocalizationSystem Localization => Instance._localizationSystem;
-        public static UnhandledExceptionHandler ExceptionHandler => Instance._unhandledExceptionHandler;
-        public static VersionChecker VersionChecker => Instance._versionChecker;
         public static InputController Input => Instance._inputController;
         public static WindowsManager WindowsManager => Instance._windowsManager;
 
@@ -77,6 +73,7 @@ namespace Deenote
 
         private void OnApplicationFocus(bool focus)
         {
+            // TODO: make this configurable
             if (!focus && GameStage.IsMusicPlaying) {
                 GameStage.PauseStage();
             }
@@ -90,9 +87,8 @@ namespace Deenote
         }
 #endif
 
-        private static readonly LocalizableText[] _quitMessageButtons = new[] {
-            LocalizableText.Localized("Message_Quit_Y"),
-            LocalizableText.Localized("Message_Quit_N"),
+        private static readonly LocalizableText[] _quitMessageButtons = {
+            LocalizableText.Localized("Message_Quit_Y"), LocalizableText.Localized("Message_Quit_N"),
         };
 
         public static async UniTask<bool> ConfirmQuitAsync()
@@ -124,7 +120,8 @@ namespace Deenote
 
             public static float ClampNoteTime(float time) => Mathf.Clamp(time, 0f, GameStage.MusicLength);
 
-            public static float ClampNotePosition(float position) => Mathf.Clamp(position, -StageMaxPosition, StageMaxPosition);
+            public static float ClampNotePosition(float position) =>
+                Mathf.Clamp(position, -StageMaxPosition, StageMaxPosition);
 
             public static float ClampNoteSize(float size) => Mathf.Clamp(size, 0.1f, 5f);
 
@@ -133,6 +130,7 @@ namespace Deenote
             #region NoteCoord <-> World Position
 
             private const float PositionToXMultiplier = 1.63f;
+
             // private const float TimeToZMultiplier = 10f / 3f;
             public static float NoteAppearZ => OffsetTimeToZ(GameStage.StageNoteAheadTime);
 
@@ -144,9 +142,11 @@ namespace Deenote
             /// The actualTime - stageCurrentTime
             /// </param>
             /// <returns></returns>
-            public static float OffsetTimeToZ(float offsetTimeToStage) => offsetTimeToStage * GameStage.Args.NoteTimeToZMultiplier * GameStage.NoteSpeed;
+            public static float OffsetTimeToZ(float offsetTimeToStage) =>
+                offsetTimeToStage * GameStage.Args.NoteTimeToZMultiplier * GameStage.NoteSpeed;
 
-            public static float ZToOffsetTime(float z) => z / GameStage.Args.NoteTimeToZMultiplier / GameStage.NoteSpeed;
+            public static float ZToOffsetTime(float z) =>
+                z / GameStage.Args.NoteTimeToZMultiplier / GameStage.NoteSpeed;
 
             public static (float X, float Z) NoteCoordToWorldPosition(NoteCoord coord, float currentTime = 0f)
                 => (PositionToX(coord.Position), OffsetTimeToZ(coord.Time - currentTime));
@@ -159,11 +159,14 @@ namespace Deenote
             private const float NoteTimeCollisionThreshold = 0.001f;
             private const float NotePositionCollisionThreshold = 0.01f;
 
-            public static bool IsTimeCollided(NoteData left, NoteData right) => Mathf.Abs(right.Time - left.Time) <= NoteTimeCollisionThreshold;
+            public static bool IsTimeCollided(NoteData left, NoteData right) =>
+                Mathf.Abs(right.Time - left.Time) <= NoteTimeCollisionThreshold;
 
-            public static bool IsPositionCollided(NoteData left, NoteData right) => Mathf.Abs(right.Position - left.Position) <= NotePositionCollisionThreshold;
+            public static bool IsPositionCollided(NoteData left, NoteData right) =>
+                Mathf.Abs(right.Position - left.Position) <= NotePositionCollisionThreshold;
 
-            public static bool IsCollided(NoteData left, NoteData right) => IsTimeCollided(left, right) && IsPositionCollided(left, right);
+            public static bool IsCollided(NoteData left, NoteData right) =>
+                IsTimeCollided(left, right) && IsPositionCollided(left, right);
 
             #region Colors
 

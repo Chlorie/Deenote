@@ -15,10 +15,14 @@ namespace Deenote.Project.Models.Datas.Serialization
 
         private sealed class DeserializerReferenceResolver : IReferenceResolver
         {
-            public void AddReference(object context, string reference, object value) => throw new NotSupportedException();
+            public void AddReference(object context, string reference, object value) =>
+                throw new NotSupportedException();
+
             public string GetReference(object context, object value) => throw new NotSupportedException();
             public bool IsReferenced(object context, object value) => throw new NotSupportedException();
-            public object ResolveReference(object context, string reference) => new DeV3Link.NoteRef { id = int.Parse(reference) };
+
+            public object ResolveReference(object context, string reference) =>
+                new DeV3Link.NoteRef { id = int.Parse(reference) };
         }
 
         public static ChartData? ParseDeV3Json(string json)
@@ -42,20 +46,18 @@ namespace Deenote.Project.Models.Datas.Serialization
             // Convert to general chart
 
             List<NoteData> notes = chart.notes.Select(note => new NoteData {
-                Position = note.pos,
-                Size = note.size,
-                Time = note._time,
-                Sounds = note.sounds,
+                Position = note.pos, Size = note.size, Time = note._time, Sounds = note.sounds,
             }).ToList();
 
-            IEnumerable<Link.Deserialzier> links = chart.links.Select(link => new Link.Deserialzier(link.notes.Select(nref =>
-            {
-                int index = nref.id - 1;
-                if (chart.notes[index].id == nref.id)
-                    return notes[index];
-                else
-                    throw new FormatException("Wrong note id");
-            }) ?? null));
+            IEnumerable<Link.Deserialzier> links = chart.links.Select(link => new Link.Deserialzier(link.notes.Select(
+                nref =>
+                {
+                    int index = nref.id - 1;
+                    if (chart.notes[index].id == nref.id)
+                        return notes[index];
+                    else
+                        throw new FormatException("Wrong note id");
+                }) ?? null));
 
             return new ChartData(chart.speed, 10, 70, notes, links, null);
         }
@@ -70,6 +72,7 @@ namespace Deenote.Project.Models.Datas.Serialization
         private sealed class DeV3Link
         {
             public IEnumerable<NoteRef> notes;
+
             public sealed class NoteRef
             {
                 [JsonProperty("$ref")]

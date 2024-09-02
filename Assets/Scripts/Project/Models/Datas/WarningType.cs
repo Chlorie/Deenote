@@ -3,7 +3,7 @@ namespace Deenote.Project.Models.Datas
     public enum WarningType
     {
         Default = -1,
-        NonDefault=0,
+        NonDefault = 0,
     }
 
     public static class WarningTypeExt

@@ -11,9 +11,7 @@ namespace Deenote.Project.Models
     public static class DifficultyExt
     {
         public static readonly string[] DropdownOptions = new[] {
-            Difficulty.Easy.ToDisplayString(),
-            Difficulty.Normal.ToDisplayString(),
-            Difficulty.Hard.ToDisplayString(),
+            Difficulty.Easy.ToDisplayString(), Difficulty.Normal.ToDisplayString(), Difficulty.Hard.ToDisplayString(),
             Difficulty.Extra.ToDisplayString(),
         };
 

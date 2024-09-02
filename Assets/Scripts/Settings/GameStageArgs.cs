@@ -66,6 +66,5 @@ namespace Deenote.Settings
             public float GlowGrowTime;
             public float GlowFadeTime;
         }
-
     }
 }

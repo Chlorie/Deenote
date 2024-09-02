@@ -6,7 +6,7 @@ namespace Deenote.UI.Windows
     public sealed class WindowsManager : MonoBehaviour
     {
         [SerializeField] CursorsArgs _cursorsArgs;
-        
+
         private Window _focusedWindow;
 
         public CursorsArgs CursorsArgs => _cursorsArgs;

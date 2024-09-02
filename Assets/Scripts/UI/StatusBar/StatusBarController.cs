@@ -27,6 +27,7 @@ namespace Deenote.UI.StatusBar
 
         [field: SerializeField]
         private bool __showFps;
+
         public bool IsFpsShown
         {
             get => __showFps;
@@ -41,7 +42,7 @@ namespace Deenote.UI.StatusBar
 
         public async UniTaskVoid SetStatusMessageAsync(LocalizableText message, float duration_s)
         {
-            unchecked { _messageToken++; };
+            unchecked { _messageToken++; }
             var token = _messageToken;
             _messageText.SetText(message);
             await UniTask.WaitForSeconds(duration_s, _messageText);

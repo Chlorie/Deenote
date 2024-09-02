@@ -1,3 +1,4 @@
+using Deenote.Audio;
 using Deenote.Edit;
 using Deenote.GameStage.Elements;
 using Deenote.Project.Comparers;
@@ -5,6 +6,7 @@ using Deenote.Project.Models;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
+using Reflex.Attributes;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,8 +15,6 @@ namespace Deenote.GameStage
 {
     public sealed partial class GameStageController : SingletonBehavior<GameStageController>
     {
-        [SerializeField] AudioSource _musicSource;
-
         [Header("Effect")]
         [SerializeField] SpriteRenderer _judgeLineBreathingEffectSpriteRenderer;
         [SerializeField] SpriteRenderer _judgeLineHitEffectSpriteRenderer;
@@ -55,14 +55,14 @@ namespace Deenote.GameStage
         [Header("Settings")]
         private ChartModel _chart;
 
-        private float __syncMusicTime;
-
         /// <remarks>
         /// If music is paused, maually set music time by this value,
         /// <br />
         /// If playing, this value should sync to _musicSource.velocity
         /// </remarks>
         [SerializeField] private float _manualPlaySpeedMultiplier;
+
+        [Inject] private MusicController _musicController = null!;
 
         public GridController Grids => GridController.Instance;
 
@@ -74,99 +74,40 @@ namespace Deenote.GameStage
 
         public float StagePlaySpeed
         {
-            get => IsMusicPlaying ? _musicSource.pitch : _manualPlaySpeedMultiplier;
-            set
-            {
-                if (value == 0f)
-                {
-                    _musicSource.pitch = MusicSpeed / 10f;
+            get => IsMusicPlaying ? _musicController.Pitch : _manualPlaySpeedMultiplier;
+            set {
+                if (value == 0f) {
+                    _musicController.Pitch = MusicSpeed / 10f;
                     _manualPlaySpeedMultiplier = 0f;
                 }
-                else
-                {
-                    _musicSource.pitch = _manualPlaySpeedMultiplier = value;
+                else {
+                    _musicController.Pitch = _manualPlaySpeedMultiplier = value;
                 }
             }
         }
 
-        public float CurrentMusicTime
-        {
-            get => __syncMusicTime;
-            set => SetMusicTime(value);
-        }
+        public float CurrentMusicTime => _musicController.Time;
 
-        public bool IsMusicPlaying => _musicSource.isPlaying;
+        public bool IsMusicPlaying => _musicController.IsPlaying;
 
-        public float MusicLength => _musicSource.clip.length;
+        public float MusicLength => _musicController.Length;
 
-        public float StageNoteAheadTime => _args.NotePanelLength / NoteSpeed * _perspectiveViewController.SuddenPlusRangeToVisibleRangePercent(SuddenPlusRange);
+        public float StageNoteAheadTime =>
+            _args.NotePanelLength / NoteSpeed *
+            _perspectiveViewController.SuddenPlusRangeToVisibleRangePercent(SuddenPlusRange);
 
         #region Music State
 
-        private void SetMusicTime(float time, bool syncMusicSource = true, bool notifyWindows = true, bool setStageNotes = true)
+        private void MusicTimeChanged(float time, bool isManuallyChanged)
         {
-            var prevTime = __syncMusicTime;
-            var maxTime = MusicLength;
-            time = Mathf.Clamp(time, 0f, maxTime);
-            __syncMusicTime = time;
-            if (syncMusicSource)
-            {
-                if (__syncMusicTime >= maxTime)
-                {
-                    // Do not set _musicSource.time when end, see Update() for reason
-                    _musicSource.Pause();
-                }
-                else
-                    _musicSource.time = __syncMusicTime;
-            }
-            if (setStageNotes)
-            {
-                UpdateStageNotesRelatively(forward: __syncMusicTime > prevTime);
-                ForceUpdateNotesDisplay();
-            }
-            if (notifyWindows)
-            {
-                _perspectiveViewWindow.NotifyMusicTimeChanged(__syncMusicTime);
-            }
-        }
-
-        public void PlayMusic()
-        {
-            if (IsMusicPlaying)
-                return;
-
-            if (CurrentMusicTime < MusicLength)
-            {
-                _musicSource.time = CurrentMusicTime;
-                _musicSource.Play();
-            }
-            // Play froms start
-            else
-            {
-                SetMusicTime(0f);
-                _musicSource.Play();
-            }
-        }
-
-        public void PauseMusic()
-        {
-            if (!IsMusicPlaying)
-                return;
-            _musicSource.Pause();
+            UpdateStageNotesRelatively(forward: !isManuallyChanged);
+            if (isManuallyChanged) ForceUpdateNotesDisplay();
         }
 
         public void PauseStage()
         {
-            PauseMusic();
+            _musicController.Stop();
             _manualPlaySpeedMultiplier = 0f;
-        }
-
-        public void ToggleMusicPlayingState()
-        {
-            if (IsMusicPlaying)
-                PauseMusic();
-            else
-                PlayMusic();
         }
 
         #endregion
@@ -175,8 +116,9 @@ namespace Deenote.GameStage
         {
             var chart = project.Charts[chartIndex];
 
-            _musicSource.Stop();
-            _musicSource.clip = project.AudioClip;
+            _musicController.Stop();
+            // TODO: try out streaming clip provider
+            _musicController.ReplaceClip(new DecodedClipProvider(project.AudioClip));
 
             _chart = chart;
 
@@ -186,7 +128,7 @@ namespace Deenote.GameStage
 
             CheckCollision();
 
-            SetMusicTime(0f, setStageNotes: false);
+            _musicController.Time = 0f;
             UpdateStageNotes();
             ForceUpdateNotesDisplay();
 
@@ -195,11 +137,9 @@ namespace Deenote.GameStage
 
             void CheckCollision()
             {
-                for (int i = 0; i < _chart.Notes.Count; i++)
-                {
+                for (int i = 0; i < _chart.Notes.Count; i++) {
                     var note = _chart.Notes[i];
-                    for (int j = i + 1; j < _chart.Notes.Count; j++)
-                    {
+                    for (int j = i + 1; j < _chart.Notes.Count; j++) {
                         var noteCmp = _chart.Notes[j];
                         if (!MainSystem.Args.IsTimeCollided(note.Data, noteCmp.Data))
                             break;
@@ -217,8 +157,7 @@ namespace Deenote.GameStage
 
         private void ForceUpdateNotesDisplay()
         {
-            foreach (var note in _stageNotes)
-            {
+            foreach (var note in _stageNotes) {
                 note.ForceUpdate(false);
             }
         }
@@ -227,8 +166,7 @@ namespace Deenote.GameStage
         {
             if (notesOrderChanged)
                 UpdateStageNotes();
-            foreach (var note in _stageNotes)
-            {
+            foreach (var note in _stageNotes) {
                 note.ForceUpdate(noteDataChangedExceptTime);
             }
         }
@@ -247,6 +185,7 @@ namespace Deenote.GameStage
             else OnPlayBackward();
 
             OnStageNoteUpdated();
+            return;
 
             void OnPlayForward()
             {
@@ -258,8 +197,7 @@ namespace Deenote.GameStage
                 // Update _nextDisappear
                 // Remove inactive notes
                 int removeCount;
-                for (removeCount = 0; removeCount < _stageNotes.Count; removeCount++)
-                {
+                for (removeCount = 0; removeCount < _stageNotes.Count; removeCount++) {
                     var note = _stageNotes[removeCount];
                     if (note.Model.Data.Time > disappearNoteTime)
                         break;
@@ -268,13 +206,10 @@ namespace Deenote.GameStage
                 _nextDisappearNoteIndex += removeCount;
                 // All notes on stage are removed, we need to continue iterating
                 // to find the first note that should display
-                if (_stageNotes.Count == 0)
-                {
-                    for (; _nextDisappearNoteIndex < _chart.Notes.Count; _nextDisappearNoteIndex++)
-                    {
+                if (_stageNotes.Count == 0) {
+                    for (; _nextDisappearNoteIndex < _chart.Notes.Count; _nextDisappearNoteIndex++) {
                         var note = _chart.Notes[_nextDisappearNoteIndex];
-                        if (note.Data.Time > disappearNoteTime)
-                        {
+                        if (note.Data.Time > disappearNoteTime) {
                             break;
                         }
                     }
@@ -283,11 +218,9 @@ namespace Deenote.GameStage
                 // Update _nextHit, Add active note that playing hit effect
                 if (_nextDisappearNoteIndex > _nextHitNoteIndex)
                     _nextHitNoteIndex = _nextDisappearNoteIndex;
-                for (; _nextHitNoteIndex < _chart.Notes.Count; _nextHitNoteIndex++)
-                {
+                for (; _nextHitNoteIndex < _chart.Notes.Count; _nextHitNoteIndex++) {
                     var note = _chart.Notes[_nextHitNoteIndex];
-                    if (note.Data.Time > CurrentMusicTime)
-                    {
+                    if (note.Data.Time > CurrentMusicTime) {
                         break;
                     }
                 }
@@ -295,15 +228,12 @@ namespace Deenote.GameStage
                 // Update _nextAppear
                 // Add active notes
                 // If new _nextDiappear is greater, we search start from _nextDisappear
-                if (_nextDisappearNoteIndex > _nextAppearNoteIndex)
-                {
+                if (_nextDisappearNoteIndex > _nextAppearNoteIndex) {
                     _nextAppearNoteIndex = _nextDisappearNoteIndex;
                 }
-                for (; _nextAppearNoteIndex < _chart.Notes.Count; _nextAppearNoteIndex++)
-                {
+                for (; _nextAppearNoteIndex < _chart.Notes.Count; _nextAppearNoteIndex++) {
                     var note = _chart.Notes[_nextAppearNoteIndex];
-                    if (note.Data.Time > appearNoteTime)
-                    {
+                    if (note.Data.Time > appearNoteTime) {
                         break;
                     }
                     _stageNotes.Add(out var noteController);
@@ -318,8 +248,7 @@ namespace Deenote.GameStage
                 var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
                 // Remove trailing inactive notes
                 int removeStart;
-                for (removeStart = _stageNotes.Count - 1; removeStart >= 0; removeStart--)
-                {
+                for (removeStart = _stageNotes.Count - 1; removeStart >= 0; removeStart--) {
                     var note = _stageNotes[removeStart];
                     if (note.Model.Data.Time <= appearNoteTime)
                         break;
@@ -329,11 +258,9 @@ namespace Deenote.GameStage
                 _stageNotes.RemoveRange(removeStart..);
                 _nextAppearNoteIndex -= removeCount;
                 // All notes on stage removed, continue iterating for display
-                if (_stageNotes.Count == 0)
-                {
+                if (_stageNotes.Count == 0) {
                     var prevAppearNoteIndex = _nextAppearNoteIndex - 1;
-                    for (; prevAppearNoteIndex >= 0; prevAppearNoteIndex--)
-                    {
+                    for (; prevAppearNoteIndex >= 0; prevAppearNoteIndex--) {
                         var note = _chart.Notes[prevAppearNoteIndex];
                         if (note.Data.Time <= appearNoteTime)
                             break;
@@ -345,11 +272,9 @@ namespace Deenote.GameStage
                 if (_nextAppearNoteIndex < _nextHitNoteIndex)
                     _nextHitNoteIndex = _nextAppearNoteIndex;
                 var prevHitNoteIndex = _nextHitNoteIndex - 1;
-                for (; prevHitNoteIndex >= 0; prevHitNoteIndex--)
-                {
+                for (; prevHitNoteIndex >= 0; prevHitNoteIndex--) {
                     var note = _chart.Notes[prevHitNoteIndex];
-                    if (note.Data.Time <= CurrentMusicTime)
-                    {
+                    if (note.Data.Time <= CurrentMusicTime) {
                         break;
                     }
                 }
@@ -358,11 +283,9 @@ namespace Deenote.GameStage
                 if (_nextAppearNoteIndex < _nextDisappearNoteIndex)
                     _nextDisappearNoteIndex = _nextAppearNoteIndex;
                 var prevDisappearNoteIndex = _nextDisappearNoteIndex - 1;
-                for (; prevDisappearNoteIndex >= 0; prevDisappearNoteIndex--)
-                {
+                for (; prevDisappearNoteIndex >= 0; prevDisappearNoteIndex--) {
                     var note = _chart.Notes[prevDisappearNoteIndex];
-                    if (note.Data.Time <= disappearNoteTime)
-                    {
+                    if (note.Data.Time <= disappearNoteTime) {
                         break;
                     }
                     _stageNotes.Insert(0, out var noteController);
@@ -378,26 +301,21 @@ namespace Deenote.GameStage
         /// </summary>
         private void UpdateStageNotes()
         {
-            using (var stageNotes = _stageNotes.Resetting())
-            {
+            using (var stageNotes = _stageNotes.Resetting()) {
                 var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
                 var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
                 int i = 0;
-                for (; i < _chart.Notes.Count; i++)
-                {
+                for (; i < _chart.Notes.Count; i++) {
                     var note = _chart.Notes[i];
-                    if (note.Data.Time > disappearNoteTime)
-                    {
+                    if (note.Data.Time > disappearNoteTime) {
                         break;
                     }
                 }
                 _nextDisappearNoteIndex = i;
 
-                for (; i < _chart.Notes.Count; i++)
-                {
+                for (; i < _chart.Notes.Count; i++) {
                     var note = _chart.Notes[i];
-                    if (note.Data.Time > CurrentMusicTime)
-                    {
+                    if (note.Data.Time > CurrentMusicTime) {
                         break;
                     }
                     stageNotes.Add(out var noteController);
@@ -405,11 +323,9 @@ namespace Deenote.GameStage
                 }
                 _nextHitNoteIndex = i;
 
-                for (; i < _chart.Notes.Count; i++)
-                {
+                for (; i < _chart.Notes.Count; i++) {
                     var note = _chart.Notes[i];
-                    if (note.Data.Time > appearNoteTime)
-                    {
+                    if (note.Data.Time > appearNoteTime) {
                         break;
                     }
                     stageNotes.Add(out var noteController);
@@ -499,6 +415,7 @@ namespace Deenote.GameStage
             base.Awake();
             _stageNotes = new PooledObjectListView<StageNoteController>(
                 UnityUtils.CreateObjectPool(_notePrefab, _noteParentTransform));
+            _musicController.OnTimeChanged += MusicTimeChanged;
         }
 
         private void Start()
@@ -512,25 +429,9 @@ namespace Deenote.GameStage
         private void Update()
         {
             if (IsStageEffectOn) UpdateStageEffect();
-
-            if (IsActive) {
-
-                if (IsMusicPlaying || _musicSource.time >= MusicLength) { // Music playing or play to end
-
-                    // Note that there's one frame when _musicSource.time == _musicSource.clip.length while audio playing,
-                    // and SetMusicTime wont set _musicSource.Time to clip.length.
-                    // So when _musicSource.time == clip.length, it means the music is playing to end,
-                    // not manually set to end
-                    SetMusicTime(_musicSource.time, syncMusicSource: false, setStageNotes: false);
-                }
-                else if (_manualPlaySpeedMultiplier is not 0f) { // Manually playing
-                    var newTime = CurrentMusicTime + Time.deltaTime * _manualPlaySpeedMultiplier;
-                    SetMusicTime(newTime, setStageNotes: false);
-                }
-
-                if (StagePlaySpeed != 0)
-                    UpdateStageNotesRelatively(StagePlaySpeed > 0);
-            }
+            if (!IsActive) return;
+            if (!IsMusicPlaying && _manualPlaySpeedMultiplier is not 0f)
+                _musicController.NudgePlaybackPosition(Time.deltaTime * _manualPlaySpeedMultiplier);
         }
     }
 }

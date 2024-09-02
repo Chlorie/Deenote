@@ -24,8 +24,6 @@ namespace Deenote.Utilities
         public static void AddListener(this UnityEvent ev, Func<UniTaskVoid> uniTaskFunc)
             => ev.AddListener(UniTask.UnityAction(uniTaskFunc));
 
-        public static Vector2Int RoundToInt(this Vector2 vector) => new(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y));
-
         public static void Resize(this RenderTexture texture, Vector2Int newSize)
         {
             int width = newSize.x, height = newSize.y;
@@ -61,6 +59,7 @@ namespace Deenote.Utilities
         public static T CreatePersistentComponent<T>() where T : Component => GlobalGameObject.AddComponent<T>();
 
         private static GameObject? _globalGameObject;
+
         private static GameObject GlobalGameObject
         {
             get {
@@ -71,10 +70,13 @@ namespace Deenote.Utilities
             }
         }
 
-        public static ObjectPool<T> CreateObjectPool<T>(T prefab, Transform? parentTransform = null, int defaultCapacity = 10, int maxSize = 10000) where T : Component
-            => CreateObjectPool(() => UnityEngine.Object.Instantiate(prefab, parentTransform), defaultCapacity, maxSize);
+        public static ObjectPool<T> CreateObjectPool<T>(T prefab, Transform? parentTransform = null,
+            int defaultCapacity = 10, int maxSize = 10000) where T : Component
+            => CreateObjectPool(() => UnityEngine.Object.Instantiate(prefab, parentTransform), defaultCapacity,
+                maxSize);
 
-        public static ObjectPool<T> CreateObjectPool<T>(Func<T> createFunc, int defaultCapacity = 10, int maxSize = 10000) where T : Component
+        public static ObjectPool<T> CreateObjectPool<T>(Func<T> createFunc, int defaultCapacity = 10,
+            int maxSize = 10000) where T : Component
             => new(createFunc,
                 obj => obj.gameObject.SetActive(true),
                 obj => obj.gameObject.SetActive(false),
@@ -113,19 +115,22 @@ namespace Deenote.Utilities
         public static bool IsKeyDown(KeyCode key, bool ctrl = false, bool shift = false, bool alt = false)
         {
             GameObject obj = EventSystem.current.currentSelectedGameObject;
-            return IsFunctionalKeyHolding(ctrl, shift, alt) && Input.GetKeyDown(key) && (obj == null || obj.GetComponent<TMP_InputField>() == null);
+            return IsFunctionalKeyHolding(ctrl, shift, alt) && Input.GetKeyDown(key) &&
+                   (obj == null || obj.GetComponent<TMP_InputField>() == null);
         }
 
         public static bool IsKeyUp(KeyCode key, bool ctrl = false, bool shift = false, bool alt = false)
         {
             GameObject obj = EventSystem.current.currentSelectedGameObject;
-            return IsFunctionalKeyHolding(ctrl, shift, alt) && Input.GetKeyUp(key) && (obj == null || obj.GetComponent<TMP_InputField>() == null);
+            return IsFunctionalKeyHolding(ctrl, shift, alt) && Input.GetKeyUp(key) &&
+                   (obj == null || obj.GetComponent<TMP_InputField>() == null);
         }
 
         public static bool IsKeyHolding(KeyCode key, bool ctrl = false, bool shift = false, bool alt = false)
         {
             GameObject obj = EventSystem.current.currentSelectedGameObject;
-            return IsFunctionalKeyHolding(ctrl, shift, alt) && Input.GetKey(key) && (obj == null || obj.GetComponent<TMP_InputField>() == null);
+            return IsFunctionalKeyHolding(ctrl, shift, alt) && Input.GetKey(key) &&
+                   (obj == null || obj.GetComponent<TMP_InputField>() == null);
         }
     }
 }

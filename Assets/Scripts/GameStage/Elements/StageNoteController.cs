@@ -28,17 +28,16 @@ namespace Deenote.GameStage.Elements
 
         [SerializeField]
         private NoteState _state;
+
         public NoteState State
         {
             get => _state;
-            set
-            {
+            set {
                 if (value == _state)
                     return;
 
                 _state = value;
-                switch (_state)
-                {
+                switch (_state) {
                     case NoteState.Fall:
                         _noteSpriteRenderer.gameObject.SetActive(true);
                         _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
@@ -106,11 +105,13 @@ namespace Deenote.GameStage.Elements
 
         public void SyncNoteDataUpdate()
         {
-            gameObject.transform.localPosition = gameObject.transform.localPosition.WithX(MainSystem.Args.PositionToX(_note.Data.Position));
+            gameObject.transform.localPosition =
+                gameObject.transform.localPosition.WithX(MainSystem.Args.PositionToX(_note.Data.Position));
             var prefab = _note.Data switch {
                 { IsSlide: true } => MainSystem.GameStage.Args.SlideNoteSpritePrefab,
                 { HasSound: true } => MainSystem.GameStage.Args.BlackNoteSpritePrefab,
-                _ when MainSystem.GameStage.IsPianoNotesDistinguished => MainSystem.GameStage.Args.NoSoundNoteSpritePrefab,
+                _ when MainSystem.GameStage.IsPianoNotesDistinguished => MainSystem.GameStage.Args
+                    .NoSoundNoteSpritePrefab,
                 _ => MainSystem.GameStage.Args.BlackNoteSpritePrefab,
             };
             _noteSpriteRenderer.sprite = prefab.Sprite;
@@ -129,8 +130,7 @@ namespace Deenote.GameStage.Elements
                 OnFalling();
             }
             // Hit effect or released
-            else
-            {
+            else {
                 _linkLine = null;
                 if (State != NoteState.HitEffect) {
                     if (playSoundOnHit) {
@@ -146,7 +146,8 @@ namespace Deenote.GameStage.Elements
             {
                 // Color
                 float noteAppearTime = Stage.StageNoteAheadTime;
-                float noteFadeInTime = MainSystem.GameStage.StageNoteAheadTime * MainSystem.GameStage.Args.NoteFadeInRangePercent;
+                float noteFadeInTime = MainSystem.GameStage.StageNoteAheadTime *
+                                       MainSystem.GameStage.Args.NoteFadeInRangePercent;
                 float alpha = Mathf.Clamp01((noteAppearTime - timeDelta) / noteFadeInTime);
                 {
                     _noteSpriteRenderer.color =
@@ -168,7 +169,8 @@ namespace Deenote.GameStage.Elements
                 var to = from.NextLink;
                 if (to is null) return;
 
-                var (fromX, fromZ) = MainSystem.Args.NoteCoordToWorldPosition(from.PositionCoord, Stage.CurrentMusicTime);
+                var (fromX, fromZ) =
+                    MainSystem.Args.NoteCoordToWorldPosition(from.PositionCoord, Stage.CurrentMusicTime);
                 var (toX, toZ) = MainSystem.Args.NoteCoordToWorldPosition(to.PositionCoord, Stage.CurrentMusicTime);
                 _linkLine = (new Vector2(fromX, fromZ), new Vector2(toX, toZ));
             }
@@ -182,7 +184,8 @@ namespace Deenote.GameStage.Elements
                 // Initialize effect
                 gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, 0f, 0f);
                 float noteSize = _note.Data.Size;
-                _explosionHitEffectSpriteRenderer.transform.localScale = noteSize * prefabs.ExplosionScale * Vector3.one;
+                _explosionHitEffectSpriteRenderer.transform.localScale =
+                    noteSize * prefabs.ExplosionScale * Vector3.one;
 
                 // Copied from Chlorie's
                 var time = -timeDelta;
@@ -194,7 +197,8 @@ namespace Deenote.GameStage.Elements
                 {
                     int frame = Mathf.FloorToInt(time / prefabs.ExplosionTime * (prefabs.Explosions.Length + 1));
                     // Here frame may be Explosions.Length
-                    _explosionHitEffectSpriteRenderer.sprite = frame < prefabs.Explosions.Length ? prefabs.Explosions[frame] : null;
+                    _explosionHitEffectSpriteRenderer.sprite =
+                        frame < prefabs.Explosions.Length ? prefabs.Explosions[frame] : null;
                 }
 
                 // Circle
@@ -213,8 +217,11 @@ namespace Deenote.GameStage.Elements
                         ? time / prefabs.WaveGrowTime
                         : 1 - (time - prefabs.WaveGrowTime) / prefabs.WaveFadeTime;
                     float alpha = Mathf.Pow(ratio, 0.5f);
-                    _waveHitEffectSpriteRenderer.transform.localScale = _note.Data.Size * new Vector3(prefabs.WaveScale.x, ratio * prefabs.WaveScale.y, 1f);
-                    _waveHitEffectSpriteRenderer.color = _waveColor.WithAlpha(Mathf.Lerp(0, prefabs.WaveMaxAlpha, alpha));
+                    _waveHitEffectSpriteRenderer.transform.localScale = _note.Data.Size *
+                                                                        new Vector3(prefabs.WaveScale.x,
+                                                                            ratio * prefabs.WaveScale.y, 1f);
+                    _waveHitEffectSpriteRenderer.color =
+                        _waveColor.WithAlpha(Mathf.Lerp(0, prefabs.WaveMaxAlpha, alpha));
                 }
 
                 // Glow
@@ -225,7 +232,8 @@ namespace Deenote.GameStage.Elements
                         ? time / prefabs.GlowGrowTime
                         : 1 - (time - prefabs.GlowGrowTime) / prefabs.GlowFadeTime;
                     float height = ratio * GlowHeight;
-                    _glowHitEffectSpriteRenderer.transform.localScale = new Vector3(prefabs.GlowScale.x, height * prefabs.GlowScale.y, 1f);
+                    _glowHitEffectSpriteRenderer.transform.localScale =
+                        new Vector3(prefabs.GlowScale.x, height * prefabs.GlowScale.y, 1f);
                     _glowHitEffectSpriteRenderer.color = prefabs.GlowColor.WithAlpha(ratio);
                 }
             }
@@ -233,17 +241,16 @@ namespace Deenote.GameStage.Elements
 
         private void PlayNoteSounds()
         {
-            if (Stage.EffectVolume > 0f)
-            {
+            if (Stage.EffectVolume > 0f) {
                 if (Model.Data.IsSlide)
                     _effectSoundSource.PlayOneShot(Stage.Args.EffectSoundAudioClip, Stage.EffectVolume / 200f);
                 else
                     _effectSoundSource.PlayOneShot(Stage.Args.EffectSoundAudioClip, Stage.EffectVolume / 100f);
             }
 
-            if (Stage.MusicVolume > 0f && Model.Data.HasSound)
-            {
-                MainSystem.PianoSoundManager.PlaySoundsAsync(Model.Data.Sounds, Stage.PianoVolume / 100f, Stage.MusicSpeed / 10f).Forget();
+            if (Stage.MusicVolume > 0f && Model.Data.HasSound) {
+                MainSystem.PianoSoundManager
+                    .PlaySoundsAsync(Model.Data.Sounds, Stage.PianoVolume / 100f, Stage.MusicSpeed / 10f).Forget();
             }
         }
 

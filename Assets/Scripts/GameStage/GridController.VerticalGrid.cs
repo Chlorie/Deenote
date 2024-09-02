@@ -28,14 +28,11 @@ namespace Deenote.GameStage
         public VerticalGridGenerationKind VerticalGridGeneration
         {
             get => _verticalGridGenerationKind;
-            set
-            {
+            set {
                 if (_verticalGridGenerationKind == value)
                     return;
-                if (value == VerticalGridGenerationKind.ByCountAndOffset)
-                {
-                    switch (__verticalGridCount)
-                    {
+                if (value == VerticalGridGenerationKind.ByCountAndOffset) {
+                    switch (__verticalGridCount) {
                         case < 2:
                             __isVerticalBorderVisible = false;
                             __verticalGridOffset = 0f;
@@ -52,8 +49,8 @@ namespace Deenote.GameStage
                             break;
                     }
                 }
-                else
-                { // ByKeyCount
+                else {
+                    // ByKeyCount
                     __verticalGridCount++;
                 }
                 // We do not immediately update grids when generation kind changed
@@ -63,8 +60,7 @@ namespace Deenote.GameStage
         public int VerticalGridCount
         {
             get => __verticalGridCount;
-            set
-            {
+            set {
                 value = Mathf.Clamp(value, 0, MaxKeyCount);
                 if (__verticalGridCount == value)
                     return;
@@ -78,8 +74,7 @@ namespace Deenote.GameStage
         public bool IsBorderVisible_Legacy
         {
             get => __isVerticalBorderVisible;
-            set
-            {
+            set {
                 Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
                 __isVerticalBorderVisible = value;
             }
@@ -91,8 +86,7 @@ namespace Deenote.GameStage
         public int VerticalGridCount_Legacy
         {
             get => __verticalGridCount;
-            set
-            {
+            set {
                 Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
                 value = Mathf.Clamp(value, 0, MaxKeyCount - 1);
                 if (__verticalGridCount == value)
@@ -109,8 +103,7 @@ namespace Deenote.GameStage
         public float VerticalGridOffset_Legacy
         {
             get => __verticalGridOffset;
-            set
-            {
+            set {
                 Debug.Assert(VerticalGridGeneration is VerticalGridGenerationKind.ByCountAndOffset);
                 value = Mathf.Clamp(value, -1f, 1f);
                 if (__verticalGridOffset == value)
@@ -125,8 +118,7 @@ namespace Deenote.GameStage
         {
             var lineRenderer = PerspectiveLinesRenderer.Instance;
             float maxZ = MainSystem.Args.NoteAppearZ;
-            foreach (var (x, kind) in _verticalGridData)
-            {
+            foreach (var (x, kind) in _verticalGridData) {
                 lineRenderer.AddLine(new Vector2(x, 0), new Vector2(x, maxZ),
                     MainSystem.Args.SubBeatLineColor, kind is VerticalGridKind.Border ? 4f : 2f);
             }
@@ -145,11 +137,9 @@ namespace Deenote.GameStage
         public void UpdateVerticalGrids()
         {
             _verticalGridData.Clear();
-            switch (VerticalGridGeneration)
-            {
+            switch (VerticalGridGeneration) {
                 case VerticalGridGenerationKind.ByCountAndOffset:
-                    for (int i = 0; i < VerticalGridCount_Legacy; i++)
-                    {
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
                         float x = MainSystem.Args.PositionToX(GetVerticalGridPosition_Legacy(i));
                         _verticalGridData.Add((x, VerticalGridKind.Default));
                     }
@@ -165,19 +155,15 @@ namespace Deenote.GameStage
 
             void ByKeyCount()
             {
-                switch (VerticalGridCount)
-                {
+                switch (VerticalGridCount) {
                     case <= 0:
                         break;
-                    case 1:
-                    {
+                    case 1: {
                         _verticalGridData.Add((0f, VerticalGridKind.Default));
                         break;
                     }
-                    default:
-                    {
-                        for (int i = 0; i < VerticalGridCount - 2; i++)
-                        {
+                    default: {
+                        for (int i = 0; i < VerticalGridCount - 2; i++) {
                             float x = MainSystem.Args.PositionToX(GetVerticalGridPosition(i + 1));
                             _verticalGridData.Add((x, VerticalGridKind.Default));
                         }
@@ -193,17 +179,14 @@ namespace Deenote.GameStage
         /// <returns><see langword="null"/> if gridCount == 0</returns>
         public float? GetNearestVerticalGridPosition(float position)
         {
-            switch (VerticalGridGeneration)
-            {
-                case VerticalGridGenerationKind.ByCountAndOffset:
-                {
+            switch (VerticalGridGeneration) {
+                case VerticalGridGenerationKind.ByCountAndOffset: {
                     if (VerticalGridCount_Legacy == 0)
                         return null;
 
                     float minDist = float.MaxValue;
                     float snapPos = default;
-                    for (int i = 0; i < VerticalGridCount_Legacy; i++)
-                    {
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
                         float gridPos = GetVerticalGridPosition_Legacy(i);
                         float dist = Mathf.Abs(gridPos - position);
                         if (!(dist < minDist)) continue;
@@ -211,32 +194,27 @@ namespace Deenote.GameStage
                         snapPos = gridPos;
                     }
 
-                    if (IsBorderVisible_Legacy)
-                    {
+                    if (IsBorderVisible_Legacy) {
                         float dist = Mathf.Abs(position + MainSystem.Args.StageMaxPosition);
-                        if (dist < minDist)
-                        {
+                        if (dist < minDist) {
                             minDist = dist;
                             snapPos = -MainSystem.Args.StageMaxPosition;
                         }
                         dist = Mathf.Abs(position - MainSystem.Args.StageMaxPosition);
-                        if (dist < minDist)
-                        {
+                        if (dist < minDist) {
                             snapPos = MainSystem.Args.StageMaxPosition;
                         }
                     }
 
                     return snapPos;
                 }
-                case VerticalGridGenerationKind.ByKeyCount:
-                {
+                case VerticalGridGenerationKind.ByKeyCount: {
                     if (VerticalGridCount == 0)
                         return null;
 
                     float minDist = float.MaxValue;
                     float snapPos = default;
-                    for (int i = 0; i < VerticalGridCount; i++)
-                    {
+                    for (int i = 0; i < VerticalGridCount; i++) {
                         float gridPos = GetVerticalGridPosition(i);
                         float dist = Mathf.Abs(gridPos - position);
                         if (minDist <= dist)
@@ -256,16 +234,13 @@ namespace Deenote.GameStage
 
         public float? FloorToNearestNextVerticalGridPosition(float position)
         {
-            switch (VerticalGridGeneration)
-            {
-                case VerticalGridGenerationKind.ByCountAndOffset:
-                {
+            switch (VerticalGridGeneration) {
+                case VerticalGridGenerationKind.ByCountAndOffset: {
                     if (VerticalGridCount_Legacy == 0)
                         return null;
 
                     float? snapPos = null;
-                    for (int i = 0; i < VerticalGridCount_Legacy; i++)
-                    {
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
                         float gridPos = GetVerticalGridPosition_Legacy(i);
                         if (position > gridPos)
                             snapPos = gridPos;
@@ -276,14 +251,12 @@ namespace Deenote.GameStage
 
                     return snapPos;
                 }
-                case VerticalGridGenerationKind.ByKeyCount:
-                {
+                case VerticalGridGenerationKind.ByKeyCount: {
                     if (VerticalGridCount == 0)
                         return null;
 
                     float pos = position;
-                    for (int i = 0; i < VerticalGridCount; i++)
-                    {
+                    for (int i = 0; i < VerticalGridCount; i++) {
                         float gridPos = GetVerticalGridPosition(i);
                         if (gridPos >= position)
                             return pos;
@@ -300,16 +273,13 @@ namespace Deenote.GameStage
 
         public float? CeilToNearestNextVerticalGridPosition(float position)
         {
-            switch (VerticalGridGeneration)
-            {
-                case VerticalGridGenerationKind.ByCountAndOffset:
-                {
+            switch (VerticalGridGeneration) {
+                case VerticalGridGenerationKind.ByCountAndOffset: {
                     if (VerticalGridCount_Legacy == 0)
                         return null;
 
                     float? snapPos = null;
-                    for (int i = 0; i < VerticalGridCount_Legacy; i++)
-                    {
+                    for (int i = 0; i < VerticalGridCount_Legacy; i++) {
                         float gridPos = GetVerticalGridPosition_Legacy(i);
                         if (position < gridPos)
                             snapPos = gridPos;
@@ -320,10 +290,8 @@ namespace Deenote.GameStage
 
                     return snapPos;
                 }
-                case VerticalGridGenerationKind.ByKeyCount:
-                {
-                    for (int i = 0; i < VerticalGridCount; i++)
-                    {
+                case VerticalGridGenerationKind.ByKeyCount: {
+                    for (int i = 0; i < VerticalGridCount; i++) {
                         float gridPos = GetVerticalGridPosition(i);
                         if (gridPos > position)
                             return gridPos;
@@ -348,7 +316,9 @@ namespace Deenote.GameStage
 
         #endregion
 
-        private float GetVerticalGridPosition(int index) => 2 * MainSystem.Args.StageMaxPosition * ((float)index / (VerticalGridCount - 1)) - MainSystem.Args.StageMaxPosition;
+        private float GetVerticalGridPosition(int index) =>
+            2 * MainSystem.Args.StageMaxPosition * ((float)index / (VerticalGridCount - 1)) -
+            MainSystem.Args.StageMaxPosition;
 
         private float GetVerticalGridPosition_Legacy(int index)
         {

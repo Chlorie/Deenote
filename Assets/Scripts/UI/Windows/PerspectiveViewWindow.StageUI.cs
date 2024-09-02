@@ -1,5 +1,7 @@
+using Deenote.Audio;
 using Deenote.Project.Models;
 using Deenote.Utilities;
+using Reflex.Attributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,21 +29,24 @@ namespace Deenote.UI.Windows
         [SerializeField] TMP_Text _backgroundStaveText;
 
         private ChartModel _chart;
+        [Inject] private MusicController _musicController = null!;
 
         private Difficulty _currentDifficulty;
         private string _currentLevel;
 
         private void AwakeStageUI()
         {
-            _timeSlider.onValueChanged.AddListener(OnTimeSliderValueChanged);
             _pauseButton.onClick.AddListener(OnPauseClicked);
+            _timeSlider.onValueChanged.AddListener(OnTimeSliderValueChanged);
+            _musicController.OnTimeChanged += (time, _) => _timeSlider.SetValueWithoutNotify(time);
+            _musicController.OnClipChanged += length => _timeSlider.maxValue = length;
         }
 
         #region Events
 
-        private void OnTimeSliderValueChanged(float value) => _gameStageController.CurrentMusicTime = value;
+        private void OnTimeSliderValueChanged(float value) => _musicController.Time = value;
 
-        private void OnPauseClicked() => _gameStageController.ToggleMusicPlayingState();
+        private void OnPauseClicked() => _musicController.TogglePlayingState();
 
         #endregion
 
@@ -92,11 +97,6 @@ namespace Deenote.UI.Windows
             _levelText.text = $"{difficulty.ToDisplayString()} Lv {_currentLevel}";
         }
 
-        public void NotifyMusicTimeChanged(float time)
-        {
-            _timeSlider.SetValueWithoutNotify(time);
-        }
-
         public void NotifyChartChanged(ProjectModel project, ChartModel chart)
         {
             if (!_window.IsActivated)
@@ -106,7 +106,6 @@ namespace Deenote.UI.Windows
                 NotifyMusicNameChanged("");
                 NotifyChartLevelChanged("");
                 NotifyChartDifficultyChanged(Difficulty.Hard);
-                NotifyMusicTimeChanged(0f);
                 NotifyGameStageProgressChanged(0);
                 return;
             }
@@ -118,7 +117,6 @@ namespace Deenote.UI.Windows
             if (chart is null) {
                 NotifyChartLevelChanged("");
                 NotifyChartDifficultyChanged(Difficulty.Hard);
-                NotifyMusicTimeChanged(0f);
                 NotifyGameStageProgressChanged(0);
                 return;
             }
@@ -150,7 +148,7 @@ namespace Deenote.UI.Windows
             //            = ((1 + judged) * judged) / ((1 + count) * count)
             float comboScore = (float)((1 + judgedNoteCount) * judgedNoteCount) / ((1 + noteCount) * noteCount);
 
-            float score = accScore * 80_00f + comboScore * 20_00f; ;
+            float score = accScore * 80_00f + comboScore * 20_00f;
             _scoreText.text = $"{Mathf.Floor(score) / 100f:F2} %";
         }
 
@@ -163,7 +161,8 @@ namespace Deenote.UI.Windows
 
             var prevHitNoteIndex = combo - 1;
             _comboParentGameObject.SetActive(true);
-            var deltaTime = _gameStageController.CurrentMusicTime - _gameStageController.Chart.Notes[prevHitNoteIndex].Data.Time;
+            var deltaTime = _gameStageController.CurrentMusicTime -
+                            _gameStageController.Chart.Notes[prevHitNoteIndex].Data.Time;
             Debug.Assert(deltaTime >= 0, $"actual delta time:{deltaTime}");
             _comboNumberText.text = _comboShadowText.text = combo.ToString();
 
@@ -234,8 +233,10 @@ namespace Deenote.UI.Windows
                     x = Mathf.Lerp(_args.ComboShockWaveStartX, _args.ComboShockWaveEndX, ratio);
                     alpha = 1f;
                 }
-                else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime + _args.ComboShockWaveAlphaDecTime) {
-                    float ratio = (deltaTime - _args.ComboShockWaveAlphaIncTime - _args.ComboShockWaveMoveTime) / _args.ComboShockWaveAlphaDecTime;
+                else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime +
+                         _args.ComboShockWaveAlphaDecTime) {
+                    float ratio = (deltaTime - _args.ComboShockWaveAlphaIncTime - _args.ComboShockWaveMoveTime) /
+                                  _args.ComboShockWaveAlphaDecTime;
                     x = _args.ComboShockWaveEndX;
                     alpha = 1 - ratio;
                 }

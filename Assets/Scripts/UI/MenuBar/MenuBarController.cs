@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Deenote.ApplicationManaging;
 using Deenote.Localization;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
@@ -42,21 +43,31 @@ namespace Deenote.UI.MenuBar
             // TODO export
 
             // Edit
-            _copyButton.Button.onClick.AddListener(() => _ = MainSystem.StatusBar.ShowToastAsync(LocalizableText.Raw("114"), 3f));
+            _copyButton.Button.onClick.AddListener(() =>
+                _ = MainSystem.StatusBar.ShowToastAsync(LocalizableText.Raw("114"), 3f));
 
             // View
-            _perspectiveViewDropdownItem.Button.onClick.AddListener(() => MainSystem.PerspectiveView.Window.IsActivated = true);
-            _propertiesViewDropdownItem.Button.onClick.AddListener(() => MainSystem.PropertiesWindow.Window.IsActivated = true);
-            _editorPropertiesViewDropdownItem.Button.onClick.AddListener(() => MainSystem.EditorProperties.Window.IsActivated = true);
-            _pianoSoundEditViewDropdownItem.Button.onClick.AddListener(() => MainSystem.PianoSoundEdit.Window.IsActivated = true);
-            _toolBarDropdownItem.Button.onClick.AddListener(() => MainSystem.ToolBar.IsActivated = !MainSystem.ToolBar.IsActivated);
+            _perspectiveViewDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.PerspectiveView.Window.IsActivated = true);
+            _propertiesViewDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.PropertiesWindow.Window.IsActivated = true);
+            _editorPropertiesViewDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.EditorProperties.Window.IsActivated = true);
+            _pianoSoundEditViewDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.PianoSoundEdit.Window.IsActivated = true);
+            _toolBarDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.ToolBar.IsActivated = !MainSystem.ToolBar.IsActivated);
 
             // Settings
-            _preferencesDropdownItem.Button.onClick.AddListener(() => MainSystem.PreferenceWindow.Window.IsActivated = true);
-            _aboutDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.AboutDevelopers));
-            _tutorialsDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.Tutorials));
-            _updateHistoryDropdownItem.Button.onClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.UpdateHistory));
-            _checkUpdateDropdownItem.Button.onClick.AddListener(() => _ = MainSystem.VersionChecker.CheckUpdateAsync(true, true));
+            _preferencesDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.PreferenceWindow.Window.IsActivated = true);
+            _aboutDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.AboutDevelopers));
+            _tutorialsDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.Tutorials));
+            _updateHistoryDropdownItem.Button.onClick.AddListener(() =>
+                MainSystem.AboutWindow.OpenWindow(AboutWindow.AboutPage.UpdateHistory));
+            _checkUpdateDropdownItem.Button.onClick.AddListener(() => _ = VersionChecker.CheckUpdateAsync(true, true));
         }
 
         private async UniTaskVoid OnQuitAsync()

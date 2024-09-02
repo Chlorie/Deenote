@@ -10,8 +10,7 @@ namespace Deenote.GameStage
         public bool IsShowLinkLines
         {
             get => __showLinkLines;
-            set
-            {
+            set {
                 if (__showLinkLines == value) return;
                 __showLinkLines = value;
                 _editorController.NotifyIsShowLinkLinesChanged(__showLinkLines);

@@ -14,11 +14,11 @@ namespace Deenote.GameStage
         private Vector2[] _curveCoords = new Vector2[CubicCurveSegmentCount];
         private bool _shouldRenderCurve;
         private bool _isCurveOn;
+
         public bool IsCurveOn
         {
             get => _isCurveOn;
-            private set
-            {
+            private set {
                 if (_isCurveOn == value)
                     return;
                 _isCurveOn = value;
@@ -31,14 +31,12 @@ namespace Deenote.GameStage
         public void InitializeCurve(ListReadOnlyView<NoteModel> interpolationNotes, CurveKind kind)
         {
             NoteTimeComparer.AssertInOrder(interpolationNotes);
-            if (interpolationNotes.Count < 2)
-            {
+            if (interpolationNotes.Count < 2) {
                 IsCurveOn = false;
                 return;
             }
 
-            _curveLineData = kind switch
-            {
+            _curveLineData = kind switch {
                 CurveKind.Cubic => CurveLineData.Cubic(interpolationNotes),
                 CurveKind.Linear => CurveLineData.Linear(interpolationNotes),
                 _ => null,
@@ -67,16 +65,14 @@ namespace Deenote.GameStage
 
             using var coords = _curveLineData!.GetRenderValues(stage.CurrentMusicTime, stageMaxTime);
             var coordSpan = coords.Span;
-            if (coordSpan.Length == 0)
-            {
+            if (coordSpan.Length == 0) {
                 _shouldRenderCurve = false;
                 return;
             }
             _shouldRenderCurve = true;
 
             Debug.Assert(coordSpan.Length == _curveCoords.Length && coordSpan.Length == CubicCurveSegmentCount);
-            for (int i = 0; i < CubicCurveSegmentCount; i++)
-            {
+            for (int i = 0; i < CubicCurveSegmentCount; i++) {
                 var (x, z) = MainSystem.Args.NoteCoordToWorldPosition(coordSpan[i]);
                 _curveCoords[i] = new Vector2(x, z);
             }
@@ -113,8 +109,7 @@ namespace Deenote.GameStage
             {
                 var curve = new CurveLineData(interpolationNotes.Count);
 
-                for (int i = 0; i < interpolationNotes.Count; i++)
-                {
+                for (int i = 0; i < interpolationNotes.Count; i++) {
                     var note = interpolationNotes[i].Data;
                     curve.x[i] = note.Time;
                     curve.a[i] = note.Position;
@@ -135,8 +130,7 @@ namespace Deenote.GameStage
                 int count = interpolationNotes.Count;
                 int n = count - 1;
 
-                for (int i = 0; i < count; i++)
-                {
+                for (int i = 0; i < count; i++) {
                     curve.x[i] = interpolationNotes[i].Data.Time;
                     curve.a[i] = interpolationNotes[i].Data.Position;
                 }
@@ -147,12 +141,10 @@ namespace Deenote.GameStage
                 var l = (stackalloc double[count]);
                 var z = (stackalloc double[count]);
 
-                for (int i = 0; i < count - 1; i++)
-                {
+                for (int i = 0; i < count - 1; i++) {
                     h[i] = i + 1 - curve.x[i + 1] - curve.x[i];
                 }
-                for (int i = 1; i < count - 1; i++)
-                {
+                for (int i = 1; i < count - 1; i++) {
                     alpha[i] = 3 * (curve.a[i + 1] - curve.a[i]) / h[i] - 3 * (curve.a[i] - curve.a[i - 1]) / h[i - 1];
                 }
 
@@ -168,8 +160,7 @@ namespace Deenote.GameStage
                 z[n] = 0d;
                 curve.c[n] = 0d;
 
-                for (int i = n - 1; i >= 0; i--)
-                {
+                for (int i = n - 1; i >= 0; i--) {
                     curve.c[i] = z[i] - mu[i] * curve.c[i + 1];
                     curve.b[i] = (curve.a[i + 1] - curve.a[i]) / h[i] - h[i] * (curve.c[i + 1] + 2 * curve.c[i]) / 3;
                     curve.d[i] = (curve.c[i + 1] - curve.c[i]) / (3 * h[i]);
@@ -183,8 +174,7 @@ namespace Deenote.GameStage
                 if (time < x[0] || time > x[^1])
                     return null;
 
-                for (int i = 0; i < x.Length - 1; i++)
-                {
+                for (int i = 0; i < x.Length - 1; i++) {
                     if (!(time < x[i + 1])) continue;
                     double diff = time - x[i];
                     return (float)(

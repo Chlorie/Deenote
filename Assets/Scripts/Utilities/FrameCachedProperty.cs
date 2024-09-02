@@ -52,7 +52,10 @@ namespace Deenote.Utilities
     public class FrameCachedNotifyingProperty<T> : FrameCachedProperty<T>
     {
         public FrameCachedNotifyingProperty(Func<T> getter, bool autoUpdate = false)
-            : this(getter, EqualityComparer<T>.Default, autoUpdate) { }
+            : this(getter, EqualityComparer<T>.Default, autoUpdate)
+        {
+        }
+
         public FrameCachedNotifyingProperty(Func<T> getter, IEqualityComparer<T> comparer, bool autoUpdate = false)
             : base(getter, autoUpdate) => _comparer = comparer;
 

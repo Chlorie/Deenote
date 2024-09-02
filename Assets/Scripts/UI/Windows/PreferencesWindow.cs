@@ -14,7 +14,6 @@ namespace Deenote.UI.Windows
         public Window Window => _window;
 
         [Header("Notify")]
-
         [Header("UI")]
         [SerializeField] Toggle _stageEffectToggle;
         [SerializeField] Toggle _showFpsToggle;
@@ -33,23 +32,34 @@ namespace Deenote.UI.Windows
             _showFpsToggle.onValueChanged.AddListener(val => MainSystem.StatusBar.IsFpsShown = val);
             _vSyncToggle.onValueChanged.AddListener(val => MainSystem.IsVSyncOn = val);
             _mouseSensitivityInputField.onEndEdit.AddListener(OnMouseWheelSensitivityChanged);
-            _mouseSensitivityReverseButton.onClick.AddListener(() => MainSystem.Input.MouseScrollSensitivity = -MainSystem.Input.MouseScrollSensitivity);
-            _languageDropdown.Dropdown.onValueChanged.AddListener(index => MainSystem.Localization.CurrentLanguage = _languageDropdown.Options[index].TextOrKey);
-            _autoSaveDropDown.Dropdown.onValueChanged.AddListener(index => MainSystem.ProjectManager.AutoSave = ProjectManager.EnumExts.AudoSaveOptionFromDropdownIndex(index));
-            _showIneffectivePropertiesToggle.onValueChanged.AddListener(val => MainSystem.PropertiesWindow.IsIneffectivePropertiesVisible = val);
-            _distinguishPianoNoteToggle.onValueChanged.AddListener(val => MainSystem.GameStage.IsPianoNotesDistinguished = val);
-            _saveAudioDataInProjectToggle.onValueChanged.AddListener(val => MainSystem.ProjectManager.IsAudioDataSaveInProject = val);
+            _mouseSensitivityReverseButton.onClick.AddListener(() =>
+                MainSystem.Input.MouseScrollSensitivity = -MainSystem.Input.MouseScrollSensitivity);
+            _languageDropdown.Dropdown.onValueChanged.AddListener(index =>
+                MainSystem.Localization.CurrentLanguage = _languageDropdown.Options[index].TextOrKey);
+            _autoSaveDropDown.Dropdown.onValueChanged.AddListener(index =>
+                MainSystem.ProjectManager.AutoSave = ProjectManager.EnumExts.AudoSaveOptionFromDropdownIndex(index));
+            _showIneffectivePropertiesToggle.onValueChanged.AddListener(val =>
+                MainSystem.PropertiesWindow.IsIneffectivePropertiesVisible = val);
+            _distinguishPianoNoteToggle.onValueChanged.AddListener(val =>
+                MainSystem.GameStage.IsPianoNotesDistinguished = val);
+            _saveAudioDataInProjectToggle.onValueChanged.AddListener(val =>
+                MainSystem.ProjectManager.IsAudioDataSaveInProject = val);
 
             _window.SetOnFirstActivating(OnFirstActivating);
-            _window.SetOnIsActivatedChanged(activated => { if (activated) OnWindowActivated(); });
+            _window.SetOnIsActivatedChanged(activated =>
+            {
+                if (activated) OnWindowActivated();
+            });
         }
 
         private void OnFirstActivating()
         {
             _languageDropdown.ResetOptions(MainSystem.Localization.Languages);
-            _languageDropdown.Dropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(opt => opt == MainSystem.Localization.CurrentLanguage));
+            _languageDropdown.Dropdown.SetValueWithoutNotify(
+                _languageDropdown.FindIndex(opt => opt == MainSystem.Localization.CurrentLanguage));
             _autoSaveDropDown.ResetOptions(ProjectManager.EnumExts.AutoSaveDropDownOptions);
-            _autoSaveDropDown.Dropdown.SetValueWithoutNotify(ProjectManager.EnumExts.ToDropdownIndex(MainSystem.ProjectManager.AutoSave));
+            _autoSaveDropDown.Dropdown.SetValueWithoutNotify(
+                ProjectManager.EnumExts.ToDropdownIndex(MainSystem.ProjectManager.AutoSave));
         }
 
         #region Events

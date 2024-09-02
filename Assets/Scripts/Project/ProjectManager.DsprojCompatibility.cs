@@ -34,9 +34,7 @@ namespace Deenote.Project
 
         private sealed class LegacyProjectSerialization : SerializationBinder
         {
-            public static readonly BinaryFormatter Formatter = new() {
-                Binder = new LegacyProjectSerialization(),
-            };
+            public static readonly BinaryFormatter Formatter = new() { Binder = new LegacyProjectSerialization(), };
 
             private LegacyProjectSerialization() { }
 
@@ -74,10 +72,7 @@ namespace Deenote.Project
             // Copy from Chlorie
             public static FullProjectDataV2 ToVersion2(SerializableProjectData dataV1)
             {
-                var dataV2 = new FullProjectDataV2 {
-                    project = dataV1.project,
-                    audioType = ".wav"
-                };
+                var dataV2 = new FullProjectDataV2 { project = dataV1.project, audioType = ".wav" };
                 AudioUtils.EncodeToWav(dataV1.channel, dataV1.frequency, dataV1.length, dataV1.sampleData,
                     out dataV2.audio);
                 dataV2.project.songName = "converted audio.wav";
@@ -110,18 +105,14 @@ namespace Deenote.Project
 
             private static ProjectModel ToVer3(Project oldProject)
             {
-                var project = new ProjectModel {
-                    MusicName = oldProject.name,
-                    ChartDesigner = oldProject.chartMaker,
-                };
+                var project = new ProjectModel { MusicName = oldProject.name, ChartDesigner = oldProject.chartMaker, };
 
                 Debug.Assert(oldProject.charts.Length == 4);
                 foreach (var oldChart in oldProject.charts) {
                     if (oldChart.notes.Count == 0)
                         continue;
                     var chartModel = new ChartModel(ToVer3(oldChart)) {
-                        Difficulty = DifficultyExt.FromInt32(oldChart.difficulty),
-                        Level = oldChart.level,
+                        Difficulty = DifficultyExt.FromInt32(oldChart.difficulty), Level = oldChart.level,
                     };
                     project.Charts.Add(chartModel);
                 }
@@ -136,11 +127,7 @@ namespace Deenote.Project
 
             private static ChartData ToVer3(Chart oldChart)
             {
-                var chart = new ChartData {
-                    Speed = oldChart.speed,
-                    RemapMinVelocity = 10,
-                    RemapMaxVelocity = 70,
-                };
+                var chart = new ChartData { Speed = oldChart.speed, RemapMinVelocity = 10, RemapMaxVelocity = 70, };
                 chart.Notes.AddRange(oldChart.notes.Select(ToVer3));
                 for (int i = 0; i < chart.Notes.Count; i++) {
                     var oldNote = oldChart.notes[i];
@@ -184,7 +171,7 @@ namespace Deenote.Project
             public class SerializableProjectData //Saves all the project data including the audio clip data
             {
                 public Project project; //Other project data
-                                        //Audio clip data
+                //Audio clip data
                 public float[] sampleData;
                 public int frequency;
                 public int channel;
@@ -228,7 +215,7 @@ namespace Deenote.Project
                 public float shift; //shift
                 public List<PianoSound> sounds; //sounds
                 public bool isLink; //Whether the note is a link note
-                                    //The two variables below are not used when isLink=false
+                //The two variables below are not used when isLink=false
                 public int prevLink; //Index of previous link note in the same link, -1 means current note is the first
                 public int nextLink; //Index of next link note in the same link, -1 means current note is the last
             }

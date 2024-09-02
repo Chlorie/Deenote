@@ -1,14 +1,18 @@
+using Deenote.Audio;
 using Deenote.Inputting;
 using Deenote.Utilities;
+using Reflex.Attributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Deenote.GameStage
 {
-    partial class PerspectiveViewController : IPointerMoveHandler, IPointerDownHandler, IPointerUpHandler, IScrollHandler
+    partial class PerspectiveViewController :
+        IPointerMoveHandler, IPointerDownHandler, IPointerUpHandler, IScrollHandler
     {
         private MouseButtons _pressedMouseButtons;
         private MouseActionState _mouseActionState;
+        [Inject] private MusicController _musicController = null!;
 
         private void UpdateNoteIndicatorPosition(Vector2 mousePosition)
         {
@@ -30,7 +34,8 @@ namespace Deenote.GameStage
                 return;
 
             // Note selection
-            if (_pressedMouseButtons.HasFlag(MouseButtons.Left) && _mouseActionState is MouseActionState.NoteSelecting) {
+            if (_pressedMouseButtons.HasFlag(MouseButtons.Left) &&
+                _mouseActionState is MouseActionState.NoteSelecting) {
                 if (TryConvertScreenPointToNoteCoord(eventData.position, out var coord)) {
                     _editor.UpdateNoteSelection(coord);
                 }
@@ -93,14 +98,15 @@ namespace Deenote.GameStage
             float scroll = eventData.scrollDelta.y;
             if (scroll != 0f) {
                 float deltaTime = scroll * 0.1f * MainSystem.Input.MouseScrollSensitivity;
-                _stage.CurrentMusicTime -= deltaTime;
+                _musicController.NudgePlaybackPosition(-deltaTime);
             }
         }
 
         private bool TryConvertScreenPointToNoteCoord(Vector2 screenPoint, out NoteCoord coord)
         {
             var transform = _cameraViewRawImage.rectTransform;
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(transform, screenPoint, null, out var localPoint)) {
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(transform, screenPoint, null,
+                    out var localPoint)) {
                 coord = default;
                 return false;
             }
@@ -121,7 +127,8 @@ namespace Deenote.GameStage
             if (coord.Time > _stage.CurrentMusicTime + _stage.StageNoteAheadTime)
                 return false;
 
-            if (coord.Position is > MainSystem.Args.NoteSelectionMaxPosition or < -MainSystem.Args.NoteSelectionMaxPosition)
+            if (coord.Position is > MainSystem.Args.NoteSelectionMaxPosition
+                or < -MainSystem.Args.NoteSelectionMaxPosition)
                 return false;
 
             return true;
@@ -132,7 +139,8 @@ namespace Deenote.GameStage
             Ray ray = ViewCamera.ViewportPointToRay(viewPoint);
             if (_stage.NotePanelPlane.Raycast(ray, out var distance)) {
                 var hitp = ray.GetPoint(distance);
-                coord = new(MainSystem.Args.ZToOffsetTime(hitp.z) + _stage.CurrentMusicTime, MainSystem.Args.XToPosition(hitp.x));
+                coord = new(MainSystem.Args.ZToOffsetTime(hitp.z) + _stage.CurrentMusicTime,
+                    MainSystem.Args.XToPosition(hitp.x));
                 return true;
             }
             coord = default;

@@ -32,7 +32,8 @@ namespace Deenote.Project.Models.Datas
 
         public PianoSoundData(PianoSoundValueData data)
             : this(data.Delay, data.Duration, data.Pitch, data.Velocity)
-        { }
+        {
+        }
 
         public PianoSoundData Clone()
             => new(Delay, Duration, Pitch, Velocity);

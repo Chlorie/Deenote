@@ -14,6 +14,7 @@ namespace Deenote.Project
         [Header("Args")]
         [SerializeField]
         private AutoSaveOption _autoSave;
+
         public AutoSaveOption AutoSave
         {
             get => _autoSave;
@@ -27,6 +28,7 @@ namespace Deenote.Project
 
         [SerializeField]
         private bool __isAudioDataSaveInProject;
+
         public bool IsAudioDataSaveInProject
         {
             get => __isAudioDataSaveInProject;
@@ -58,7 +60,7 @@ namespace Deenote.Project
                         return;
                     if (_lastAutoSaveTime.IncAndTryWrap(Time.deltaTime, AutoSaveIntervalTime_s)) {
                         _ = SaveProjectAsync();
-                     
+
                         string timeStr = DateTime.Now.ToString("yyMMddHHmmss");
                         string dir = Path.Combine(CurrentProjectSaveDirectory, $"{_currentProjectFileName}_$autosave");
                         var filename = Path.GetFileNameWithoutExtension(_currentProjectFileName);

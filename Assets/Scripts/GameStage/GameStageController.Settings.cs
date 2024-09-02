@@ -11,6 +11,7 @@ namespace Deenote.GameStage
 
         [Header("Settings")]
         [SerializeField] private bool __isStageEffectOn;
+
         public bool IsStageEffectOn
         {
             get => __isStageEffectOn;
@@ -25,6 +26,7 @@ namespace Deenote.GameStage
         }
 
         [SerializeField, Range(1, 19)] private int __noteSpeed;
+
         /// <summary>
         /// Range [1, 19], display [0.5, 9.5]
         /// </summary>
@@ -44,6 +46,7 @@ namespace Deenote.GameStage
         }
 
         [SerializeField, Range(1, 30)] private int __musicSpeed;
+
         /// <summary>
         /// Range [1, 30], display [0.1, 3.0]
         /// </summary>
@@ -56,12 +59,13 @@ namespace Deenote.GameStage
                 if (__musicSpeed == value)
                     return;
                 __musicSpeed = value;
-                _musicSource.pitch = value / 10f;
+                _musicController.Pitch = value / 10f;
                 _editorPropertiesWindow.NotifyMusicSpeedChanged(__musicSpeed);
             }
         }
 
         [SerializeField, Range(0, 100)] private int __effectVolume;
+
         /// <summary>
         /// Range [0, 100]
         /// </summary>
@@ -79,6 +83,7 @@ namespace Deenote.GameStage
         }
 
         [SerializeField, Range(0, 100)] private int __musicVolume;
+
         /// <summary>
         /// Range [0, 100]
         /// </summary>
@@ -91,12 +96,13 @@ namespace Deenote.GameStage
                 if (__musicVolume == value)
                     return;
                 __musicVolume = value;
-                _musicSource.volume = __musicVolume / 100f;
+                _musicController.Volume = __musicVolume / 100f;
                 _editorPropertiesWindow.NotifyMusicVolumeChanged(__musicVolume);
             }
         }
 
         [SerializeField, Range(0, 100)] private int __pianoVolume;
+
         /// <summary>
         /// Range [0, 100]
         /// </summary>
@@ -114,6 +120,7 @@ namespace Deenote.GameStage
         }
 
         [SerializeField, Range(0f, 100f)] private int __suddenPlusRange;
+
         /// <summary>
         /// Range [0, 100], means percent
         /// </summary>
@@ -134,6 +141,7 @@ namespace Deenote.GameStage
         }
 
         private bool __isPianoNotesDistinguished;
+
         public bool IsPianoNotesDistinguished
         {
             get => __isPianoNotesDistinguished;

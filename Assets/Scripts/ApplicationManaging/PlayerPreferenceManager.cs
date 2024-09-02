@@ -7,7 +7,7 @@ namespace Deenote.ApplicationManaging
         public int GetInt(string key, int defaultValue)
         {
             return PlayerPrefs.GetInt(key, defaultValue);
-            
+
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Deenote.UI.ToolBar
     public sealed partial class ToolBarController : MonoBehaviour
     {
         [SerializeField] private bool __isActivated;
+
         public bool IsActivated
         {
             get => __isActivated;
@@ -44,7 +45,9 @@ namespace Deenote.UI.ToolBar
             _unlinkItem.Button.onClick.AddListener(MainSystem.Editor.UnlinkSelectedNotes);
             _soundItem.Button.onClick.AddListener(MainSystem.Editor.SoundifySelectedNotes);
             _desoundItem.Button.onClick.AddListener(MainSystem.Editor.DesoundifySelectedNotes);
-            _quantizeItem.Button.onClick.AddListener(() => MainSystem.Editor.EditSelectedNotesPositionCoord(coord => MainSystem.GameStage.Grids.Quantize(coord, true, true)));
+            _quantizeItem.Button.onClick.AddListener(() =>
+                MainSystem.Editor.EditSelectedNotesPositionCoord(coord =>
+                    MainSystem.GameStage.Grids.Quantize(coord, true, true)));
             _mirrorItem.Button.onClick.AddListener(() => MainSystem.Editor.EditSelectedNotesPosition(pos => -pos));
 
             AwakePointer();

@@ -28,6 +28,5 @@ namespace Deenote.UI.MenuBar.Components
 
         public override void OnPointerExit(PointerEventData eventData) { }
         public void OnPointerExit_Base(PointerEventData eventData) => base.OnPointerExit(eventData);
-
     }
 }

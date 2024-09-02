@@ -21,11 +21,13 @@ namespace Deenote.GameStage
 
         [field: Header("Aspect Ratio Adjust")]
         [field: SerializeField] public Camera ViewCamera { get; private set; } = null!;
+
         [field: SerializeField] public Camera BackgroundCamera { get; private set; } = null!;
 
         public bool IsFullScreen { get; private set; }
 
         private ViewAspectRatio __aspectRatio;
+
         public ViewAspectRatio AspectRatio
         {
             get => __aspectRatio;

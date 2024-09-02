@@ -9,7 +9,7 @@ namespace Deenote
 
         public static bool IsVSyncOn
         {
-            get => Instance. __isVSyncOn;
+            get => Instance.__isVSyncOn;
             set {
                 if (Instance.__isVSyncOn == value)
                     return;

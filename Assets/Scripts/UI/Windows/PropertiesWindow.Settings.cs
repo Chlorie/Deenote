@@ -23,7 +23,7 @@ namespace Deenote.UI.Windows
                 _noteSwipeToggle.gameObject.SetActive(__isIneffectivePropertiesVisible);
                 _noteWarningTypeInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
                 _noteEventIdInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                
+
                 MainSystem.PreferenceWindow.NotifyIsIneffectivePropertiesVisible(__isIneffectivePropertiesVisible);
             }
         }

@@ -15,7 +15,6 @@ namespace Deenote.UI.Windows.Elements
 {
     public sealed class ProjectPropertiesChartController : MonoBehaviour
     {
-
         [Header("UI")]
         [SerializeField] TMP_InputField _nameInputField;
         [SerializeField] WindowDropdown _difficultyDropDown;
@@ -42,13 +41,11 @@ namespace Deenote.UI.Windows.Elements
             _window = window;
             _difficultyDropDown.ResetOptions(DifficultyExt.DropdownOptions);
         }
-        
+
         public void Initialize(ChartModel? chart)
         {
             __chartModel = chart ?? new ChartModel(new ChartData()) {
-                Name = "",
-                Difficulty = Difficulty.Hard,
-                Level = "1",
+                Name = "", Difficulty = Difficulty.Hard, Level = "1",
             };
 
             _nameInputField.text = __chartModel.Name;
@@ -68,7 +65,8 @@ namespace Deenote.UI.Windows.Elements
         {
             _nameInputField.onEndEdit.AddListener(val => Chart.Name = val);
             _levelInputField.onEndEdit.AddListener(val => Chart.Level = val);
-            _difficultyDropDown.Dropdown.onValueChanged.AddListener(val => Chart.Difficulty = DifficultyExt.FromInt32(val));
+            _difficultyDropDown.Dropdown.onValueChanged.AddListener(val =>
+                Chart.Difficulty = DifficultyExt.FromInt32(val));
 
             _loadButton.onClick.AddListener(() => _window.SelectChartToLoad(this));
             _importButton.onClick.AddListener(ImportChartAsync);
@@ -99,7 +97,8 @@ namespace Deenote.UI.Windows.Elements
             if (!ChartData.TryLoad(await File.ReadAllTextAsync(res.Path), out var chartData)) {
                 _importText.SetLocalizedText("Window_ProjectProperties_ChartImport");
                 var arg = Path.GetFileName(res.Path);
-                MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_ImportChart_Failed"), MemoryMarshal.CreateReadOnlySpan(ref arg, 1));
+                MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_ImportChart_Failed"),
+                    MemoryMarshal.CreateReadOnlySpan(ref arg, 1));
                 _importButton.interactable = true;
                 return;
             }

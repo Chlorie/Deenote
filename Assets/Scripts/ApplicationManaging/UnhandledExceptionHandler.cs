@@ -6,17 +6,17 @@ using UnityEngine;
 
 namespace Deenote.ApplicationManaging
 {
-    public sealed class UnhandledExceptionHandler : MonoBehaviour
+    public sealed class UnhandledExceptionHandler
     {
-        private const string LogFile = "exceptions.log";
-
-        private void Awake()
+        public UnhandledExceptionHandler()
         {
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             Application.logMessageReceived += OnUnityLogMessageReceived;
             if (File.Exists(LogFile))
                 File.Delete(LogFile);
         }
+
+        private const string LogFile = "exceptions.log";
 
         private void OnUnityLogMessageReceived(string condition, string stackTrace, LogType type)
         {

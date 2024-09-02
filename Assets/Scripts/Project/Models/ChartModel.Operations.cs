@@ -46,7 +46,8 @@ namespace Deenote.Project.Models
                 return new AddNoteOperation(iModel, iData, _chartModel, model);
             }
 
-            public AddMultipleNotesOperation AddMultipleNotes(NoteCoord baseCoord, ListReadOnlyView<NoteData> notePrototypes)
+            public AddMultipleNotesOperation AddMultipleNotes(NoteCoord baseCoord,
+                ListReadOnlyView<NoteData> notePrototypes)
             {
                 NoteTimeComparer.AssertInOrder(notePrototypes);
 
@@ -72,7 +73,8 @@ namespace Deenote.Project.Models
                 NoteModel[] insertModels = Utils.Array<NoteModel>(notePrototypes.Count);
                 for (int i = 0; i < notePrototypes.Count; i++) {
                     var insertNote = notePrototypes[i].Clone();
-                    var coord = NoteCoord.ClampPosition(new(insertNote.Time + baseCoord.Time, insertNote.Position + baseCoord.Position));
+                    var coord = NoteCoord.ClampPosition(new(insertNote.Time + baseCoord.Time,
+                        insertNote.Position + baseCoord.Position));
                     insertNote.PositionCoord = coord;
                     insertModels[i] = new(insertNote);
                 }
@@ -146,7 +148,8 @@ namespace Deenote.Project.Models
                 return new UnlinkNotesOperation(editNotes);
             }
 
-            public EditNotesPropertyOperation<T> EditNotes<T>(ListReadOnlyView<NoteModel> notes, T value, Func<NoteData, T> valueGetter, Action<NoteData, T> valueSetter)
+            public EditNotesPropertyOperation<T> EditNotes<T>(ListReadOnlyView<NoteModel> notes, T value,
+                Func<NoteData, T> valueGetter, Action<NoteData, T> valueSetter)
             {
                 var contexts = Utils.Array<(NoteModel Note, T OldValue)>(notes.Count);
                 for (int i = 0; i < contexts.Length; i++) {
@@ -156,7 +159,8 @@ namespace Deenote.Project.Models
                 return new EditNotesPropertyOperation<T>(contexts, value, valueSetter, _chartModel);
             }
 
-            public EditNotesPropertyOperation<T> EditNotes<T>(ListReadOnlyView<NoteModel> notes, Func<T, T> valueSelector, Func<NoteData, T> valueGetter, Action<NoteData, T> valueSetter)
+            public EditNotesPropertyOperation<T> EditNotes<T>(ListReadOnlyView<NoteModel> notes,
+                Func<T, T> valueSelector, Func<NoteData, T> valueGetter, Action<NoteData, T> valueSetter)
             {
                 var contexts = Utils.Array<(NoteModel Note, T OldValue)>(notes.Count);
                 for (int i = 0; i < contexts.Length; i++) {
@@ -166,7 +170,8 @@ namespace Deenote.Project.Models
                 return new EditNotesPropertyOperation<T>(contexts, valueSelector, valueSetter, _chartModel);
             }
 
-            public EditNotesSoundsOperation EditNotesSounds(ListReadOnlyView<NoteModel> notes, PianoSoundValueData[] valueData)
+            public EditNotesSoundsOperation EditNotesSounds(ListReadOnlyView<NoteModel> notes,
+                PianoSoundValueData[] valueData)
             {
                 var contexts = Utils.Array<(NoteModel, PianoSoundValueData[])>(notes.Count);
                 for (int i = 0; i < notes.Count; i++) {
@@ -226,7 +231,8 @@ namespace Deenote.Project.Models
                 private ListReadOnlyView<NoteModel> _collidedNotes;
 
                 // Unity 什么时候支持 C#12.jpg
-                public AddNoteOperation(int modelInsertIndex, int dataInsertIndex, ChartModel chartModel, NoteModel noteModel)
+                public AddNoteOperation(int modelInsertIndex, int dataInsertIndex, ChartModel chartModel,
+                    NoteModel noteModel)
                 {
                     _modelInsertIndex = modelInsertIndex;
                     _dataInsertIndex = dataInsertIndex;
@@ -296,7 +302,8 @@ namespace Deenote.Project.Models
 
                 private readonly ListReadOnlyView<NoteModel>[] _collidedNotes;
 
-                public AddMultipleNotesOperation((int ModelIndex, int DataIndex)[] insertIndices, ChartModel chartModel, NoteModel[] noteModels)
+                public AddMultipleNotesOperation((int ModelIndex, int DataIndex)[] insertIndices, ChartModel chartModel,
+                    NoteModel[] noteModels)
                 {
                     Debug.Assert(insertIndices.Length == noteModels.Length);
                     _insertIndices = insertIndices;
@@ -331,7 +338,8 @@ namespace Deenote.Project.Models
                     {
                         ref var collidedNotes = ref _collidedNotes[index];
                         if (collidedNotes.IsNull) {
-                            collidedNotes = _chartModel.Notes.GetCollidedNotesTo(_insertIndices[index].ModelIndex + index);
+                            collidedNotes =
+                                _chartModel.Notes.GetCollidedNotesTo(_insertIndices[index].ModelIndex + index);
                         }
                         _notes[index].CollisionCount += collidedNotes.Count;
                         foreach (var note in collidedNotes) {
@@ -604,7 +612,8 @@ namespace Deenote.Project.Models
                 private ListReadOnlyView<NoteModel>[]? _afterCollidedNotes;
                 private (bool? IsInsertBefore, NoteData BeforeRefNote, NoteData AfterRefNote)[] _linkChangeDatas;
 
-                public EditNotesPropertyOperation((NoteModel, T OldValue)[] contexts, T newValue, Action<NoteData, T> edit, ChartModel chartModel)
+                public EditNotesPropertyOperation((NoteModel, T OldValue)[] contexts, T newValue,
+                    Action<NoteData, T> edit, ChartModel chartModel)
                 {
                     _contexts = contexts;
                     _newValue = newValue;
@@ -614,7 +623,8 @@ namespace Deenote.Project.Models
                     NoteTimeComparer.AssertInOrder(_contexts.Select(v => v.Note));
                 }
 
-                public EditNotesPropertyOperation((NoteModel, T OldValue)[] contexts, Func<T, T> newValueSelector, Action<NoteData, T> valueSetter, ChartModel chartModel)
+                public EditNotesPropertyOperation((NoteModel, T OldValue)[] contexts, Func<T, T> newValueSelector,
+                    Action<NoteData, T> valueSetter, ChartModel chartModel)
                 {
                     _contexts = contexts;
                     _newValueSelector = newValueSelector;
@@ -649,7 +659,8 @@ namespace Deenote.Project.Models
 
                     for (int i = 0; i < _contexts.Length; i++) {
                         var (note, oldValue) = _contexts[i];
-                        _valueSetter(note.Data, _newValueSelector is null ? _newValue : _newValueSelector.Invoke(oldValue));
+                        _valueSetter(note.Data,
+                            _newValueSelector is null ? _newValue : _newValueSelector.Invoke(oldValue));
                         if (requiresLaterInit)
                             InitAfterSortNotesDatas(i);
                     }
@@ -715,7 +726,8 @@ namespace Deenote.Project.Models
                     }
 
                     if (_linkChangeDatas is null && _isRequireSortNotes) {
-                        _linkChangeDatas = new (bool? IsInsertBefore, NoteData BeforeRefNote, NoteData AfterRefNote)[_contexts.Length];
+                        _linkChangeDatas =
+                            new (bool? IsInsertBefore, NoteData BeforeRefNote, NoteData AfterRefNote)[_contexts.Length];
                     }
                 }
 
@@ -892,7 +904,8 @@ namespace Deenote.Project.Models
 
                 private Action? _onDone;
 
-                public EditNotesSoundsOperation((NoteModel Note, PianoSoundValueData[] OldValues)[] contexts, PianoSoundValueData[] newValue)
+                public EditNotesSoundsOperation((NoteModel Note, PianoSoundValueData[] OldValues)[] contexts,
+                    PianoSoundValueData[] newValue)
                 {
                     _contexts = contexts;
                     _newValue = newValue;

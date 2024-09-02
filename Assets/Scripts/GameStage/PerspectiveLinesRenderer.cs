@@ -23,13 +23,9 @@ namespace Deenote.GameStage
         public void AddLineStrip(ListReadOnlyView<Vector2> points, Color color, float width)
         {
             Vector2 prev = points[0];
-            foreach (var point in points)
-            {
-                _vertices.Add(new VertexData
-                {
-                    Positions = new Vector4(point.x, point.y, prev.x, prev.y),
-                    Color = color,
-                    Width = width
+            foreach (var point in points) {
+                _vertices.Add(new VertexData {
+                    Positions = new Vector4(point.x, point.y, prev.x, prev.y), Color = color, Width = width
                 });
                 prev = point;
             }
@@ -38,13 +34,9 @@ namespace Deenote.GameStage
         public void AddLineStrip(ReadOnlySpan<Vector2> points, Color color, float width)
         {
             Vector2 prev = points[0];
-            foreach (var point in points)
-            {
-                _vertices.Add(new VertexData
-                {
-                    Positions = new Vector4(point.x, point.y, prev.x, prev.y),
-                    Color = color,
-                    Width = width
+            foreach (var point in points) {
+                _vertices.Add(new VertexData {
+                    Positions = new Vector4(point.x, point.y, prev.x, prev.y), Color = color, Width = width
                 });
                 prev = point;
             }
@@ -73,8 +65,7 @@ namespace Deenote.GameStage
             public float Width;
         }
 
-        private static readonly VertexAttributeDescriptor[] VertexLayout =
-        {
+        private static readonly VertexAttributeDescriptor[] VertexLayout = {
             new(VertexAttribute.Position, VertexAttributeFormat.Float32, 4),
             new(VertexAttribute.Color, VertexAttributeFormat.UNorm8, 4),
             new(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 1)
@@ -86,8 +77,8 @@ namespace Deenote.GameStage
         private static readonly int SmoothingPx = Shader.PropertyToID("_SmoothingPx");
         private static readonly int ActualViewSize = Shader.PropertyToID("_ActualViewSize");
 
-        [SerializeField][HideInInspector] private MeshFilter _meshFilter = null!;
-        [SerializeField][HideInInspector] private MeshRenderer _meshRenderer = null!;
+        [SerializeField] [HideInInspector] private MeshFilter _meshFilter = null!;
+        [SerializeField] [HideInInspector] private MeshRenderer _meshRenderer = null!;
         private List<VertexData> _vertices = new();
         private MaterialPropertyBlock _props = null!;
 
@@ -110,8 +101,7 @@ namespace Deenote.GameStage
         private Mesh GenerateMesh()
         {
             // No lines
-            if (_vertices.Count == 0)
-            {
+            if (_vertices.Count == 0) {
                 if (_emptyMesh is not null) return _emptyMesh;
                 _emptyMesh = new Mesh();
                 _emptyMesh.SetVertexBufferParams(0, VertexLayout);

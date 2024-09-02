@@ -15,6 +15,7 @@ namespace Deenote.Project.Models
         public string Level { get; set; } = "";
 
         private ChartData _data = null!;
+
         public ChartData Data
         {
             get => _data;

@@ -78,7 +78,10 @@ namespace Deenote.UI.Windows
             AwakeStageUI();
 
             _window.SetOnFirstActivating(OnFirstActivating);
-            _window.SetOnIsActivatedChanged(activated => { if (activated) OnWindowActivated(); });
+            _window.SetOnIsActivatedChanged(activated =>
+            {
+                if (activated) OnWindowActivated();
+            });
         }
 
         private void ResizeCameraTexture(Vector2 size)
@@ -92,7 +95,8 @@ namespace Deenote.UI.Windows
         private void OnFirstActivating()
         {
             _aspectDropdown.ResetOptions(ViewAspectRatioExt.ViewAspectDropdownOptions);
-            _aspectDropdown.Dropdown.SetValueWithoutNotify(PerspectiveViewController.Instance.AspectRatio.ToDropdownIndex());
+            _aspectDropdown.Dropdown.SetValueWithoutNotify(PerspectiveViewController.Instance.AspectRatio
+                .ToDropdownIndex());
         }
 
         #region Event

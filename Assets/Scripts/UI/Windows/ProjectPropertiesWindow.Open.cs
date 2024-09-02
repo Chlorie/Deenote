@@ -53,12 +53,6 @@ namespace Deenote.UI.Windows
             return new Result(proj, loadChartIndex);
         }
 
-        private ValueTask<int> TestAsync()
-        {
-            return TestImpl(this);
-            static UniTask<int> TestImpl(ProjectPropertiesWindow self) => UniTask.FromResult(self._charts.Count);
-        }
-
         /// <summary>
         /// Open window for existing project
         /// </summary>

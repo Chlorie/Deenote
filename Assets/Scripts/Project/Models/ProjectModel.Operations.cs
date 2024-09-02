@@ -44,14 +44,14 @@ namespace Deenote.Project.Models
                     float nextTempoTime = GetNonOverflowTempoTime(removeEndIndex);
                     Tempo prevTempo = removeEndIndex < 1 ? default : tempos[removeEndIndex - 1];
                     float continuingTempoTime = prevTempo.GetBeatTime(prevTempo.GetCeilingBeatIndex(endTime));
-                    
+
                     if (continuingTempoTime <= nextTempoTime - MainSystem.Args.MinBeatLineInterval) {
                         nextTempoTime = continuingTempoTime;
                         insertContinuingTempo = new Tempo(prevTempo.Bpm, continuingTempoTime);
                     }
                     // else if continuingTempo is near to or greater than nextTempo, ignore continuingTempo.
-                    else { } 
-                    
+                    else { }
+
                     if (endTime <= nextTempoTime - MainSystem.Args.MinBeatLineInterval) {
                         insertEndTempo = new Tempo(bpm: 0f, endTime);
                     }
@@ -59,7 +59,8 @@ namespace Deenote.Project.Models
                 }
                 // else if given tempo time range is too short, we only adjust startTime
 
-                return new InsertTempoOperation(_projectModel._tempos, removeStartIndex, removeEndIndex, tempo, insertEndTempo, insertContinuingTempo);
+                return new InsertTempoOperation(_projectModel._tempos, removeStartIndex, removeEndIndex, tempo,
+                    insertEndTempo, insertContinuingTempo);
             }
 
             #region Impls
@@ -76,7 +77,8 @@ namespace Deenote.Project.Models
 
                 private Action? _onDone;
 
-                public InsertTempoOperation(List<Tempo> tempoList, int startIndex, int endIndex, Tempo insertStartTempo, Tempo? insertEndTempo, Tempo? insertContinuingTempo)
+                public InsertTempoOperation(List<Tempo> tempoList, int startIndex, int endIndex, Tempo insertStartTempo,
+                    Tempo? insertEndTempo, Tempo? insertContinuingTempo)
                 {
                     _tempoList = tempoList;
                     _startIndex = startIndex;

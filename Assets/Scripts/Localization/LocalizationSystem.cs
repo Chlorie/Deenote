@@ -114,7 +114,8 @@ namespace Deenote.Localization
             return (name, dict);
         }
 
-        private bool TryGetTextDictionary(string languageName, [NotNullWhen(true)] out Dictionary<string, string>? texts)
+        private bool TryGetTextDictionary(string languageName,
+            [NotNullWhen(true)] out Dictionary<string, string>? texts)
         {
             var index = Languages.IndexOf(languageName);
             if (index < 0) {

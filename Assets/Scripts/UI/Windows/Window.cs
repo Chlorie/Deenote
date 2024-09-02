@@ -39,6 +39,7 @@ namespace Deenote.UI.Windows
                     Size = Size;
             }
         }
+
         public bool IsFixedAspectRatio => _fixedRatio > 0f;
 
         public bool IsActivated

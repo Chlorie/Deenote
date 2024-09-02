@@ -9,14 +9,17 @@ namespace Deenote.Utilities
     // Copied from Chlorie's version
     public static class AudioUtils
     {
-        public static async UniTask<AudioClip?> LoadAsync(Stream stream, string audioType, CancellationToken cancellationToken = default)
+        public static async UniTask<AudioClip?> LoadAsync(Stream stream, string audioType,
+            CancellationToken cancellationToken = default)
         {
-            var result = await UniTask.RunOnThreadPool(Load, configureAwait: true, cancellationToken: cancellationToken);
+            var result =
+                await UniTask.RunOnThreadPool(Load, configureAwait: true, cancellationToken: cancellationToken);
             if (result is not var (data, reader))
                 return null;
 
             // AudioClip.Create should run on main thread
-            AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+            AudioClip newClip = AudioClip.Create("SongAudioClip", data.Length / reader.WaveFormat.Channels,
+                reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
             newClip.SetData(data, 0);
             return newClip;
 

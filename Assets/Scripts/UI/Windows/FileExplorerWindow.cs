@@ -37,6 +37,7 @@ namespace Deenote.UI.Windows
         private string? _selectedFilePath;
 
         private string? __currentDirectory;
+
         private string? CurrentDirectory
         {
             get => __currentDirectory;

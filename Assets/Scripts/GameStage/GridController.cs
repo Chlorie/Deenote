@@ -17,7 +17,8 @@ namespace Deenote.GameStage
         {
             float snappedTime = snapTime ? GetNearestTimeGridTime(coord.Time) ?? coord.Time : coord.Time;
             float snappedPos = (snapPosition, IsCurveOn) switch {
-                (true, true) => _curveLineData.GetPosition(snappedTime) ?? GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
+                (true, true) => _curveLineData.GetPosition(snappedTime) ??
+                                GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
                 (true, false) => GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
                 (false, _) => coord.Position,
             };

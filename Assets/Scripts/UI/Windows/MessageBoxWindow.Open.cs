@@ -14,7 +14,8 @@ namespace Deenote.UI.Windows
         /// <returns>
         /// Returns the index of clicked button, -1 if close button
         /// </returns>
-        public async UniTask<int> ShowAsync(LocalizableText title, LocalizableText content, LocalizableText[] buttonTexts)
+        public async UniTask<int> ShowAsync(LocalizableText title, LocalizableText content,
+            LocalizableText[] buttonTexts)
         {
             Window.IsActivated = true;
 

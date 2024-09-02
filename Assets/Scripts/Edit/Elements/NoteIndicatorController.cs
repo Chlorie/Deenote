@@ -19,15 +19,18 @@ namespace Deenote.Edit.Elements
             var prefab = _notePrototype switch {
                 { IsSlide: true } => MainSystem.GameStage.Args.SlideNoteSpritePrefab,
                 { HasSound: true } => MainSystem.GameStage.Args.BlackNoteSpritePrefab,
-                _ when MainSystem.GameStage.IsPianoNotesDistinguished => MainSystem.GameStage.Args.NoSoundNoteSpritePrefab,
+                _ when MainSystem.GameStage.IsPianoNotesDistinguished => MainSystem.GameStage.Args
+                    .NoSoundNoteSpritePrefab,
                 _ => MainSystem.GameStage.Args.BlackNoteSpritePrefab,
             };
             _noteSpriteRenderer.sprite = prefab.Sprite;
-            _noteSpriteRenderer.gameObject.transform.localScale = new(prefab.Scale * _notePrototype.Size, prefab.Scale, prefab.Scale);
+            _noteSpriteRenderer.gameObject.transform.localScale =
+                new(prefab.Scale * _notePrototype.Size, prefab.Scale, prefab.Scale);
             UpdateLinkLineVisibility(MainSystem.GameStage.IsShowLinkLines);
-            if (note.NextLink is not null)
-            {
-                var (toX, toZ) = MainSystem.Args.NoteCoordToWorldPosition(note.NextLink.PositionCoord - _notePrototype.PositionCoord);
+            if (note.NextLink is not null) {
+                var (toX, toZ) =
+                    MainSystem.Args.NoteCoordToWorldPosition(note.NextLink.PositionCoord -
+                                                             _notePrototype.PositionCoord);
                 _linkLine = (Vector2.zero, new Vector2(toX, toZ));
             }
         }

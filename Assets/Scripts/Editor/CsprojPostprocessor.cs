@@ -15,13 +15,11 @@ namespace Deenote.Editor
             nsManager.AddNamespace("ns", nsUri);
 
             XmlNode propGroup;
-            if (doc.SelectSingleNode("/ns:Project/ns:PropertyGroup/ns:LangVersion", nsManager) is { } langVersion)
-            {
+            if (doc.SelectSingleNode("/ns:Project/ns:PropertyGroup/ns:LangVersion", nsManager) is { } langVersion) {
                 langVersion.InnerText = "11.0";
                 propGroup = langVersion.ParentNode!;
             }
-            else
-            {
+            else {
                 propGroup = doc.CreateElement("PropertyGroup", nsUri);
                 doc.SelectSingleNode("/Project", nsManager)!.PrependChild(propGroup);
             }
@@ -36,8 +34,7 @@ namespace Deenote.Editor
         private static string FormatXml(XmlDocument doc)
         {
             using StringWriter stringWriter = new();
-            XmlWriterSettings settings = new()
-            {
+            XmlWriterSettings settings = new() {
                 Indent = true,
                 IndentChars = "  ",
                 NewLineChars = "\n",

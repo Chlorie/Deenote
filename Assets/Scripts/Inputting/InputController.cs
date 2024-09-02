@@ -1,4 +1,6 @@
+using Deenote.Audio;
 using Deenote.Utilities;
+using Reflex.Attributes;
 using UnityEngine;
 
 namespace Deenote.Inputting
@@ -7,6 +9,7 @@ namespace Deenote.Inputting
     {
         [SerializeField, Range(-10, 10)]
         private float __mouseScrollSensitivity;
+
         public float MouseScrollSensitivity
         {
             get => __mouseScrollSensitivity;
@@ -19,7 +22,7 @@ namespace Deenote.Inputting
             }
         }
 
-        private float _tryPlayResetTime;
+        [Inject] private MusicController _musicController = null!;
 
         private void Update() => DetectKeys();
 
@@ -42,7 +45,8 @@ namespace Deenote.Inputting
 
             // Edit
             if (UnityUtils.IsKeyDown(KeyCode.G))
-                MainSystem.Editor.SnapToPositionGrid = MainSystem.Editor.SnapToTimeGrid = !(MainSystem.Editor.SnapToPositionGrid && MainSystem.Editor.SnapToTimeGrid);
+                MainSystem.Editor.SnapToPositionGrid = MainSystem.Editor.SnapToTimeGrid =
+                    !(MainSystem.Editor.SnapToPositionGrid && MainSystem.Editor.SnapToTimeGrid);
             if (UnityUtils.IsKeyDown(KeyCode.Delete))
                 MainSystem.Editor.RemoveSelectedNotes();
             if (UnityUtils.IsKeyDown(KeyCode.A, ctrl: true))
@@ -56,7 +60,8 @@ namespace Deenote.Inputting
             else if (UnityUtils.IsKeyDown(KeyCode.P, ctrl: true))
                 MainSystem.Editor.DesoundifySelectedNotes();
             if (UnityUtils.IsKeyDown(KeyCode.Q))
-                MainSystem.Editor.EditSelectedNotesPositionCoord(c => MainSystem.GameStage.Grids.Quantize(c, true, true));
+                MainSystem.Editor.EditSelectedNotesPositionCoord(
+                    c => MainSystem.GameStage.Grids.Quantize(c, true, true));
             if (UnityUtils.IsKeyDown(KeyCode.M))
                 MainSystem.Editor.EditSelectedNotesPosition(p => -p);
 
@@ -66,25 +71,29 @@ namespace Deenote.Inputting
             else if (UnityUtils.IsKeyDown(KeyCode.W, alt: true))
                 MainSystem.Editor.EditSelectedNotesTime(t => t + 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.W, shift: true))
-                MainSystem.Editor.EditSelectedNotesTime(t => MainSystem.GameStage.Grids.CeilToNextNearestTimeGridTime(t) ?? t);
+                MainSystem.Editor.EditSelectedNotesTime(t =>
+                    MainSystem.GameStage.Grids.CeilToNextNearestTimeGridTime(t) ?? t);
             if (UnityUtils.IsKeyDown(KeyCode.S))
                 MainSystem.Editor.EditSelectedNotesTime(t => t - 0.001f);
             else if (UnityUtils.IsKeyDown(KeyCode.S, alt: true))
                 MainSystem.Editor.EditSelectedNotesTime(t => t - 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.S, shift: true))
-                MainSystem.Editor.EditSelectedNotesTime(t => MainSystem.GameStage.Grids.FloorToNextNearestTimeGridTime(t) ?? t);
+                MainSystem.Editor.EditSelectedNotesTime(t =>
+                    MainSystem.GameStage.Grids.FloorToNextNearestTimeGridTime(t) ?? t);
             if (UnityUtils.IsKeyDown(KeyCode.A))
                 MainSystem.Editor.EditSelectedNotesPosition(p => p - 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.A, alt: true))
                 MainSystem.Editor.EditSelectedNotesPosition(p => p - 0.1f);
             else if (UnityUtils.IsKeyDown(KeyCode.A, shift: true))
-                MainSystem.Editor.EditSelectedNotesPosition(p => MainSystem.GameStage.Grids.FloorToNearestNextVerticalGridPosition(p) ?? p);
+                MainSystem.Editor.EditSelectedNotesPosition(p =>
+                    MainSystem.GameStage.Grids.FloorToNearestNextVerticalGridPosition(p) ?? p);
             if (UnityUtils.IsKeyDown(KeyCode.D))
                 MainSystem.Editor.EditSelectedNotesPosition(p => p + 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.D, alt: true))
                 MainSystem.Editor.EditSelectedNotesPosition(p => p + 0.1f);
             else if (UnityUtils.IsKeyDown(KeyCode.D, shift: true))
-                MainSystem.Editor.EditSelectedNotesPosition(p => MainSystem.GameStage.Grids.CeilToNearestNextVerticalGridPosition(p) ?? p);
+                MainSystem.Editor.EditSelectedNotesPosition(p =>
+                    MainSystem.GameStage.Grids.CeilToNearestNextVerticalGridPosition(p) ?? p);
             if (UnityUtils.IsKeyDown(KeyCode.Z))
                 MainSystem.Editor.EditSelectedNotesSize(s => s - 0.01f);
             else if (UnityUtils.IsKeyDown(KeyCode.Z, shift: true))
@@ -98,19 +107,15 @@ namespace Deenote.Inputting
 
             // Stage
             if (UnityUtils.IsKeyDown(KeyCode.Return) || UnityUtils.IsKeyDown(KeyCode.KeypadEnter))
-                MainSystem.GameStage.ToggleMusicPlayingState();
-            if (UnityUtils.IsKeyDown(KeyCode.Space)) {
-                _tryPlayResetTime = MainSystem.GameStage.CurrentMusicTime;
-                MainSystem.GameStage.PlayMusic();
-            }
-            else if (UnityUtils.IsKeyUp(KeyCode.Space)) {
-                MainSystem.GameStage.CurrentMusicTime = _tryPlayResetTime;
-                MainSystem.GameStage.PauseMusic();
-            }
+                _musicController.TogglePlayingState();
+            if (UnityUtils.IsKeyDown(KeyCode.Space))
+                _musicController.Play(autoReset: true);
+            else if (UnityUtils.IsKeyUp(KeyCode.Space))
+                _musicController.Stop();
             if (UnityUtils.IsKeyDown(KeyCode.Home))
-                MainSystem.GameStage.CurrentMusicTime = 0f;
+                _musicController.Time = 0f;
             if (UnityUtils.IsKeyDown(KeyCode.End))
-                MainSystem.GameStage.CurrentMusicTime = MainSystem.GameStage.MusicLength;
+                _musicController.Time = _musicController.Length;
             if (UnityUtils.IsKeyDown(KeyCode.UpArrow, ctrl: true))
                 MainSystem.GameStage.NoteSpeed += 1;
             if (UnityUtils.IsKeyDown(KeyCode.DownArrow, ctrl: true))

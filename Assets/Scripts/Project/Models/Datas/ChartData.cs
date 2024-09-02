@@ -57,9 +57,11 @@ namespace Deenote.Project.Models.Datas
         #region Constructors
 
         public ChartData() : this(6.0f, 10, 70, new(), new())
-        { }
+        {
+        }
 
-        private ChartData(float speed, int remapMinVelocity, int remapMaxVelocity, List<NoteData> notes, List<SpeedLine> lines)
+        private ChartData(float speed, int remapMinVelocity, int remapMaxVelocity, List<NoteData> notes,
+            List<SpeedLine> lines)
         {
             Speed = speed;
             RemapMinVelocity = remapMinVelocity;
@@ -73,7 +75,8 @@ namespace Deenote.Project.Models.Datas
         }
 
         [JsonConstructor]
-        internal ChartData(float speed, int remapMinVelocity, int remapMaxVelocity, List<NoteData> notes, IEnumerable<Link.Deserialzier> links, List<SpeedLine> speedLines) :
+        internal ChartData(float speed, int remapMinVelocity, int remapMaxVelocity, List<NoteData> notes,
+            IEnumerable<Link.Deserialzier> links, List<SpeedLine> speedLines) :
             this(speed, remapMinVelocity, remapMaxVelocity, notes, speedLines)
         {
             if (links is null)
@@ -103,12 +106,16 @@ namespace Deenote.Project.Models.Datas
             try {
                 chart = JsonConvert.DeserializeObject<ChartData>(json);
                 if (chart is not null) return true;
-            } catch (Exception) { /* ignored */ }
+            } catch (Exception) {
+                /* ignored */
+            }
 
             try {
                 chart = ChartAdapter.ParseDeV3Json(json);
                 if (chart is not null) return true;
-            } catch (Exception) { /* ignored */ }
+            } catch (Exception) {
+                /* ignored */
+            }
 
             chart = null;
             return false;
