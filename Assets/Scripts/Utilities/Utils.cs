@@ -63,6 +63,27 @@ namespace Deenote.Utilities
 
         public static T[] Array<T>(int length) => length == 0 ? System.Array.Empty<T>() : new T[length];
 
+        /// <summary>
+        /// Get a value from a dictionary or add it if it doesn't exist.
+        /// </summary>
+        /// <param name="dict">The dictionary.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="valueFactory">
+        /// A factory to produce the value if the specified key does not exist in the dictionary.
+        /// </param>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// If the key existed in the original dictionary, returns <see langword="true"/>;
+        /// otherwise, returns <see langword="false"/>.
+        /// </returns>
+        public static bool GetValueOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict,
+            TKey key, Func<TValue> valueFactory, out TValue value) where TKey : notnull
+        {
+            if (dict.TryGetValue(key, out value)) return true;
+            dict[key] = value = valueFactory();
+            return false;
+        }
+
         public static bool IsSameForAll<T, TValue>(this ListReadOnlyView<T> list,
             Func<T, TValue> valueGetter, out TValue? value, IEqualityComparer<TValue>? comparer = null)
         {

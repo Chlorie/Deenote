@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Deenote.Settings
 {
-    [CreateAssetMenu(fileName = nameof(CursorsArgs), menuName = $"Settings/{nameof(CursorsArgs)}")]
+    [CreateAssetMenu(fileName = nameof(CursorsArgs), menuName = $"{nameof(Deenote)}/{nameof(CursorsArgs)}")]
     public sealed class CursorsArgs : ScriptableObject
     {
         public Texture2D DefaultCursor;

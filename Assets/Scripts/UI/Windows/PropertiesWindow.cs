@@ -4,10 +4,8 @@ using Deenote.GameStage;
 using Deenote.Localization;
 using Deenote.Project;
 using Deenote.Project.Models;
-using Deenote.Project.Models.Datas;
 using Deenote.UI.Windows.Components;
 using Deenote.Utilities;
-using Deenote.Utilities.Robustness;
 using System.IO;
 using System.Linq;
 using TMPro;
@@ -89,34 +87,31 @@ namespace Deenote.UI.Windows
         private async UniTaskVoid OnAudioButtonClickedAsync()
         {
             FileStream? fs = null;
-            try {
-                while (true) {
-                    var res = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args
-                        .SupportAudioFileExtensions);
-                    if (res.IsCancelled)
+            // ReSharper disable once AccessToModifiedClosure
+            using ScopeExit guard = new(() => fs?.Dispose());
+            while (true) {
+                var res = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args
+                    .SupportAudioFileExtensions);
+                if (res.IsCancelled)
+                    return;
+
+                fs = File.OpenRead(res.Path);
+                var clip = await AudioUtils.LoadAsync(fs, Path.GetExtension(res.Path));
+                if (clip is null) {
+                    var btn = await MainSystem.MessageBox.ShowAsync(
+                        LocalizableText.Localized("Message_AudioLoadFailed_Title"),
+                        LocalizableText.Localized("Message_AudioLoadFailed_Content"),
+                        _loadAudioFailedMessageButtonTexts);
+                    if (btn != 0)
                         return;
-
-                    fs = File.OpenRead(res.Path);
-                    var clip = await AudioUtils.LoadAsync(fs, Path.GetExtension(res.Path));
-                    if (clip is null) {
-                        var btn = await MainSystem.MessageBox.ShowAsync(
-                            LocalizableText.Localized("Message_AudioLoadFailed_Title"),
-                            LocalizableText.Localized("Message_AudioLoadFailed_Content"),
-                            _loadAudioFailedMessageButtonTexts);
-                        if (btn != 0)
-                            return;
-                        // Reselect file
-                        continue;
-                    }
-                    var bytes = new byte[fs.Length];
-                    fs.Seek(0, SeekOrigin.Begin);
-                    fs.Read(bytes);
-                    _editorController.EditProjectAudio(res.Path, bytes, clip);
-                    break;
+                    // Reselect file
+                    continue;
                 }
-
-            } finally {
-                fs?.Dispose();
+                var bytes = new byte[fs.Length];
+                fs.Seek(0, SeekOrigin.Begin);
+                fs.Read(bytes);
+                _editorController.EditProjectAudio(res.Path, bytes, clip);
+                break;
             }
         }
 

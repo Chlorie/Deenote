@@ -1,6 +1,7 @@
+en
 English
 
-# Grammer of this file:
+# Grammar of this file:
 # The FIRST LINE in the file is the language name that will display in application.
 #
 # Format 'key=value' defines a localized text, change the right part to change the display text

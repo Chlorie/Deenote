@@ -6072,7 +6072,7 @@ PrefabInstance:
     - target: {fileID: 8336088062516546648, guid: de06510c370946346bb69c5196def7d4,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000022888184
+      value: -0.000015258789
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -8691,11 +8691,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1115121221}
     m_Modifications:
-    - target: {fileID: 1403165530610972434, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 1936496370143495289, guid: c9dd4fe4e0a3d334fb28c39fc68828d7,
         type: 3}
       propertyPath: m_Value
@@ -8846,6 +8841,11 @@ PrefabInstance:
       propertyPath: _textKey
       value: Window_Editor_Player_MusicVolume
       objectReference: {fileID: 0}
+    - target: {fileID: 1403165530610972434, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2715321684830134431, guid: c9dd4fe4e0a3d334fb28c39fc68828d7, type: 3}
     m_RemovedGameObjects: []
@@ -8862,11 +8862,11 @@ GameObject:
   m_Component:
   - component: {fileID: 376903358}
   - component: {fileID: 376903357}
-  - component: {fileID: 376903360}
   - component: {fileID: 376903361}
   - component: {fileID: 376903364}
   - component: {fileID: 376903365}
   - component: {fileID: 376903366}
+  - component: {fileID: 376903367}
   m_Layer: 0
   m_Name: MainSystem
   m_TagString: Untagged
@@ -8898,7 +8898,6 @@ MonoBehaviour:
   _fileExplorerWindow: {fileID: 302624897}
   _projectPropertiesWindow: {fileID: 7044846889011582399}
   _messageBoxWindow: {fileID: 556261080}
-  _localizationSystem: {fileID: 376903360}
   _inputController: {fileID: 376903364}
   _windowsManager: {fileID: 17706862}
   _projectManager: {fileID: 376903361}
@@ -8922,18 +8921,6 @@ Transform:
   - {fileID: 1756441410}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &376903360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 376903356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6f9a121a9c85994d85806119481aa86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &376903361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8989,7 +8976,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 923102f8c6c4990499643e2ab214d285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fontSetter: {fileID: 376903367}
   _musicController: {fileID: 2128576698}
+  _windowsManager: {fileID: 17706862}
+--- !u!114 &376903367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376903356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b10625c8e211a484496439141ede6aaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _fontAsset: {fileID: 11400000, guid: 551de239c6c97c04aaee1383278e9221, type: 2}
+  _settings: {fileID: 11400000, guid: e5c5c8b0d96b72245a2ad2fd322215b2, type: 2}
 --- !u!1001 &377204547
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13776,6 +13779,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1115121221}
     m_Modifications:
+    - target: {fileID: 1403165530610972434, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9018898430642661141, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1077185834899351972, guid: 8dda372081d67a045b05a0c2b434663a,
         type: 3}
       propertyPath: m_Pivot.x
@@ -13890,16 +13903,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_text
       value: Note Speed
-      objectReference: {fileID: 0}
-    - target: {fileID: 1403165530610972434, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 9018898430642661141, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 9127997898118932505, guid: 8dda372081d67a045b05a0c2b434663a, type: 3}
@@ -24856,11 +24859,6 @@ PrefabInstance:
       propertyPath: _textKey
       value: WindowTitleBar_SoundEdit
       objectReference: {fileID: 0}
-    - target: {fileID: 6232182791346080210, guid: caa154994393e2440a625cdbef24519b,
-        type: 3}
-      propertyPath: m_text
-      value: Piano Sound Edit
-      objectReference: {fileID: 0}
     - target: {fileID: 1574744031767908582, guid: de06510c370946346bb69c5196def7d4,
         type: 3}
       propertyPath: m_Size
@@ -24910,6 +24908,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMin.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232182791346080210, guid: caa154994393e2440a625cdbef24519b,
+        type: 3}
+      propertyPath: m_text
+      value: Piano Sound Edit
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26142,6 +26145,51 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1485688108}
     m_Modifications:
+    - target: {fileID: 945003730275159409, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3620403512052721196, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_text
+      value: Selected Notes
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_Text
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_Colors.m_DisabledColor.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_Colors.m_DisabledColor.b
+      value: 0.1764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_Colors.m_DisabledColor.g
+      value: 0.1764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_Colors.m_DisabledColor.r
+      value: 0.1764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 8055977387372633116, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: _textKey
+      value: Window_Properties_ChartInfo_Selected
+      objectReference: {fileID: 0}
     - target: {fileID: 1077185834899351972, guid: 8dda372081d67a045b05a0c2b434663a,
         type: 3}
       propertyPath: m_Pivot.x
@@ -26256,51 +26304,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_text
       value: Selected Notes
-      objectReference: {fileID: 0}
-    - target: {fileID: 945003730275159409, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3620403512052721196, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_text
-      value: Selected Notes
-      objectReference: {fileID: 0}
-    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_Text
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_Interactable
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_Colors.m_DisabledColor.a
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_Colors.m_DisabledColor.b
-      value: 0.1764706
-      objectReference: {fileID: 0}
-    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_Colors.m_DisabledColor.g
-      value: 0.1764706
-      objectReference: {fileID: 0}
-    - target: {fileID: 5591377972656915952, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_Colors.m_DisabledColor.r
-      value: 0.1764706
-      objectReference: {fileID: 0}
-    - target: {fileID: 8055977387372633116, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: _textKey
-      value: Window_Properties_ChartInfo_Selected
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 9127997898118932505, guid: 8dda372081d67a045b05a0c2b434663a, type: 3}
@@ -26616,11 +26619,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1115121221}
     m_Modifications:
-    - target: {fileID: 1403165530610972434, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 1936496370143495289, guid: c9dd4fe4e0a3d334fb28c39fc68828d7,
         type: 3}
       propertyPath: m_Value
@@ -26775,6 +26773,11 @@ PrefabInstance:
         type: 3}
       propertyPath: _textKey
       value: Window_Editor_Player_PianoVolume
+      objectReference: {fileID: 0}
+    - target: {fileID: 1403165530610972434, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2715321684830134431, guid: c9dd4fe4e0a3d334fb28c39fc68828d7, type: 3}
@@ -31163,6 +31166,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1115121221}
     m_Modifications:
+    - target: {fileID: 1403165530610972434, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 1077185834899351972, guid: 8dda372081d67a045b05a0c2b434663a,
         type: 3}
       propertyPath: m_Pivot.x
@@ -31282,11 +31290,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_text
       value: Music Speed
-      objectReference: {fileID: 0}
-    - target: {fileID: 1403165530610972434, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 9127997898118932505, guid: 8dda372081d67a045b05a0c2b434663a, type: 3}
@@ -35144,6 +35147,56 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 17706861}
     m_Modifications:
+    - target: {fileID: 448587270921810809, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_text
+      value: Perspective View
+      objectReference: {fileID: 0}
+    - target: {fileID: 1733540410798628711, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_VerticalScrollbar
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5884566716637031305, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5884566716637031305, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5884566716637031305, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7268857621859518328, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_Size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7268857621859518328, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8529710288601146139, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8529710288601146139, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8529710288601146139, guid: 9d7bb5b44be070a4d807176f05206e2a,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -17
+      objectReference: {fileID: 0}
     - target: {fileID: 673486082103629645, guid: caa154994393e2440a625cdbef24519b,
         type: 3}
       propertyPath: _fixedRatio
@@ -35283,56 +35336,6 @@ PrefabInstance:
         type: 3}
       propertyPath: _textKey
       value: WindowTitleBar_Perspective
-      objectReference: {fileID: 0}
-    - target: {fileID: 448587270921810809, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_text
-      value: Perspective View
-      objectReference: {fileID: 0}
-    - target: {fileID: 1733540410798628711, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_VerticalScrollbar
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5884566716637031305, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5884566716637031305, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5884566716637031305, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7268857621859518328, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_Size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7268857621859518328, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_Value
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8529710288601146139, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8529710288601146139, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8529710288601146139, guid: 9d7bb5b44be070a4d807176f05206e2a,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: -17
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

@@ -57,3 +57,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac563c76a7a962345a31983a85df6261, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fontSetter: {fileID: -4541707703106034796, guid: 555b6c74133904140957848c2410dcb9,
+    type: 3}

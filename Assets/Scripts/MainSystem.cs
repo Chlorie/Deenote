@@ -11,6 +11,7 @@ using Deenote.UI.StatusBar;
 using Deenote.UI.ToolBar;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
+using Reflex.Attributes;
 using UnityEngine;
 
 namespace Deenote
@@ -36,7 +37,6 @@ namespace Deenote
         [SerializeField] MessageBoxWindow _messageBoxWindow;
 
         [Header("System")]
-        [SerializeField] LocalizationSystem _localizationSystem;
         [SerializeField] InputController _inputController;
         [SerializeField] WindowsManager _windowsManager;
 
@@ -44,6 +44,8 @@ namespace Deenote
         [SerializeField] GameStageController _gameStageController;
         [SerializeField] EditorController _editorController;
         [SerializeField] PianoSoundManager _pianoSoundManager;
+
+        [Inject] private LocalizationSystem _localizationSystem = null!;
 
         public static ResolutionAdjuster ResolutionAdjuster => Instance._resolutionAdjuster;
 
@@ -102,7 +104,7 @@ namespace Deenote
 
         public static void QuitApplication()
         {
-            // TODO:SavePlayerPrefs
+            // TODO: SaveConfig
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else

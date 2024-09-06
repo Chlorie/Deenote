@@ -1,5 +1,7 @@
+using Deenote.Localization;
 using Deenote.Project;
 using Deenote.UI.Windows.Components;
+using Reflex.Attributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +27,7 @@ namespace Deenote.UI.Windows
         [SerializeField] Toggle _showIneffectivePropertiesToggle;
         [SerializeField] Toggle _distinguishPianoNoteToggle;
         [SerializeField] Toggle _saveAudioDataInProjectToggle;
+        [Inject] private LocalizationSystem _localizationSystem = null!;
 
         private void Awake()
         {
@@ -44,6 +47,7 @@ namespace Deenote.UI.Windows
                 MainSystem.GameStage.IsPianoNotesDistinguished = val);
             _saveAudioDataInProjectToggle.onValueChanged.AddListener(val =>
                 MainSystem.ProjectManager.IsAudioDataSaveInProject = val);
+            _localizationSystem.OnLanguageChanged += NotifyLanguageChanged;
 
             _window.SetOnFirstActivating(OnFirstActivating);
             _window.SetOnIsActivatedChanged(activated =>
@@ -119,7 +123,7 @@ namespace Deenote.UI.Windows
             _mouseSensitivityInputField.SetTextWithoutNotify(value.ToString("F1"));
         }
 
-        public void NotifyLanguageChanged(string value)
+        private void NotifyLanguageChanged(string value)
         {
             if (!_window.IsActivated)
                 return;

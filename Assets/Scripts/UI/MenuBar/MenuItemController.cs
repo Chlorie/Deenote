@@ -27,7 +27,7 @@ namespace Deenote.UI.MenuBar
         private void Awake()
         {
             _titleText.OnTextUpdated += text =>
-                _layoutElement.preferredWidth = text.TmpText.preferredWidth + 2 * HorizontalOneSidePadding;
+                _layoutElement.preferredWidth = text.Text.preferredWidth + 2 * HorizontalOneSidePadding;
             _button.InitController(this);
         }
 

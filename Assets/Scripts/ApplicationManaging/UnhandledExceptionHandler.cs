@@ -20,10 +20,8 @@ namespace Deenote.ApplicationManaging
 
         private void OnUnityLogMessageReceived(string condition, string stackTrace, LogType type)
         {
-            if (type is not LogType.Exception)
-                return;
-
-            HandleMessage(condition, stackTrace);
+            if (type is LogType.Exception)
+                HandleMessage(condition, stackTrace);
         }
 
         private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -50,8 +48,7 @@ namespace Deenote.ApplicationManaging
             using var sw = new StreamWriter(LogFile, append: true);
             var msg = MainSystem.Localization.GetText(LocalizableText.Localized("Misc_UnhandledExceptionMessage"));
             sw.WriteLine(msg, message, stackTrace);
-
-            _ = MainSystem.StatusBar.ShowToastAsync(LocalizableText.Localized("Toast_UnhandledException"), 3f);
+            MainSystem.StatusBar.ShowToastAsync(LocalizableText.Localized("Toast_UnhandledException"), 3f).Forget();
         }
     }
 }

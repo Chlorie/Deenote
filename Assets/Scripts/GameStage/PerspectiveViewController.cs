@@ -57,6 +57,12 @@ namespace Deenote.GameStage
             }
         }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            RegisterKeyBindings();
+        }
+
         private void Update()
         {
             if (_stage.IsActive) {

@@ -106,8 +106,6 @@ namespace Deenote.Inputting
             // IF
 
             // Stage
-            if (UnityUtils.IsKeyDown(KeyCode.Return) || UnityUtils.IsKeyDown(KeyCode.KeypadEnter))
-                _musicController.TogglePlayingState();
             if (UnityUtils.IsKeyDown(KeyCode.Space))
                 _musicController.Play(autoReset: true);
             else if (UnityUtils.IsKeyUp(KeyCode.Space))

@@ -9,13 +9,13 @@ namespace Deenote.Localization
     [RequireComponent(typeof(TMP_Text))]
     public sealed class LocalizedText : MonoBehaviour
     {
-        [SerializeField] private TMP_Text _text = null!;
         [SerializeField] private string _textKey = "";
         [SerializeField] private bool _isLocalized;
 
         private List<string> _args = new();
 
-        public TMP_Text TmpText => _text;
+        public TMP_Text Text => this.MaybeGetComponent(ref _text);
+        private TMP_Text? _text;
 
         public event Action<LocalizedText>? OnTextUpdated;
 
@@ -71,14 +71,11 @@ namespace Deenote.Localization
             for (int i = 0; i < _args.Count; i++) {
                 text = text.Replace($"{{{i}}}", _args[i]);
             }
-            _text.text = text;
+            Text.text = text;
 
             OnTextUpdated?.Invoke(this);
         }
 
-        public void NotifyLanguageUpdated()
-        {
-            RefreshText();
-        }
+        private void NotifyLanguageUpdated(string _) => RefreshText();
     }
 }

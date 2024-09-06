@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Deenote.Settings
 {
-    [CreateAssetMenu(fileName = nameof(GameStageViewArgs), menuName = $"Settings/{nameof(GameStageViewArgs)}")]
+    [CreateAssetMenu(fileName = nameof(GameStageViewArgs), menuName = $"{nameof(Deenote)}/{nameof(GameStageViewArgs)}")]
     public sealed class GameStageViewArgs : ScriptableObject
     {
         [Header("Difficulty Resources")]

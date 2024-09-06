@@ -80,7 +80,7 @@ namespace Deenote.UI.Windows
                 _musicNameInputField.text = "";
                 _composerInputField.text = "";
                 _chartDesignerInputField.text = "";
-                _audioFileText.TmpText.alignment = TextAlignmentOptions.CenterGeoAligned;
+                _audioFileText.Text.alignment = TextAlignmentOptions.CenterGeoAligned;
 
                 _charts.SetCount(1);
                 _charts[0].Initialize(null);
@@ -93,11 +93,11 @@ namespace Deenote.UI.Windows
                 project.AudioClip = clip;
                 if (project.SaveAsRefPath) {
                     _audioFileText.SetRawText(Path.GetFileName(project.AudioFileRelativePath));
-                    _audioFileText.TmpText.alignment = TextAlignmentOptions.BaselineLeft;
+                    _audioFileText.Text.alignment = TextAlignmentOptions.BaselineLeft;
                 }
                 else {
                     _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad_Embeded");
-                    _audioFileText.TmpText.alignment = TextAlignmentOptions.CenterGeoAligned;
+                    _audioFileText.Text.alignment = TextAlignmentOptions.CenterGeoAligned;
                 }
                 _musicNameInputField.text = project.MusicName;
                 _composerInputField.text = project.Composer;
@@ -145,7 +145,7 @@ namespace Deenote.UI.Windows
             SetChartLoadable(false);
 
             _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad_Loading");
-            _audioFileText.TmpText.alignment = TextAlignmentOptions.MidlineGeoAligned;
+            _audioFileText.Text.alignment = TextAlignmentOptions.MidlineGeoAligned;
 
             await using var fs = File.OpenRead(res.Path);
             if (await TryLoadAudioFileAsync(fs, Path.GetExtension(res.Path)) is not { } clip) return;
@@ -158,7 +158,7 @@ namespace Deenote.UI.Windows
             _loadedClip = clip;
 
             _audioFileText.SetRawText(Path.GetFileName(res.Path));
-            _audioFileText.TmpText.alignment = TextAlignmentOptions.MidlineLeft;
+            _audioFileText.Text.alignment = TextAlignmentOptions.MidlineLeft;
             if (string.IsNullOrEmpty(_musicNameInputField.text))
                 _musicNameInputField.text = Path.GetFileNameWithoutExtension(res.Path);
 

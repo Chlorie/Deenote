@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Deenote.Settings
 {
-    [CreateAssetMenu(fileName = nameof(GameStageArgs), menuName = $"Settings/{nameof(GameStageArgs)}")]
+    [CreateAssetMenu(fileName = nameof(GameStageArgs), menuName = $"{nameof(Deenote)}/{nameof(GameStageArgs)}")]
     public sealed class GameStageArgs : ScriptableObject
     {
         public float NotePanelLength;

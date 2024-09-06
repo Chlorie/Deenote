@@ -13,6 +13,17 @@ namespace Deenote.GameStage
         private MouseButtons _pressedMouseButtons;
         private MouseActionState _mouseActionState;
         [Inject] private MusicController _musicController = null!;
+        [Inject] private KeyBindingManager _keyBindingManager = null!;
+
+        private void RegisterKeyBindings()
+        {
+            // TODO: convert to contextual bindings
+            const string togglePlayingStateName = "Deenote.TogglePlayingState";
+            _keyBindingManager.RegisterAction(togglePlayingStateName, _musicController.TogglePlayingState);
+            var list = _keyBindingManager.GetBindings(togglePlayingStateName);
+            list.AddGlobalBinding(new KeyBinding(KeyCode.Return));
+            list.AddGlobalBinding(new KeyBinding(KeyCode.KeypadEnter));
+        }
 
         private void UpdateNoteIndicatorPosition(Vector2 mousePosition)
         {

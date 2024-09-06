@@ -16,16 +16,16 @@ namespace Deenote.UI.ToolBar
                     return __expandedSize.Value;
 
                 float maxTextSize = 0f;
-                maxTextSize = Mathf.Max(maxTextSize, _undoItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _redoItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _cutItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _copyItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _pasteItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _linkItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _unlinkItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _soundItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _quantizeItem.Text.TmpText.preferredWidth);
-                maxTextSize = Mathf.Max(maxTextSize, _mirrorItem.Text.TmpText.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _undoItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _redoItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _cutItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _copyItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _pasteItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _linkItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _unlinkItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _soundItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _quantizeItem.Text.Text.preferredWidth);
+                maxTextSize = Mathf.Max(maxTextSize, _mirrorItem.Text.Text.preferredWidth);
 
                 __expandedSize = CollapsedWidth + 8 + maxTextSize;
                 return __expandedSize.Value;
@@ -34,7 +34,7 @@ namespace Deenote.UI.ToolBar
 
         private void AwakePointer()
         {
-            MainSystem.Localization.OnLanguageChanged += () => __expandedSize = null;
+            MainSystem.Localization.OnLanguageChanged += _ => __expandedSize = null;
         }
 
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
