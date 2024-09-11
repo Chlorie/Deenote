@@ -98,9 +98,9 @@ namespace Deenote.GameStage
 
         #region Music State
 
-        private void MusicTimeChanged(float time, bool isManuallyChanged)
+        private void OnMusicTimeChanged(float oldTime, float newTime, bool isManuallyChanged)
         {
-            UpdateStageNotesRelatively(forward: !isManuallyChanged);
+            UpdateStageNotesRelatively(forward: newTime > oldTime);
             if (isManuallyChanged) ForceUpdateNotesDisplay();
         }
 
@@ -415,7 +415,7 @@ namespace Deenote.GameStage
             base.Awake();
             _stageNotes = new PooledObjectListView<StageNoteController>(
                 UnityUtils.CreateObjectPool(_notePrefab, _noteParentTransform));
-            _musicController.OnTimeChanged += MusicTimeChanged;
+            _musicController.OnTimeChanged += OnMusicTimeChanged;
         }
 
         private void Start()

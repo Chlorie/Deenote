@@ -85,15 +85,12 @@ namespace Deenote.GameStage.Elements
             if (State is NoteState.Inactive)
                 return;
 
-            if (MainSystem.GameStage.StagePlaySpeed != 0)
-                UpdateDisplay(MainSystem.GameStage.IsMusicPlaying);
+            if (MainSystem.GameStage.IsMusicPlaying && MainSystem.GameStage.StagePlaySpeed != 0)
+                UpdateDisplay(true);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <remarks>
-        /// This should be called when manually set music time when music is paused,
+        /// This should be called when audio is not playing
         /// as NoteController wont invoke UpdateDisplay() when paused.
         /// </remarks>
         public void ForceUpdate(bool noteDataChangedExceptTime)

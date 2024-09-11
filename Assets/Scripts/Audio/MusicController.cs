@@ -11,11 +11,12 @@ namespace Deenote.Audio
         /// <summary>
         /// Handler for when the playback position changes.
         /// </summary>
-        /// <param name="time">The new playback position in seconds.</param>
+        /// <param name="oldTime">The old playback position in seconds.</param>
+        /// <param name="newTime">The new playback position in seconds.</param>
         /// <param name="isManuallyChanged">
         /// Whether the playback position is manually changed, possibly due to user input.
         /// </param>
-        public delegate void TimeChangedHandler(float time, bool isManuallyChanged);
+        public delegate void TimeChangedHandler(float oldTime, float newTime, bool isManuallyChanged);
 
         /// <summary>
         /// Called on each frame when the playback position changes.
@@ -39,8 +40,9 @@ namespace Deenote.Audio
             [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
             set {
                 if (_time == value) return;
+                var old = _time;
                 Source.time = _time = value;
-                OnTimeChanged?.Invoke(value, isManuallyChanged: true);
+                OnTimeChanged?.Invoke(old, value, isManuallyChanged: true);
             }
         }
 
@@ -119,8 +121,10 @@ namespace Deenote.Audio
         private void Update()
         {
             if (!IsPlaying) return;
+
+            float oldTime = _time;
             _time = Source.time;
-            OnTimeChanged?.Invoke(_time, isManuallyChanged: false);
+            OnTimeChanged?.Invoke(oldTime,_time, isManuallyChanged: false);
         }
 
         private void OnDestroy() => (_factory as IDisposable)?.Dispose();

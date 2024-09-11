@@ -37,7 +37,7 @@ namespace Deenote.UI.Windows
         {
             _pauseButton.onClick.AddListener(OnPauseClicked);
             _timeSlider.onValueChanged.AddListener(OnTimeSliderValueChanged);
-            _musicController.OnTimeChanged += (time, _) => _timeSlider.SetValueWithoutNotify(time);
+            _musicController.OnTimeChanged += (_, time, _) => _timeSlider.SetValueWithoutNotify(time);
             _musicController.OnClipChanged += length => _timeSlider.maxValue = length;
         }
 
