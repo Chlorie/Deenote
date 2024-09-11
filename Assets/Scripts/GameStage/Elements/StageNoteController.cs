@@ -74,7 +74,7 @@ namespace Deenote.GameStage.Elements
         private void Update()
         {
             if (_linkLine is var (start, end))
-                PerspectiveLinesRenderer.Instance.AddLine(start, end, MainSystem.Args.LinkLineColor, 2.0f);
+                PerspectiveLinesRenderer.Instance.AddLine(start, end, MainSystem.Args.LinkLineColor, MainSystem.Args.GridWidth);
         }
 
         // GameStageController will select notes in stage when Update,
@@ -248,7 +248,7 @@ namespace Deenote.GameStage.Elements
                     _effectSoundSource.PlayOneShot(Stage.Args.EffectSoundAudioClip, Stage.EffectVolume / 100f);
             }
 
-            if (Stage.MusicVolume > 0f && Model.Data.HasSound) {
+            if (Stage.PianoVolume > 0f && Model.Data.HasSound) {
                 MainSystem.PianoSoundManager
                     .PlaySoundsAsync(Model.Data.Sounds, Stage.PianoVolume / 100f, Stage.MusicSpeed / 10f).Forget();
             }

@@ -28,7 +28,6 @@ namespace Deenote.UI.Windows
         [Header("UI Stage")]
         [SerializeField] TMP_Text _backgroundStaveText;
 
-        private ChartModel _chart;
         [Inject] private MusicController _musicController = null!;
 
         private Difficulty _currentDifficulty;

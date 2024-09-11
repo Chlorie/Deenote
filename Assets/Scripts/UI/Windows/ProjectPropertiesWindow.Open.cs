@@ -20,7 +20,7 @@ namespace Deenote.UI.Windows
             Window.IsActivated = true;
 
             _window.TitleBar.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties_Create"));
-            await InitializeProject(null);
+            await InitializeProjectAsync(null);
 
             _newProjTcs = new UniTaskCompletionSource<ProjectPropertiesChartController?>();
             var confirmedChart = await _newProjTcs.Task;
@@ -63,7 +63,7 @@ namespace Deenote.UI.Windows
             Window.IsActivated = true;
 
             _window.TitleBar.SetTitle(LocalizableText.Localized("WindowTitleBar_ProjectProperties"));
-            await InitializeProject(project);
+            await InitializeProjectAsync(project);
 
             _newProjTcs = new UniTaskCompletionSource<ProjectPropertiesChartController?>();
             var confirmedChart = await _newProjTcs.Task;

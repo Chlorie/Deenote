@@ -38,7 +38,7 @@ namespace Deenote.GameStage
                     TimeGridKind.TempoLine => MainSystem.Args.TempoLineColor,
                     _ => Color.white,
                 };
-                lineRenderer.AddLine(new Vector3(-x, z), new Vector3(x, z), color, 2f);
+                lineRenderer.AddLine(new Vector3(-x, z), new Vector3(x, z), color, MainSystem.Args.GridWidth);
             }
         }
 

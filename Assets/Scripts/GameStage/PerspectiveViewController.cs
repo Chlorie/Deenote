@@ -1,7 +1,10 @@
 using Deenote.Edit;
+using Deenote.UI;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
+using System;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 namespace Deenote.GameStage
@@ -24,6 +27,14 @@ namespace Deenote.GameStage
 
         [field: SerializeField] public Camera BackgroundCamera { get; private set; } = null!;
 
+        public Vector2 ViewSize => _viewSize.Value;
+        public event Action<Vector2>? OnViewSizeChanged;
+
+        private FrameCachedNotifyingProperty<Vector2> _viewSize = null!;
+        private RectTransform _cameraViewTransform = null!;
+        [SerializeField] private IntegralSizeAspectRatioFitter _imageAspectFitter = null!;
+
+
         public bool IsFullScreen { get; private set; }
 
         private ViewAspectRatio __aspectRatio;
@@ -35,6 +46,7 @@ namespace Deenote.GameStage
                 if (__aspectRatio == value)
                     return;
                 __aspectRatio = value;
+                _imageAspectFitter.AspectRatio = __aspectRatio.GetRatio();
                 _perspectiveViewWindow.NotifyAspectRatioChanged(__aspectRatio);
             }
         }
@@ -60,7 +72,40 @@ namespace Deenote.GameStage
         protected override void Awake()
         {
             base.Awake();
+            InitAspectRatioController();
             RegisterKeyBindings();
+
+            void InitAspectRatioController()
+            {
+                Vector2 GetViewSize()
+                {
+                    Vector3[] corners = new Vector3[4];
+                    _cameraViewTransform.GetWorldCorners(corners);
+                    return corners[2] - corners[0];
+                }
+
+                void ResizeCameraTexture(Vector2 size)
+                {
+                    ViewCamera.targetTexture.Resize(size.RoundToInt());
+                    float rectHeight = 9f / 16f * size.x / size.y;
+                    ViewCamera.rect = new Rect(0, 0, 1, rectHeight);
+                }
+
+                void ViewSizeChanged(Vector2 _, Vector2 newSize) => OnViewSizeChanged?.Invoke(newSize);
+
+                _cameraViewTransform = _cameraViewRawImage.rectTransform;
+                RenderTexture texture = new(1280, 720, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.None);
+                _cameraViewRawImage.texture = texture;
+                _cameraViewRawImage.enabled = true;
+
+                ViewCamera.targetTexture = texture;
+                BackgroundCamera.targetTexture = texture;
+
+                _viewSize = new FrameCachedNotifyingProperty<Vector2>(GetViewSize, autoUpdate: true);
+                _viewSize.OnValueChanged += ViewSizeChanged;
+                OnViewSizeChanged += ResizeCameraTexture;
+                _imageAspectFitter = _cameraViewRawImage.GetComponent<IntegralSizeAspectRatioFitter>();
+            }
         }
 
         private void Update()

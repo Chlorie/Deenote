@@ -188,6 +188,13 @@ namespace Deenote
 
             #endregion
 
+            #region Grids
+
+            public const float GridWidth = 2f;
+            public const float GridBorderWidth = 4f;
+
+            #endregion
+
             public const string DeenotePreferFileExtension = ".dnt";
             public const ushort DeenoteProjectFileHeader = 0xDEE0;
             public const byte DeenoteProjectFileVersionMark = 1;

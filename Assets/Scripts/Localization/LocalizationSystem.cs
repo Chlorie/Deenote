@@ -77,15 +77,19 @@ namespace Deenote.Localization
                 if (line.StartsWith('#') || // Ignore comments
                     (line.IndexOf('=') is var separator && separator < 0)) // Ignore lines without '='
                     continue;
-                string key = line[..separator], value = line[(separator + 1)..];
-                if (value == "\"\"\"") { // Multiline text
+
+                string value;
+                ReadOnlySpan<char> firstLineValueSpan = line.AsSpan(separator + 1);
+                if (firstLineValueSpan.SequenceEqual("\"\"\"")) { // Multiline text
                     StringBuilder sb = new();
                     while (!reader.EndOfStream && reader.ReadLine() is { } line2 and not "\"\"\"")
                         sb.AppendLine(line2);
                     value = sb.ToString();
                 }
                 else
-                    value = value.Replace("<br/>", "\n");
+                    value = firstLineValueSpan.ToString().Replace("<br/>", "\n");
+
+                string key = line[..separator];
                 if (!pack.Translations.TryAdd(key, value))
                     Debug.LogWarning($"Language pack {name} contains duplicated key: {key}");
             }

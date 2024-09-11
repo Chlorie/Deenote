@@ -48,7 +48,9 @@ namespace Deenote.Edit.Elements
         private void Update()
         {
             if (_shouldDrawLinkLine && _linkLine is var (start, offset))
-                PerspectiveLinesRenderer.Instance.AddLine(start, start + offset, MainSystem.Args.LinkLineColor, 2.0f);
+                PerspectiveLinesRenderer.Instance.AddLine(start, start + offset,
+                    color: MainSystem.Args.LinkLineColor,
+                    width: MainSystem.Args.GridWidth);
         }
     }
 }

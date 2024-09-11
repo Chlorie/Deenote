@@ -9,6 +9,22 @@ namespace Deenote.GameStage
         [SerializeField] GameStageArgs _args;
         public GameStageArgs Args => _args;
 
+        public Plane NotePanelPlane => new(Vector3.up, 0f);
+
+        [Header("Link Line")]
+        [SerializeField] bool __showLinkLines;
+
+        public bool IsShowLinkLines
+        {
+            get => __showLinkLines;
+            set {
+                if (__showLinkLines == value) return;
+                __showLinkLines = value;
+                _editorController.NotifyIsShowLinkLinesChanged(__showLinkLines);
+                _editorPropertiesWindow.NotifyIsShowLinksChanged(__showLinkLines);
+            }
+        }
+
         [Header("Settings")]
         [SerializeField] private bool __isStageEffectOn;
 
@@ -136,6 +152,7 @@ namespace Deenote.GameStage
                 UpdateStageNotes();
                 ForceUpdateNotesDisplay();
                 Grids.UpdateVerticalGrids();
+                PerspectiveLinesRenderer.Instance.NotifyStageSuddenPlusChanged(__suddenPlusRange);
                 _editorPropertiesWindow.NotifySuddenPlusRangeChanged(__suddenPlusRange);
             }
         }

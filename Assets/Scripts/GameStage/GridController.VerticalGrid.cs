@@ -120,7 +120,8 @@ namespace Deenote.GameStage
             float maxZ = MainSystem.Args.NoteAppearZ;
             foreach (var (x, kind) in _verticalGridData) {
                 lineRenderer.AddLine(new Vector2(x, 0), new Vector2(x, maxZ),
-                    MainSystem.Args.SubBeatLineColor, kind is VerticalGridKind.Border ? 4f : 2f);
+                    color: MainSystem.Args.SubBeatLineColor,
+                    width: kind is VerticalGridKind.Border ? MainSystem.Args.GridBorderWidth : MainSystem.Args.GridWidth);
             }
 
             if (!IsBorderVisible_Legacy ||
@@ -129,9 +130,9 @@ namespace Deenote.GameStage
             // Legacy system
             float maxX = MainSystem.Args.PositionToX(MainSystem.Args.StageMaxPosition);
             lineRenderer.AddLine(new Vector2(-maxX, 0), new Vector2(-maxX, maxZ),
-                MainSystem.Args.SubBeatLineColor, 4f);
+                MainSystem.Args.SubBeatLineColor, MainSystem.Args.GridBorderWidth);
             lineRenderer.AddLine(new Vector2(maxX, 0), new Vector2(maxX, maxZ),
-                MainSystem.Args.SubBeatLineColor, 4f);
+                MainSystem.Args.SubBeatLineColor, MainSystem.Args.GridBorderWidth);
         }
 
         public void UpdateVerticalGrids()

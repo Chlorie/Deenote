@@ -73,7 +73,7 @@ namespace Deenote.UI.Windows
             }
         }
 
-        private async UniTask InitializeProject(ProjectModel? project)
+        private async UniTask InitializeProjectAsync(ProjectModel? project)
         {
             _audioFileText.SetLocalizedText("Window_ProjectProperties_AudioFileLoad");
             if (project is null) {

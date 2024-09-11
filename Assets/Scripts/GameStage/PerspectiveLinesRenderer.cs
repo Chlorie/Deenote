@@ -25,7 +25,9 @@ namespace Deenote.GameStage
             Vector2 prev = points[0];
             foreach (var point in points) {
                 _vertices.Add(new VertexData {
-                    Positions = new Vector4(point.x, point.y, prev.x, prev.y), Color = color, Width = width
+                    Positions = new Vector4(point.x, point.y, prev.x, prev.y),
+                    Color = color,
+                    Width = width
                 });
                 prev = point;
             }
@@ -36,7 +38,9 @@ namespace Deenote.GameStage
             Vector2 prev = points[0];
             foreach (var point in points) {
                 _vertices.Add(new VertexData {
-                    Positions = new Vector4(point.x, point.y, prev.x, prev.y), Color = color, Width = width
+                    Positions = new Vector4(point.x, point.y, prev.x, prev.y),
+                    Color = color,
+                    Width = width
                 });
                 prev = point;
             }
@@ -77,8 +81,8 @@ namespace Deenote.GameStage
         private static readonly int SmoothingPx = Shader.PropertyToID("_SmoothingPx");
         private static readonly int ActualViewSize = Shader.PropertyToID("_ActualViewSize");
 
-        [SerializeField] [HideInInspector] private MeshFilter _meshFilter = null!;
-        [SerializeField] [HideInInspector] private MeshRenderer _meshRenderer = null!;
+        [SerializeField][HideInInspector] private MeshFilter _meshFilter = null!;
+        [SerializeField][HideInInspector] private MeshRenderer _meshRenderer = null!;
         private List<VertexData> _vertices = new();
         private MaterialPropertyBlock _props = null!;
 
@@ -92,10 +96,8 @@ namespace Deenote.GameStage
         {
             base.Awake();
             _meshRenderer.sortingLayerName = "Lines";
-            // TODO: do not use hardcoded values
             _props = new MaterialPropertyBlock();
-            _props.SetFloat(FadeInZ, 18.0f);
-            _props.SetFloat(CutOffZ, 40.0f);
+            NotifyStageSuddenPlusChanged(0);
         }
 
         private Mesh GenerateMesh()
@@ -126,9 +128,18 @@ namespace Deenote.GameStage
             return mesh;
         }
 
+        public void NotifyStageSuddenPlusChanged(int range)
+        {
+            var args = MainSystem.GameStage.Args;
+            float percent = PerspectiveViewController.Instance.SuddenPlusRangeToVisibleRangePercent(range);
+            float cutoff = args.NotePanelLength * args.NoteTimeToZMultiplier * percent;
+            _props.SetFloat(CutOffZ, cutoff);
+            _props.SetFloat(FadeInZ, cutoff * args.NoteFadeInRangePercent);
+        }
+
         private void Update()
         {
-            var viewSize = PerspectiveViewWindow.Instance.ViewSize;
+            var viewSize = PerspectiveViewController.Instance.ViewSize;
             _props.SetFloat(SmoothingPx, 2.0f); // TODO: is it necessary for this to be configurable?
             _props.SetVector(ActualViewSize, new Vector4(viewSize.x, viewSize.y));
             _meshRenderer.SetPropertyBlock(_props);

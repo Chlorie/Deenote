@@ -50,7 +50,7 @@ namespace Deenote.GameStage
         private void DrawCurve()
         {
             if (_isCurveOn && _shouldRenderCurve)
-                PerspectiveLinesRenderer.Instance.AddLineStrip(_curveCoords, MainSystem.Args.CurveLineColor, 2f);
+                PerspectiveLinesRenderer.Instance.AddLineStrip(_curveCoords, MainSystem.Args.CurveLineColor, MainSystem.Args.GridWidth);
         }
 
         // Copied from Chlorie's
