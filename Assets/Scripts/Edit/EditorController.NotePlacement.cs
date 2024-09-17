@@ -79,13 +79,15 @@ namespace Deenote.Edit
         public void PlaceNoteAt(NoteCoord coord, bool rememberPosition)
         {
             if (_isPasting) {
+                if (_clipBoardNotes.Count == 0)
+                    return;
                 PasteNote();
             }
             else {
                 PlaceNote();
             }
 
-            NoteTimeComparer.AssertInOrder(Stage.Chart.Data.Notes);
+            NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
 
             void PasteNote()
             {
@@ -128,10 +130,8 @@ namespace Deenote.Edit
 
         public void RemoveSelectedNotes()
         {
-            if (SelectedNotes.Count == 0) {
-                _operationHistory.Do(UndoableOperation.DoNothing);
+            if (SelectedNotes.Count == 0)
                 return;
-            }
 
             // __selectedNotes.Sort(NoteTimeComparer.Instance);
             _operationHistory.Do(Stage.Chart.Notes.RemoveNotes(SelectedNotes)

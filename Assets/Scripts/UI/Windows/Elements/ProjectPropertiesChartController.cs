@@ -103,7 +103,7 @@ namespace Deenote.UI.Windows.Elements
                 return;
             }
 
-            Chart.Data = chartData;
+            ChartModel.InitializationHelper.SetData(Chart, chartData);
             _notesCountText.text = $"{__chartModel.Notes.Count} Note{(__chartModel.Notes.Count == 1 ? null : "s")}";
             _importText.SetLocalizedText("Window_ProjectProperties_ChartImported");
             _importButton.interactable = true;

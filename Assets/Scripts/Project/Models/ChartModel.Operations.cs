@@ -12,9 +12,6 @@ namespace Deenote.Project.Models
 {
     partial class ChartModel
     {
-        // TODO: 不调整ChartData.Notes的顺序，在保存时统一sort
-        // ChartModel应对外关闭Data属性的访问，并代理ChartData的属性，以避免直接访问ChartData.Notes
-        // 目前在EditNotePropertyOperation没有注意排序，直接输出可能会无序
         partial struct NoteModelListProxy
         {
             public AddNoteOperation AddNote(NoteCoord coord, NoteData notePrototype)
@@ -32,18 +29,8 @@ namespace Deenote.Project.Models
                 }
                 iModel++;
 
-                // Optimizable full iteration?
-                var notedatas = _chartModel.Data.Notes;
-                int iData;
-                for (iData = notedatas.Count - 1; iData >= 0; iData--) {
-                    if (notedatas[iData].Time <= coord.Time) {
-                        break;
-                    }
-                }
-                iData++;
-
                 NoteModel model = new(data);
-                return new AddNoteOperation(iModel, iData, _chartModel, model);
+                return new AddNoteOperation(iModel, _chartModel, model);
             }
 
             public AddMultipleNotesOperation AddMultipleNotes(NoteCoord baseCoord,
@@ -51,26 +38,20 @@ namespace Deenote.Project.Models
             {
                 NoteTimeComparer.AssertInOrder(notePrototypes);
 
-                var insertIndices = Utils.Array<(int ModelIndex, int DataIndex)>(notePrototypes.Count);
+                var insertIndices = new int[notePrototypes.Count];
 
                 var noteModels = _chartModel._visibleNotes;
                 int iModel = _chartModel.Notes.Count - 1;
-                var noteDatas = _chartModel.Data.Notes;
-                int iData = noteDatas.Count - 1;
                 for (int i = notePrototypes.Count - 1; i >= 0; i--) {
                     var note = notePrototypes[i];
                     var realTime = note.Time + baseCoord.Time;
 
                     while (iModel >= 0 && noteModels[iModel].Data.Time > realTime)
                         iModel--;
-                    insertIndices[i].ModelIndex = iModel + 1;
-
-                    while (iData >= 0 && noteDatas[iData].Time > realTime)
-                        iData--;
-                    insertIndices[i].DataIndex = iData + 1;
+                    insertIndices[i] = iModel + 1;
                 }
 
-                NoteModel[] insertModels = Utils.Array<NoteModel>(notePrototypes.Count);
+                NoteModel[] insertModels = new NoteModel[notePrototypes.Count];
                 for (int i = 0; i < notePrototypes.Count; i++) {
                     var insertNote = notePrototypes[i].Clone();
                     var coord = NoteCoord.ClampPosition(new(insertNote.Time + baseCoord.Time,
@@ -86,12 +67,10 @@ namespace Deenote.Project.Models
                 NoteTimeComparer.AssertInOrder(notesInTimeOrder);
 
                 // Record all visible notes, mark their indices
-                var removeIndices = new (int ModelIndex, int DataIndex)[notesInTimeOrder.Count];
+                var removeIndices = new int[notesInTimeOrder.Count];
 
                 var notemodels = _chartModel._visibleNotes;
                 int iModel = 0;
-                var notedatas = _chartModel.Data.Notes;
-                int iData = 0;
 
                 for (int index = 0; index < notesInTimeOrder.Count; index++) {
                     var note = notesInTimeOrder[index];
@@ -99,27 +78,22 @@ namespace Deenote.Project.Models
 
                     int i = notemodels.IndexOf(note, iModel);
                     Debug.Assert(i >= 0);
-                    removeIndices[index].ModelIndex = i;
+                    removeIndices[index] = i;
                     iModel = i + 1;
-
-                    i = notedatas.IndexOf(note.Data, iData);
-                    Debug.Assert(i >= 0);
-                    removeIndices[index].DataIndex = i;
-                    iData = i + 1;
                 }
 
                 Debug.Assert(IsInOrder(removeIndices));
 
                 return new RemoveNotesOperation(removeIndices, _chartModel);
 
-                static bool IsInOrder(IEnumerable<(int, int)> indices)
+                static bool IsInOrder(IEnumerable<int> indices)
                 {
                     if (!indices.Any())
                         return true;
                     var prev = indices.First();
 
                     foreach (var item in indices.Skip(1)) {
-                        if (item.Item1 < prev.Item1 || item.Item2 < prev.Item2)
+                        if (item < prev)
                             return false;
                         prev = item;
                     }
@@ -129,7 +103,7 @@ namespace Deenote.Project.Models
 
             public LinkNotesOperation LinkNotes(ListReadOnlyView<NoteModel> notes)
             {
-                var editNotes = Utils.Array<NoteModel>(notes.Count);
+                var editNotes = new NoteModel[notes.Count];
                 for (int i = 0; i < notes.Count; i++) {
                     editNotes[i] = notes[i];
                 }
@@ -139,8 +113,7 @@ namespace Deenote.Project.Models
 
             public UnlinkNotesOperation UnlinkNotes(ListReadOnlyView<NoteModel> notes)
             {
-                var editNotes = Utils.Array<NoteModel>(notes.Count);
-
+                var editNotes = new NoteModel[notes.Count];
                 for (int i = 0; i < notes.Count; i++) {
                     editNotes[i] = notes[i];
                 }
@@ -221,7 +194,6 @@ namespace Deenote.Project.Models
             public sealed class AddNoteOperation : IUndoableOperation
             {
                 private readonly int _modelInsertIndex;
-                private readonly int _dataInsertIndex;
                 private readonly ChartModel _chartModel;
                 private readonly NoteModel _note;
 
@@ -231,11 +203,9 @@ namespace Deenote.Project.Models
                 private ListReadOnlyView<NoteModel> _collidedNotes;
 
                 // Unity 什么时候支持 C#12.jpg
-                public AddNoteOperation(int modelInsertIndex, int dataInsertIndex, ChartModel chartModel,
-                    NoteModel noteModel)
+                public AddNoteOperation(int modelInsertIndex, ChartModel chartModel, NoteModel noteModel)
                 {
                     _modelInsertIndex = modelInsertIndex;
-                    _dataInsertIndex = dataInsertIndex;
                     _chartModel = chartModel;
                     _note = noteModel;
                 }
@@ -255,7 +225,6 @@ namespace Deenote.Project.Models
                 void IUndoableOperation.Redo()
                 {
                     _chartModel._visibleNotes.Insert(_modelInsertIndex, _note);
-                    _chartModel.Data.Notes.Insert(_dataInsertIndex, _note.Data);
                     CheckCollision();
                     _onRedone?.Invoke();
 
@@ -275,9 +244,7 @@ namespace Deenote.Project.Models
                 void IUndoableOperation.Undo()
                 {
                     Debug.Assert(_chartModel._visibleNotes[_modelInsertIndex] == _note);
-                    Debug.Assert(_chartModel.Data.Notes[_dataInsertIndex] == _note.Data);
                     _chartModel._visibleNotes.RemoveAt(_modelInsertIndex);
-                    _chartModel.Data.Notes.RemoveAt(_dataInsertIndex);
                     RevertCollision();
                     _onUndone?.Invoke();
 
@@ -293,7 +260,7 @@ namespace Deenote.Project.Models
 
             public sealed class AddMultipleNotesOperation : IUndoableOperation
             {
-                private readonly (int ModelIndex, int DataIndex)[] _insertIndices;
+                private readonly int[] _insertIndices;
                 private readonly ChartModel _chartModel;
                 private readonly NoteModel[] _notes;
 
@@ -302,14 +269,13 @@ namespace Deenote.Project.Models
 
                 private readonly ListReadOnlyView<NoteModel>[] _collidedNotes;
 
-                public AddMultipleNotesOperation((int ModelIndex, int DataIndex)[] insertIndices, ChartModel chartModel,
-                    NoteModel[] noteModels)
+                public AddMultipleNotesOperation(int[] insertIndices, ChartModel chartModel, NoteModel[] noteModels)
                 {
                     Debug.Assert(insertIndices.Length == noteModels.Length);
                     _insertIndices = insertIndices;
                     _chartModel = chartModel;
                     _notes = noteModels;
-                    _collidedNotes = Utils.Array<ListReadOnlyView<NoteModel>>(_insertIndices.Length);
+                    _collidedNotes = new ListReadOnlyView<NoteModel>[_insertIndices.Length];
                 }
 
                 public AddMultipleNotesOperation WithRedoneAction(Action<NoteModel[]> action)
@@ -328,8 +294,7 @@ namespace Deenote.Project.Models
                 {
                     for (int i = 0; i < _notes.Length; i++) {
                         // We need to maually adjust offset when insert from start
-                        _chartModel._visibleNotes.Insert(_insertIndices[i].ModelIndex + i, _notes[i]);
-                        _chartModel.Data.Notes.Insert(_insertIndices[i].DataIndex + i, _notes[i].Data);
+                        _chartModel._visibleNotes.Insert(_insertIndices[i] + i, _notes[i]);
                         CheckCollision(i);
                     }
                     _onRedone?.Invoke(_notes);
@@ -339,7 +304,7 @@ namespace Deenote.Project.Models
                         ref var collidedNotes = ref _collidedNotes[index];
                         if (collidedNotes.IsNull) {
                             collidedNotes =
-                                _chartModel.Notes.GetCollidedNotesTo(_insertIndices[index].ModelIndex + index);
+                                _chartModel.Notes.GetCollidedNotesTo(_insertIndices[index] + index);
                         }
                         _notes[index].CollisionCount += collidedNotes.Count;
                         foreach (var note in collidedNotes) {
@@ -351,10 +316,8 @@ namespace Deenote.Project.Models
                 void IUndoableOperation.Undo()
                 {
                     for (int i = _notes.Length - 1; i >= 0; i--) {
-                        Debug.Assert(_chartModel._visibleNotes[_insertIndices[i].ModelIndex + i] == _notes[i]);
-                        Debug.Assert(_chartModel.Data.Notes[_insertIndices[i].DataIndex + i] == _notes[i].Data);
-                        _chartModel._visibleNotes.RemoveAt(_insertIndices[i].ModelIndex + i);
-                        _chartModel.Data.Notes.RemoveAt(_insertIndices[i].DataIndex + i);
+                        Debug.Assert(_chartModel._visibleNotes[_insertIndices[i] + i] == _notes[i]);
+                        _chartModel._visibleNotes.RemoveAt(_insertIndices[i] + i);
                     }
                     RevertCollision();
                     _onUndone?.Invoke(_notes);
@@ -374,7 +337,7 @@ namespace Deenote.Project.Models
 
             public sealed class RemoveNotesOperation : IUndoableOperation
             {
-                private readonly (int ModelIndex, int DataIndex)[] _removeIndices;
+                private readonly int[] _removeIndices;
                 private readonly NoteModel[] _removeModels;
 
                 private readonly ChartModel _chartModel;
@@ -385,14 +348,13 @@ namespace Deenote.Project.Models
                 private Action<NoteModel[]>? _onUndone;
                 private readonly ListReadOnlyView<NoteModel>[] _collidedNotes;
 
-                public RemoveNotesOperation((int ModelIndex, int DataIndex)[] removeIndices, ChartModel chartModel)
+                public RemoveNotesOperation(int[] removeIndices, ChartModel chartModel)
                 {
                     _removeIndices = removeIndices;
                     _chartModel = chartModel;
                     _removeModels = new NoteModel[removeIndices.Length];
                     for (int i = 0; i < _removeModels.Length; i++) {
-                        _removeModels[i] = _chartModel._visibleNotes[removeIndices[i].ModelIndex];
-                        Debug.Assert(_removeModels[i].Data == _chartModel.Data.Notes[removeIndices[i].DataIndex]);
+                        _removeModels[i] = _chartModel._visibleNotes[removeIndices[i]];
                     }
                     _collidedNotes = new ListReadOnlyView<NoteModel>[_removeIndices.Length];
 
@@ -417,9 +379,7 @@ namespace Deenote.Project.Models
 
                     for (int i = _removeIndices.Length - 1; i >= 0; i--) {
                         UpdateCollision(i);
-                        var (modelIndex, dataIndex) = _removeIndices[i];
-                        _chartModel._visibleNotes.RemoveAt(modelIndex);
-                        _chartModel.Data.Notes.RemoveAt(dataIndex);
+                        _chartModel._visibleNotes.RemoveAt(_removeIndices[i]);
                     }
                     _onRedone?.Invoke();
 
@@ -427,7 +387,7 @@ namespace Deenote.Project.Models
                     {
                         ref var collidedNotes = ref _collidedNotes[index];
                         if (collidedNotes.IsNull) {
-                            collidedNotes = _chartModel.Notes.GetCollidedNotesTo(_removeIndices[index].ModelIndex);
+                            collidedNotes = _chartModel.Notes.GetCollidedNotesTo(_removeIndices[index]);
                         }
                         foreach (var note in collidedNotes) {
                             note.CollisionCount--;
@@ -441,9 +401,7 @@ namespace Deenote.Project.Models
 
                     for (int i = 0; i < _removeModels.Length; i++) {
                         var model = _removeModels[i];
-                        var (modelIndex, dataIndex) = _removeIndices[i];
-                        _chartModel._visibleNotes.Insert(modelIndex, model);
-                        _chartModel.Data.Notes.Insert(dataIndex, model.Data);
+                        _chartModel._visibleNotes.Insert(_removeIndices[i], model);
                     }
                     RevertCollision();
                     _onUndone?.Invoke(_removeModels);
@@ -461,8 +419,6 @@ namespace Deenote.Project.Models
 
             public sealed class LinkNotesOperation : IUndoableOperation
             {
-                //private readonly (NoteModel Note, (bool IsSlide, NoteData Prev, NoteData Next) OldValue, (NoteData Prev, NoteData Next) NewValue)[] _contexts;
-
                 private readonly NoteModel[] _notes;
                 private readonly (bool IsSlide, NoteData? Prev, NoteData? Next)[] _oldValues;
 

@@ -35,7 +35,10 @@ namespace Deenote.Project
         }
 
         public static UniTask SaveAsync(ProjectModel project, string saveFilePath)
-            => UniTask.RunOnThreadPool(() => Save(project, saveFilePath));
+        {
+            var saveProj = project.CloneForSave();
+            return UniTask.RunOnThreadPool(() => Save(saveProj, saveFilePath));
+        }
 
         public static void Save(ProjectModel project, string saveFilePath)
         {
@@ -100,7 +103,7 @@ namespace Deenote.Project
                     var startTime = reader.ReadSingle();
                     tempos.Add(new Tempo(bpm, startTime));
                 }
-                ProjectModel.InitializeHelper.SetTempoList(project, tempos);
+                ProjectModel.InitializationHelper.SetTempoList(project, tempos);
 
                 return project;
             }

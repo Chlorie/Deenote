@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UnityEngine;
 
 namespace Deenote.Project.Models.Datas
@@ -95,6 +96,13 @@ namespace Deenote.Project.Models.Datas
         }
 
         #endregion
+
+        public ChartData Clone(bool cloneNotes = true, bool cloneLines = true)
+        {
+            return new ChartData(Speed, RemapMinVelocity, RemapMaxVelocity,
+                cloneNotes ? Notes.Select(n => n.Clone()).ToList() : new(),
+                cloneLines ? SpeedLines.Select(l => l.Clone()).ToList() : new());
+        }
 
         public static ChartData Load(string json)
         {

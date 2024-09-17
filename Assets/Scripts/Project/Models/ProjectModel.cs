@@ -24,6 +24,27 @@ namespace Deenote.Project.Models
         // NonSerialize
         public AudioClip AudioClip { get; set; }
 
+        public ProjectModel CloneForSave()
+        {
+            var proj = new ProjectModel() {
+                MusicName = MusicName,
+                Composer = Composer,
+                ChartDesigner = ChartDesigner,
+                SaveAsRefPath = SaveAsRefPath,
+                AudioFileData = AudioFileData,
+                AudioFileRelativePath = AudioFileRelativePath,
+            };
+            proj.Charts.Capacity = Charts.Count;
+            foreach (var chart in Charts) {
+                proj.Charts.Add(chart.CloneForSave());
+            }
+            proj._tempos.Capacity = _tempos.Count;
+            foreach (var tempo in _tempos) {
+                proj._tempos.Add(new Tempo(tempo.Bpm, tempo.StartTime));
+            }
+            return proj;
+        }
+
         public readonly partial struct TempoListProxy : IReadOnlyList<Tempo>
         {
             private readonly ProjectModel _projectModel;
@@ -71,7 +92,7 @@ namespace Deenote.Project.Models
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        public static class InitializeHelper
+        public static class InitializationHelper
         {
             public static void SetTempoList(ProjectModel model, List<Tempo> tempos)
             {

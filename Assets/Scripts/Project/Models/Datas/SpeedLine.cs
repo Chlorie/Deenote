@@ -27,5 +27,10 @@ namespace Deenote.Project.Models.Datas
             EndTime = endTime;
             WarningType = warningType;
         }
+
+        public SpeedLine Clone()
+        {
+            return new(Speed, StartTime, EndTime, WarningType);
+        }
     }
 }

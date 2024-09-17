@@ -120,7 +120,7 @@ namespace Deenote.Project
                 List<Tempo> tempos = oldProject.charts[0].beats
                     .Select(time => new Tempo(bpm: 0f, time))
                     .ToList();
-                ProjectModel.InitializeHelper.SetTempoList(project, tempos);
+                ProjectModel.InitializationHelper.SetTempoList(project, tempos);
 
                 return project;
             }

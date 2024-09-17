@@ -28,7 +28,7 @@ namespace Deenote
                     // Name = "<Cht> name",
                     Level = "10", Difficulty = Difficulty.Hard,
                 });
-            ProjectModel.InitializeHelper.SetTempoList(_project, new List<Tempo> { new(160f, 1.5f) });
+            ProjectModel.InitializationHelper.SetTempoList(_project, new List<Tempo> { new(160f, 1.5f) });
             return _project;
         }
     }
