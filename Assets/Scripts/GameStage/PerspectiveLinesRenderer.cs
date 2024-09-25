@@ -1,9 +1,7 @@
+using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Deenote.Utilities;
-using Deenote.UI.Windows;
-using Deenote.Utilities.Robustness;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -19,20 +17,6 @@ namespace Deenote.GameStage
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class PerspectiveLinesRenderer : SingletonBehavior<PerspectiveLinesRenderer>
     {
-        // I need CollectionsMarshal.AsSpan!!!!!
-        public void AddLineStrip(ListReadOnlyView<Vector2> points, Color color, float width)
-        {
-            Vector2 prev = points[0];
-            foreach (var point in points) {
-                _vertices.Add(new VertexData {
-                    Positions = new Vector4(point.x, point.y, prev.x, prev.y),
-                    Color = color,
-                    Width = width
-                });
-                prev = point;
-            }
-        }
-
         public void AddLineStrip(ReadOnlySpan<Vector2> points, Color color, float width)
         {
             Vector2 prev = points[0];

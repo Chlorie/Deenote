@@ -2,6 +2,7 @@ using Deenote.Utilities.Robustness;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Deenote.Utilities
 {
@@ -106,6 +107,19 @@ namespace Deenote.Utilities
             }
 
             return true;
+        }
+
+        public static Span<T> AsSpan<T>(this List<T> list)
+        {
+            // The underlying array is the first field of List<T>, so if we
+            // force cast it into another reference type whose first field
+            // is T[], we can get the underlying array.
+
+            // I'm not sure if the layout of List<T> is the same for all runtimes,
+            // so please do test after changing the runtime
+            var provider = Unsafe.As<StrongBox<T[]>>(list);
+            var array = provider.Value;
+            return array.AsSpan(0, list.Count);
         }
     }
 }
