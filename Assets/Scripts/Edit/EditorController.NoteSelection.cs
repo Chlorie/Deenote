@@ -1,8 +1,9 @@
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;
-using Deenote.Utilities.Robustness;
+using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Deenote.Edit
@@ -12,12 +13,12 @@ namespace Deenote.Edit
         [Header("Note Selection")]
         [SerializeField] NoteSelectionController _noteSelectionController;
 
-        public ListReadOnlyView<NoteModel> SelectedNotes => _noteSelectionController.SelectedNotes;
+        public ReadOnlySpan<NoteModel> SelectedNotes => _noteSelectionController.SelectedNotes;
 
         public void SelectAllNotes()
         {
             OnNoteSelectionChanging();
-            _noteSelectionController.SelectNotes(Stage.Chart.Notes);
+            _noteSelectionController.SelectNotes(Stage.Chart.Notes.EnumerateSelectableModels());
             OnNotesChanged(false, true);
         }
 
@@ -50,7 +51,7 @@ namespace Deenote.Edit
             private readonly List<NoteModel> _selectedNotes = new();
             private readonly List<NoteModel> _inSelectionNotes = new();
 
-            public ListReadOnlyView<NoteModel> SelectedNotes => _selectedNotes;
+            public ReadOnlySpan<NoteModel> SelectedNotes => _selectedNotes.AsSpan();
 
             public void SelectNotes(IEnumerable<NoteModel> notes)
             {
@@ -64,7 +65,29 @@ namespace Deenote.Edit
                 }
             }
 
+            public void SelectNotes(LightLinq.SpanOfTypeIterator<IStageNoteModel, NoteModel> notes)
+            {
+                foreach (var note in _selectedNotes) {
+                    note.IsSelected = false;
+                }
+                _selectedNotes.Clear();
+                foreach (var note in notes) {
+                    _selectedNotes.Add(note);
+                    note.IsSelected = true;
+                }
+            }
+
             public void AddNote(IEnumerable<NoteModel> notes)
+            {
+                foreach (var note in notes) {
+                    if (note.IsSelected)
+                        continue;
+                    _selectedNotes.Add(note);
+                    note.IsSelected = true;
+                }
+            }
+
+            public void AddNote(LightLinq.SpanOfTypeIterator<IStageNoteModel, NoteModel> notes)
             {
                 foreach (var note in notes) {
                     if (note.IsSelected)
@@ -92,6 +115,14 @@ namespace Deenote.Edit
                     if (_selectedNotes.Remove(note)) {
                         note.IsSelected = false;
                     }
+                }
+            }
+
+            public void DeselectNotes(LightLinq.SpanOfTypeIterator<IStageNoteModel, NoteModel> notes)
+            {
+                foreach (var note in notes) {
+                    if (_selectedNotes.Remove(note))
+                        note.IsSelected = false;
                 }
             }
 
@@ -167,7 +198,7 @@ namespace Deenote.Edit
                 // Optimizable
                 _selectedNotes.Clear();
 
-                foreach (var note in _editor.Stage.Chart.Notes) {
+                foreach (var note in _editor.Stage.Chart.Notes.EnumerateSelectableModels()) {
                     float notePos = note.Data.Position;
                     float halfNoteSize = note.Data.Size / 2;
                     float noteTime = note.Data.Time;

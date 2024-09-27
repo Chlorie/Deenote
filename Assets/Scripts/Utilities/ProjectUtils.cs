@@ -1,3 +1,4 @@
+using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using System;
 
@@ -18,6 +19,10 @@ namespace Deenote.Utilities
         public static string ToPitchDisplayString(this PianoSoundData sound)
             => ToPitchDisplayString(sound.Pitch);
 
+        /// <summary>
+        /// Set <paramref name="note"/> to non-slide, and 
+        /// link its original prev note to original next note
+        /// </summary>
         public static void UnlinkWithoutCutLinkChain(this NoteData note)
         {
             var prevLink = note.PrevLink;
@@ -30,9 +35,14 @@ namespace Deenote.Utilities
                 nextLink.PrevLink = prevLink;
         }
 
+        /// <summary>
+        /// Insert <paramref name="note"/> into another link before <paramref name="nextLink"/>,
+        /// this method auto calls <see cref="UnlinkWithoutCutLinkChain(NoteData)"/> first
+        /// </summary>
         public static void InsertAsLinkBefore(this NoteData note, NoteData nextLink)
         {
-            note.UnlinkWithoutCutLinkChain();
+            if (note.IsSlide)
+                note.UnlinkWithoutCutLinkChain();
 
             note.NextLink = nextLink;
             note.PrevLink = nextLink.PrevLink;
@@ -41,9 +51,14 @@ namespace Deenote.Utilities
             nextLink.PrevLink = note;
         }
 
+        /// <summary>
+        /// Insert <paramref name="note"/> into another link after <paramref name="prevLink"/>,
+        /// this method auto calls <see cref="UnlinkWithoutCutLinkChain(NoteData)"/> first
+        /// </summary>
         public static void InsertAsLinkAfter(this NoteData note, NoteData prevLink)
         {
-            note.UnlinkWithoutCutLinkChain();
+            if (note.IsSlide)
+                note.UnlinkWithoutCutLinkChain();
 
             note.PrevLink = prevLink;
             note.NextLink = prevLink.NextLink;
@@ -51,5 +66,11 @@ namespace Deenote.Utilities
                 note.NextLink.PrevLink = note;
             prevLink.NextLink = note;
         }
+
+        /// <summary>
+        /// Check whether the <paramref name="note"/> reached judgeline, the combo should plus or not
+        /// </summary>
+        public static bool IsComboNote(this IStageNoteModel note)
+            => note is NoteTailModel or NoteModel { Data.IsHold: false };
     }
 }

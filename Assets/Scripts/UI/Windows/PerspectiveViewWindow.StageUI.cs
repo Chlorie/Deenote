@@ -105,7 +105,7 @@ namespace Deenote.UI.Windows
                 NotifyMusicNameChanged("");
                 NotifyChartLevelChanged("");
                 NotifyChartDifficultyChanged(Difficulty.Hard);
-                NotifyGameStageProgressChanged(0);
+                NotifyGameStageProgressChanged(-1, 0);
                 return;
             }
 
@@ -116,7 +116,7 @@ namespace Deenote.UI.Windows
             if (chart is null) {
                 NotifyChartLevelChanged("");
                 NotifyChartDifficultyChanged(Difficulty.Hard);
-                NotifyGameStageProgressChanged(0);
+                NotifyGameStageProgressChanged(-1, 0);
                 return;
             }
 
@@ -124,10 +124,10 @@ namespace Deenote.UI.Windows
             NotifyChartDifficultyChanged(chart.Difficulty);
         }
 
-        public void NotifyGameStageProgressChanged(int nextHitNoteIndex)
+        public void NotifyGameStageProgressChanged(int prevHitComboNoteIndex, int combo)
         {
-            UpdateScore(nextHitNoteIndex);
-            UpdateCombo(nextHitNoteIndex);
+            UpdateScore(combo);
+            UpdateCombo(prevHitComboNoteIndex, combo);
         }
 
         #endregion
@@ -139,7 +139,7 @@ namespace Deenote.UI.Windows
                 return;
             }
 
-            int noteCount = _gameStageController.Chart.Notes.Count;
+            int noteCount = _gameStageController.Chart.Notes.NoteCount;
             float accScore = (float)judgedNoteCount / noteCount;
             // comboActual = Sum(1..judgeNoteCount);
             // comboTotal = Sum(1..noteCount)
@@ -151,17 +151,21 @@ namespace Deenote.UI.Windows
             _scoreText.text = $"{Mathf.Floor(score) / 100f:F2} %";
         }
 
-        private void UpdateCombo(int combo)
+        private void UpdateCombo(int prevHitComboNoteIndex, int combo)
         {
             if (combo < 5) {
                 _comboParentGameObject.SetActive(false);
                 return;
             }
+            // prevHitNoteIndex wont smaller than combo, so here
+            // it is asserted a valid index
+            Debug.Assert(prevHitComboNoteIndex >= 0);
 
-            var prevHitNoteIndex = combo - 1;
+            var prevHitNote = _gameStageController.Chart.Notes[prevHitComboNoteIndex];
+            Debug.Assert(prevHitNote.IsComboNote());
+
             _comboParentGameObject.SetActive(true);
-            var deltaTime = _gameStageController.CurrentMusicTime -
-                            _gameStageController.Chart.Notes[prevHitNoteIndex].Data.Time;
+            var deltaTime = _gameStageController.CurrentMusicTime - prevHitNote.Time;
             Debug.Assert(deltaTime >= 0, $"actual delta time:{deltaTime}");
             _comboNumberText.text = _comboShadowText.text = combo.ToString();
 

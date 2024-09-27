@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Deenote.Project.Models
 {
     [Serializable]
-    public sealed class NoteModel
+    public sealed class NoteModel : IStageNoteModel
     {
         [field: SerializeField]
         private NoteData __data;
@@ -34,7 +34,6 @@ namespace Deenote.Project.Models
 
         public bool IsCollided => CollisionCount > 0;
 
-
         public NoteModel(NoteData data)
         {
             __data = data;
@@ -44,5 +43,13 @@ namespace Deenote.Project.Models
         {
             _isInSelection = value;
         }
+
+        #region IStageNoteModel
+
+        float IStageNoteModel.Time => Data.Time;
+
+        float IStageNoteModel.Position => Data.Position;
+
+        #endregion
     }
 }

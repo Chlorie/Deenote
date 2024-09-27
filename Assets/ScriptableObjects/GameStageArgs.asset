@@ -36,6 +36,10 @@ MonoBehaviour:
     Scale: 0.975
     Sprite: {fileID: 21300000, guid: 89abba366329a32459d2e62fb3726c36, type: 3}
     WaveColor: {r: 0.9058824, g: 0.882353, b: 0.5686275, a: 1}
+  HoldSpritePrefab:
+    ScaleX: 2.7
+    NotePanelZToYMultiplier: 21
+    Sprite: {fileID: 21300000, guid: c35290366173e14469d6a6b65ad2c169, type: 3}
   HitEffectSpritePrefabs:
     HitEffectTime: 0.8
     Explosions:

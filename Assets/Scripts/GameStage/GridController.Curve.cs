@@ -28,10 +28,10 @@ namespace Deenote.GameStage
 
         public (float Start, float End)? CurveTime => IsCurveOn ? (_curveLineData!.MinX, _curveLineData.MaxX) : null;
 
-        public void InitializeCurve(ListReadOnlyView<NoteModel> interpolationNotes, CurveKind kind)
+        public void InitializeCurve(ReadOnlySpan<NoteModel> interpolationNotes, CurveKind kind)
         {
             NoteTimeComparer.AssertInOrder(interpolationNotes);
-            if (interpolationNotes.Count < 2) {
+            if (interpolationNotes.Length < 2) {
                 IsCurveOn = false;
                 return;
             }
@@ -105,16 +105,16 @@ namespace Deenote.GameStage
                 d = new double[pointCount - 1];
             }
 
-            public static CurveLineData Linear(ListReadOnlyView<NoteModel> interpolationNotes)
+            public static CurveLineData Linear(ReadOnlySpan<NoteModel> interpolationNotes)
             {
-                var curve = new CurveLineData(interpolationNotes.Count);
+                var curve = new CurveLineData(interpolationNotes.Length);
 
-                for (int i = 0; i < interpolationNotes.Count; i++) {
+                for (int i = 0; i < interpolationNotes.Length; i++) {
                     var note = interpolationNotes[i].Data;
                     curve.x[i] = note.Time;
                     curve.a[i] = note.Position;
                 }
-                for (int i = 0; i < interpolationNotes.Count - 1; i++) {
+                for (int i = 0; i < interpolationNotes.Length - 1; i++) {
                     curve.b[i] = (curve.a[i + 1] - curve.a[i]) / (curve.x[i + 1] - curve.x[i]);
                 }
                 Array.Clear(curve.c, 0, curve.c.Length);
@@ -123,11 +123,11 @@ namespace Deenote.GameStage
                 return curve;
             }
 
-            public static CurveLineData Cubic(ListReadOnlyView<NoteModel> interpolationNotes)
+            public static CurveLineData Cubic(ReadOnlySpan<NoteModel> interpolationNotes)
             {
-                var curve = new CurveLineData(interpolationNotes.Count);
+                var curve = new CurveLineData(interpolationNotes.Length);
 
-                int count = interpolationNotes.Count;
+                int count = interpolationNotes.Length;
                 int n = count - 1;
 
                 for (int i = 0; i < count; i++) {

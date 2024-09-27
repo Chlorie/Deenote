@@ -3,6 +3,7 @@ using Deenote.GameStage;
 using Deenote.Project;
 using Deenote.Project.Models;
 using Deenote.Utilities.Robustness;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -269,6 +270,7 @@ namespace Deenote.UI.Windows
 
         private void OnBpmStartTimeChanged(string value)
         {
+            Debug.Log($"StartTime: {value}");
             if (float.TryParse(value, out var time))
                 _bpmStartTime = Mathf.Max(time, 0f);
 
@@ -277,6 +279,7 @@ namespace Deenote.UI.Windows
 
         private void OnBpmEndTimeChanged(string value)
         {
+            Debug.Log($"EndTime: {value}");
             if (float.TryParse(value, out var time))
                 _bpmEndTime = Mathf.Min(time, _stage.MusicLength);
 
@@ -439,19 +442,21 @@ namespace Deenote.UI.Windows
 
         #region Bpm Notify
 
-        public void NotifyNoteSelectionChanged(ListReadOnlyView<NoteModel> selectedNotes)
+        public void NotifyNoteSelectionChanged(ReadOnlySpan<NoteModel> selectedNotes)
         {
             if (!_window.IsActivated)
                 return;
 
-            if (selectedNotes.Count == 0)
+            if (selectedNotes.IsEmpty)
                 return;
 
             float start = selectedNotes[0].Data.Time;
+            _bpmStartTime = start;
             _bpmStartTimeInputField.text = start.ToString("F3");
             float end = selectedNotes[^1].Data.Time;
+            _bpmEndTime = end;
             _bpmEndTimeInputField.text = end.ToString("F3");
-            if (selectedNotes.Count < 2)
+            if (selectedNotes.Length < 2)
                 return;
 
             float interval = end - start;
@@ -459,6 +464,7 @@ namespace Deenote.UI.Windows
                 return;
 
             var bpm = 60f / interval;
+            _bpm = bpm;
             _bpmInputField.text = bpm.ToString("F3");
         }
 

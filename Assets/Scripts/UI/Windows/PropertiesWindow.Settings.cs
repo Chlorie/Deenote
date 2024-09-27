@@ -1,8 +1,12 @@
+using UnityEngine;
+
 namespace Deenote.UI.Windows
 {
     partial class PropertiesWindow
     {
         private bool __isIneffectivePropertiesVisible;
+
+        [SerializeField] GameObject[] _ineffectivePropertyGameObjects;
 
         public bool IsIneffectivePropertiesVisible
         {
@@ -13,16 +17,9 @@ namespace Deenote.UI.Windows
                 }
                 __isIneffectivePropertiesVisible = value;
 
-                _chartSpeedInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _chartRemapVMinInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _chartRemapVMaxInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _noteShiftInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _noteSpeedInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _noteDurationInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _noteVibrateToggle.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _noteSwipeToggle.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _noteWarningTypeInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
-                _noteEventIdInputField.gameObject.SetActive(__isIneffectivePropertiesVisible);
+                foreach (var go in _ineffectivePropertyGameObjects) {
+                    go.SetActive(__isIneffectivePropertiesVisible);
+                }
 
                 MainSystem.PreferenceWindow.NotifyIsIneffectivePropertiesVisible(__isIneffectivePropertiesVisible);
             }

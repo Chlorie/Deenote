@@ -1040,6 +1040,7 @@ MonoBehaviour:
   _fullScreenParentTransform: {fileID: 649000514}
   <ViewCamera>k__BackingField: {fileID: 1122502912}
   <BackgroundCamera>k__BackingField: {fileID: 2015415055}
+  _imageAspectFitter: {fileID: 0}
 --- !u!114 &17624274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2128,6 +2129,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &79130313 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6444987518915351736, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+    type: 3}
+  m_PrefabInstance: {fileID: 79130310}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &80411988 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1458312439362434252, guid: aca18cad1f12eaf40a0b647ce0cd21b7,
@@ -14120,6 +14127,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &707941390 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6444987518915351736, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+    type: 3}
+  m_PrefabInstance: {fileID: 707941387}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &711703656 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3008644361473031534, guid: bdeb5c7b81ff2d54cb8b042521e60df4,
@@ -17828,6 +17841,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &886790232 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6444987518915351736, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+    type: 3}
+  m_PrefabInstance: {fileID: 886790229}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &888740216 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5273472650678960067, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
@@ -19171,12 +19190,15 @@ MonoBehaviour:
   _noteParentTransform: {fileID: 1248500713}
   _notePrefab: {fileID: 8088016575839004564, guid: 160a09d6b531cb34d876b0226dae8742,
     type: 3}
-  _nextHitNoteIndex: 0
-  _nextAppearNoteIndex: 0
-  _nextDisappearNoteIndex: 0
+  _stageNoteManager:
+    _trackingNotes: []
+    NextDisappearNoteIndex: 0
+    NextHitNoteIndex: 0
+    CurrentCombo: 0
+    NextAppearNoteIndex: 0
   _manualPlaySpeedMultiplier: 0
-  __showLinkLines: 1
   _args: {fileID: 11400000, guid: 399f834d066c57e48bed3c4c88de2962, type: 2}
+  __showLinkLines: 1
   __isStageEffectOn: 1
   __noteSpeed: 2
   __musicSpeed: 10
@@ -35388,18 +35410,8 @@ MonoBehaviour:
   _args: {fileID: 11400000, guid: 4b0c430570bfd6349992eb93d24d9782, type: 2}
   _gameStageController: {fileID: 986768627}
   _editorController: {fileID: 986768628}
-  _backgroundBreathingMaskImage: {fileID: 0}
-  _cameraViewRawImage: {fileID: 526768658}
   _fullScreenButton: {fileID: 1644932451}
   _aspectDropdown: {fileID: 728519744}
-  _easyDifficultyIconSprite: {fileID: 0}
-  _easyLevelTextColor: {r: 0, g: 0, b: 0, a: 0}
-  _normalDifficultyIconSprite: {fileID: 0}
-  _normalLevelTextColor: {r: 0, g: 0, b: 0, a: 0}
-  _hardDifficultyIconSprite: {fileID: 0}
-  _hardLevelTextColor: {r: 0, g: 0, b: 0, a: 0}
-  _extraDifficultyIconSprite: {fileID: 0}
-  _extraLevelTextColor: {r: 0, g: 0, b: 0, a: 0}
   _musicNameText: {fileID: 1180209520}
   _scoreText: {fileID: 1766739979}
   _timeSlider: {fileID: 2002025296}
@@ -36893,6 +36905,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1918399499 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6444987518915351736, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+    type: 3}
+  m_PrefabInstance: {fileID: 1918399496}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1930897483
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37867,6 +37885,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1980998282 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6444987518915351736, guid: a6c069d37ff1e0b4ab4222752b4be7c9,
+    type: 3}
+  m_PrefabInstance: {fileID: 1980998279}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1987772076 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7798145783042627123, guid: c9dd4fe4e0a3d334fb28c39fc68828d7,
@@ -39516,6 +39540,13 @@ MonoBehaviour:
   _noteIsLinkToggle: {fileID: 849622862}
   _noteSoundsButton: {fileID: 118541724}
   _noteSoundsText: {fileID: 118541723}
+  _ineffectivePropertyGameObjects:
+  - {fileID: 1918399499}
+  - {fileID: 707941390}
+  - {fileID: 886790232}
+  - {fileID: 6379683659039916263}
+  - {fileID: 79130313}
+  - {fileID: 1980998282}
 --- !u!1 &2094604723
 GameObject:
   m_ObjectHideFlags: 0
@@ -42516,6 +42547,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &6379683659039916263 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2918555065017050355, guid: 16e6afa96b15e9940a4aff310885893a,
+    type: 3}
+  m_PrefabInstance: {fileID: 6379683659039916260}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6878512002319511910
 PrefabInstance:
   m_ObjectHideFlags: 0

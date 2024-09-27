@@ -7,6 +7,7 @@ namespace Deenote.GameStage.Elements
     public sealed class StageNoteController : MonoBehaviour
     {
         [SerializeField] private SpriteRenderer _noteSpriteRenderer = null!;
+        [SerializeField] private SpriteRenderer _holdBodySpriteRenderer = null!;
         [SerializeField] private SpriteRenderer _explosionHitEffectSpriteRenderer = null!;
         [SerializeField] private SpriteRenderer _circleHitEffectSpriteRenderer = null!;
         [SerializeField] private SpriteRenderer _waveHitEffectSpriteRenderer = null!;
@@ -39,6 +40,13 @@ namespace Deenote.GameStage.Elements
                 _state = value;
                 switch (_state) {
                     case NoteState.Fall:
+                        _noteSpriteRenderer.gameObject.SetActive(true);
+                        _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
+                        _circleHitEffectSpriteRenderer.gameObject.SetActive(false);
+                        _waveHitEffectSpriteRenderer.gameObject.SetActive(false);
+                        _glowHitEffectSpriteRenderer.gameObject.SetActive(false);
+                        break;
+                    case NoteState.Holding:
                         _noteSpriteRenderer.gameObject.SetActive(true);
                         _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _circleHitEffectSpriteRenderer.gameObject.SetActive(false);
@@ -113,6 +121,18 @@ namespace Deenote.GameStage.Elements
             };
             _noteSpriteRenderer.sprite = prefab.Sprite;
             _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(_note.Data.Size, 1f, 1f) * prefab.Scale;
+
+            if (_note.Data.IsHold) {
+                ref readonly var holdPrefab = ref MainSystem.GameStage.Args.HoldSpritePrefab;
+                _holdBodySpriteRenderer.gameObject.SetActive(true);
+                _holdBodySpriteRenderer.transform.localScale = _holdBodySpriteRenderer.transform.localScale with {
+                    x = _note.Data.Size * holdPrefab.ScaleX,
+                };
+            }
+            else {
+                _holdBodySpriteRenderer.gameObject.SetActive(false);
+            }
+
             _linkLine = null;
             _waveColor = prefab.WaveColor;
         }
@@ -125,6 +145,11 @@ namespace Deenote.GameStage.Elements
             if (timeDelta > 0) {
                 State = NoteState.Fall;
                 OnFalling();
+            }
+            // Holding
+            else if (Model.Data.IsHold && -timeDelta < Model.Data.Duration) {
+                State = NoteState.Holding;
+                OnHolding();
             }
             // Hit effect or released
             else {
@@ -146,46 +171,71 @@ namespace Deenote.GameStage.Elements
                 float noteFadeInTime = MainSystem.GameStage.StageNoteAheadTime *
                                        MainSystem.GameStage.Args.NoteFadeInRangePercent;
                 float alpha = Mathf.Clamp01((noteAppearTime - timeDelta) / noteFadeInTime);
-                {
-                    _noteSpriteRenderer.color =
-                        Model.IsSelected ? MainSystem.Args.NoteSelectedColor.WithAlpha(alpha) :
-                        Model.IsCollided && !Model.Data.IsSlide ? MainSystem.Args.NoteCollidedColor.WithAlpha(alpha) :
-                        Color.white.WithAlpha(alpha);
+                _noteSpriteRenderer.color =
+                    Model.IsSelected ? MainSystem.Args.NoteSelectedColor.WithAlpha(alpha) :
+                    Model.IsCollided && !Model.Data.IsSlide ? MainSystem.Args.NoteCollidedColor.WithAlpha(alpha) :
+                    Color.white.WithAlpha(alpha);
 
-                    // Position
-                    Debug.Assert(_note.Data.Time > Stage.CurrentMusicTime);
-                    float z = MainSystem.Args.OffsetTimeToZ(timeDelta);
-                    gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, 0f, z);
-                }
+                // Position
+
+                Debug.Assert(_note.Data.Time > Stage.CurrentMusicTime);
+                float z = MainSystem.Args.OffsetTimeToZ(timeDelta);
+                gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, 0f, z);
 
                 // Link line
-                if (!MainSystem.GameStage.IsShowLinkLines)
-                    return;
 
-                var from = Model.Data;
-                var to = from.NextLink;
-                if (to is null) return;
+                if (MainSystem.GameStage.IsShowLinkLines) {
+                    var from = Model.Data;
+                    var to = from.NextLink;
+                    if (to is null)
+                        goto EndLinkLine;
 
-                var (fromX, fromZ) =
-                    MainSystem.Args.NoteCoordToWorldPosition(from.PositionCoord, Stage.CurrentMusicTime);
-                var (toX, toZ) = MainSystem.Args.NoteCoordToWorldPosition(to.PositionCoord, Stage.CurrentMusicTime);
-                _linkLine = (new Vector2(fromX, fromZ), new Vector2(toX, toZ));
+                    var (fromX, fromZ) =
+                        MainSystem.Args.NoteCoordToWorldPosition(from.PositionCoord, Stage.CurrentMusicTime);
+                    var (toX, toZ) = MainSystem.Args.NoteCoordToWorldPosition(to.PositionCoord, Stage.CurrentMusicTime);
+                    _linkLine = (new Vector2(fromX, fromZ), new Vector2(toX, toZ));
+                }
+            EndLinkLine:
+
+                // Hold body
+
+                ref readonly var holdPrefab = ref MainSystem.GameStage.Args.HoldSpritePrefab;
+
+                var holdLengthTime = _note.Data.Duration;
+                var holdLengthY = MainSystem.Args.TimeToHoldScaleY(holdLengthTime);
+                _holdBodySpriteRenderer.transform.localScale = _holdBodySpriteRenderer.transform.localScale with { y = holdLengthY };
+
+                return;
+            }
+
+            void OnHolding()
+            {
+                Debug.Assert(_note.Data.IsHold);
+
+                gameObject.transform.localPosition = gameObject.transform.localPosition with { y = 0f, z = 0f };
+
+                ref readonly var prefabs = ref MainSystem.GameStage.Args.HoldSpritePrefab;
+
+                var holdLengthTime = _note.Data.EndTime - MainSystem.GameStage.CurrentMusicTime;
+                var holdLengthY = MainSystem.Args.TimeToHoldScaleY(holdLengthTime);
+                _holdBodySpriteRenderer.transform.localScale = _holdBodySpriteRenderer.transform.localScale with { y = holdLengthY };
             }
 
             void OnHitEffect()
             {
-                Debug.Assert(timeDelta <= 0);
+                Debug.Assert(currentTime >= Model.Data.EndTime);
 
                 ref readonly var prefabs = ref Stage.Args.HitEffectSpritePrefabs;
 
                 // Initialize effect
                 gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, 0f, 0f);
+                _holdBodySpriteRenderer.transform.localScale = _holdBodySpriteRenderer.transform.localScale with { y = 0 };
+
                 float noteSize = _note.Data.Size;
                 _explosionHitEffectSpriteRenderer.transform.localScale =
                     noteSize * prefabs.ExplosionScale * Vector3.one;
 
-                // Copied from Chlorie's
-                var time = -timeDelta;
+                var time = currentTime - Model.Data.EndTime;
                 if (time > prefabs.HitEffectTime) {
                     return;
                 }
@@ -214,11 +264,10 @@ namespace Deenote.GameStage.Elements
                         ? time / prefabs.WaveGrowTime
                         : 1 - (time - prefabs.WaveGrowTime) / prefabs.WaveFadeTime;
                     float alpha = Mathf.Pow(ratio, 0.5f);
-                    _waveHitEffectSpriteRenderer.transform.localScale = _note.Data.Size *
-                                                                        new Vector3(prefabs.WaveScale.x,
-                                                                            ratio * prefabs.WaveScale.y, 1f);
-                    _waveHitEffectSpriteRenderer.color =
-                        _waveColor.WithAlpha(Mathf.Lerp(0, prefabs.WaveMaxAlpha, alpha));
+                    _waveHitEffectSpriteRenderer.transform.localScale
+                        = _note.Data.Size * new Vector3(prefabs.WaveScale.x, ratio * prefabs.WaveScale.y, 1f);
+                    _waveHitEffectSpriteRenderer.color
+                        = _waveColor.WithAlpha(Mathf.Lerp(0, prefabs.WaveMaxAlpha, alpha));
                 }
 
                 // Glow
@@ -255,6 +304,7 @@ namespace Deenote.GameStage.Elements
         {
             Activated,
             Fall,
+            Holding,
             HitEffect,
             Inactive,
         }

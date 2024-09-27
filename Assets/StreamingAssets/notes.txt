@@ -44,8 +44,9 @@
 -14|  normal grid
    -20
    |-effect
--21|  circle
--22|  glow
+-21|  hold body
+-22|  circle
+-23|  glow
    -30
    |-background
    |  stave

@@ -3,12 +3,17 @@ using Deenote.Edit;
 using Deenote.GameStage.Elements;
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;
+using Deenote.Project.Models.Datas;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
 using Reflex.Attributes;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace Deenote.GameStage
@@ -31,26 +36,7 @@ namespace Deenote.GameStage
         [SerializeField] Transform _noteParentTransform;
         [SerializeField] StageNoteController _notePrefab;
 
-        private PooledObjectListView<StageNoteController> _stageNotes;
-
-        /// <summary>
-        /// Index of the note that will next touch the 
-        /// judgeline when player is playing forward.
-        /// </summary>
-        [Header("ReadOnly")]
-        [SerializeField] private int _nextHitNoteIndex;
-        /// <summary>
-        /// Index of the note that will next appear when
-        /// player is playing forward.
-        /// </summary>
-        [SerializeField] private int _nextAppearNoteIndex;
-        /// <summary>
-        /// Index of the note that will disappear next when
-        /// player is playing forward
-        /// </summary>
-        [SerializeField] private int _nextDisappearNoteIndex;
-
-        public int HittedNoteCount => Mathf.Max(0, _nextHitNoteIndex - 1);
+        [SerializeField] private StageNoteManager _stageNoteManager;
 
         [Header("Settings")]
         private ChartModel _chart;
@@ -100,7 +86,8 @@ namespace Deenote.GameStage
 
         private void OnMusicTimeChanged(float oldTime, float newTime, bool isManuallyChanged)
         {
-            UpdateStageNotesRelatively(forward: newTime > oldTime);
+            SearchForNotesOnStage(oldTime, newTime);
+            //UpdateStageNotesRelatively(forward: newTime > oldTime);
             if (isManuallyChanged) ForceUpdateNotesDisplay();
         }
 
@@ -122,14 +109,12 @@ namespace Deenote.GameStage
 
             _chart = chart;
 
-            _nextAppearNoteIndex = 0;
-            _nextDisappearNoteIndex = 0;
-            _nextHitNoteIndex = 0;
-
+            _stageNoteManager.ResetIndices();
             CheckCollision();
 
             _musicController.Time = 0f;
-            UpdateStageNotes();
+            SearchForNotesFromStart();
+            //UpdateStageNotes();
             ForceUpdateNotesDisplay();
 
             _propertiesWindow.NotifyChartChanged(project, chartIndex);
@@ -138,9 +123,13 @@ namespace Deenote.GameStage
             void CheckCollision()
             {
                 for (int i = 0; i < _chart.Notes.Count; i++) {
-                    var note = _chart.Notes[i];
+                    if (_chart.Notes[i] is not NoteModel note)
+                        continue;
+
                     for (int j = i + 1; j < _chart.Notes.Count; j++) {
-                        var noteCmp = _chart.Notes[j];
+                        if (_chart.Notes[j] is not NoteModel noteCmp)
+                            continue;
+
                         if (!MainSystem.Args.IsTimeCollided(note.Data, noteCmp.Data))
                             break;
 
@@ -157,7 +146,10 @@ namespace Deenote.GameStage
 
         private void ForceUpdateNotesDisplay()
         {
-            foreach (var note in _stageNotes) {
+            foreach (var note in _stageNoteManager.OnStageNotes) {
+                note.ForceUpdate(false);
+            }
+            foreach (var note in _stageNoteManager.TrackingNotes) {
                 note.ForceUpdate(false);
             }
         }
@@ -165,23 +157,29 @@ namespace Deenote.GameStage
         public void ForceUpdateStageNotes(bool notesOrderChanged, bool noteDataChangedExceptTime)
         {
             if (notesOrderChanged)
-                UpdateStageNotes();
-            foreach (var note in _stageNotes) {
+                SearchForNotesFromStart();
+            //UpdateStageNotes();
+            foreach (var note in _stageNoteManager.OnStageNotes) {
+                note.ForceUpdate(noteDataChangedExceptTime);
+            }
+            foreach (var note in _stageNoteManager.OnStageNotes) {
                 note.ForceUpdate(noteDataChangedExceptTime);
             }
         }
 
         /// <remarks>
-        /// This is optimized version of <see cref="UpdateStageNotes"/>,
+        /// This is optimized version of <see cref="SearchForNotesFromStart"/>,
         /// If we know the time of previous update, we can iterate from
         /// cached indices
         /// </remarks>
         /// <param name="forward">
         /// <see langword="true"/> if current time is greater than time on previous update
         /// </param>
-        private void UpdateStageNotesRelatively(bool forward)
+        private void SearchForNotesOnStage(float oldTime, float newTime)
         {
-            if (forward) OnPlayForward();
+            Debug.Assert(newTime == CurrentMusicTime);
+
+            if (newTime > oldTime) OnPlayForward();
             else OnPlayBackward();
 
             OnStageNoteUpdated();
@@ -189,109 +187,206 @@ namespace Deenote.GameStage
 
             void OnPlayForward()
             {
-                NoteTimeComparer.AssertInOrder(_stageNotes.Select(n => n.Model), "In forward");
+                _stageNoteManager.AssertOnStageNotesInOrder("In forward");
+
                 // Notes in _onStageNotes are sorted by time
                 // so inactive notes always appears at leading of list
-                var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
-                var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
-                // Update _nextDisappear
+                var appearNoteTime = newTime + StageNoteAheadTime;
+                var disappearNoteTime = newTime - Args.HitEffectSpritePrefabs.HitEffectTime;
+                var old_disappearNoteTime = oldTime - Args.HitEffectSpritePrefabs.HitEffectTime;
+
+                // Update NextDisappear
                 // Remove inactive notes
-                int removeCount;
-                for (removeCount = 0; removeCount < _stageNotes.Count; removeCount++) {
-                    var note = _stageNotes[removeCount];
-                    if (note.Model.Data.Time > disappearNoteTime)
-                        break;
+
+                int newNextDisappearNoteIndex = _stageNoteManager.NextDisappearNoteIndex;
+                IterateNotesUntil(ref newNextDisappearNoteIndex, disappearNoteTime);
+
+                // Remove all notes on stage
+                if (newNextDisappearNoteIndex >= _stageNoteManager.NextAppearNoteIndex) {
+                    _stageNoteManager.RemoveOnStageNotes(Range.All);
+                    _stageNoteManager.RemoveAllTrackingNotes(n => n.Model.Data.EndTime <= disappearNoteTime);
                 }
-                _stageNotes.RemoveRange(..removeCount);
-                _nextDisappearNoteIndex += removeCount;
-                // All notes on stage are removed, we need to continue iterating
-                // to find the first note that should display
-                if (_stageNotes.Count == 0) {
-                    for (; _nextDisappearNoteIndex < _chart.Notes.Count; _nextDisappearNoteIndex++) {
-                        var note = _chart.Notes[_nextDisappearNoteIndex];
-                        if (note.Data.Time > disappearNoteTime) {
-                            break;
+                // Remove notes in [old DisappearIndex..new DisappearIndex]
+                else {
+                    int iController = 0;
+                    for (int i = _stageNoteManager.NextDisappearNoteIndex; i < newNextDisappearNoteIndex; i++) {
+                        IStageNoteModel note = _chart.Notes[i];
+                        if (note is NoteTailModel noteTail) {
+                            // For note tail
+                            NoteModel noteHead = noteTail.HeadModel;
+                            //   - Note head is in _trackingNotes, remove it
+                            if (noteHead.Data.Time <= old_disappearNoteTime) {
+                                _stageNoteManager.RemoveTrackingNote(noteHead);
+                            }
+                            //   - Note head is removed in this loop, do nothing.
+                            else { }
+                        }
+                        else {
+                            Debug.Assert(note is NoteModel);
+                            // For note model
+                            NoteModel noteModel = (NoteModel)note;
+                            //   - Hold note. Check if tail is still on stage, if true move controller to _keepingNotes;
+                            if (noteModel.Data.EndTime > disappearNoteTime) {
+                                _stageNoteManager.MoveNoteToTracking_NonRemove(iController);
+                            }
+                            //   - Hold note, if tail will be removed, remove this controller,
+                            //   - Note is not hold, just remove this controller.
+                            else { /* Remove outside the for loop */}
+                            iController++;
                         }
                     }
+                    _stageNoteManager.RemoveOnStageNotesWithTrackingCheck(..iController);
                 }
+                _stageNoteManager.NextDisappearNoteIndex = newNextDisappearNoteIndex;
 
-                // Update _nextHit, Add active note that playing hit effect
-                if (_nextDisappearNoteIndex > _nextHitNoteIndex)
-                    _nextHitNoteIndex = _nextDisappearNoteIndex;
-                for (; _nextHitNoteIndex < _chart.Notes.Count; _nextHitNoteIndex++) {
-                    var note = _chart.Notes[_nextHitNoteIndex];
-                    if (note.Data.Time > CurrentMusicTime) {
-                        break;
-                    }
+                // Update NextHit & Combo
+
+                int newNextHitNoteIndex = Math.Max(
+                    _stageNoteManager.NextDisappearNoteIndex,
+                    _stageNoteManager.NextHitNoteIndex);
+                IterateNotesUntil(ref newNextHitNoteIndex, CurrentMusicTime);
+                int newCombo = _stageNoteManager.CurrentCombo;
+                for (int i = _stageNoteManager.NextHitNoteIndex; i < newNextHitNoteIndex; i++) {
+                    var note = _chart.Notes[i];
+                    if (note.IsComboNote())
+                        _stageNoteManager.CurrentCombo++;
                 }
+                _stageNoteManager.NextHitNoteIndex = newNextHitNoteIndex;
 
-                // Update _nextAppear
+                // Update NextAppear
                 // Add active notes
-                // If new _nextDiappear is greater, we search start from _nextDisappear
-                if (_nextDisappearNoteIndex > _nextAppearNoteIndex) {
-                    _nextAppearNoteIndex = _nextDisappearNoteIndex;
-                }
-                for (; _nextAppearNoteIndex < _chart.Notes.Count; _nextAppearNoteIndex++) {
-                    var note = _chart.Notes[_nextAppearNoteIndex];
-                    if (note.Data.Time > appearNoteTime) {
-                        break;
+
+                int newNextAppearNoteIndex = Math.Max(
+                    _stageNoteManager.NextDisappearNoteIndex,
+                    _stageNoteManager.NextAppearNoteIndex);
+                int appendStartIndex = newNextAppearNoteIndex;
+                IterateNotesUntil(ref newNextAppearNoteIndex, appearNoteTime);
+
+                for (int i = appendStartIndex; i < newNextAppearNoteIndex; i++) {
+                    IStageNoteModel note = _chart.Notes[i];
+                    if (note is NoteTailModel noteTail) {
+                        // For note tail
+                        NoteModel noteHead = noteTail.HeadModel;
+                        // If newDisappear > oldAppear, then hold notes
+                        // in [old Appear.. new Disappear] may match this branch
+                        if (_stageNoteManager.NextDisappearNoteIndex > _stageNoteManager.NextAppearNoteIndex) {
+                            //   - Note head < disappearTime, should in _trackingNotes 
+                            if (noteHead.Data.Time <= disappearNoteTime) {
+                                _stageNoteManager.AddTrackingNote(noteHead);
+                            }
+                            // If note head is on the new stage, do nothing.
+                            // The head should have been added to _onStageNotes;
+                            else { }
+                        }
+                        // Else, all found hold tail's head model is in _trackingNotes or _onStageNotes
+                        else { }
                     }
-                    _stageNotes.Add(out var noteController);
-                    noteController.Initialize(note);
+                    else {
+                        Debug.Assert(note is NoteModel);
+                        // For note model
+                        NoteModel noteModel = (NoteModel)note;
+                        _stageNoteManager.AddOnStageNote(noteModel);
+                    }
+                }
+                _stageNoteManager.NextAppearNoteIndex = newNextAppearNoteIndex;
+
+                void IterateNotesUntil(ref int index, float compareTime)
+                {
+                    for (; index < _chart.Notes.Count; index++) {
+                        var note = _chart.Notes[index];
+                        if (note.Time > compareTime)
+                            break;
+                    }
                 }
             }
 
             void OnPlayBackward()
             {
-                NoteTimeComparer.AssertInOrder(_stageNotes.Select(n => n.Model), "In backward");
+                _stageNoteManager.AssertOnStageNotesInOrder("In backward");
+
                 var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
                 var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
-                // Remove trailing inactive notes
-                int removeStart;
-                for (removeStart = _stageNotes.Count - 1; removeStart >= 0; removeStart--) {
-                    var note = _stageNotes[removeStart];
-                    if (note.Model.Data.Time <= appearNoteTime)
-                        break;
+
+                // Update NextAppear
+
+                int newNextAppearNoteIndex = _stageNoteManager.NextAppearNoteIndex;
+                IterateNotesUntil(ref newNextAppearNoteIndex, appearNoteTime);
+
+                // Remove all notes on stage
+                if (newNextAppearNoteIndex <= _stageNoteManager.NextDisappearNoteIndex) {
+                    _stageNoteManager.RemoveOnStageNotes(Range.All);
+                    _stageNoteManager.RemoveAllTrackingNotes(n => n.Model.Data.Time >= appearNoteTime);
                 }
-                removeStart++;
-                var removeCount = _stageNotes.Count - removeStart;
-                _stageNotes.RemoveRange(removeStart..);
-                _nextAppearNoteIndex -= removeCount;
-                // All notes on stage removed, continue iterating for display
-                if (_stageNotes.Count == 0) {
-                    var prevAppearNoteIndex = _nextAppearNoteIndex - 1;
-                    for (; prevAppearNoteIndex >= 0; prevAppearNoteIndex--) {
-                        var note = _chart.Notes[prevAppearNoteIndex];
-                        if (note.Data.Time <= appearNoteTime)
+                // Remove notes in [new AppearIndex..old AppearIndex]
+                else {
+                    int iController = _stageNoteManager.OnStageNotes.Length - 1;
+                    for (int i = _stageNoteManager.NextAppearNoteIndex - 1; i >= newNextAppearNoteIndex; i--) {
+                        IStageNoteModel note = _chart.Notes[i];
+                        if (note is NoteModel) {
+                            iController--;
+                        }
+                    }
+                    _stageNoteManager.RemoveOnStageNotes((iController + 1)..);
+                }
+                _stageNoteManager.NextAppearNoteIndex = newNextAppearNoteIndex;
+
+                // Update NextHit & Combo
+
+                int newNextHitNoteIndex = Math.Min(
+                    _stageNoteManager.NextAppearNoteIndex,
+                    _stageNoteManager.NextHitNoteIndex);
+                IterateNotesUntil(ref newNextHitNoteIndex, CurrentMusicTime);
+                int newCombo = _stageNoteManager.CurrentCombo;
+                for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= newNextHitNoteIndex; i--) {
+                    var note = _chart.Notes[i];
+                    if (note.IsComboNote())
+                        _stageNoteManager.CurrentCombo--;
+                }
+                _stageNoteManager.NextHitNoteIndex = newNextHitNoteIndex;
+
+                // Update NextDisappear
+
+                int newNextDisappearNoteIndex = Math.Min(
+                    _stageNoteManager.NextAppearNoteIndex,
+                    _stageNoteManager.NextDisappearNoteIndex);
+                int prependStartIndex = newNextDisappearNoteIndex;
+                IterateNotesUntil(ref newNextDisappearNoteIndex, disappearNoteTime);
+
+                using var _n = ListPool<NoteModel>.Get(out var buffer);
+                for (int i = prependStartIndex - 1; i >= newNextDisappearNoteIndex; i--) {
+                    IStageNoteModel note = _chart.Notes[i];
+                    if (note is NoteTailModel noteTail) {
+                        // For note tail
+                        NoteModel noteHead = noteTail.HeadModel;
+                        // - Note head is < disappearTime, add into _trackingNotes
+                        if (noteHead.Data.Time <= disappearNoteTime) {
+                            _stageNoteManager.AddTrackingNote(noteHead);
+                        }
+                        // - Note head is on new stage, do nothing,
+                        //   The head should will be added to _onStageNotes
+                        else { }
+                    }
+                    else {
+                        // For Note Head
+                        Debug.Assert(note is NoteModel);
+                        NoteModel noteModel = (NoteModel)note;
+                        buffer.Add(noteModel);
+                    }
+                }
+                _stageNoteManager.PrependOnStageNotes(buffer.AsSpan());
+                _stageNoteManager.NextDisappearNoteIndex = newNextDisappearNoteIndex;
+
+                void IterateNotesUntil(ref int index, float compareTime)
+                {
+                    index--;
+                    for (; index >= 0; index--) {
+                        var note = _chart.Notes[index];
+                        if (note.Time <= compareTime) {
                             break;
+                        }
                     }
-                    _nextAppearNoteIndex = prevAppearNoteIndex + 1;
+                    index++;
                 }
-
-                // Update _nextHit
-                if (_nextAppearNoteIndex < _nextHitNoteIndex)
-                    _nextHitNoteIndex = _nextAppearNoteIndex;
-                var prevHitNoteIndex = _nextHitNoteIndex - 1;
-                for (; prevHitNoteIndex >= 0; prevHitNoteIndex--) {
-                    var note = _chart.Notes[prevHitNoteIndex];
-                    if (note.Data.Time <= CurrentMusicTime) {
-                        break;
-                    }
-                }
-                _nextHitNoteIndex = prevHitNoteIndex + 1;
-
-                if (_nextAppearNoteIndex < _nextDisappearNoteIndex)
-                    _nextDisappearNoteIndex = _nextAppearNoteIndex;
-                var prevDisappearNoteIndex = _nextDisappearNoteIndex - 1;
-                for (; prevDisappearNoteIndex >= 0; prevDisappearNoteIndex--) {
-                    var note = _chart.Notes[prevDisappearNoteIndex];
-                    if (note.Data.Time <= disappearNoteTime) {
-                        break;
-                    }
-                    _stageNotes.Insert(0, out var noteController);
-                    noteController.Initialize(note);
-                }
-                _nextDisappearNoteIndex = prevDisappearNoteIndex + 1;
             }
         }
 
@@ -299,43 +394,64 @@ namespace Deenote.GameStage
         /// Find notes that should display on stage, this method won't update note display,
         /// if music is not playing, you should manually call <see cref="ForceUpdateNotesDisplay"/>
         /// </summary>
-        private void UpdateStageNotes()
+        private void SearchForNotesFromStart()
         {
-            using (var stageNotes = _stageNotes.Resetting()) {
-                var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
-                var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
-                int i = 0;
-                for (; i < _chart.Notes.Count; i++) {
-                    var note = _chart.Notes[i];
-                    if (note.Data.Time > disappearNoteTime) {
-                        break;
-                    }
-                }
-                _nextDisappearNoteIndex = i;
+            _stageNoteManager.ClearAll();
 
-                for (; i < _chart.Notes.Count; i++) {
-                    var note = _chart.Notes[i];
-                    if (note.Data.Time > CurrentMusicTime) {
-                        break;
-                    }
-                    stageNotes.Add(out var noteController);
-                    noteController.Initialize(note);
-                }
-                _nextHitNoteIndex = i;
+            var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
+            var disappearNoteTime = CurrentMusicTime - Args.HitEffectSpritePrefabs.HitEffectTime;
+            int index = 0;
+            int combo = 0;
 
-                for (; i < _chart.Notes.Count; i++) {
-                    var note = _chart.Notes[i];
-                    if (note.Data.Time > appearNoteTime) {
-                        break;
-                    }
-                    stageNotes.Add(out var noteController);
-                    noteController.Initialize(note);
-                }
-                _nextAppearNoteIndex = i;
-
+            for (; index < _chart.Notes.Count; index++) {
+                var note = _chart.Notes[index];
+                if (note.Time > disappearNoteTime)
+                    break;
+                AdjustCombo(note);
             }
+            _stageNoteManager.NextDisappearNoteIndex = index;
+
+            for (; index < _chart.Notes.Count; index++) {
+                var note = _chart.Notes[index];
+                if (note.Time > CurrentMusicTime)
+                    break;
+                AdjustCombo(note);
+                AdjustDisplay(note);
+            }
+            _stageNoteManager.NextHitNoteIndex = index;
+            _stageNoteManager.CurrentCombo = combo;
+
+            for (; index < _chart.Notes.Count; ++index) {
+                var note = _chart.Notes[index];
+                if (note.Time > appearNoteTime)
+                    break;
+                AdjustDisplay(note);
+            }
+            _stageNoteManager.NextAppearNoteIndex = index;
 
             OnStageNoteUpdated();
+
+            void AdjustCombo(IStageNoteModel note)
+            {
+                if (note.IsComboNote())
+                    combo++;
+            }
+
+            void AdjustDisplay(IStageNoteModel note)
+            {
+                if (note is NoteTailModel noteTail) {
+                    NoteModel noteHead = noteTail.HeadModel;
+                    if (noteHead.Data.Time <= disappearNoteTime)
+                        _stageNoteManager.AddTrackingNote(noteHead);
+                    // Handled in another branch
+                    else { }
+                }
+                else {
+                    Debug.Assert(note is NoteModel);
+                    NoteModel noteModel = (NoteModel)note;
+                    _stageNoteManager.AddOnStageNote(noteModel);
+                }
+            }
         }
 
         #endregion
@@ -381,12 +497,12 @@ namespace Deenote.GameStage
 
         private void UpdateJudgeLineHitEffect()
         {
-            var noteIndex = _nextHitNoteIndex - 1;
-            if (noteIndex < 0) {
+            var previousHitNote = GetPreviousHitNote();
+            if (previousHitNote is null) {
                 _judgeLineHitEffectSpriteRenderer.color = Color.clear;
                 return;
             }
-            var hitTime = _chart.Notes[_nextHitNoteIndex - 1].Data.Time;
+            var hitTime = previousHitNote.Data.Time;
             var deltaTime = CurrentMusicTime - hitTime;
             Debug.Assert(deltaTime >= 0);
 
@@ -399,6 +515,16 @@ namespace Deenote.GameStage
                 alpha = 0f;
             }
             _judgeLineHitEffectSpriteRenderer.color = Color.white.WithAlpha(alpha);
+
+            NoteModel? GetPreviousHitNote()
+            {
+                for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= 0; i--) {
+                    if (_chart.Notes[i] is NoteModel noteModel) {
+                        return noteModel;
+                    }
+                }
+                return null;
+            }
         }
 
         #endregion
@@ -407,14 +533,25 @@ namespace Deenote.GameStage
         {
             UpdateJudgeLineHitEffect();
             GridController.Instance.NotifyGameStageProgressChanged();
-            _perspectiveViewWindow.NotifyGameStageProgressChanged(_nextHitNoteIndex);
+            _perspectiveViewWindow.NotifyGameStageProgressChanged(GetPrevComboNoteIndex(), _stageNoteManager.CurrentCombo);
+
+            int GetPrevComboNoteIndex()
+            {
+                for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= 0; i--) {
+                    if (_chart.Notes[i].IsComboNote())
+                        return i;
+                }
+                return -1;
+            }
         }
 
         protected override void Awake()
         {
             base.Awake();
-            _stageNotes = new PooledObjectListView<StageNoteController>(
+            _stageNoteManager = new StageNoteManager(
                 UnityUtils.CreateObjectPool(_notePrefab, _noteParentTransform));
+            //_stageNotes = new PooledObjectListView<StageNoteController>(
+            //    UnityUtils.CreateObjectPool(_notePrefab, _noteParentTransform));
             _musicController.OnTimeChanged += OnMusicTimeChanged;
         }
 

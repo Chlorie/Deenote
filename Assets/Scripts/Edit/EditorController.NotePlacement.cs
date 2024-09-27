@@ -1,6 +1,6 @@
 using Deenote.Edit.Elements;
-using Deenote.Edit.Operations;
 using Deenote.Project.Comparers;
+using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
@@ -97,17 +97,17 @@ namespace Deenote.Edit
                 else {
                     coord = Stage.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
                 }
-                _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(coord, _clipBoardNotes)
+                _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(coord, _clipBoardNotes.AsSpan())
                     .WithRedoneAction(notes =>
                     {
                         OnNoteSelectionChanging();
-                        _noteSelectionController.SelectNotes(notes);
+                        _noteSelectionController.SelectNotes(notes.OfType<IStageNoteModel, NoteModel>());
                         OnNotesChanged(true, true);
                     })
                     .WithUndoneAction(notes =>
                     {
                         OnNoteSelectionChanging();
-                        _noteSelectionController.DeselectNotes(notes);
+                        _noteSelectionController.DeselectNotes(notes.OfType<IStageNoteModel, NoteModel>());
                         OnNotesChanged(true, true);
                     }));
                 _isPasting = false;
@@ -130,7 +130,7 @@ namespace Deenote.Edit
 
         public void RemoveSelectedNotes()
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             // __selectedNotes.Sort(NoteTimeComparer.Instance);
@@ -145,7 +145,7 @@ namespace Deenote.Edit
                 .WithUndoneAction((removedNotes) =>
                 {
                     OnNoteSelectionChanging();
-                    _noteSelectionController.AddNote(removedNotes);
+                    _noteSelectionController.AddNote(removedNotes.OfType<IStageNoteModel, NoteModel>());
                     _propertiesWindow.NotifyNoteIsLinkChanged(
                         SelectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide) ? slide : null);
                     OnNotesChanged(true, true, noteDataChangedExceptTime: true);
@@ -168,17 +168,18 @@ namespace Deenote.Edit
                 var coord = Stage.Grids.Quantize(new(time, 0f), true, false);
                 list.Add(new NoteData { PositionCoord = coord, });
             }
-            _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(new NoteCoord(startTime, 0f), list)
+            _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(new NoteCoord(startTime, 0f), list.AsSpan())
                 .WithRedoneAction(notes =>
                 {
                     OnNoteSelectionChanging();
-                    _noteSelectionController.SelectNotes(notes);
+                    // TODO: 如果确定SelectedNotes是IStageNoteModel的话，改一下
+                    _noteSelectionController.SelectNotes(notes.OfType<IStageNoteModel, NoteModel>());
                     OnNotesChanged(true, true);
                 })
                 .WithUndoneAction(notes =>
                 {
                     OnNoteSelectionChanging();
-                    _noteSelectionController.DeselectNotes(notes);
+                    _noteSelectionController.DeselectNotes(notes.OfType<IStageNoteModel, NoteModel>());
                     OnNotesChanged(true, true);
                 }));
 
@@ -252,7 +253,7 @@ namespace Deenote.Edit
             _isPasting = false;
 
             _clipBoardNotes.Clear();
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             // __selectedNotes.Sort(NoteTimeComparer.Instance);

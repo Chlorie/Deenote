@@ -27,6 +27,7 @@ namespace Deenote.Settings
         public NoteSpritePrefab BlackNoteSpritePrefab;
         public NoteSpritePrefab NoSoundNoteSpritePrefab;
         public NoteSpritePrefab SlideNoteSpritePrefab;
+        public HoldNoteBodySpritePrefab HoldSpritePrefab;
         public NoteHitEffectSpritePrefabs HitEffectSpritePrefabs;
 
         [Serializable]
@@ -35,6 +36,14 @@ namespace Deenote.Settings
             public float Scale;
             public Sprite Sprite;
             public Color WaveColor;
+        }
+
+        [Serializable]
+        public struct HoldNoteBodySpritePrefab
+        {
+            public float ScaleX;
+            public float NotePanelZToYMultiplier;
+            public Sprite Sprite;
         }
 
         [Serializable]

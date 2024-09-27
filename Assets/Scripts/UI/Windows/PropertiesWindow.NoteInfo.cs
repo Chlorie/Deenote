@@ -3,6 +3,7 @@ using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -131,11 +132,11 @@ namespace Deenote.UI.Windows
 
         #region Notify
 
-        public void NotifyNoteSelectionChanged(ListReadOnlyView<NoteModel> selectedNotes)
+        public void NotifyNoteSelectionChanged(ReadOnlySpan<NoteModel> selectedNotes)
         {
-            _selectedNotesText.text = selectedNotes.Count.ToString();
+            _selectedNotesText.text = selectedNotes.Length.ToString();
 
-            switch (selectedNotes.Count) {
+            switch (selectedNotes.Length) {
                 case 0: {
                     NotifyNoteTimeChanged(null);
                     NotifyNotePositionChanged(null);

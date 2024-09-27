@@ -153,6 +153,9 @@ namespace Deenote
             public static (float X, float Z) NoteCoordToWorldPosition(NoteCoord coord, float currentTime = 0f)
                 => (PositionToX(coord.Position), OffsetTimeToZ(coord.Time - currentTime));
 
+            public static float TimeToHoldScaleY(float time)
+                => time * GameStage.Args.HoldSpritePrefab.NotePanelZToYMultiplier * GameStage.NoteSpeed;
+
             #endregion
 
             public const float MaxBpm = 1200f;

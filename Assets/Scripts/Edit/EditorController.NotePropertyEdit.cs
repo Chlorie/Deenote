@@ -3,7 +3,6 @@ using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using System;
-using System.Diagnostics;
 using UnityEngine.Pool;
 
 namespace Deenote.Edit
@@ -11,18 +10,17 @@ namespace Deenote.Edit
     partial class EditorController
     {
         private static readonly PianoSoundValueData[] _defaultNoteSounds =
-            new PianoSoundValueData[] { new PianoSoundValueData(0f, 0f, 72, 0) };
+            new[] { new PianoSoundValueData(0f, 0f, 72, 0) };
 
         #region Simple Properties
 
         public void EditSelectedNotesPositionCoord(Func<NoteCoord, NoteCoord> valueSelector)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
-                .EditNotes(SelectedNotes, valueSelector, n => n.PositionCoord, (n, v) => n.PositionCoord = v)
-                .WithOptions(sortNotes: true, updateCollision: true)
+                .EditNotesCoord(SelectedNotes, valueSelector, editingTime: true)
                 .WithDoneAction(() =>
                 {
                     NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
@@ -37,13 +35,11 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesTime(Func<float, float> valueSelector)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
-                .EditNotes(SelectedNotes, valueSelector, n => n.Time,
-                    (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
-                .WithOptions(sortNotes: true, updateCollision: true)
+                .EditNotesCoord(SelectedNotes, nc => nc with { Time = valueSelector(nc.Time) }, true)
                 .WithDoneAction(() =>
                 {
                     NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
@@ -56,12 +52,11 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesTime(float newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
-                .EditNotes(SelectedNotes, newValue, n => n.Time, (n, v) => n.Time = MainSystem.Args.ClampNoteTime(v))
-                .WithOptions(sortNotes: true, updateCollision: true)
+                .EditNotesCoord(SelectedNotes, nc => nc with { Time = newValue }, true)
                 .WithDoneAction(() =>
                 {
                     NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
@@ -74,13 +69,11 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesPosition(Func<float, float> valueSelector)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
-                .EditNotes(SelectedNotes, valueSelector, n => n.Position,
-                    (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
-                .WithOptions(updateCollision: true)
+                .EditNotesCoord(SelectedNotes, nc => nc with { Position = valueSelector(nc.Position) }, false)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePositionChanged(
@@ -91,13 +84,11 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesPosition(float newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
-                .EditNotes(SelectedNotes, newValue, n => n.Position,
-                    (n, v) => n.Position = MainSystem.Args.ClampNotePosition(v))
-                .WithOptions(updateCollision: true)
+                .EditNotesCoord(SelectedNotes, nc => nc with { Position = newValue }, false)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePositionChanged(
@@ -108,7 +99,7 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesSize(Func<float, float> valueSelector)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
@@ -125,7 +116,7 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesSize(float newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
@@ -141,7 +132,7 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesShift(float newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
@@ -156,7 +147,7 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesSpeed(float newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
@@ -171,11 +162,11 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesDuration(float newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
-                .EditNotes(SelectedNotes, newValue, n => n.Duration, (n, v) => n.Duration = v)
+                .EditNotesDuration(SelectedNotes, newValue)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNoteDurationChanged(
@@ -186,7 +177,7 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesVibrate(bool newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
@@ -201,7 +192,7 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesIsSwipe(bool newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
@@ -216,7 +207,7 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesWarningType(WarningType newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
@@ -231,7 +222,7 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesEventId(string newValue)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes
@@ -246,9 +237,9 @@ namespace Deenote.Edit
 
         #endregion
 
-        public void EditSelectedNoteSounds(PianoSoundValueData[] values)
+        public void EditSelectedNoteSounds(ReadOnlySpan<PianoSoundValueData> values)
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.EditNotesSounds(SelectedNotes, values)
@@ -264,7 +255,7 @@ namespace Deenote.Edit
 
         public void LinkSelectedNotes()
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.LinkNotes(SelectedNotes)
@@ -283,7 +274,7 @@ namespace Deenote.Edit
 
         public void UnlinkSelectedNotes()
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.UnlinkNotes(SelectedNotes)
@@ -302,7 +293,7 @@ namespace Deenote.Edit
 
         public void SoundifySelectedNotes()
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
             using var _en = ListPool<NoteModel>.Get(out var editNotes);
 
@@ -311,7 +302,7 @@ namespace Deenote.Edit
                     editNotes.Add(n);
             }
 
-            _operationHistory.Do(Stage.Chart.Notes.EditNotesSounds(editNotes, _defaultNoteSounds)
+            _operationHistory.Do(Stage.Chart.Notes.EditNotesSounds(editNotes.AsSpan(), _defaultNoteSounds)
                 .WithDoneAction(() =>
                 {
                     _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds,
@@ -324,7 +315,7 @@ namespace Deenote.Edit
 
         public void DesoundifySelectedNotes()
         {
-            if (SelectedNotes.Count == 0)
+            if (SelectedNotes.IsEmpty)
                 return;
 
             _operationHistory.Do(Stage.Chart.Notes.EditNotesSounds(SelectedNotes, Array.Empty<PianoSoundValueData>())

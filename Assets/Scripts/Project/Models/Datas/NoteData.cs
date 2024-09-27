@@ -90,6 +90,7 @@ namespace Deenote.Project.Models.Datas
         [SerializeField]
         [JsonProperty("warningType", DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(WarningType.Default)]
+        [Obsolete("New chart format of DEEMO II removed this property...")]
         public WarningType WarningType = WarningType.Default;
 
         [SerializeField]
@@ -168,7 +169,7 @@ namespace Deenote.Project.Models.Datas
 
         public bool IsHold => !IsSwipe && Duration > 0f;
 
-        public float EndTime => Time + Duration;
+        public float EndTime => IsHold ? Time + Duration : Time;
 
         public bool IsVisible =>
             Position is >= -MainSystem.Args.StageMaxPosition and <= MainSystem.Args.StageMaxPosition;

@@ -19,7 +19,7 @@ namespace Deenote.Utilities.Robustness
 
         public static implicit operator ListReadOnlyView<T>(List<T> list) => new(list);
 
-        public List<T>.Enumerator GetEnumerator() => _list.GetEnumerator();
+        public List<T>.Enumerator GetEnumerator() => _list?.GetEnumerator() ?? default;
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

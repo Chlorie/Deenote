@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using UnityEditor;
 
 namespace Deenote.Utilities
 {
@@ -52,15 +53,27 @@ namespace Deenote.Utilities
             list.RemoveRange(offset, length);
         }
 
-        public static void MoveTo<T>(this List<T> list, int fromIndex, int toIndex)
+        public static void MoveTo<T>(this Span<T> span, int fromIndex, int toIndex)
         {
             if (fromIndex == toIndex)
                 return;
 
-            var val = list[fromIndex];
-            list.RemoveAt(fromIndex);
-            list.Insert(toIndex, val);
+            var val = span[fromIndex];
+
+            if (fromIndex > toIndex) {
+                var len = fromIndex - toIndex;
+                span.Slice(toIndex, len).CopyTo(span.Slice(toIndex + 1, len));
+            }
+            else {
+                var len = toIndex - fromIndex;
+                span.Slice(fromIndex + 1, len).CopyTo(span.Slice(fromIndex, len));
+            }
+
+            span[toIndex] = val;
         }
+
+        public static void MoveTo<T>(this List<T> list, int fromIndex, int toIndex)
+            => list.AsSpan().MoveTo(fromIndex, toIndex);
 
         public static T[] Array<T>(int length) => length == 0 ? System.Array.Empty<T>() : new T[length];
 
@@ -85,14 +98,14 @@ namespace Deenote.Utilities
             return false;
         }
 
-        public static bool IsSameForAll<T, TValue>(this ListReadOnlyView<T> list,
+        public static bool IsSameForAll<T, TValue>(this ReadOnlySpan<T> list,
             Func<T, TValue> valueGetter, out TValue? value, IEqualityComparer<TValue>? comparer = null)
         {
             switch (list) {
-                case { Count: 0 } or { IsNull: true }:
+                case { Length: 0 }:
                     value = default;
                     return true;
-                case { Count: 1 }:
+                case { Length: 1 }:
                     value = valueGetter(list[0]);
                     return true;
             }
@@ -100,8 +113,8 @@ namespace Deenote.Utilities
             value = valueGetter(list[0]);
             comparer ??= EqualityComparer<TValue>.Default;
 
-            for (int i = 0; i < list.Count; i++) {
-                if (comparer.Equals(value, valueGetter(list[i]))) continue;
+            foreach (T v in list) {
+                if (comparer.Equals(value, valueGetter(v))) continue;
                 value = default;
                 return false;
             }
@@ -120,6 +133,57 @@ namespace Deenote.Utilities
             var provider = Unsafe.As<StrongBox<T[]>>(list);
             var array = provider.Value;
             return array.AsSpan(0, list.Count);
+        }
+
+        public static ReadOnlySpan<T> AsReadOnlySpan<T>(this List<T> list)
+            => list.AsSpan();
+
+        public static Memory<T> AsMemory<T>(this List<T> list)
+        {
+            var provider = Unsafe.As<StrongBox<T[]>>(list);
+            var array = provider.Value;
+            return array.AsMemory(0, list.Count);
+        }
+
+        public static void InsertionSortAsc<T>(Span<T> values, IComparer<T>? comparer = null)
+        {
+            comparer ??= Comparer<T>.Default;
+
+            for (int i = 1; i < values.Length; i++) {
+                int j = i - 1;
+                for (; j >= 0; j--) {
+                    var left = values[j];
+                    var right = values[i];
+                    if (comparer.Compare(left, right) <= 0) {
+                        break;
+                    }
+                }
+                values.MoveTo(i, j + 1);
+            }
+        }
+
+        public static int FindLowerBoundIndex<T>(this ReadOnlySpan<T> values, T key, IComparer<T>? comparer = null)
+        {
+            comparer ??= Comparer<T>.Default;
+
+            for (int i = 0; i < values.Length; i++) {
+                if (comparer.Compare(key, values[i]) <= 0) {
+                    return i;
+                }
+            }
+            return values.Length;
+        }
+
+        public static int FindUpperBoundIndex<T>(this ReadOnlySpan<T> values,T key,IComparer<T>? comparer = null)
+        {
+            comparer ??= Comparer<T>.Default;
+
+            for(int i=0; i < values.Length; i++) {
+                if (comparer.Compare(key, values[i]) < 0) {
+                    return i;
+                }
+            }
+            return values.Length;
         }
     }
 }

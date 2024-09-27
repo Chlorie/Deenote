@@ -55,7 +55,8 @@ namespace Deenote.GameStage
                 if (__noteSpeed == value)
                     return;
                 __noteSpeed = value;
-                UpdateStageNotes();
+                SearchForNotesFromStart();
+                //UpdateStageNotes();
                 ForceUpdateNotesDisplay();
                 _editorPropertiesWindow.NotifyNoteSpeedChanged(__noteSpeed);
             }
@@ -149,7 +150,8 @@ namespace Deenote.GameStage
                 if (__suddenPlusRange == value)
                     return;
                 __suddenPlusRange = value;
-                UpdateStageNotes();
+                SearchForNotesFromStart();
+                //UpdateStageNotes();
                 ForceUpdateNotesDisplay();
                 Grids.UpdateVerticalGrids();
                 PerspectiveLinesRenderer.Instance.NotifyStageSuddenPlusChanged(__suddenPlusRange);

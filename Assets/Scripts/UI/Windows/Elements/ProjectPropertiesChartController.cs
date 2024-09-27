@@ -51,7 +51,7 @@ namespace Deenote.UI.Windows.Elements
             _nameInputField.text = __chartModel.Name;
             _difficultyDropDown.Dropdown.SetValueWithoutNotify(__chartModel.Difficulty.ToInt32());
             _levelInputField.text = __chartModel.Level;
-            _notesCountText.text = $"{__chartModel.Notes.Count} Note{(__chartModel.Notes.Count == 1 ? null : "s")}";
+            _notesCountText.text = $"{__chartModel.Notes.NoteCount} Note{(__chartModel.Notes.NoteCount == 1 ? null : "s")}";
 
             _importButton.interactable = true;
             _importText.SetLocalizedText("Window_ProjectProperties_ChartImport");
@@ -104,7 +104,7 @@ namespace Deenote.UI.Windows.Elements
             }
 
             ChartModel.InitializationHelper.SetData(Chart, chartData);
-            _notesCountText.text = $"{__chartModel.Notes.Count} Note{(__chartModel.Notes.Count == 1 ? null : "s")}";
+            _notesCountText.text = $"{__chartModel.Notes.NoteCount} Note{(__chartModel.Notes.NoteCount == 1 ? null : "s")}";
             _importText.SetLocalizedText("Window_ProjectProperties_ChartImported");
             _importButton.interactable = true;
         }

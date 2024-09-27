@@ -7,6 +7,7 @@ using Deenote.Project.Models.Datas;
 using Deenote.UI.Windows.Elements;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -65,7 +66,7 @@ namespace Deenote.UI.Windows
 
         public void AddSound(in PianoSoundValueData pianoSound)
         {
-            if (MainSystem.Editor.SelectedNotes.Count == 0)
+            if (MainSystem.Editor.SelectedNotes.IsEmpty)
                 return;
 
             _soundItems.Add(out var soundItem);
@@ -124,7 +125,9 @@ namespace Deenote.UI.Windows
             if (!IsDirty)
                 return;
 
-            var sounds = Utils.Array<PianoSoundValueData>(_soundItems.Count);
+            var sounds = _soundItems.Count > 512
+                ? new PianoSoundValueData[_soundItems.Count]
+                : (stackalloc PianoSoundValueData[_soundItems.Count]);
             for (int i = 0; i < sounds.Length; i++) {
                 sounds[i] = _soundItems[i].PianoSound.GetValues();
             }
@@ -147,12 +150,12 @@ namespace Deenote.UI.Windows
 
         #region Notify
 
-        public void NotifySelectedNotesChanging(ListReadOnlyView<NoteModel> selectedNotes)
+        public void NotifySelectedNotesChanging(ReadOnlySpan<NoteModel> selectedNotes)
         {
             SaveDataToNotes();
         }
 
-        public void NotifySelectedNotesChanged(ListReadOnlyView<NoteModel> selectedNotes)
+        public void NotifySelectedNotesChanged(ReadOnlySpan<NoteModel> selectedNotes)
         {
             if (!Window.IsActivated)
                 return;
