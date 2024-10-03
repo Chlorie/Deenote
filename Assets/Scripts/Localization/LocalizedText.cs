@@ -53,7 +53,7 @@ namespace Deenote.Localization
 
         public void SetText(LocalizableText text, ReadOnlySpan<string> args = default)
         {
-            if (LocalizableText == text && args.SequenceEqual(_args))
+            if (LocalizableText == text && args.SequenceEqual(_args.AsSpan()))
                 return;
 
             LocalizableText = text;

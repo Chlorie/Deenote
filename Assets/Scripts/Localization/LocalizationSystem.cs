@@ -1,5 +1,4 @@
 using Deenote.Utilities;
-using Deenote.Utilities.Robustness;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +9,7 @@ namespace Deenote.Localization
 {
     public sealed class LocalizationSystem
     {
-        public ListReadOnlyView<string> Languages => _languages;
+        public ReadOnlySpan<string> Languages => _languages.AsSpan();
 
         public string CurrentLanguage
         {

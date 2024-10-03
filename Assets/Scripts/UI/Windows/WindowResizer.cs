@@ -27,56 +27,48 @@ namespace Deenote.UI.Windows
             var rectTransform = (RectTransform)_window.transform;
             switch (_direction) {
                 case ResizeDirection.Left:
-                    delta = _window.IsFixedAspectRatio
-                        ? delta.WithY(delta.x / _window.FixedAspectRatio)
-                        : delta.WithY(0f);
-                    rectTransform.offsetMin += delta;
+                    rectTransform.offsetMin += delta with {
+                        y = _window.IsFixedAspectRatio ? delta.x / _window.FixedAspectRatio : 0f,
+                    };
                     break;
                 case ResizeDirection.UpLeft:
-                    if (_window.IsFixedAspectRatio) {
-                        delta = delta.WithY(-delta.x / _window.FixedAspectRatio);
-                    }
-                    rectTransform.offsetMin += delta.WithY(0f);
-                    rectTransform.offsetMax += delta.WithX(0f);
+                    rectTransform.offsetMin += delta with { y = 0f };
+                    rectTransform.offsetMax += _window.IsFixedAspectRatio
+                        ? delta with { x = 0f, y = -delta.x / _window.FixedAspectRatio, }
+                        : delta with { x = 0f };
                     break;
                 case ResizeDirection.Up:
-                    delta = _window.IsFixedAspectRatio
-                        ? delta.WithX(delta.y * _window.FixedAspectRatio)
-                        : delta.WithX(0);
-                    rectTransform.offsetMax += delta;
+                    rectTransform.offsetMax += delta with {
+                        x = _window.IsFixedAspectRatio ? delta.y * _window.FixedAspectRatio : 0f,
+                    };
                     break;
                 case ResizeDirection.UpRight:
-                    if (_window.IsFixedAspectRatio) {
-                        delta = delta.WithY(delta.x / _window.FixedAspectRatio);
-                    }
-                    rectTransform.offsetMax += delta;
+                    rectTransform.offsetMax += _window.IsFixedAspectRatio
+                        ? delta with { y = delta.x / _window.FixedAspectRatio }
+                        : delta;
                     break;
                 case ResizeDirection.Right:
-                    delta = _window.IsFixedAspectRatio
-                        ? delta.WithY(-delta.x / _window.FixedAspectRatio)
-                        : delta.WithY(0f);
-                    rectTransform.offsetMin += delta.WithX(0f);
-                    rectTransform.offsetMax += delta.WithY(0f);
+                    if (_window.IsFixedAspectRatio) {
+                        rectTransform.offsetMin += new Vector2(0f, -delta.x / _window.FixedAspectRatio);
+                    }
+                    rectTransform.offsetMax += delta with { y = 0 };
                     break;
                 case ResizeDirection.DownRight:
-                    if (_window.IsFixedAspectRatio) {
-                        delta = delta.WithY(-delta.x / _window.FixedAspectRatio);
-                    }
-                    rectTransform.offsetMin += delta.WithX(0f);
-                    rectTransform.offsetMax += delta.WithY(0f);
+                    rectTransform.offsetMin += _window.IsFixedAspectRatio
+                        ? delta with { x = 0f, y = -delta.x / _window.FixedAspectRatio }
+                        : delta with { x = 0f };
+                    rectTransform.offsetMax += delta with { y = 0f };
                     break;
                 case ResizeDirection.Down:
-                    delta = _window.IsFixedAspectRatio
-                        ? delta.WithX(-delta.y * _window.FixedAspectRatio)
-                        : delta.WithX(0);
-                    rectTransform.offsetMin += delta.WithX(0f);
-                    rectTransform.offsetMax += delta.WithY(0f);
+                    rectTransform.offsetMin += delta with { x = 0f };
+                    if (_window.IsFixedAspectRatio) {
+                        rectTransform.offsetMax += new Vector2(-delta.y * _window.FixedAspectRatio, 0f);
+                    }
                     break;
                 case ResizeDirection.DownLeft:
-                    if (_window.IsFixedAspectRatio) {
-                        delta = delta.WithY(delta.x / _window.FixedAspectRatio);
-                    }
-                    rectTransform.offsetMin += delta;
+                    rectTransform.offsetMin += _window.IsFixedAspectRatio
+                        ? delta with { y = delta.x / _window.FixedAspectRatio }
+                        : delta;
                     break;
             }
         }

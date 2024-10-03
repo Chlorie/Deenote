@@ -199,7 +199,7 @@ namespace Deenote.UI.Windows
                     scale = _args.ComboShadowMaxScale;
                 }
                 _comboShadowText.transform.localScale = new Vector3(scale, scale, scale);
-                _comboShadowText.color = Color.black.WithAlpha(alpha);
+                _comboShadowText.color = Color.black with { a = alpha };
             }
             // Shock Wave Circle
             {
@@ -219,7 +219,7 @@ namespace Deenote.UI.Windows
                     scale = alpha = 0f;
                 }
                 _shockWaveCircleImage.transform.localScale = new Vector3(scale, scale, scale);
-                _shockWaveCircleImage.color = Color.white.WithAlpha(alpha);
+                _shockWaveCircleImage.color = Color.white with { a = alpha };
             }
             // Shock Wave Strike
             {
@@ -248,7 +248,7 @@ namespace Deenote.UI.Windows
                     alpha = 0;
                 }
                 _shockWaveImage.transform.localPosition = new(x, 0f, 0f);
-                _shockWaveImage.color = Color.white.WithAlpha(alpha);
+                _shockWaveImage.color = Color.white with { a = alpha };
             }
             // Charming
             {
@@ -281,7 +281,7 @@ namespace Deenote.UI.Windows
                     alpha = 0f;
                 }
                 _charmingImage.transform.localScale = new Vector3(1f, scale, 1f);
-                _charmingImage.color = Color.white.WithAlpha(alpha);
+                _charmingImage.color = Color.white with { a = alpha };
             }
         }
     }

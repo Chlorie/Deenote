@@ -1,3 +1,4 @@
+using CommunityToolkit.HighPerformance;
 using Deenote.Edit.Operations;
 using Deenote.Project.Comparers;
 using Deenote.Project.Models.Datas;
@@ -19,31 +20,24 @@ namespace Deenote.Project.Models
                 data.Position = coord.Position;
                 data.Time = coord.Time;
 
-                var noteModels = _chartModel._visibleNotes;
-                int iModel = noteModels.Count - 1;
+                ReadOnlySpan<IStageNoteModel> noteModels = this.AsSpan();
+
+                int iModel;
                 int iTailModel;
                 if (data.IsHold) {
-                    iTailModel = iModel;
-                    IterateUntil(ref iTailModel, coord.Time + data.Duration);
-                    iModel = iTailModel - 1;
+                    iTailModel = noteModels.BinarySearch(new NoteTimeComparable(coord.Time + data.Duration));
+                    if (iTailModel < 0) iTailModel = ~iTailModel;
+                    // iModel is not far from iTail, so by iterate is ok
+                    iModel = noteModels[..iTailModel].LinearSearchFromEnd(new NoteTimeComparable(coord.Time));
+                    if (iModel < 0) iModel = ~iModel;
                 }
                 else {
                     iTailModel = -1;
+                    iModel = noteModels.BinarySearch(new NoteTimeComparable(coord.Time));
+                    if (iModel < 0) iModel = ~iModel;
                 }
-
-                IterateUntil(ref iModel, coord.Time);
 
                 return new AddNoteOperation(iModel, _chartModel, data, iTailModel);
-
-                void IterateUntil(ref int index, float compareTime)
-                {
-                    for (; index >= 0; index--) {
-                        if (noteModels[index].Time <= compareTime) {
-                            break;
-                        }
-                    }
-                    index++;
-                }
             }
 
             public AddMultipleNotesOperation AddMultipleNotes(NoteCoord baseCoord,
@@ -51,49 +45,55 @@ namespace Deenote.Project.Models
             {
                 NoteTimeComparer.AssertInOrder(notePrototypes);
 
+                // Clone Notes
                 List<IStageNoteModel> insertModels = new(notePrototypes.Length);
-                for (int i = 0; i < notePrototypes.Length; i++) {
-                    var insertNote = notePrototypes[i].Clone();
+                foreach (NoteData notePrototype in notePrototypes) {
+                    var insertNote = notePrototype.Clone();
                     var coord = NoteCoord.ClampPosition(baseCoord + insertNote.PositionCoord);
                     insertNote.PositionCoord = coord;
 
                     var noteModel = new NoteModel(insertNote);
-                    insertModels.Add(noteModel);
+                    insertModels.GetSortedModifier().Add(noteModel);
                     if (noteModel.Data.IsHold)
                         insertModels.Add(new NoteTailModel(noteModel));
                 }
+                // CollectionUtils.InsertionSortAsc(insertModels.AsSpan(), NoteTimeComparer.Instance);
 
-                Utils.InsertionSortAsc(insertModels.AsSpan(), NoteTimeComparer.Instance);
+                // Pre-find note insert indices
 
-                int[] insertIndices = new int[notePrototypes.Length];
+                int[] insertIndices = new int[insertModels.Count];
+                ReadOnlySpan<IStageNoteModel> noteModels = this.AsSpan();
 
-                int iModel = _chartModel.Notes.Count - 1;
-                for (int i = notePrototypes.Length - 1; i >= 0; i--) {
+                int iModel = noteModels.BinarySearch(new NoteTimeComparable(insertModels[^1].Time));
+                if (iModel < 0)
+                    iModel = ~iModel;
+                for (int i = insertModels.Count - 1; i >= 0; i--) {
                     var note = insertModels[i];
-
-                    while (iModel >= 0 && _chartModel._visibleNotes[iModel].Time > note.Time)
-                        iModel--;
-                    insertIndices[i] = iModel + 1;
+                    iModel = noteModels[..iModel].LinearSearchFromEnd(new NoteTimeComparable(note.Time));
+                    if (iModel < 0)
+                        iModel = ~iModel;
+                    insertIndices[i] = iModel;
                 }
 
-                return new AddMultipleNotesOperation(insertIndices, _chartModel, insertModels.AsMemory());
+                return new AddMultipleNotesOperation(insertIndices, _chartModel, insertModels);
             }
 
             public RemoveNotesOperation RemoveNotes(ReadOnlySpan<NoteModel> notesInTimeOrder)
             {
                 NoteTimeComparer.AssertInOrder(notesInTimeOrder);
-                var notemodels = _chartModel._visibleNotes;
+                ReadOnlySpan<IStageNoteModel> notemodels = this.AsSpan();
 
                 // Record all visible notes, mark their indices
                 var removeIndices = new List<int>(notesInTimeOrder.Length);
-                int iModel = 0;
+                int iModel = this.Search(notesInTimeOrder[0]);
+                Debug.Assert(iModel >= 0);
                 foreach (var note in notesInTimeOrder) {
-                    int i = notemodels.IndexOf(note, iModel);
+                    int i = notemodels[iModel..].IndexOf(note);
                     Debug.Assert(i >= 0, "Remove a note that doesn't on stage");
-                    removeIndices.Add(i);
+                    removeIndices.GetSortedModifier().Add(i);
 
                     if (note.Data.IsHold) {
-                        int iTail = _chartModel.Notes.SearchTailOf(i);
+                        int iTail = this.IndexOfTailOf(i);
                         Debug.Assert(iTail >= 0, "Remove a note tail that doesn't on stage");
                         removeIndices.Add(iTail);
                     }
@@ -101,17 +101,15 @@ namespace Deenote.Project.Models
                     iModel = i + 1;
                 }
 
-                Utils.InsertionSortAsc(removeIndices.AsSpan());
+                //CollectionUtils.InsertionSortAsc(removeIndices.AsSpan());
 
-                return new RemoveNotesOperation(removeIndices.AsMemory(), _chartModel);
+                return new RemoveNotesOperation(removeIndices, _chartModel);
             }
 
             public LinkNotesOperation LinkNotes(ReadOnlySpan<NoteModel> notes)
             {
                 var editNotes = new NoteModel[notes.Length];
-                for (int i = 0; i < notes.Length; i++) {
-                    editNotes[i] = notes[i];
-                }
+                notes.CopyTo(editNotes);
 
                 return new LinkNotesOperation(editNotes);
             }
@@ -119,9 +117,7 @@ namespace Deenote.Project.Models
             public UnlinkNotesOperation UnlinkNotes(ReadOnlySpan<NoteModel> notes)
             {
                 var editNotes = new NoteModel[notes.Length];
-                for (int i = 0; i < notes.Length; i++) {
-                    editNotes[i] = notes[i];
-                }
+                notes.CopyTo(editNotes);
 
                 return new UnlinkNotesOperation(editNotes);
             }
@@ -187,7 +183,7 @@ namespace Deenote.Project.Models
                 for (int i = 0; i < notes.Length; i++) {
                     var note = notes[i];
                     var sounds = note.Data.Sounds;
-                    var datas = Utils.Array<PianoSoundValueData>(sounds.Count);
+                    var datas = sounds.Count == 0 ? Array.Empty<PianoSoundValueData>() : new PianoSoundValueData[sounds.Count];
                     for (int j = 0; j < sounds.Count; i++) {
                         datas[j] = sounds[i].GetValues();
                     }
@@ -210,7 +206,7 @@ namespace Deenote.Project.Models
                 private Action? _onRedone;
                 private Action? _onUndone;
 
-                private ReadOnlyMemory<NoteModel>? _collidedNotes;
+                private IReadOnlyList<NoteModel>? _collidedNotes;
 
                 private bool RequiresInsertTail => _holdTailInsertIndex >= 0;
 
@@ -253,10 +249,9 @@ namespace Deenote.Project.Models
                     void CheckCollision()
                     {
                         _collidedNotes ??= _chartModel.Notes.GetCollidedNotesTo(_modelInsertIndex);
-                        var collidedNotes = _collidedNotes.Value.Span;
 
-                        _note.CollisionCount += collidedNotes.Length;
-                        foreach (var n in collidedNotes) {
+                        _note.CollisionCount += _collidedNotes.Count;
+                        foreach (var n in _collidedNotes) {
                             n.CollisionCount++;
                         }
                     }
@@ -279,9 +274,8 @@ namespace Deenote.Project.Models
                     {
                         Debug.Assert(_collidedNotes is not null);
 
-                        var collidedNotes = _collidedNotes.Value.Span;
-                        _note.CollisionCount -= collidedNotes.Length;
-                        foreach (var n in collidedNotes) {
+                        _note.CollisionCount -= _collidedNotes.Count;
+                        foreach (var n in _collidedNotes) {
                             n.CollisionCount--;
                         }
                     }
@@ -292,40 +286,40 @@ namespace Deenote.Project.Models
             {
                 private readonly int[] _insertIndices;
                 private readonly ChartModel _chartModel;
-                private readonly ReadOnlyMemory<IStageNoteModel> _notes;
+                private readonly IReadOnlyList<IStageNoteModel> _notes;
 
                 private readonly int _holdCount;
 
-                private ReadOnlySpanAction<IStageNoteModel>? _onRedone;
-                private ReadOnlySpanAction<IStageNoteModel>? _onUndone;
+                private Action<IReadOnlyList<IStageNoteModel>>? _onRedone;
+                private Action<IReadOnlyList<IStageNoteModel>>? _onUndone;
 
                 /// <summary>
                 /// Notes that collides to _notes[index], the value is default
                 /// when _notes[index] is not <see cref="NoteModel"/>
                 /// </summary>
-                private readonly ReadOnlyMemory<NoteModel>?[] _collidedNotes;
+                private readonly IReadOnlyList<NoteModel>?[] _collidedNotes;
 
-                public AddMultipleNotesOperation(int[] insertIndices, ChartModel chartModel, ReadOnlyMemory<IStageNoteModel> noteModels)
+                public AddMultipleNotesOperation(int[] insertIndices, ChartModel chartModel, IReadOnlyList<IStageNoteModel> noteModels)
                 {
-                    Debug.Assert(insertIndices.Length == noteModels.Length);
+                    Debug.Assert(insertIndices.Length == noteModels.Count);
                     _insertIndices = insertIndices;
                     _chartModel = chartModel;
                     _notes = noteModels;
-                    _collidedNotes = new ReadOnlyMemory<NoteModel>?[_insertIndices.Length];
+                    _collidedNotes = new IReadOnlyList<NoteModel>?[_insertIndices.Length];
 
-                    foreach (var note in _notes.Span) {
+                    foreach (var note in _notes) {
                         if (note is NoteTailModel)
                             _holdCount++;
                     }
                 }
 
-                public AddMultipleNotesOperation WithRedoneAction(ReadOnlySpanAction<IStageNoteModel> action)
+                public AddMultipleNotesOperation WithRedoneAction(Action<IReadOnlyList<IStageNoteModel>> action)
                 {
                     _onRedone = action;
                     return this;
                 }
 
-                public AddMultipleNotesOperation WithUndoneAction(ReadOnlySpanAction<IStageNoteModel> action)
+                public AddMultipleNotesOperation WithUndoneAction(Action<IReadOnlyList<IStageNoteModel>> action)
                 {
                     _onUndone = action;
                     return this;
@@ -333,27 +327,25 @@ namespace Deenote.Project.Models
 
                 void IUndoableOperation.Redo()
                 {
-                    var notes = _notes.Span;
-                    for (int i = 0; i < notes.Length; i++) {
-                        IStageNoteModel note = notes[i];
+                    for (int i = 0; i < _notes.Count; i++) {
+                        IStageNoteModel note = _notes[i];
                         // We need to maually adjust offset when insert from start
                         _chartModel._visibleNotes.Insert(_insertIndices[i] + i, note);
                         if (note is NoteModel noteModel)
                             CheckCollision(i, noteModel);
                     }
                     _chartModel._holdCount += _holdCount;
-                    _onRedone?.Invoke(notes);
+                    _onRedone?.Invoke(_notes);
 
                     void CheckCollision(int index, NoteModel noteModel)
                     {
-                        Debug.Assert(_notes.Span[index] == noteModel);
+                        Debug.Assert(_notes[index] == noteModel);
 
                         ref var collidedNotes = ref _collidedNotes[index];
                         collidedNotes ??= _chartModel.Notes.GetCollidedNotesTo(_insertIndices[index] + index);
-                        var collidedNotesSpan = collidedNotes.Value.Span;
 
-                        noteModel.CollisionCount += collidedNotesSpan.Length;
-                        foreach (var note in collidedNotesSpan) {
+                        noteModel.CollisionCount += collidedNotes.Count;
+                        foreach (var note in collidedNotes) {
                             note.CollisionCount++;
                         }
                     }
@@ -361,27 +353,26 @@ namespace Deenote.Project.Models
 
                 void IUndoableOperation.Undo()
                 {
-                    var notes = _notes.Span;
-                    for (int i = _notes.Length - 1; i >= 0; i--) {
-                        Debug.Assert(_chartModel._visibleNotes[_insertIndices[i] + i] == notes[i]);
+                    for (int i = _notes.Count - 1; i >= 0; i--) {
+                        Debug.Assert(_chartModel._visibleNotes[_insertIndices[i] + i] == _notes[i]);
                         _chartModel._visibleNotes.RemoveAt(_insertIndices[i] + i);
                     }
                     RevertCollision();
                     _chartModel._holdCount -= _holdCount;
-                    _onUndone?.Invoke(notes);
+                    _onUndone?.Invoke(_notes);
 
                     void RevertCollision()
                     {
                         for (int i = 0; i < _collidedNotes.Length; i++) {
-                            Debug.Assert(_collidedNotes[i].HasValue);
-                            var collidedNotes = _collidedNotes[i].Value.Span;
-                            if (collidedNotes.IsEmpty) {
+                            Debug.Assert(_collidedNotes[i] is not null);
+                            var collidedNotes = _collidedNotes[i];
+                            if (collidedNotes.Count == 0) {
                                 // If empty, means this note doesnt collided to any other note
                                 // or this note is a NoteTailModel
                                 continue;
                             }
 
-                            ((NoteModel)_notes.Span[i]).CollisionCount -= collidedNotes.Length;
+                            ((NoteModel)_notes[i]).CollisionCount -= collidedNotes.Count;
                             foreach (var note in collidedNotes) {
                                 note.CollisionCount--;
                             }
@@ -394,34 +385,33 @@ namespace Deenote.Project.Models
             {
                 private readonly ChartModel _chartModel;
 
-                private readonly Memory<int> _removeIndices;
+                private readonly IReadOnlyList<int> _removeIndices;
                 private readonly IStageNoteModel[] _removeModels;
 
                 private readonly int _holdCount;
                 private readonly UnlinkNotesOperation _unlinkOperation;
 
                 private Action? _onRedone;
-                private ReadOnlySpanAction<IStageNoteModel>? _onUndone;
+                private Action<IReadOnlyList<IStageNoteModel>>? _onUndone;
 
                 /// <summary>
                 /// Notes that collides to _notes[index], the value is default
                 /// when _notes[index] is not <see cref="NoteModel"/>
                 /// </summary>
-                private readonly ReadOnlyMemory<NoteModel>?[] _collidedNotes;
+                private readonly IReadOnlyList<NoteModel>?[] _collidedNotes;
 
-                public RemoveNotesOperation(Memory<int> removeIndices, ChartModel chartModel)
+                public RemoveNotesOperation(IReadOnlyList<int> removeIndices, ChartModel chartModel)
                 {
                     _removeIndices = removeIndices;
                     _chartModel = chartModel;
-                    _removeModels = new IStageNoteModel[removeIndices.Length];
-                    var removeIndicesSpan = removeIndices.Span;
+                    _removeModels = new IStageNoteModel[removeIndices.Count];
                     for (int i = 0; i < _removeModels.Length; i++) {
-                        var model = _chartModel._visibleNotes[removeIndicesSpan[i]];
+                        var model = _chartModel._visibleNotes[_removeIndices[i]];
                         _removeModels[i] = model;
                         if (model is NoteTailModel)
                             _holdCount++;
                     }
-                    _collidedNotes = new ReadOnlyMemory<NoteModel>?[_removeIndices.Length];
+                    _collidedNotes = new IReadOnlyList<NoteModel>?[_removeIndices.Count];
 
                     _unlinkOperation = new UnlinkNotesOperation(_removeModels.OfType<NoteModel>().ToArray());
                 }
@@ -432,7 +422,7 @@ namespace Deenote.Project.Models
                     return this;
                 }
 
-                public RemoveNotesOperation WithUndoneAction(ReadOnlySpanAction<IStageNoteModel> action)
+                public RemoveNotesOperation WithUndoneAction(Action<IReadOnlyList<IStageNoteModel>> action)
                 {
                     _onUndone = action;
                     return this;
@@ -442,25 +432,23 @@ namespace Deenote.Project.Models
                 {
                     ((IUndoableOperation)_unlinkOperation).Redo();
 
-                    var removeIndices = _removeIndices.Span;
 
-                    for (int i = _removeIndices.Length - 1; i >= 0; i--) {
-                        if (_chartModel._visibleNotes[removeIndices[i]] is NoteModel)
+                    for (int i = _removeIndices.Count - 1; i >= 0; i--) {
+                        if (_chartModel._visibleNotes[_removeIndices[i]] is NoteModel)
                             UpdateCollision(i);
-                        _chartModel._visibleNotes.RemoveAt(removeIndices[i]);
+                        _chartModel._visibleNotes.RemoveAt(_removeIndices[i]);
                     }
                     _chartModel._holdCount -= _holdCount;
                     _onRedone?.Invoke();
 
                     void UpdateCollision(int index)
                     {
-                        var removeIndices = _removeIndices.Span;
-                        Debug.Assert(_chartModel._visibleNotes[removeIndices[index]] is NoteModel);
+                        Debug.Assert(_chartModel._visibleNotes[_removeIndices[index]] is NoteModel);
 
                         ref var collidedNotes = ref _collidedNotes[index];
-                        collidedNotes ??= _chartModel.Notes.GetCollidedNotesTo(removeIndices[index]);
+                        collidedNotes ??= _chartModel.Notes.GetCollidedNotesTo(_removeIndices[index]);
 
-                        foreach (var note in collidedNotes.Value.Span) {
+                        foreach (var note in collidedNotes) {
                             note.CollisionCount--;
                         }
                     }
@@ -469,11 +457,10 @@ namespace Deenote.Project.Models
                 void IUndoableOperation.Undo()
                 {
                     ((IUndoableOperation)_unlinkOperation).Undo();
-                    var removeIndices = _removeIndices.Span;
 
                     for (int i = 0; i < _removeModels.Length; i++) {
                         var model = _removeModels[i];
-                        _chartModel._visibleNotes.Insert(removeIndices[i], model);
+                        _chartModel._visibleNotes.Insert(_removeIndices[i], model);
                     }
                     RevertCollision();
                     _chartModel._holdCount += _holdCount;
@@ -486,9 +473,9 @@ namespace Deenote.Project.Models
                                 // Means the related IStageNoteModel is NoteTailModel
                                 continue;
                             }
-                            if (collidedNotes.Value.IsEmpty)
+                            if (collidedNotes.Count == 0)
                                 continue;
-                            foreach (var note in collidedNotes.Value.Span) {
+                            foreach (var note in collidedNotes) {
                                 note.CollisionCount++;
                             }
                         }
@@ -507,7 +494,7 @@ namespace Deenote.Project.Models
                 public LinkNotesOperation(NoteModel[] notes)
                 {
                     _notes = notes;
-                    _oldValues = Utils.Array<(bool IsSlide, NoteData? Prev, NoteData? Next)>(_notes.Length);
+                    _oldValues = new (bool IsSlide, NoteData? Prev, NoteData? Next)[_notes.Length];
 
                     for (int i = 0; i < _notes.Length; i++) {
                         var data = _notes[i].Data;
@@ -578,7 +565,7 @@ namespace Deenote.Project.Models
                 public UnlinkNotesOperation(NoteModel[] contexts)
                 {
                     _notes = contexts;
-                    _oldValues = Utils.Array<(bool IsSlide, NoteData? Prev, NoteData? Next)>(_notes.Length);
+                    _oldValues = new (bool IsSlide, NoteData? Prev, NoteData? Next)[_notes.Length];
 
                     for (int i = 0; i < _notes.Length; i++) {
                         var data = _notes[i].Data;
@@ -1309,8 +1296,8 @@ namespace Deenote.Project.Models
                 private int[] _noteIndicesAfterSort;
                 private (bool? InsertBefore, NoteData NoteRefBeforeSort, NoteData NoteRefAfterSort)[] _linkChangeInfosOnSorting;
 
-                private ReadOnlyMemory<NoteModel>[] _collidedNotesBeforeUpdate;
-                private ReadOnlyMemory<NoteModel>[] _collidedNotesAfterUpdate;
+                private IReadOnlyList<NoteModel>[] _collidedNotesBeforeUpdate;
+                private IReadOnlyList<NoteModel>[] _collidedNotesAfterUpdate;
 
                 private void Initialize()
                 {
@@ -1324,30 +1311,28 @@ namespace Deenote.Project.Models
                     if (_timeEditing)
                         _linkChangeInfosOnSorting = new (bool?, NoteData, NoteData)[_contexts.Length];
 
-                    _collidedNotesBeforeUpdate = new ReadOnlyMemory<NoteModel>[_contexts.Length];
+                    _collidedNotesBeforeUpdate = new IReadOnlyList<NoteModel>[_contexts.Length];
                     for (int i = 0; i < _contexts.Length; i++)
                         _collidedNotesBeforeUpdate[i] = _chartModel.Notes.GetCollidedNotesTo(_noteIndicesBeforeSort[i]);
 
-                    _collidedNotesAfterUpdate = new ReadOnlyMemory<NoteModel>[_contexts.Length];
+                    _collidedNotesAfterUpdate = new IReadOnlyList<NoteModel>[_contexts.Length];
 
                     void InitCurrentIndices(int[] indices)
                     {
-                        int iContext = 0;
-                        NoteModel currentNote = _contexts[iContext].Note;
+                        Debug.Assert(_contexts.Length == indices.Length);
 
-                        int iModel = _chartModel.Notes.Search(currentNote);
+                        int iModel = _chartModel.Notes.Search(_contexts[0].Note);
                         Debug.Assert(iModel >= 0);
 
-                        for (; iModel < _chartModel.Notes.Count; iModel++) {
-                            var note = _chartModel.Notes[iModel];
-                            if (note != currentNote)
-                                continue;
+                        ReadOnlySpan<IStageNoteModel> noteModels = _chartModel.Notes.AsSpan();
 
-                            indices[iContext] = iModel;
-                            iContext++;
-                            if (iContext >= _contexts.Length)
-                                break;
-                            currentNote = _contexts[iContext].Note;
+                        for (int i = 0; i < _contexts.Length; i++) {
+                            NoteModel note = _contexts[i].Note;
+                            int index = noteModels[iModel..].LinearSearch(note, null);
+                            Debug.Assert(index >= 0);
+                            index += iModel;
+                            indices[i] = index;
+                            iModel = index;
                         }
                     }
                 }
@@ -1379,27 +1364,18 @@ namespace Deenote.Project.Models
                     int GetExpectedIndexAfterSort(int fromIndex)
                     {
                         var note = _chartModel.Notes[fromIndex];
+                        ReadOnlySpan<IStageNoteModel> noteModels = _chartModel.Notes.AsSpan();
 
-                        int newIndex = fromIndex - 1;
-
-                        // Search backward
-                        for (; newIndex >= 0; newIndex--) {
-                            var prevNote = _chartModel.Notes[newIndex];
-                            if (prevNote.Time <= note.Time)
-                                break;
-                        }
-                        newIndex++;
+                        int newIndex = noteModels[..fromIndex].LinearSearchFromEnd(new NoteTimeComparable(note.Time));
+                        if (newIndex < 0)
+                            newIndex = ~newIndex;
                         if (newIndex != fromIndex)
                             // The note is moved backward
                             return newIndex;
 
-                        newIndex = fromIndex + 1;
-                        for (; newIndex < _chartModel.Notes.Count; newIndex++) {
-                            var nextNote = _chartModel.Notes[newIndex];
-                            if (nextNote.Time >= note.Time)
-                                break;
-                        }
-                        newIndex--;
+                        newIndex = noteModels[fromIndex..].LinearSearch(new NoteTimeComparable(note.Time));
+                        if (newIndex < 0)
+                            newIndex = ~newIndex;
                         if (newIndex != fromIndex)
                             // The note is moved forward
                             return newIndex;
@@ -1487,10 +1463,10 @@ namespace Deenote.Project.Models
 
                         for (int i = 0; i < _contexts.Length; i++) {
                             var curNote = _contexts[i].Note;
-                            curNote.CollisionCount += _collidedNotesAfterUpdate[i].Length - _collidedNotesBeforeUpdate[i].Length;
-                            foreach (var note in _collidedNotesBeforeUpdate[i].Span)
+                            curNote.CollisionCount += _collidedNotesAfterUpdate[i].Count - _collidedNotesBeforeUpdate[i].Count;
+                            foreach (var note in _collidedNotesBeforeUpdate[i])
                                 note.CollisionCount--;
-                            foreach (var note in _collidedNotesAfterUpdate[i].Span)
+                            foreach (var note in _collidedNotesAfterUpdate[i])
                                 note.CollisionCount++;
                         }
                     }
@@ -1524,10 +1500,10 @@ namespace Deenote.Project.Models
                     {
                         for (int i = _contexts.Length - 1; i >= 0; i--) {
                             var curNote = _contexts[i].Note;
-                            curNote.CollisionCount += _collidedNotesBeforeUpdate[i].Length - _collidedNotesAfterUpdate[i].Length;
-                            foreach (var note in _collidedNotesAfterUpdate[i].Span)
+                            curNote.CollisionCount += _collidedNotesBeforeUpdate[i].Count - _collidedNotesAfterUpdate[i].Count;
+                            foreach (var note in _collidedNotesAfterUpdate[i])
                                 note.CollisionCount--;
-                            foreach (var note in _collidedNotesBeforeUpdate[i].Span)
+                            foreach (var note in _collidedNotesBeforeUpdate[i])
                                 note.CollisionCount++;
                         }
                     }
@@ -1574,15 +1550,14 @@ namespace Deenote.Project.Models
                         switch (oldValue, newValue) {
                             case (0, not 0): {
                                 var tail = new NoteTailModel(note);
-                                int insertIndex = _chartModel._visibleNotes.AsReadOnlySpan()
-                                    .FindLowerBoundIndex(tail, NoteTimeComparer.Instance);
+                                int insertIndex = _chartModel.Notes.AsSpan().BinarySearch(tail, NoteTimeComparer.Instance);
                                 _tails[contextIndex] = (tail, -1, insertIndex);
                                 _holdCountDelta++;
                                 break;
                             }
                             case (not 0, 0): {
-                                int tailIndex = _chartModel.Notes.SearchTailOf(note);
-                                _tails[contextIndex] = ((NoteTailModel)_chartModel._visibleNotes[tailIndex], tailIndex, -1);
+                                int tailIndex = _chartModel.Notes.IndexOfTailOf(note);
+                                _tails[contextIndex] = ((NoteTailModel)_chartModel.Notes[tailIndex], tailIndex, -1);
                                 _holdCountDelta--;
                                 break;
                             }
@@ -1592,18 +1567,17 @@ namespace Deenote.Project.Models
                                     break;
                                 }
 
-                                int tailIndex = _chartModel.Notes.SearchTailOf(note);
-                                var tail = (NoteTailModel)_chartModel._visibleNotes[tailIndex];
+                                int tailIndex = _chartModel.Notes.IndexOfTailOf(note);
+                                var tail = (NoteTailModel)_chartModel.Notes[tailIndex];
                                 int toIndex;
                                 if (oldValue < newValue) {
-                                    toIndex = tailIndex + _chartModel._visibleNotes
-                                        .AsReadOnlySpan()[tailIndex..]
-                                        .FindLowerBoundIndex(tail, NoteTimeComparer.Instance);
+                                    toIndex = _chartModel.Notes.AsSpan()[tailIndex..].LinearSearch(tail, NoteTimeComparer.Instance);
+                                    if (toIndex < 0)
+                                        toIndex = ~toIndex;
+                                    toIndex += tailIndex;
                                 }
                                 else {
-                                    toIndex = _chartModel._visibleNotes
-                                        .AsReadOnlySpan()[..tailIndex]
-                                        .FindUpperBoundIndex(tail, NoteTimeComparer.Instance);
+                                    toIndex = _chartModel.Notes.AsSpan()[..tailIndex].LinearSearchFromEnd(tail, NoteTimeComparer.Instance);
                                 }
                                 _tails[contextIndex] = (tail, tailIndex, toIndex);
                                 break;

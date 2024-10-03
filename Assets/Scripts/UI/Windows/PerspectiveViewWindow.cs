@@ -1,11 +1,10 @@
-using System;
 using Deenote.Edit;
 using Deenote.GameStage;
 using Deenote.Settings;
 using Deenote.UI.Windows.Components;
 using Deenote.Utilities;
+using System;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Windows
@@ -46,7 +45,7 @@ namespace Deenote.UI.Windows
 
         private void OnFirstActivating()
         {
-            _aspectDropdown.ResetOptions(ViewAspectRatioExt.ViewAspectDropdownOptions);
+            _aspectDropdown.ResetOptions(ViewAspectRatioExt.ViewAspectDropdownOptions.AsSpan());
             _aspectDropdown.Dropdown.SetValueWithoutNotify(PerspectiveViewController.Instance.AspectRatio
                 .ToDropdownIndex());
         }

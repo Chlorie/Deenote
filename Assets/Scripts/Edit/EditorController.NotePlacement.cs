@@ -5,6 +5,7 @@ using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -101,13 +102,14 @@ namespace Deenote.Edit
                     .WithRedoneAction(notes =>
                     {
                         OnNoteSelectionChanging();
-                        _noteSelectionController.SelectNotes(notes.OfType<IStageNoteModel, NoteModel>());
+                        _noteSelectionController.ClearSelection();
+                        _noteSelectionController.SelectNotes(notes.OfType<NoteModel>());
                         OnNotesChanged(true, true);
                     })
                     .WithUndoneAction(notes =>
                     {
                         OnNoteSelectionChanging();
-                        _noteSelectionController.DeselectNotes(notes.OfType<IStageNoteModel, NoteModel>());
+                        _noteSelectionController.DeselectNotes(notes.OfType<NoteModel>());
                         OnNotesChanged(true, true);
                     }));
                 _isPasting = false;
@@ -123,6 +125,7 @@ namespace Deenote.Edit
                         OnNoteSelectionChanging();
                         _noteSelectionController.ClearSelection();
                         OnNotesChanged(true, true);
+                        NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
                     })
                     .WithUndoneAction(() => OnNotesChanged(true, false)));
             }
@@ -145,7 +148,7 @@ namespace Deenote.Edit
                 .WithUndoneAction((removedNotes) =>
                 {
                     OnNoteSelectionChanging();
-                    _noteSelectionController.AddNote(removedNotes.OfType<IStageNoteModel, NoteModel>());
+                    _noteSelectionController.SelectNotes(removedNotes.OfType<NoteModel>());
                     _propertiesWindow.NotifyNoteIsLinkChanged(
                         SelectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide) ? slide : null);
                     OnNotesChanged(true, true, noteDataChangedExceptTime: true);
@@ -172,14 +175,14 @@ namespace Deenote.Edit
                 .WithRedoneAction(notes =>
                 {
                     OnNoteSelectionChanging();
-                    // TODO: 如果确定SelectedNotes是IStageNoteModel的话，改一下
-                    _noteSelectionController.SelectNotes(notes.OfType<IStageNoteModel, NoteModel>());
+                    _noteSelectionController.ClearSelection();
+                    _noteSelectionController.SelectNotes(notes.OfType<NoteModel>());
                     OnNotesChanged(true, true);
                 })
                 .WithUndoneAction(notes =>
                 {
                     OnNoteSelectionChanging();
-                    _noteSelectionController.DeselectNotes(notes.OfType<IStageNoteModel, NoteModel>());
+                    _noteSelectionController.DeselectNotes(notes.OfType<NoteModel>());
                     OnNotesChanged(true, true);
                 }));
 

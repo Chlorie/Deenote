@@ -1,3 +1,4 @@
+using CommunityToolkit.HighPerformance.Buffers;
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;
 using Deenote.Utilities.Robustness;
@@ -189,21 +190,21 @@ namespace Deenote.GameStage
                 return 0;
             }
 
-            public PooledSpan<NoteCoord>.ReadOnlyView GetRenderValues(float renderMinTime, float renderMaxTime)
+            public SpanOwner<NoteCoord> GetRenderValues(float renderMinTime, float renderMaxTime)
             {
                 if (MinX >= renderMaxTime || MaxX <= renderMinTime || renderMinTime >= renderMaxTime)
                     return default;
 
                 float min = Mathf.Max(MinX, renderMinTime);
                 float max = Mathf.Min(MaxX, renderMaxTime);
-                var coords = new PooledSpan<NoteCoord>(CubicCurveSegmentCount);
+                var coords = SpanOwner<NoteCoord>.Allocate(CubicCurveSegmentCount);
                 var span = coords.Span;
                 for (int i = 0; i < CubicCurveSegmentCount; i++) {
                     float time = Mathf.Lerp(min, max, (float)i / CubicCurveSegmentCount);
                     float pos = GetPosition(time).Value;
                     span[i] = NoteCoord.ClampPosition(time, pos);
                 }
-                return coords.ToReadOnly();
+                return coords;
             }
         }
     }

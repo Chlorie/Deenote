@@ -12,15 +12,6 @@ namespace Deenote.Utilities
 {
     public static class UnityUtils
     {
-        public static Color WithAlpha(this in Color color, float alpha)
-            => new(color.r, color.g, color.b, alpha);
-
-        public static Vector3 WithX(this in Vector3 vector, float x) => new(x, vector.y, vector.z);
-
-        public static Vector2 WithX(this in Vector2 vector, float x) => new(x, vector.y);
-
-        public static Vector2 WithY(this in Vector2 vector, float y) => new(vector.x, y);
-
         public static void AddListener(this UnityEvent ev, Func<UniTaskVoid> uniTaskFunc)
             => ev.AddListener(UniTask.UnityAction(uniTaskFunc));
 

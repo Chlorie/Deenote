@@ -1,4 +1,4 @@
-using Deenote.Utilities.Robustness;
+using Deenote.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -27,12 +27,12 @@ namespace Deenote.Inputting
             return true;
         }
 
-        public ListReadOnlyView<KeyBinding> GetGlobalBindings() => GetContextualBindings(GlobalContextKey);
+        public IReadOnlyList<KeyBinding> GetGlobalBindings() => GetContextualBindings(GlobalContextKey);
 
-        public ListReadOnlyView<KeyBinding> GetContextualBindings(string context) =>
+        public IReadOnlyList<KeyBinding> GetContextualBindings(string context) =>
             Bindings.TryGetValue(context, out var list)
-                ? new ListReadOnlyView<KeyBinding>(list)
-                : ListReadOnlyView<KeyBinding>.Empty;
+                ? list
+                : Array.Empty<KeyBinding>();
 
         public bool RemoveBinding(string context, KeyBinding binding) =>
             Bindings.TryGetValue(context, out var list) && list.Remove(binding);

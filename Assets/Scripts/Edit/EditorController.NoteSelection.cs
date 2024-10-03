@@ -3,7 +3,6 @@ using Deenote.Project.Models;
 using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Deenote.Edit
@@ -18,7 +17,10 @@ namespace Deenote.Edit
         public void SelectAllNotes()
         {
             OnNoteSelectionChanging();
-            _noteSelectionController.SelectNotes(Stage.Chart.Notes.EnumerateSelectableModels());
+            _noteSelectionController.ClearSelection();
+            foreach (var note in Stage.Chart.Notes.EnumerateSelectableModels()) {
+                _noteSelectionController.SelectNote(note);
+            }
             OnNotesChanged(false, true);
         }
 
@@ -53,47 +55,43 @@ namespace Deenote.Edit
 
             public ReadOnlySpan<NoteModel> SelectedNotes => _selectedNotes.AsSpan();
 
+            public void SelectNote(NoteModel note)
+            {
+                if (note.IsSelected)
+                    return;
+
+                _selectedNotes.Add(note);
+                note.IsSelected = true;
+            }
+
+            /// <summary>
+            /// Add new notes into selection
+            /// </summary>
             public void SelectNotes(IEnumerable<NoteModel> notes)
             {
-                foreach (var note in _selectedNotes) {
+                foreach (var note in notes) {
+                    SelectNote(note);
+                }
+            }
+
+            public void DeselectNote(NoteModel note)
+            {
+                if (_selectedNotes.Remove(note))
                     note.IsSelected = false;
-                }
-                _selectedNotes.Clear();
-                _selectedNotes.AddRange(notes);
-                foreach (var note in _selectedNotes) {
-                    note.IsSelected = true;
-                }
             }
 
-            public void SelectNotes(LightLinq.SpanOfTypeIterator<IStageNoteModel, NoteModel> notes)
-            {
-                foreach (var note in _selectedNotes) {
-                    note.IsSelected = false;
-                }
-                _selectedNotes.Clear();
-                foreach (var note in notes) {
-                    _selectedNotes.Add(note);
-                    note.IsSelected = true;
-                }
-            }
-
-            public void AddNote(IEnumerable<NoteModel> notes)
+            /// <summary>
+            /// Deselect notes in selection, if note is not selected, do nothing
+            /// </summary>
+            /// <param name="notes"></param>
+            public void DeselectNotes(IEnumerable<NoteModel> notes)
             {
                 foreach (var note in notes) {
-                    if (note.IsSelected)
-                        continue;
-                    _selectedNotes.Add(note);
-                    note.IsSelected = true;
-                }
-            }
-
-            public void AddNote(LightLinq.SpanOfTypeIterator<IStageNoteModel, NoteModel> notes)
-            {
-                foreach (var note in notes) {
-                    if (note.IsSelected)
-                        continue;
-                    _selectedNotes.Add(note);
-                    note.IsSelected = true;
+                    if (note.IsSelected) {
+                        var remove = _selectedNotes.Remove(note);
+                        Debug.Assert(remove == true);
+                        note.IsSelected = false;
+                    }
                 }
             }
 
@@ -103,27 +101,6 @@ namespace Deenote.Edit
                 var note = _selectedNotes[i];
                 _selectedNotes.RemoveAt(i);
                 note.IsSelected = false;
-            }
-
-            /// <summary>
-            /// Deselect note if note was selected, else do nothing
-            /// </summary>
-            /// <param name="notes"></param>
-            public void DeselectNotes(IEnumerable<NoteModel> notes)
-            {
-                foreach (var note in notes) {
-                    if (_selectedNotes.Remove(note)) {
-                        note.IsSelected = false;
-                    }
-                }
-            }
-
-            public void DeselectNotes(LightLinq.SpanOfTypeIterator<IStageNoteModel, NoteModel> notes)
-            {
-                foreach (var note in notes) {
-                    if (_selectedNotes.Remove(note))
-                        note.IsSelected = false;
-                }
             }
 
             public void StartNoteSelection(NoteCoord startCoord, bool toggleMode)

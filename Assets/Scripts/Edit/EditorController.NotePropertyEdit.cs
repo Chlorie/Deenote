@@ -247,7 +247,7 @@ namespace Deenote.Edit
                 {
                     _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds,
                         out var sounds, PianoSoundListDataEqualityComparer.Instance)
-                        ? sounds
+                        ? sounds.AsSpan()
                         : null);
                     OnNotesChanged(true, false, noteDataChangedExceptTime: true);
                 }));
@@ -307,7 +307,7 @@ namespace Deenote.Edit
                 {
                     _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds,
                         out var sounds, PianoSoundListDataEqualityComparer.Instance)
-                        ? sounds
+                        ? sounds.AsSpan()
                         : null);
                     OnNotesChanged(false, false, noteDataChangedExceptTime: true);
                 }));
@@ -323,7 +323,7 @@ namespace Deenote.Edit
                 {
                     _propertiesWindow.NotifyNotePianoSoundsChanged(SelectedNotes.IsSameForAll(n => n.Data.Sounds,
                         out var sounds, PianoSoundListDataEqualityComparer.Instance)
-                        ? sounds
+                        ? sounds.AsSpan()
                         : null);
                     OnNotesChanged(false, false, noteDataChangedExceptTime: true);
                 }));

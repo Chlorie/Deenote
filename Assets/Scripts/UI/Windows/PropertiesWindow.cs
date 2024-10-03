@@ -6,6 +6,7 @@ using Deenote.Project;
 using Deenote.Project.Models;
 using Deenote.UI.Windows.Components;
 using Deenote.Utilities;
+using System;
 using System.IO;
 using System.Linq;
 using TMPro;
@@ -73,7 +74,7 @@ namespace Deenote.UI.Windows
 
         private void Start()
         {
-            _chartDifficultyDropdown.ResetOptions(DifficultyExt.DropdownOptions);
+            _chartDifficultyDropdown.ResetOptions(DifficultyExt.DropdownOptions.AsSpan());
             _chartDifficultyDropdown.Dropdown.SetValueWithoutNotify(_gameStageController.Chart.Difficulty.ToInt32());
         }
 
@@ -86,16 +87,14 @@ namespace Deenote.UI.Windows
 
         private async UniTaskVoid OnAudioButtonClickedAsync()
         {
-            FileStream? fs = null;
-            // ReSharper disable once AccessToModifiedClosure
-            using ScopeExit guard = new(() => fs?.Dispose());
+            using DisposableGuard guard = new();
             while (true) {
                 var res = await MainSystem.FileExplorer.OpenSelectFileAsync(MainSystem.Args
                     .SupportAudioFileExtensions);
                 if (res.IsCancelled)
                     return;
 
-                fs = File.OpenRead(res.Path);
+                var fs = guard.Set(File.OpenRead(res.Path));
                 var clip = await AudioUtils.LoadAsync(fs, Path.GetExtension(res.Path));
                 if (clip is null) {
                     var btn = await MainSystem.MessageBox.ShowAsync(

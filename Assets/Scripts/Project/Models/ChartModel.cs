@@ -6,8 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using UnityEngine.Pool;
 
 namespace Deenote.Project.Models
 {
@@ -249,7 +247,7 @@ namespace Deenote.Project.Models
                 return ~index;
             }
 
-            public int SearchTailOf(int noteModelIndex)
+            public int IndexOfTailOf(int noteModelIndex)
             {
                 if (this[noteModelIndex] is not NoteModel { Data.IsHold: true } head)
                     return -1;
@@ -264,28 +262,30 @@ namespace Deenote.Project.Models
                 return -1;
             }
 
-            public int SearchTailOf(NoteModel note)
+            public int IndexOfTailOf(NoteModel note)
             {
                 if (!note.Data.IsHold)
                     return -1;
 
                 var noteIndex = Search(note);
-                return SearchTailOf(noteIndex);
+                if (noteIndex < 0)
+                    return -1;
+                return IndexOfTailOf(noteIndex);
             }
 
             #region Helpers
 
             /// <param name="noteIndex">Index of a <see cref="NoteModel"/></param>
             /// <returns></returns>
-            private ReadOnlyMemory<NoteModel> GetCollidedNotesTo(int noteIndex)
+            private IReadOnlyList<NoteModel> GetCollidedNotesTo(int noteIndex)
             {
-                Debug.Assert(_chartModel.Notes[noteIndex] is NoteModel);
+                Debug.Assert(this[noteIndex] is NoteModel);
 
                 var collidedNotes = new List<NoteModel>();
-                var editNote = (NoteModel)_chartModel.Notes[noteIndex];
+                var editNote = (NoteModel)this[noteIndex];
 
                 for (int i = noteIndex - 1; i >= 0; i--) {
-                    if (_chartModel.Notes[i] is not NoteModel note)
+                    if (this[i] is not NoteModel note)
                         continue;
 
                     if (!MainSystem.Args.IsTimeCollided(note.Data, editNote.Data))
@@ -296,7 +296,7 @@ namespace Deenote.Project.Models
                 }
 
                 for (int i = noteIndex + 1; i < _chartModel.Notes.Count; i++) {
-                    if (_chartModel.Notes[i] is not NoteModel note)
+                    if (this[i] is not NoteModel note)
                         continue;
 
                     if (!MainSystem.Args.IsTimeCollided(editNote.Data, note.Data))
@@ -306,15 +306,17 @@ namespace Deenote.Project.Models
                     }
                 }
 
-                return collidedNotes.Count == 0 ? ReadOnlyMemory<NoteModel>.Empty : collidedNotes.AsMemory();
+                return collidedNotes.Count == 0 ? Array.Empty<NoteModel>() : collidedNotes;
             }
 
             #endregion
 
+            public ReadOnlySpan<IStageNoteModel> AsSpan() => _chartModel._visibleNotes.AsSpan();
+
             public List<IStageNoteModel>.Enumerator GetEnumerator() => _chartModel._visibleNotes.GetEnumerator();
 
-            public LightLinq.SpanOfTypeIterator<IStageNoteModel, NoteModel> EnumerateSelectableModels()
-                => _chartModel._visibleNotes.AsSpan().OfType<IStageNoteModel, NoteModel>();
+            public CollectionUtils.SpanOfTypeIterator<IStageNoteModel, NoteModel> EnumerateSelectableModels()
+                => AsSpan().OfType<IStageNoteModel, NoteModel>();
 
             IEnumerator<IStageNoteModel> IEnumerable<IStageNoteModel>.GetEnumerator() => GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

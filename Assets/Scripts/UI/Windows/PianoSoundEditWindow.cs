@@ -101,7 +101,7 @@ namespace Deenote.UI.Windows
 
             IsDirty = false;
 
-            static bool SameForAll(ListReadOnlyView<NoteData> notes)
+            static bool SameForAll(List<NoteData> notes)
             {
                 var first = notes[0].Sounds;
 

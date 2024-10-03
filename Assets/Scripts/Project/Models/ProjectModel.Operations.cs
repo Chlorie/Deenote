@@ -87,7 +87,7 @@ namespace Deenote.Project.Models
                     _insertEndTempo = insertEndTempo;
                     _insertContinuingTempo = insertContinuingTempo;
 
-                    _removeTempos = Utils.Array<Tempo>(_endIndex - _startIndex);
+                    _removeTempos = _endIndex == _startIndex ? Array.Empty<Tempo>() : new Tempo[_endIndex - _startIndex];
                     for (int i = 0; i < _removeTempos.Length; i++) {
                         _removeTempos[i] = _tempoList[_startIndex + i];
                     }

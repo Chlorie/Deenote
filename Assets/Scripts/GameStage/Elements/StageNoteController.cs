@@ -111,7 +111,7 @@ namespace Deenote.GameStage.Elements
         public void SyncNoteDataUpdate()
         {
             gameObject.transform.localPosition =
-                gameObject.transform.localPosition.WithX(MainSystem.Args.PositionToX(_note.Data.Position));
+                gameObject.transform.localPosition with { x = MainSystem.Args.PositionToX(_note.Data.Position) };
             var prefab = _note.Data switch {
                 { IsSlide: true } => MainSystem.GameStage.Args.SlideNoteSpritePrefab,
                 { HasSound: true } => MainSystem.GameStage.Args.BlackNoteSpritePrefab,
@@ -172,9 +172,9 @@ namespace Deenote.GameStage.Elements
                                        MainSystem.GameStage.Args.NoteFadeInRangePercent;
                 float alpha = Mathf.Clamp01((noteAppearTime - timeDelta) / noteFadeInTime);
                 _noteSpriteRenderer.color =
-                    Model.IsSelected ? MainSystem.Args.NoteSelectedColor.WithAlpha(alpha) :
-                    Model.IsCollided && !Model.Data.IsSlide ? MainSystem.Args.NoteCollidedColor.WithAlpha(alpha) :
-                    Color.white.WithAlpha(alpha);
+                    Model.IsSelected ? MainSystem.Args.NoteSelectedColor with { a = alpha } :
+                    Model.IsCollided && !Model.Data.IsSlide ? MainSystem.Args.NoteCollidedColor with { a = alpha } :
+                    Color.white with { a = alpha };
 
                 // Position
 
@@ -255,7 +255,7 @@ namespace Deenote.GameStage.Elements
                     float size = Mathf.Pow(ratio, 0.6f) * prefabs.CircleScale;
                     float alpha = Mathf.Pow(1 - ratio, 0.33f);
                     _circleHitEffectSpriteRenderer.transform.localScale = new Vector3(size, size, size);
-                    _circleHitEffectSpriteRenderer.color = Color.black.WithAlpha(alpha);
+                    _circleHitEffectSpriteRenderer.color = Color.black with { a = alpha };
                 }
 
                 // Wave
@@ -267,7 +267,7 @@ namespace Deenote.GameStage.Elements
                     _waveHitEffectSpriteRenderer.transform.localScale
                         = _note.Data.Size * new Vector3(prefabs.WaveScale.x, ratio * prefabs.WaveScale.y, 1f);
                     _waveHitEffectSpriteRenderer.color
-                        = _waveColor.WithAlpha(Mathf.Lerp(0, prefabs.WaveMaxAlpha, alpha));
+                        = _waveColor with { a = Mathf.Lerp(0, prefabs.WaveMaxAlpha, alpha) };
                 }
 
                 // Glow
@@ -280,7 +280,7 @@ namespace Deenote.GameStage.Elements
                     float height = ratio * GlowHeight;
                     _glowHitEffectSpriteRenderer.transform.localScale =
                         new Vector3(prefabs.GlowScale.x, height * prefabs.GlowScale.y, 1f);
-                    _glowHitEffectSpriteRenderer.color = prefabs.GlowColor.WithAlpha(ratio);
+                    _glowHitEffectSpriteRenderer.color = prefabs.GlowColor with { a = ratio };
                 }
             }
         }
@@ -296,7 +296,7 @@ namespace Deenote.GameStage.Elements
 
             if (Stage.PianoVolume > 0f && Model.Data.HasSound) {
                 MainSystem.PianoSoundManager
-                    .PlaySoundsAsync(Model.Data.Sounds, Stage.PianoVolume / 100f, Stage.MusicSpeed / 10f).Forget();
+                    .PlaySoundsAsync(Model.Data.Sounds.AsSpan(), Stage.PianoVolume / 100f, Stage.MusicSpeed / 10f).Forget();
             }
         }
 

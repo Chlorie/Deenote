@@ -38,7 +38,17 @@ namespace Deenote.UI.Windows.Components
             Dropdown.RefreshShownValue();
         }
 
-        public void AddOptions(IEnumerable<LocalizableText> texts)
+        public void AddOptions(ReadOnlySpan<string> texts)
+        {
+            foreach (var text in texts) {
+                var localized = LocalizableText.Raw(text);
+                _options.Add(localized);
+                Dropdown.options.Add(new TMP_Dropdown.OptionData(MainSystem.Localization.GetText(localized)));
+            }
+            Dropdown.RefreshShownValue();
+        }
+
+        public void AddOptions(ReadOnlySpan<LocalizableText> texts)
         {
             foreach (var text in texts) {
                 _options.Add(text);
@@ -54,7 +64,14 @@ namespace Deenote.UI.Windows.Components
             AddOptions(texts);
         }
 
-        public void ResetOptions(IEnumerable<LocalizableText> texts)
+        public void ResetOptions(ReadOnlySpan<string> texts)
+        {
+            _options.Clear();
+            Dropdown.options.Clear();
+            AddOptions(texts);
+        }
+
+        public void ResetOptions(ReadOnlySpan<LocalizableText> texts)
         {
             _options.Clear();
             Dropdown.options.Clear();

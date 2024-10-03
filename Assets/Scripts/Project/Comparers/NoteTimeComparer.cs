@@ -7,6 +7,15 @@ using UnityEngine;
 
 namespace Deenote.Project.Comparers
 {
+    public readonly struct NoteTimeComparable : IComparable<IStageNoteModel>
+    {
+        private readonly float _value;
+
+        public NoteTimeComparable(float value) => _value = value;
+
+        public int CompareTo(IStageNoteModel other) => Comparer<float>.Default.Compare(_value, other.Time);
+    }
+
     public sealed class NoteTimeComparer : IComparer<IStageNoteModel>, IComparer<NoteData>
     {
         public static readonly NoteTimeComparer Instance = new();

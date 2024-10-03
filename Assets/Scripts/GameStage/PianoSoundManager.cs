@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
-using Deenote.Utilities.Robustness;
+using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -68,7 +68,7 @@ namespace Deenote.GameStage
         public UniTaskVoid PlaySoundAsync(PianoSoundData sound, float volume, float speed)
             => PlaySoundAsync(sound.Pitch, (int)(sound.Velocity * volume), sound.Duration, sound.Delay, speed);
 
-        public UniTaskVoid PlaySoundsAsync(ListReadOnlyView<PianoSoundData> sounds, float volume, float speed)
+        public UniTaskVoid PlaySoundsAsync(ReadOnlySpan<PianoSoundData> sounds, float volume, float speed)
         {
             foreach (var sound in sounds) {
                 PlaySoundAsync(sound, volume, speed).Forget();

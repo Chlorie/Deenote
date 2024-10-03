@@ -14,5 +14,13 @@ namespace Deenote.Utilities
             if (min == max) return 0;
             return (value - min) / (max - min);
         }
+
+        public static bool IncAndTryWrap(this ref float value, float delta, float max)
+        {
+            value += delta;
+            if (value <= max) return false;
+            value -= max;
+            return true;
+        }
     }
 }

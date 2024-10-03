@@ -4,7 +4,7 @@ using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.UI.Windows.Components;
 using Deenote.Utilities;
-using Deenote.Utilities.Robustness;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using TMPro;
@@ -39,7 +39,7 @@ namespace Deenote.UI.Windows.Elements
         public void OnCreated(ProjectPropertiesWindow window)
         {
             _window = window;
-            _difficultyDropDown.ResetOptions(DifficultyExt.DropdownOptions);
+            _difficultyDropDown.ResetOptions(DifficultyExt.DropdownOptions.AsSpan());
         }
 
         public void Initialize(ChartModel? chart)

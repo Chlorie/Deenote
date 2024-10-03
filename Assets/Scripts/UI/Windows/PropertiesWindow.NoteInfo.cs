@@ -2,7 +2,6 @@ using Deenote.Project.Comparers;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
-using Deenote.Utilities.Robustness;
 using System;
 using TMPro;
 using UnityEngine;
@@ -149,7 +148,7 @@ namespace Deenote.UI.Windows
                     NotifyNoteWarningTypeChanged(null);
                     NotifyNoteEventIdChanged(null);
                     NotifyNoteIsLinkChanged(null);
-                    NotifyNotePianoSoundsChanged(null);
+                    NotifyNotePianoSoundsChanged(default);
 
                     SetControlsInteractable(false);
                     break;
@@ -169,7 +168,7 @@ namespace Deenote.UI.Windows
                     NotifyNoteWarningTypeChanged(note.WarningType);
                     NotifyNoteEventIdChanged(note.EventId);
                     NotifyNoteIsLinkChanged(note.IsSlide);
-                    NotifyNotePianoSoundsChanged(note.Sounds);
+                    NotifyNotePianoSoundsChanged(note.Sounds.AsSpan());
 
                     SetControlsInteractable(true);
                     break;
@@ -201,7 +200,7 @@ namespace Deenote.UI.Windows
                         : null);
                     NotifyNotePianoSoundsChanged(selectedNotes.IsSameForAll(n => n.Data.Sounds, out var sounds,
                         PianoSoundListDataEqualityComparer.Instance)
-                        ? sounds
+                        ? sounds.AsSpan()
                         : null);
 
                     SetControlsInteractable(true);
@@ -261,17 +260,12 @@ namespace Deenote.UI.Windows
         public void NotifyNoteIsLinkChanged(bool? value)
             => NotifyBooleanValueChanged(_noteIsLinkToggle, value);
 
-        public void NotifyNotePianoSoundsChanged(ListReadOnlyView<PianoSoundData> value)
+        public void NotifyNotePianoSoundsChanged(ReadOnlySpan<PianoSoundData> value)
         {
-            if (value.IsNull) {
-                _noteSoundsText.text = "-";
-                return;
-            }
-
-            _noteSoundsText.text = value.Count switch {
+            _noteSoundsText.text = value.Length switch {
                 0 => "-",
                 1 => value[0].ToPitchDisplayString(),
-                _ => value.Count.ToString(),
+                _ => value.Length.ToString(),
             };
         }
 

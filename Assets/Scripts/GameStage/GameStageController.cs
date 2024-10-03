@@ -465,15 +465,14 @@ namespace Deenote.GameStage
             {
                 var ratio = Mathf.Sin(time * (2f * Mathf.PI / _args.JudgeLinePeriod));
                 ratio = Mathf.InverseLerp(-1f, 1f, ratio);
-                _judgeLineBreathingEffectSpriteRenderer.color = Color.white.WithAlpha(ratio);
+                _judgeLineBreathingEffectSpriteRenderer.color = Color.white with { a = ratio };
             }
 
             // Background
             {
                 var ratio = Mathf.Sin(time * (2f * Mathf.PI / _args.BackgroundMaskPeriod));
                 ratio = Mathf.InverseLerp(-1f, 1f, ratio);
-                _backgroundBreathingMaskImage.color = Color.white
-                    .WithAlpha(Mathf.Lerp(_args.BackgroundMaskMinAlpha, _args.BackgroundMaskMaxAlpha, ratio));
+                _backgroundBreathingMaskImage.color = Color.white with { a = Mathf.Lerp(_args.BackgroundMaskMinAlpha, _args.BackgroundMaskMaxAlpha, ratio) };
             }
 
             // if (lightEffectState) stageLight.intensity = 2.5f + 2.5f * Mathf.Sin(2 * currentTime);
@@ -514,7 +513,7 @@ namespace Deenote.GameStage
             else {
                 alpha = 0f;
             }
-            _judgeLineHitEffectSpriteRenderer.color = Color.white.WithAlpha(alpha);
+            _judgeLineHitEffectSpriteRenderer.color = Color.white with { a = alpha };
 
             NoteModel? GetPreviousHitNote()
             {
