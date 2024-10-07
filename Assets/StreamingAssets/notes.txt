@@ -34,7 +34,9 @@
   2|  explosion
   1|  wave
    0  judgeline
+   0  note indicator
    |-effect
+ -1|  note hold indicator
  -1|  note sprite
    -10 
    |-grid

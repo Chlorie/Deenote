@@ -8,10 +8,8 @@ using UnityEngine.EventSystems;
 namespace Deenote.GameStage
 {
     partial class PerspectiveViewController :
-        IPointerMoveHandler, IPointerDownHandler, IPointerUpHandler, IScrollHandler
+        IPointerMoveHandler, IPointerDownHandler, IPointerUpHandler, IScrollHandler, IPointerExitHandler
     {
-        private MouseButtons _pressedMouseButtons;
-        private MouseActionState _mouseActionState;
         [Inject] private MusicController _musicController = null!;
         [Inject] private KeyBindingManager _keyBindingManager = null!;
 
@@ -25,19 +23,6 @@ namespace Deenote.GameStage
             list.AddGlobalBinding(new KeyBinding(KeyCode.KeypadEnter));
         }
 
-        private void UpdateNoteIndicatorPosition(Vector2 mousePosition)
-        {
-            // Move indicator
-            if (TryConvertScreenPointToNoteCoord(mousePosition, out var coord)) {
-                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-                    _editor.MoveNoteIndicator(coord, true);
-                else
-                    _editor.MoveNoteIndicator(coord, false);
-            }
-            else {
-                _editor.HideNoteIndicator();
-            }
-        }
 
         void IPointerMoveHandler.OnPointerMove(PointerEventData eventData)
         {
@@ -45,10 +30,19 @@ namespace Deenote.GameStage
                 return;
 
             // Note selection
-            if (_pressedMouseButtons.HasFlag(MouseButtons.Left) &&
-                _mouseActionState is MouseActionState.NoteSelecting) {
+            if (_editor.IsSelecting) {
                 if (TryConvertScreenPointToNoteCoord(eventData.position, out var coord)) {
                     _editor.UpdateNoteSelection(coord);
+                }
+            }
+            else {
+                Vector2 mousePosition = eventData.position;
+                // Move indicator
+                if (TryConvertScreenPointToNoteCoord(mousePosition, out var coord)) {
+                    _editor.MoveNoteIndicator(mousePosition, coord);
+                }
+                else {
+                    _editor.HideNoteIndicator();
                 }
             }
         }
@@ -60,16 +54,24 @@ namespace Deenote.GameStage
 
             switch (eventData.button) {
                 case PointerEventData.InputButton.Left: {
-                    _pressedMouseButtons.Add(MouseButtons.Left);
-                    _mouseActionState = MouseActionState.NoteSelecting;
-                    if (TryConvertScreenPointToNoteCoord(eventData.position, out var coord)) {
-                        _editor.StartNoteSelection(coord, toggleMode: UnityUtils.IsFunctionalKeyHolding(ctrl: true));
+                    if (_editor.IsPlacing) {
+                        _editor.CancelPlaceNote();
+                    }
+                    else {
+                        _editor.HideNoteIndicator();
+                        if (TryConvertScreenPointToNoteCoord(eventData.position, out var coord)) {
+                            _editor.BeginSelectNote(coord, toggleMode: UnityUtils.IsFunctionalKeyHolding(ctrl: true));
+                        }
                     }
                     break;
                 }
                 case PointerEventData.InputButton.Right: {
-                    _pressedMouseButtons.Add(MouseButtons.Right);
-                    _mouseActionState = MouseActionState.NotePlacing;
+                    if (!_editor.IsSelecting) {
+                        Vector2 mousepos = eventData.position;
+                        if (TryConvertScreenPointToNoteCoord(mousepos, out var coord)) {
+                            _editor.BeginPlaceNote(mousepos, coord);
+                        }
+                    }
                     break;
                 }
             }
@@ -82,19 +84,15 @@ namespace Deenote.GameStage
 
             switch (eventData.button) {
                 case PointerEventData.InputButton.Left: {
-                    _pressedMouseButtons.Remove(MouseButtons.Left);
-                    _mouseActionState = MouseActionState.None;
-                    _editor.EndNoteSelection();
+                    _editor.EndSelectNote();
                     break;
                 }
                 case PointerEventData.InputButton.Right: {
-                    _pressedMouseButtons.Remove(MouseButtons.Right);
-                    _mouseActionState = MouseActionState.None;
                     if (TryConvertScreenPointToNoteCoord(eventData.position, out var coord)) {
-                        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-                            _editor.PlaceNoteAt(coord, true);
-                        else
-                            _editor.PlaceNoteAt(coord, false);
+                        _editor.EndPlaceNote(coord);
+                    }
+                    else {
+                        _editor.CancelPlaceNote();
                     }
                     break;
                 }
@@ -113,7 +111,12 @@ namespace Deenote.GameStage
             }
         }
 
-        private bool TryConvertScreenPointToNoteCoord(Vector2 screenPoint, out NoteCoord coord)
+        void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
+        {
+            _editor.CancelPlaceNote();
+        }
+
+        public bool TryConvertScreenPointToNoteCoord(Vector2 screenPoint, out NoteCoord coord)
         {
             var transform = _cameraViewRawImage.rectTransform;
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(transform, screenPoint, null,
@@ -133,15 +136,6 @@ namespace Deenote.GameStage
 
             if (!TryConvertViewPointToNoteCoord(viewPoint, out coord))
                 return false;
-
-            // Ignore when press position is too far
-            if (coord.Time > _stage.CurrentMusicTime + _stage.StageNoteAheadTime)
-                return false;
-
-            if (coord.Position is > MainSystem.Args.NoteSelectionMaxPosition
-                or < -MainSystem.Args.NoteSelectionMaxPosition)
-                return false;
-
             return true;
         }
 
@@ -156,13 +150,6 @@ namespace Deenote.GameStage
             }
             coord = default;
             return false;
-        }
-
-        private enum MouseActionState
-        {
-            None,
-            NoteSelecting = 1,
-            NotePlacing = 2,
         }
     }
 }

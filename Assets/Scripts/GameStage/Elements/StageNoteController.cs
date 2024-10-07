@@ -47,8 +47,8 @@ namespace Deenote.GameStage.Elements
                         _glowHitEffectSpriteRenderer.gameObject.SetActive(false);
                         break;
                     case NoteState.Holding:
-                        _noteSpriteRenderer.gameObject.SetActive(true);
-                        _explosionHitEffectSpriteRenderer.gameObject.SetActive(false);
+                        _noteSpriteRenderer.gameObject.SetActive(false);
+                        _explosionHitEffectSpriteRenderer.gameObject.SetActive(true);
                         _circleHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _waveHitEffectSpriteRenderer.gameObject.SetActive(false);
                         _glowHitEffectSpriteRenderer.gameObject.SetActive(false);
@@ -113,6 +113,7 @@ namespace Deenote.GameStage.Elements
             gameObject.transform.localPosition =
                 gameObject.transform.localPosition with { x = MainSystem.Args.PositionToX(_note.Data.Position) };
             var prefab = _note.Data switch {
+                { IsSwipe: true } => MainSystem.GameStage.Args.SwipeNoteSpritePrefab,
                 { IsSlide: true } => MainSystem.GameStage.Args.SlideNoteSpritePrefab,
                 { HasSound: true } => MainSystem.GameStage.Args.BlackNoteSpritePrefab,
                 _ when MainSystem.GameStage.IsPianoNotesDistinguished => MainSystem.GameStage.Args
@@ -128,6 +129,7 @@ namespace Deenote.GameStage.Elements
                 _holdBodySpriteRenderer.transform.localScale = _holdBodySpriteRenderer.transform.localScale with {
                     x = _note.Data.Size * holdPrefab.ScaleX,
                 };
+                // Scale.y is set in UpdateDisplay
             }
             else {
                 _holdBodySpriteRenderer.gameObject.SetActive(false);
@@ -219,6 +221,13 @@ namespace Deenote.GameStage.Elements
                 var holdLengthTime = _note.Data.EndTime - MainSystem.GameStage.CurrentMusicTime;
                 var holdLengthY = MainSystem.Args.TimeToHoldScaleY(holdLengthTime);
                 _holdBodySpriteRenderer.transform.localScale = _holdBodySpriteRenderer.transform.localScale with { y = holdLengthY };
+
+                // TODO: hold's hit effect on judge line
+                ref readonly var hitEffectPrefabs = ref Stage.Args.HitEffectSpritePrefabs;
+                float noteSize = _note.Data.Size;
+                _explosionHitEffectSpriteRenderer.transform.localScale =
+                    noteSize * hitEffectPrefabs.ExplosionScale * Vector3.one;
+                _explosionHitEffectSpriteRenderer.sprite = hitEffectPrefabs.Explosions[5];
             }
 
             void OnHitEffect()

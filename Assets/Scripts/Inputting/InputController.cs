@@ -1,4 +1,5 @@
 using Deenote.Audio;
+using Deenote.Edit;
 using Deenote.Utilities;
 using Reflex.Attributes;
 using UnityEngine;
@@ -44,6 +45,12 @@ namespace Deenote.Inputting
                 MainSystem.Editor.PasteNotes();
 
             // Edit
+            // TODO: 因为shift没法测临时用的O
+            if (UnityUtils.IsKeyDown(KeyCode.O) || UnityUtils.IsKeyDown(KeyCode.RightShift))
+                MainSystem.Editor.PlaceOptions |= EditorController.PlacementOptions.PlaceSlide;
+            if (UnityUtils.IsKeyUp(KeyCode.O) || UnityUtils.IsKeyUp(KeyCode.RightShift))
+                MainSystem.Editor.PlaceOptions &= ~EditorController.PlacementOptions.PlaceSlide;
+
             if (UnityUtils.IsKeyDown(KeyCode.G))
                 MainSystem.Editor.SnapToPositionGrid = MainSystem.Editor.SnapToTimeGrid =
                     !(MainSystem.Editor.SnapToPositionGrid && MainSystem.Editor.SnapToTimeGrid);

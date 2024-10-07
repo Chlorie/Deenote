@@ -12,7 +12,21 @@ namespace Deenote.Edit
         [Header("Note Selection")]
         [SerializeField] NoteSelectionController _noteSelectionController;
 
+        public bool IsSelecting => _noteSelectionController.IsSelecting;
+
         public ReadOnlySpan<NoteModel> SelectedNotes => _noteSelectionController.SelectedNotes;
+
+        private bool IsInNoteSelectionArea(NoteCoord coord)
+        {
+            if (coord.Time > Stage.CurrentMusicTime + Stage.StageNoteAheadTime)
+                return false;
+            if (coord.Time < 0)
+                return false;
+            if (coord.Position is > MainSystem.Args.NoteSelectionMaxPosition
+                or < -MainSystem.Args.NoteSelectionMaxPosition)
+                return false;
+            return true;
+        }
 
         public void SelectAllNotes()
         {
@@ -24,8 +38,11 @@ namespace Deenote.Edit
             OnNotesChanged(false, true);
         }
 
-        public void StartNoteSelection(NoteCoord startCoord, bool toggleMode)
+        public void BeginSelectNote(NoteCoord startCoord, bool toggleMode)
         {
+            if (!IsInNoteSelectionArea(startCoord))
+                return;
+
             OnNoteSelectionChanging();
             _noteSelectionController.StartNoteSelection(startCoord, toggleMode);
             OnNotesChanged(false, true);
@@ -33,12 +50,15 @@ namespace Deenote.Edit
 
         public void UpdateNoteSelection(NoteCoord endCoord)
         {
+            if (!IsInNoteSelectionArea(endCoord))
+                return;
+
             OnNoteSelectionChanging();
             _noteSelectionController.UpdateNoteSelection(endCoord);
             OnNotesChanged(false, true);
         }
 
-        public void EndNoteSelection()
+        public void EndSelectNote()
         {
             _noteSelectionController.EndNoteSelection();
         }
@@ -52,6 +72,8 @@ namespace Deenote.Edit
             private bool _isSelecting;
             private readonly List<NoteModel> _selectedNotes = new();
             private readonly List<NoteModel> _inSelectionNotes = new();
+
+            public bool IsSelecting => _isSelecting;
 
             public ReadOnlySpan<NoteModel> SelectedNotes => _selectedNotes.AsSpan();
 
@@ -130,6 +152,8 @@ namespace Deenote.Edit
 
             public void EndNoteSelection()
             {
+                if (_isSelecting == false)
+                    return;
                 _noteSelectionIndicatorImageTransform.gameObject.SetActive(false);
                 _isSelecting = false;
 

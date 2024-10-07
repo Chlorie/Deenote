@@ -36,6 +36,7 @@ namespace Deenote.Edit
             // TODO: Temp
             SnapToPositionGrid = SnapToTimeGrid = true;
             IsNoteIndicatorOn = true;
+            Start_NotePlacement();
         }
 
         private void OnNoteSelectionChanging()
@@ -46,7 +47,7 @@ namespace Deenote.Edit
         private void OnNotesChanged(bool notesOrderChanged, bool selectionChanged,
             bool noteDataChangedExceptTime = false)
         {
-            GameStageController.Instance.ForceUpdateStageNotes(notesOrderChanged, noteDataChangedExceptTime);
+            Stage.ForceUpdateStageNotes(notesOrderChanged, noteDataChangedExceptTime);
 
             if (selectionChanged) {
                 // Keep sync with NotifyProjectChanged()
@@ -62,7 +63,7 @@ namespace Deenote.Edit
             _operationHistory.Clear();
 
             // _clipBoardNotes.Clear();
-            _isPasting = false;
+            _placeState = PlacementState.Idle;
             RefreshNoteIndicator();
 
             _noteSelectionController.ClearSelection();

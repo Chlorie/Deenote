@@ -7,7 +7,7 @@ using UnityEngine.Pool;
 namespace Deenote.Utilities.Robustness
 {
     [Serializable]
-    public readonly struct PooledObjectListView<T> : IEnumerable<T> where T : Component
+    public readonly struct PooledObjectListView<T> : IEnumerable<T> where T : class
     {
         private readonly ObjectPool<T> _pool;
         [SerializeField]
@@ -42,6 +42,14 @@ namespace Deenote.Utilities.Robustness
             if (!_items.Remove(item)) return false;
             _pool.Release(item);
             return true;
+        }
+
+        public void RemoveAt(Index index)
+        {
+            var offset = index.GetOffset(_items.Count);
+            var item = _items[offset];
+            _items.RemoveAt(offset);
+            _pool.Release(item);
         }
 
         public void RemoveRange(Range range)
@@ -84,6 +92,8 @@ namespace Deenote.Utilities.Robustness
         }
 
         public ResettingScope Resetting() => new(this);
+
+        public ReadOnlySpan<T> AsSpan() => _items.AsSpan();
 
         public List<T>.Enumerator GetEnumerator() => _items.GetEnumerator();
 

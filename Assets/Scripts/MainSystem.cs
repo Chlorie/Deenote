@@ -158,6 +158,29 @@ namespace Deenote
 
             #endregion
 
+            #region NoteTimeAdjusting
+
+            // NOTE: This change is for speed property of note, currently has no use
+
+            // TODO：NoteModel基于这个值排序，
+            public static float NoteActualAppearTime(float time, float noteSpeed) => time - GameStage.StageNoteAheadTime / noteSpeed;
+
+            // 这个时间主要用于显示
+            // 形象地说，Note在出现之前以1速下落，出现之后以NoteSpeed速度下落，在判定线以下以1速下落
+            // 基于这个PseudoTime排列，Note能够以其在界面上的位置排序
+            public static float NoteTimeToPseudoTime(float time, float noteSpeed)
+            {
+                var currentTime = GameStage.CurrentMusicTime;
+                if (time <= currentTime)
+                    return time;
+                else if (time < currentTime + GameStage.StageNoteAheadTime)
+                    return (time - currentTime) * noteSpeed;
+                else
+                    return (time - currentTime) - GameStage.StageNoteAheadTime / noteSpeed;
+            }
+
+            #endregion
+
             public const float MaxBpm = 1200f;
             public const float MinBeatLineInterval = 60 / 1200f;
 

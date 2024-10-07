@@ -6,6 +6,7 @@ namespace Deenote.Utilities
     {
         public static T Instance
         {
+            [System.Diagnostics.DebuggerStepThrough]
             get {
 #if DEBUG
                 if (_instance is null)

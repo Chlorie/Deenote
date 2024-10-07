@@ -52,6 +52,8 @@ namespace Deenote.GameStage
 
         public GridController Grids => GridController.Instance;
 
+        public MusicController MusicController => _musicController;
+
         public PerspectiveViewController PerspectiveView => _perspectiveViewController;
 
         public ChartModel Chart => _chart;
@@ -162,7 +164,7 @@ namespace Deenote.GameStage
             foreach (var note in _stageNoteManager.OnStageNotes) {
                 note.ForceUpdate(noteDataChangedExceptTime);
             }
-            foreach (var note in _stageNoteManager.OnStageNotes) {
+            foreach (var note in _stageNoteManager.TrackingNotes) {
                 note.ForceUpdate(noteDataChangedExceptTime);
             }
         }

@@ -110,9 +110,6 @@ namespace Deenote.GameStage
 
         private void Update()
         {
-            if (_stage.IsActive) {
-                UpdateNoteIndicatorPosition(Input.mousePosition);
-            }
         }
 
         public float SuddenPlusRangeToVisibleRangePercent(int suddenPlusRange)

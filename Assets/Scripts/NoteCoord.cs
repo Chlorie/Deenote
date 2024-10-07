@@ -28,5 +28,7 @@ namespace Deenote
 
         public static NoteCoord operator +(NoteCoord left, NoteCoord right) =>
             new(left.Time + right.Time, left.Position + right.Position);
+
+        public override readonly string ToString() => $"{{ Time: {Time}, Pos: {Position} }}";
     }
 }

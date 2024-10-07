@@ -112,7 +112,7 @@ namespace Deenote.Utilities
         }
 
         public static int LinearSearch<T>(this ReadOnlySpan<T> span, T item, IComparer<T>? comparer)
-            => LinearSearch(span, item, comparer ?? Comparer<T>.Default);
+            => LinearSearch<T, IComparer<T>>(span, item, comparer ?? Comparer<T>.Default);
 
         public static int LinearSearch<T, TComparer>(this ReadOnlySpan<T> span, T item, TComparer comparer) where TComparer : IComparer<T>
             => LinearSearch(span, new ComparerComparable<T, TComparer>(item, comparer));

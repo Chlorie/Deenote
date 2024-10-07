@@ -65,7 +65,6 @@ namespace Deenote.UI.Windows
         [SerializeField] Button _disableCurveButton;
         [SerializeField] TMP_InputField _fillByAmountInputField;
         [SerializeField] Button _fillByAmountButton;
-        [SerializeField] Button _fillByGridButton;
         [SerializeField] GameObject _curveFillGroupGameObject;
 
         [Header("BPM")]
@@ -120,8 +119,6 @@ namespace Deenote.UI.Windows
             _disableCurveButton.onClick.AddListener(OnDisableCurve);
             _fillByAmountInputField.onEndEdit.AddListener(OnFillAmountChanged);
             _fillByAmountButton.onClick.AddListener(OnFillAmountedNotesToCurve);
-            // TODO
-            //_fillByGridButton.onClick.AddListener(null);
 
             // Bpm
             _bpmGroupButton.onClick.AddListener(() => _bpmGroupGameObject.SetActive(!_bpmGroupGameObject.activeSelf));

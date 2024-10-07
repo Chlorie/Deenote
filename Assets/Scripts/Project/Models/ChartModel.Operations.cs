@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Deenote.Project.Models
 {
@@ -44,8 +45,8 @@ namespace Deenote.Project.Models
                 ReadOnlySpan<NoteData> notePrototypes)
             {
                 NoteTimeComparer.AssertInOrder(notePrototypes);
-
                 // Clone Notes
+                using var __sn_dict = DictionaryPool<NoteData, NoteData>.Get(out var slideNotes);
                 List<IStageNoteModel> insertModels = new(notePrototypes.Length);
                 foreach (NoteData notePrototype in notePrototypes) {
                     var insertNote = notePrototype.Clone();
@@ -53,11 +54,27 @@ namespace Deenote.Project.Models
                     insertNote.PositionCoord = coord;
 
                     var noteModel = new NoteModel(insertNote);
-                    insertModels.GetSortedModifier().Add(noteModel);
+                    insertModels.GetSortedModifier(NoteTimeComparer.Instance).Add(noteModel);
                     if (noteModel.Data.IsHold)
                         insertModels.Add(new NoteTailModel(noteModel));
+
+                    if (insertNote.IsSlide) {
+                        slideNotes.Add(notePrototype, insertNote);
+
+                        NoteData prevLink = notePrototype.PrevLink;
+                        NoteData copiedPrev = null;
+                        while (prevLink is not null && !slideNotes.TryGetValue(prevLink, out copiedPrev)) {
+                            prevLink = prevLink.PrevLink;
+                        }
+                        // Here prevLink is null || copiedPrev is not null
+
+                        if (prevLink != null) {
+                            insertNote.PrevLink = copiedPrev;
+                            copiedPrev.NextLink = insertNote;
+                        }
+                    }
                 }
-                // CollectionUtils.InsertionSortAsc(insertModels.AsSpan(), NoteTimeComparer.Instance);
+
 
                 // Pre-find note insert indices
 
@@ -1373,12 +1390,18 @@ namespace Deenote.Project.Models
                             // The note is moved backward
                             return newIndex;
 
-                        newIndex = noteModels[fromIndex..].LinearSearch(new NoteTimeComparable(note.Time));
+                        newIndex = noteModels[(fromIndex + 1)..].LinearSearch(new NoteTimeComparable(note.Time));
                         if (newIndex < 0)
                             newIndex = ~newIndex;
+                        newIndex += fromIndex;
                         if (newIndex != fromIndex)
                             // The note is moved forward
                             return newIndex;
+                        //newIndex += fromIndex + 1;
+                        //if (newIndex != fromIndex + 1)
+                        //    // Insert at newIndex will move a greater item back, so off by 1
+                        //    return newIndex - 1;
+
 
                         // The note doesn't need move
                         return fromIndex;

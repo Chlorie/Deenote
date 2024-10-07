@@ -27,6 +27,7 @@ namespace Deenote.Settings
         public NoteSpritePrefab BlackNoteSpritePrefab;
         public NoteSpritePrefab NoSoundNoteSpritePrefab;
         public NoteSpritePrefab SlideNoteSpritePrefab;
+        public NoteSpritePrefab SwipeNoteSpritePrefab;
         public HoldNoteBodySpritePrefab HoldSpritePrefab;
         public NoteHitEffectSpritePrefabs HitEffectSpritePrefabs;
 

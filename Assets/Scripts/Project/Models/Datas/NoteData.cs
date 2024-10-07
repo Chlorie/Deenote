@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Deenote.Project.Models.Datas
 {
@@ -12,6 +13,8 @@ namespace Deenote.Project.Models.Datas
     [JsonObject(MemberSerialization.OptIn, IsReference = true)]
     public sealed class NoteData
     {
+        public static ObjectPool<NoteData> Pool { get; } = new ObjectPool<NoteData>(createFunc: () => new NoteData());
+
         #region Serialize Members
 
         /// <remarks>
@@ -180,6 +183,12 @@ namespace Deenote.Project.Models.Datas
             set => (Position, Time) = (value.Position, value.Time);
         }
 
+        /// <summary>
+        /// Clone note properties, this method sets <see cref="IsSlide"/> but not clone link info,
+        /// so do not forget to manually set links
+        /// </summary>
+        /// <param name="cloneSounds"></param>
+        /// <returns></returns>
         public NoteData Clone(bool cloneSounds = true)
         {
             List<PianoSoundData>? sounds = null;
@@ -203,6 +212,32 @@ namespace Deenote.Project.Models.Datas
                 EventId = EventId,
                 IsSlide = IsSlide,
             };
+#pragma warning restore CS0618
+        }
+
+        /// <summary>
+        /// Clone note properties, this method sets <see cref="IsSlide"/> but not clone link info,
+        /// so do not forget to manually set links
+        /// </summary>
+        /// <param name="cloneSounds"></param>
+        /// <returns></returns>
+        public void CloneTo(NoteData other, bool cloneSounds = true)
+        {
+#pragma warning disable CS0618 // Clone all
+            other.Type = Type;
+            if (cloneSounds)
+                other.Sounds.AddRange(Sounds.Select(s => s.Clone()));
+            other.Position = Position;
+            other.Size = Size;
+            other.Time = Time;
+            other.Shift = Shift;
+            other.Speed = Speed;
+            other.Duration = Duration;
+            other.Vibrate = Vibrate;
+            other.IsSwipe = IsSwipe;
+            other.WarningType = WarningType;
+            other.EventId = EventId;
+            other.IsSlide = IsSlide;
 #pragma warning restore CS0618
         }
 
