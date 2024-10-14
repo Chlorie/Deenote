@@ -21,6 +21,7 @@ namespace Deenote.GameStage
                     return;
                 __timeGridSubBeatCount = value;
                 UpdateTimeGrids();
+                _propertyChangedNotifier.Invoke(this, NotifyProperty.TimeGridSubBeatCount);
                 _editorPropertiesWindow.NotifyTimeGridSubBeatCountChanged(__timeGridSubBeatCount);
             }
         }

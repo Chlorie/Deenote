@@ -1,7 +1,9 @@
 using Deenote.Edit.Operations;
 using Deenote.GameStage;
 using Deenote.Project;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Windows;
+using System;
 using UnityEngine;
 
 namespace Deenote.Edit
@@ -10,7 +12,7 @@ namespace Deenote.Edit
     /// Containing all chart editing logic, 
     /// DO NOT bypass this class to edit chart and notes, 'cause it contains undo/notify actions etc.
     /// </summary>
-    public sealed partial class EditorController : MonoBehaviour
+    public sealed partial class EditorController : MonoBehaviour, INotifyPropertyChange<EditorController, EditorController.NotifyProperty>
     {
         [SerializeField] private ProjectManager _projectManager = null!;
         private GameStageController Stage => GameStageController.Instance;
@@ -52,6 +54,7 @@ namespace Deenote.Edit
             if (selectionChanged) {
                 // Keep sync with NotifyProjectChanged()
                 // Stage is required to update when selection changed unless project changed
+                _propertyChangedNotifier.Invoke(this, NotifyProperty.SelectedNotes);
                 _editorPropertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
                 _propertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
                 _pianoSoundEditWindow.NotifySelectedNotesChanged(SelectedNotes);
@@ -68,6 +71,7 @@ namespace Deenote.Edit
 
             _noteSelectionController.ClearSelection();
             // Keep sync with OnNoteChanged()
+            _propertyChangedNotifier.Invoke(this, NotifyProperty.SelectedNotes);
             _editorPropertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
             _propertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
             _pianoSoundEditWindow.NotifySelectedNotesChanged(SelectedNotes);
@@ -80,5 +84,31 @@ namespace Deenote.Edit
         public void Redo() => _operationHistory.Redo();
 
         #endregion
+
+        private PropertyChangeNotifier<EditorController, NotifyProperty> _propertyChangedNotifier;
+
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<EditorController> action)
+            => _propertyChangedNotifier.AddListener(flag, action);
+
+        public enum NotifyProperty
+        {
+            SelectedNotes_Changing,
+            SelectedNotes,
+            IsIndicatorOn,
+            SnapToTimeGrid,
+            SnapToPositionGrid,
+
+            NoteTime,
+            NotePosition,
+            NoteSize,
+            NoteShift,
+            NoteSpeed,
+            NoteDuration,
+            NoteKind,
+            NoteVibrate,
+            NoteWarningType,
+            NoteEventId,
+            NoteSounds,
+        }
     }
 }

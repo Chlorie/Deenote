@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e31bc32f2b2145149923e71594451e4e, type: 3}
+  m_Name: KnownIcons
+  m_EditorClassIdentifier: 
+  FileListItemFolderSprite: {fileID: 21300000, guid: 57a1936a76ee68947b064e36eade3d29,
+    type: 3}
+  FileListItemFileSprite: {fileID: 21300000, guid: 3c3065b5b6e92c74f9fc1c2fa53cc6be,
+    type: 3}
+  NoteInfoSoundsEditSprite: {fileID: 21300000, guid: 949b9de9409ddeb4193e41f2ead2c588,
+    type: 3}
+  NoteInfoSoundsAcceptSprite: {fileID: 21300000, guid: 4e3d7bfd8b14e554298a5b333bb2304c,
+    type: 3}
+  NoteInfoSoundsCollapseSprite: {fileID: 21300000, guid: 6d390438810f398478384b600814be1f,
+    type: 3}

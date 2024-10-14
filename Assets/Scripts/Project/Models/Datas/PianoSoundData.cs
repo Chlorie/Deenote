@@ -60,12 +60,12 @@ namespace Deenote.Project.Models.Datas
         }
     }
 
-    public readonly struct PianoSoundValueData
+    public struct PianoSoundValueData
     {
-        public readonly float Delay;
-        public readonly float Duration;
-        public readonly int Pitch;
-        public readonly int Velocity;
+        public float Delay;
+        public float Duration;
+        public int Pitch;
+        public int Velocity;
 
         public PianoSoundValueData(float delay, float duration, int pitch, int velocity)
         {
@@ -74,5 +74,16 @@ namespace Deenote.Project.Models.Datas
             Pitch = pitch;
             Velocity = velocity;
         }
+
+        public override readonly bool Equals(object obj)
+            => obj is PianoSoundValueData data && data == this;
+        public override readonly int GetHashCode()
+            => HashCode.Combine(Delay, Duration, Pitch, Velocity);
+
+        public static bool operator ==(PianoSoundValueData left, PianoSoundValueData right)
+            => left.Delay == right.Delay && left.Duration == right.Duration
+            && left.Pitch == right.Pitch && left.Velocity == right.Velocity;
+        public static bool operator !=(PianoSoundValueData left, PianoSoundValueData right)
+            => !(left == right);
     }
 }

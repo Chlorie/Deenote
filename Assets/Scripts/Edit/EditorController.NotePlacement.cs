@@ -82,6 +82,7 @@ namespace Deenote.Edit
                     _noteIndicatorList.Clear();
                 }
 
+                _propertyChangedNotifier.Invoke(this, NotifyProperty.IsIndicatorOn);
                 _editorPropertiesWindow.NotifyShowIndicatorChanged(__isNoteIndicatorOn);
             }
         }
@@ -93,6 +94,7 @@ namespace Deenote.Edit
                 if (__snapToPositionGrid == value)
                     return;
                 __snapToPositionGrid = value;
+                _propertyChangedNotifier.Invoke(this, NotifyProperty.SnapToPositionGrid); 
                 _editorPropertiesWindow.NotifyVerticalGridSnapChanged(value);
             }
         }
@@ -104,6 +106,7 @@ namespace Deenote.Edit
                 if (__snapToTimeGrid == value)
                     return;
                 __snapToTimeGrid = value;
+                _propertyChangedNotifier.Invoke(this, NotifyProperty.SnapToTimeGrid);
                 _editorPropertiesWindow.NotifyTimeGridSnapChanged(value);
             }
         }
@@ -461,6 +464,7 @@ namespace Deenote.Edit
                 {
                     OnNoteSelectionChanging();
                     _noteSelectionController.ClearSelection();
+                    _propertyChangedNotifier.Invoke(this, NotifyProperty.NoteKind);
                     _propertiesWindow.NotifyNoteIsLinkChanged(false);
                     OnNotesChanged(true, true, noteDataChangedExceptTime: true);
                 })
@@ -468,6 +472,7 @@ namespace Deenote.Edit
                 {
                     OnNoteSelectionChanging();
                     _noteSelectionController.SelectNotes(removedNotes.OfType<NoteModel>());
+                    _propertyChangedNotifier.Invoke(this, NotifyProperty.NoteKind);
                     _propertiesWindow.NotifyNoteIsLinkChanged(
                         SelectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide) ? slide : null);
                     OnNotesChanged(true, true, noteDataChangedExceptTime: true);

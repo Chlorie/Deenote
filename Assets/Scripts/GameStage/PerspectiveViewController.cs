@@ -97,7 +97,8 @@ namespace Deenote.GameStage
                 RenderTexture texture = new(1280, 720, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.None);
                 _cameraViewRawImage.texture = texture;
                 _cameraViewRawImage.enabled = true;
-
+                // TODO: Background stretch height and width to full texture
+                //       View stretch width and has a fixed aspect ratio(1280x720), at the bottom of texture.
                 ViewCamera.targetTexture = texture;
                 BackgroundCamera.targetTexture = texture;
 

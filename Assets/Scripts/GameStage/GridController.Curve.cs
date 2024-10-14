@@ -1,8 +1,11 @@
 using CommunityToolkit.HighPerformance.Buffers;
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;
-using Deenote.Utilities.Robustness;
+using Deenote.Project.Models.Datas;
+using Deenote.Utilities;
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Deenote.GameStage
@@ -11,7 +14,14 @@ namespace Deenote.GameStage
     {
         private const int CubicCurveSegmentCount = 400;
 
+        // Update _curveGenerationContext and _curveLineData everytime when initialize
+        // new curve, and set _size/speedCurveData to null
+        // Lazy initialize _size/speedCurveData when required, and that why we need to
+        // cache _curveGenerationContext
+        private (List<NoteData> InterpolationNotes, CurveKind Kind) _curveGenerationContext = (new(), default);
         private CurveLineData? _curveLineData;
+        private CurveLineData? _sizeCurveData;
+        private CurveLineData? _speedCurveData;
         private Vector2[] _curveCoords = new Vector2[CubicCurveSegmentCount];
         private bool _shouldRenderCurve;
         private bool _isCurveOn;
@@ -23,6 +33,7 @@ namespace Deenote.GameStage
                 if (_isCurveOn == value)
                     return;
                 _isCurveOn = value;
+                _propertyChangedNotifier.Invoke(this, NotifyProperty.IsCurveOn);
                 _editorPropertiesWindow.NotifyCurveOn(_isCurveOn);
             }
         }
@@ -33,17 +44,59 @@ namespace Deenote.GameStage
         {
             NoteTimeComparer.AssertInOrder(interpolationNotes);
             if (interpolationNotes.Length < 2) {
+                _curveGenerationContext.InterpolationNotes.Clear();
+                _curveLineData = null;
+                _sizeCurveData = null;
+                _speedCurveData = null;
                 IsCurveOn = false;
                 return;
             }
 
+            _curveGenerationContext.InterpolationNotes.Clear();
+            foreach (var note in interpolationNotes)
+                _curveGenerationContext.InterpolationNotes.Add(note.Data);
+
             _curveLineData = kind switch {
-                CurveKind.Cubic => CurveLineData.Cubic(interpolationNotes),
-                CurveKind.Linear => CurveLineData.Linear(interpolationNotes),
+                CurveKind.Cubic => CurveLineData.Cubic(_curveGenerationContext.InterpolationNotes.AsSpan(), n => n.Position),
+                CurveKind.Linear => CurveLineData.Linear(_curveGenerationContext.InterpolationNotes.AsSpan(), n => n.Position),
                 _ => null,
             };
+            _sizeCurveData = null;
+            _speedCurveData = null;
             IsCurveOn = true;
             UpdateCurveLine();
+        }
+
+        /// <summary>
+        /// Apply size or speed transform with current curve
+        /// </summary>
+        /// <returns>null if curve is disabled, or given <paramref name="note"/> is not in curve range</returns>
+        public float? GetCurveTransformedValue(float propertyValue, CurveApplyProperty property)
+        {
+            if (!IsCurveOn)
+                return null;
+
+            ref var curveData = ref Unsafe.NullRef<CurveLineData>();
+            switch (property) {
+                case CurveApplyProperty.Size: curveData = ref _sizeCurveData; break;
+                case CurveApplyProperty.Speed: curveData = ref _speedCurveData; break;
+                default: Debug.Assert(false, "Unknown CurveApplyProperty."); return null!;
+            }
+
+            if (curveData is null) {
+                Func<NoteData, float> selector = property switch {
+                    CurveApplyProperty.Size => n => n.Size,
+                    CurveApplyProperty.Speed => n => n.Speed,
+                    _ => null!,
+                };
+                curveData = _curveGenerationContext.Kind switch {
+                    CurveKind.Cubic => CurveLineData.Cubic(_curveGenerationContext.InterpolationNotes.AsSpan(), selector),
+                    CurveKind.Linear => CurveLineData.Linear(_curveGenerationContext.InterpolationNotes.AsSpan(), selector),
+                    _ => null!
+                };
+            }
+
+            return curveData.GetValue(propertyValue);
         }
 
         public void HideCurve() => IsCurveOn = false;
@@ -85,6 +138,12 @@ namespace Deenote.GameStage
             Linear,
         }
 
+        public enum CurveApplyProperty
+        {
+            Size,
+            Speed,
+        }
+
         // Copied from Chlorie's
         private sealed class CurveLineData
         {
@@ -106,14 +165,14 @@ namespace Deenote.GameStage
                 d = new double[pointCount - 1];
             }
 
-            public static CurveLineData Linear(ReadOnlySpan<NoteModel> interpolationNotes)
+            public static CurveLineData Linear(ReadOnlySpan<NoteData> interpolationNotes, Func<NoteData, float> valueSelector)
             {
                 var curve = new CurveLineData(interpolationNotes.Length);
 
                 for (int i = 0; i < interpolationNotes.Length; i++) {
-                    var note = interpolationNotes[i].Data;
+                    var note = interpolationNotes[i];
                     curve.x[i] = note.Time;
-                    curve.a[i] = note.Position;
+                    curve.a[i] = valueSelector.Invoke(note);
                 }
                 for (int i = 0; i < interpolationNotes.Length - 1; i++) {
                     curve.b[i] = (curve.a[i + 1] - curve.a[i]) / (curve.x[i + 1] - curve.x[i]);
@@ -124,7 +183,7 @@ namespace Deenote.GameStage
                 return curve;
             }
 
-            public static CurveLineData Cubic(ReadOnlySpan<NoteModel> interpolationNotes)
+            public static CurveLineData Cubic(ReadOnlySpan<NoteData> interpolationNotes, Func<NoteData, float> valueSelector)
             {
                 var curve = new CurveLineData(interpolationNotes.Length);
 
@@ -132,8 +191,8 @@ namespace Deenote.GameStage
                 int n = count - 1;
 
                 for (int i = 0; i < count; i++) {
-                    curve.x[i] = interpolationNotes[i].Data.Time;
-                    curve.a[i] = interpolationNotes[i].Data.Position;
+                    curve.x[i] = interpolationNotes[i].Time;
+                    curve.a[i] = valueSelector.Invoke(interpolationNotes[i]);
                 }
 
                 var alpha = (stackalloc double[count - 1]);
@@ -170,7 +229,7 @@ namespace Deenote.GameStage
                 return curve;
             }
 
-            public float? GetPosition(float time)
+            public float? GetValue(float time)
             {
                 if (time < x[0] || time > x[^1])
                     return null;
@@ -201,7 +260,7 @@ namespace Deenote.GameStage
                 var span = coords.Span;
                 for (int i = 0; i < CubicCurveSegmentCount; i++) {
                     float time = Mathf.Lerp(min, max, (float)i / CubicCurveSegmentCount);
-                    float pos = GetPosition(time).Value;
+                    float pos = GetValue(time).Value;
                     span[i] = NoteCoord.ClampPosition(time, pos);
                 }
                 return coords;

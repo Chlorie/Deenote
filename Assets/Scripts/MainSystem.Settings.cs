@@ -1,21 +1,46 @@
+using Deenote.Settings;
+using Deenote.UI;
+using Deenote.UI.ComponentModel;
+using System;
 using UnityEngine;
 
 namespace Deenote
 {
     partial class MainSystem
     {
-        [Header("Settings")]
-        [SerializeField] bool __isVSyncOn;
+        [Header("Args")]
+        [SerializeField] GameStageViewArgs _gameStageViewArgs;
+        [SerializeField] KnownIconsArgs _knownIconsArgs;
 
-        public static bool IsVSyncOn
+        partial class Args
         {
-            get => Instance.__isVSyncOn;
-            set {
-                if (Instance.__isVSyncOn == value)
-                    return;
-                Instance.__isVSyncOn = value;
-                QualitySettings.vSyncCount = Instance.__isVSyncOn ? 1 : 0;
-                PreferenceWindow.NotifyIsVSyncOnChanged(Instance.__isVSyncOn);
+            public static GameStageViewArgs GameStageViewArgs => Instance._gameStageViewArgs;
+
+            public static KnownIconsArgs KnownIconsArgs => Instance._knownIconsArgs;
+        }
+
+        public sealed class Settings : INotifyPropertyChange<Settings, Settings.NotifyProperty>
+        {
+            private bool _isVSyncOn;
+            public bool IsVSyncOn
+            {
+                get => _isVSyncOn;
+                set {
+                    if (_isVSyncOn == value)
+                        return;
+                    _isVSyncOn = value;
+                    QualitySettings.vSyncCount = _isVSyncOn ? 1 : 0;
+                    _propertyChangedNotifier.Invoke(this, NotifyProperty.VSync);
+                }
+            }
+
+            private readonly PropertyChangeNotifier<Settings, NotifyProperty> _propertyChangedNotifier = new();
+            public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<Settings> action)
+                => _propertyChangedNotifier.AddListener(flag, action);
+
+            public enum NotifyProperty
+            {
+                VSync,
             }
         }
     }

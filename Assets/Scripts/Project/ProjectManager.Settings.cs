@@ -2,6 +2,7 @@ using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.Utilities;
 using System;
+using System.Collections.Immutable;
 using System.IO;
 using UnityEngine;
 
@@ -22,6 +23,7 @@ namespace Deenote.Project
                 if (_autoSave == value)
                     return;
                 _autoSave = value;
+                _propertyChangedNotifier.Invoke(this, NotifyProperty.AutoSave);
                 MainSystem.PreferenceWindow.NotifyAutoSaveChanged(_autoSave);
             }
         }
@@ -36,6 +38,7 @@ namespace Deenote.Project
                 if (__isAudioDataSaveInProject == value)
                     return;
                 __isAudioDataSaveInProject = value;
+                _propertyChangedNotifier.Invoke(this, NotifyProperty.SaveAudioDataInProject);
                 MainSystem.PreferenceWindow.NotifyIsAudioDataSaveInProjectChanged(value);
             }
         }
@@ -87,13 +90,12 @@ namespace Deenote.Project
 
         public static class EnumExts
         {
-            public static LocalizableText[] AutoSaveDropDownOptions = new[] {
+            public static ImmutableArray<LocalizableText> AutoSaveDropDownOptions = ImmutableArray.Create(
                 LocalizableText.Localized("Window_Preferences_AutoSave_Off"),
                 LocalizableText.Localized("Window_Preferences_AutoSave_On"),
-                LocalizableText.Localized("Window_Preferences_AutoSave_OnAndSaveJson"),
-            };
+                LocalizableText.Localized("Window_Preferences_AutoSave_OnAndSaveJson"));
 
-            public static AutoSaveOption AudoSaveOptionFromDropdownIndex(int index) => (AutoSaveOption)index;
+            public static AutoSaveOption AutoSaveOptionFromDropdownIndex(int index) => (AutoSaveOption)index;
 
             public static int ToDropdownIndex(AutoSaveOption option) => (int)option;
         }

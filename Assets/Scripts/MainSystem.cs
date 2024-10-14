@@ -6,12 +6,15 @@ using Deenote.Inputting;
 using Deenote.Localization;
 using Deenote.Project;
 using Deenote.Project.Models.Datas;
+using Deenote.UI.Dialogs;
 using Deenote.UI.MenuBar;
 using Deenote.UI.StatusBar;
 using Deenote.UI.ToolBar;
+using Deenote.UI.Views;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
 using Reflex.Attributes;
+using System.Collections.Immutable;
 using UnityEngine;
 
 namespace Deenote
@@ -45,7 +48,16 @@ namespace Deenote
         [SerializeField] EditorController _editorController;
         [SerializeField] PianoSoundManager _pianoSoundManager;
 
+        [Header("Views")]
+        [SerializeField] NoteInfoPanelView _noteInfoPanelView;
+        [SerializeField] StatusBarView _statusBarView;
+        [Header("Dialogs")]
+        [SerializeField] FileExplorerDialog _fileExplorerDialog;
+        [SerializeField] MessageBoxDialog _messageBoxDialog;
+
         [Inject] private LocalizationSystem _localizationSystem = null!;
+
+        public static Settings GlobalSettings { get; } = new();
 
         public static ResolutionAdjuster ResolutionAdjuster => Instance._resolutionAdjuster;
 
@@ -72,6 +84,12 @@ namespace Deenote
         public static GameStageController GameStage => Instance._gameStageController;
         public static EditorController Editor => Instance._editorController;
         public static PianoSoundManager PianoSoundManager => Instance._pianoSoundManager;
+
+        public static NoteInfoPanelView NoteInfoPanelView => Instance._noteInfoPanelView;
+        public static StatusBarView StatusBarView => Instance._statusBarView;
+
+        public static FileExplorerDialog FileExplorerDialog => Instance._fileExplorerDialog;
+        public static MessageBoxDialog MessageBoxDialog => Instance._messageBoxDialog;
 
         private void OnApplicationFocus(bool focus)
         {
@@ -112,7 +130,7 @@ namespace Deenote
 #endif
         }
 
-        public static class Args
+        public static partial class Args
         {
             public const float NoteSelectionMaxPosition = 4f;
 
@@ -228,6 +246,9 @@ namespace Deenote
             public static readonly string[] SupportAudioFileExtensions = { ".mp3", ".wav", };
             public static readonly string[] SupportProjectFileExtensions = { DeenotePreferFileExtension, ".dsproj", };
             public static readonly string[] SupportChartFileExtensions = { ".json", ".txt" };
+
+            public static readonly ImmutableArray<string> SupportLoadProjectFileExtensions = 
+                ImmutableArray.Create(DeenotePreferFileExtension, ".dsproj");
         }
     }
 }

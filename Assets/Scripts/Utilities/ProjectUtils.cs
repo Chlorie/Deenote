@@ -19,6 +19,9 @@ namespace Deenote.Utilities
         public static string ToPitchDisplayString(this PianoSoundData sound)
             => ToPitchDisplayString(sound.Pitch);
 
+        public static string ToPitchDisplayString(this in PianoSoundValueData sound)
+            => ToPitchDisplayString(sound.Pitch);
+
         /// <summary>
         /// Set <paramref name="note"/> to non-slide, and 
         /// link its original prev note to original next note

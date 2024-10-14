@@ -183,6 +183,7 @@ namespace Deenote.UI.Windows
 
         #region Notify
 
+        [Obsolete]
         public void NotifyProjectChanged(ProjectModel project)
         {
             NotifyAudioFileChanged(project.SaveAsRefPath ? project.AudioFileRelativePath : null);
@@ -192,7 +193,7 @@ namespace Deenote.UI.Windows
             _projectLoadedChartDropdown.ResetOptions(project.Charts.Select(c =>
                 string.IsNullOrEmpty(c.Name) ? $"<{c.Difficulty.ToDisplayString()}>" : c.Name));
         }
-
+        [Obsolete]
         public void NotifyAudioFileChanged(string? filePath)
         {
             if (filePath is not null)
@@ -200,15 +201,15 @@ namespace Deenote.UI.Windows
             else
                 _projectAudioText.SetLocalizedText("Window_Properties_ProjectInfo_Audio_Embeded");
         }
-
+        [Obsolete]
         public void NotifyProjectMusicNameChanged(string name) => _projectNameInputField.SetTextWithoutNotify(name);
-
+        [Obsolete]
         public void NotifyProjectComposerChanged(string composer) =>
             _projectComposerInputField.SetTextWithoutNotify(composer);
-
+        [Obsolete]
         public void NotifyProjectChartDesignerChanged(string charter) =>
             _projectChartDesignerInputField.SetTextWithoutNotify(charter);
-
+        [Obsolete]
         public void NotifyChartChanged(ProjectModel project, int chartIndex)
         {
             _projectLoadedChartDropdown.Dropdown.SetValueWithoutNotify(chartIndex);
@@ -221,25 +222,25 @@ namespace Deenote.UI.Windows
             NotifyChartRemapVMinChanged(chart.Data.RemapMinVelocity);
             NotifyChartRemapVMaxChanged(chart.Data.RemapMaxVelocity);
         }
-
+        [Obsolete]
         public void NotifyChartNameChanged(string name, Difficulty fallbackDifficulty)
         {
             _chartNameInputField.SetTextWithoutNotify(name);
             _projectLoadedChartDropdown.SetOption(_projectLoadedChartDropdown.Dropdown.value,
                 LocalizableText.Raw(string.IsNullOrEmpty(name) ? $"<{fallbackDifficulty.ToDisplayString()}>" : name));
         }
-
+        [Obsolete]
         public void NotifyChartDifficultyChanged(Difficulty difficulty) =>
             _chartDifficultyDropdown.Dropdown.SetValueWithoutNotify(difficulty.ToInt32());
-
+        [Obsolete]
         public void NotifyChartLevelChangd(string level) => _chartLevelInputField.SetTextWithoutNotify(level);
-
+        [Obsolete]
         public void NotifyChartSpeedChanged(float speed) =>
             _chartSpeedInputField.SetTextWithoutNotify(speed.ToString("F1"));
-
+        [Obsolete]
         public void NotifyChartRemapVMinChanged(int remapVMin) =>
             _chartRemapVMinInputField.SetTextWithoutNotify(remapVMin.ToString());
-
+        [Obsolete]
         public void NotifyChartRemapVMaxChanged(int remapVMax) =>
             _chartRemapVMinInputField.SetTextWithoutNotify(remapVMax.ToString());
 

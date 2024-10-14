@@ -25,6 +25,15 @@ namespace Deenote.Utilities.Robustness
 
         public int IndexOf(T item) => _items.IndexOf(item);
 
+        public int Find<TArgs>(TArgs args, Func<T, TArgs, bool> predicate)
+        {
+            for (int i = 0; i < _items.Count; i++) {
+                if (predicate(_items[i], args))
+                    return i;
+            }
+            return -1;
+        }
+
         public void Add(out T item)
         {
             item = _pool.Get();
@@ -73,6 +82,11 @@ namespace Deenote.Utilities.Robustness
             }
         }
 
+        public void MoveTo(Index fromIndex,Index toIndex)
+        {
+            _items.MoveTo(fromIndex.GetOffset(Count), toIndex.GetOffset(Count));
+        }
+
         public void SetCount(int count)
         {
             if (count <= 0) {
@@ -91,6 +105,15 @@ namespace Deenote.Utilities.Robustness
             }
         }
 
+        /// <summary>
+        /// Create a scope with <see langword="using"/> statement add item after clear.
+        /// Use <see cref="ResettingScope.Add(out T)"/> in scope.
+        /// </summary>
+        /// <remarks>
+        /// The scope doesn't call <see cref="Clear(bool)"/>, it reuse items that is
+        /// already in collection without returning them to the pool, which make execution cheaper.
+        /// </remarks>
+        /// <returns></returns>
         public ResettingScope Resetting() => new(this);
 
         public ReadOnlySpan<T> AsSpan() => _items.AsSpan();

@@ -34,13 +34,13 @@ namespace Deenote.Project
             return IOHelper.ReadProject(br);
         }
 
-        public static UniTask SaveAsync(ProjectModel project, string saveFilePath)
+        private static UniTask SaveAsync(ProjectModel project, string saveFilePath)
         {
             var saveProj = project.CloneForSave();
             return UniTask.RunOnThreadPool(() => Save(saveProj, saveFilePath));
         }
 
-        public static void Save(ProjectModel project, string saveFilePath)
+        private static void Save(ProjectModel project, string saveFilePath)
         {
             using var fs = File.OpenWrite(saveFilePath);
             using var bw = new BinaryWriter(fs);

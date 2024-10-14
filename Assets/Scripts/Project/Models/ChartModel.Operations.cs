@@ -201,7 +201,7 @@ namespace Deenote.Project.Models
                     var note = notes[i];
                     var sounds = note.Data.Sounds;
                     var datas = sounds.Count == 0 ? Array.Empty<PianoSoundValueData>() : new PianoSoundValueData[sounds.Count];
-                    for (int j = 0; j < sounds.Count; i++) {
+                    for (int j = 0; j < sounds.Count; j++) {
                         datas[j] = sounds[i].GetValues();
                     }
                     contexts[i] = (note, datas);

@@ -1,10 +1,12 @@
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
+using System;
 using UnityEngine;
 
 namespace Deenote.GameStage
 {
-    public sealed partial class GridController : SingletonBehavior<GridController>
+    public sealed partial class GridController : SingletonBehavior<GridController>, INotifyPropertyChange<GridController, GridController.NotifyProperty>
     {
         [Header("Notify")]
         [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
@@ -17,7 +19,7 @@ namespace Deenote.GameStage
         {
             float snappedTime = snapTime ? GetNearestTimeGridTime(coord.Time) ?? coord.Time : coord.Time;
             float snappedPos = (snapPosition, IsCurveOn) switch {
-                (true, true) => _curveLineData.GetPosition(snappedTime) ??
+                (true, true) => _curveLineData.GetValue(snappedTime) ??
                                 GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
                 (true, false) => GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
                 (false, _) => coord.Position,
@@ -54,5 +56,16 @@ namespace Deenote.GameStage
         }
 
         #endregion
+
+        private PropertyChangeNotifier<GridController, NotifyProperty> _propertyChangedNotifier;
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<GridController> action)
+            => _propertyChangedNotifier.AddListener(flag, action);
+
+        public enum NotifyProperty
+        {
+            TimeGridSubBeatCount,
+            VerticalGridCount,
+            IsCurveOn,
+        }
     }
 }

@@ -1,6 +1,7 @@
 using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace Deenote.Localization
         [SerializeField] private string _textKey = "";
         [SerializeField] private bool _isLocalized;
 
+        [SerializeField] private LocalizableText _localizableText;
         private List<string> _args = new();
 
         public TMP_Text Text => this.MaybeGetComponent(ref _text);
@@ -42,36 +44,41 @@ namespace Deenote.Localization
         }
 
         public void SetRawText(string text)
-        {
-            SetText(LocalizableText.Raw(text));
-        }
+            => SetText(LocalizableText.Raw(text));
 
         public void SetLocalizedText(string textKey, ReadOnlySpan<string> args = default)
-        {
-            SetText(LocalizableText.Localized(textKey), args);
-        }
+            => SetText(LocalizableText.Localized(textKey), args);
 
         public void SetText(LocalizableText text, ReadOnlySpan<string> args = default)
         {
-            if (LocalizableText == text && args.SequenceEqual(_args.AsSpan()))
-                return;
+            bool valueChanged = false;
+            if (LocalizableText != text) {
+                LocalizableText = text;
+                valueChanged = true;
+            }
+            if (args.SequenceEqual(_args.AsSpan())) {
+                _args.Clear();
+                _args.AddRange(args);
+                valueChanged = true;
+            }
 
-            LocalizableText = text;
-            _args.Clear();
-            foreach (var arg in args)
-                _args.Add(arg);
-
-            RefreshText();
+            if (valueChanged)
+                RefreshText();
         }
 
         private void RefreshText()
         {
             string text = MainSystem.Localization.GetText(LocalizableText);
-
-            for (int i = 0; i < _args.Count; i++) {
-                text = text.Replace($"{{{i}}}", _args[i]);
+            if (_args.Count == 0) {
+                Text.text = text;
             }
-            Text.text = text;
+            else {
+                var sb = new StringBuilder(text);
+                for (int i = 0; i < _args.Count; i++) {
+                    sb.Replace($"{{{i}}}", _args[i]);
+                }
+                Text.text = sb.ToString();
+            }
 
             OnTextUpdated?.Invoke(this);
         }

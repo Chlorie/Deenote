@@ -8,6 +8,13 @@ namespace Deenote.Utilities
     {
         #region Modifiers
 
+        public static void AddRange<T>(this List<T> list, ReadOnlySpan<T> collection)
+        {
+            foreach (var item in collection) {
+                list.Add(item);
+            }
+        }
+
         public static void RemoveRange<T>(this List<T> list, Range range)
         {
             var (offset, length) = range.GetOffsetAndLength(list.Count);
@@ -86,6 +93,15 @@ namespace Deenote.Utilities
         #endregion
 
         #region Search
+
+        public static int Find<T>(this IReadOnlyList<T> list, Predicate<T> predicate)
+        {
+            for (int i = 0; i < list.Count; i++) {
+                if (predicate(list[i]))
+                    return i;
+            }
+            return -1;
+        }
 
         public static bool IsSameForAll<T, TValue>(this ReadOnlySpan<T> list,
             Func<T, TValue> valueGetter, out TValue? value, IEqualityComparer<TValue>? comparer = null)

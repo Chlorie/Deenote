@@ -93,7 +93,7 @@ namespace Deenote.Project.Models.Datas
         [SerializeField]
         [JsonProperty("warningType", DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(WarningType.Default)]
-        [Obsolete("New chart format of DEEMO II removed this property...")]
+        // [Obsolete("New chart format of DEEMO II removed this property...")]
         public WarningType WarningType = WarningType.Default;
 
         [SerializeField]
@@ -183,6 +183,8 @@ namespace Deenote.Project.Models.Datas
             set => (Position, Time) = (value.Position, value.Time);
         }
 
+        public NoteKind Kind => IsSwipe ? NoteKind.Swipe : IsSlide ? NoteKind.Slide : NoteKind.Click;
+
         /// <summary>
         /// Clone note properties, this method sets <see cref="IsSlide"/> but not clone link info,
         /// so do not forget to manually set links
@@ -243,5 +245,7 @@ namespace Deenote.Project.Models.Datas
 
         [Obsolete("For json serialization only")]
         public enum NoteType { Hit = 0, Slide = 1, }
+
+        public enum NoteKind { Click, Slide, Swipe, }
     }
 }

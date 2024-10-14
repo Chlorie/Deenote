@@ -2,6 +2,7 @@ using Deenote.Localization;
 using Deenote.Project;
 using Deenote.UI.Windows.Components;
 using Reflex.Attributes;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,14 +34,14 @@ namespace Deenote.UI.Windows
         {
             _stageEffectToggle.onValueChanged.AddListener(val => MainSystem.GameStage.IsStageEffectOn = val);
             _showFpsToggle.onValueChanged.AddListener(val => MainSystem.StatusBar.IsFpsShown = val);
-            _vSyncToggle.onValueChanged.AddListener(val => MainSystem.IsVSyncOn = val);
+            _vSyncToggle.onValueChanged.AddListener(val => MainSystem.GlobalSettings.IsVSyncOn = val);
             _mouseSensitivityInputField.onEndEdit.AddListener(OnMouseWheelSensitivityChanged);
             _mouseSensitivityReverseButton.onClick.AddListener(() =>
                 MainSystem.Input.MouseScrollSensitivity = -MainSystem.Input.MouseScrollSensitivity);
             _languageDropdown.Dropdown.onValueChanged.AddListener(index =>
                 MainSystem.Localization.CurrentLanguage = _languageDropdown.Options[index].TextOrKey);
             _autoSaveDropDown.Dropdown.onValueChanged.AddListener(index =>
-                MainSystem.ProjectManager.AutoSave = ProjectManager.EnumExts.AudoSaveOptionFromDropdownIndex(index));
+                MainSystem.ProjectManager.AutoSave = ProjectManager.EnumExts.AutoSaveOptionFromDropdownIndex(index));
             _showIneffectivePropertiesToggle.onValueChanged.AddListener(val =>
                 MainSystem.PropertiesWindow.IsIneffectivePropertiesVisible = val);
             _distinguishPianoNoteToggle.onValueChanged.AddListener(val =>
@@ -61,7 +62,7 @@ namespace Deenote.UI.Windows
             _languageDropdown.ResetOptions(MainSystem.Localization.Languages);
             _languageDropdown.Dropdown.SetValueWithoutNotify(
                 _languageDropdown.FindIndex(opt => opt == MainSystem.Localization.CurrentLanguage));
-            _autoSaveDropDown.ResetOptions(ProjectManager.EnumExts.AutoSaveDropDownOptions);
+            _autoSaveDropDown.ResetOptions(ProjectManager.EnumExts.AutoSaveDropDownOptions.AsSpan());
             _autoSaveDropDown.Dropdown.SetValueWithoutNotify(
                 ProjectManager.EnumExts.ToDropdownIndex(MainSystem.ProjectManager.AutoSave));
         }
@@ -84,7 +85,7 @@ namespace Deenote.UI.Windows
         {
             NotifyIsStageEffectOnChanged(MainSystem.GameStage.IsStageEffectOn);
             NotifyIsFpsShownChanged(MainSystem.StatusBar.IsFpsShown);
-            NotifyIsVSyncOnChanged(MainSystem.IsVSyncOn);
+            NotifyIsVSyncOnChanged(MainSystem.GlobalSettings.IsVSyncOn);
             NotifyMouseScrollSensitivityChanged(MainSystem.Input.MouseScrollSensitivity);
             NotifyLanguageChanged(MainSystem.Localization.CurrentLanguage);
             NotifyAutoSaveChanged(MainSystem.ProjectManager.AutoSave);
@@ -94,21 +95,21 @@ namespace Deenote.UI.Windows
         }
 
         #region Notify
-
+        [Obsolete]
         public void NotifyIsStageEffectOnChanged(bool value)
         {
             if (!_window.IsActivated)
                 return;
             _stageEffectToggle.SetIsOnWithoutNotify(value);
         }
-
+        [Obsolete]
         public void NotifyIsFpsShownChanged(bool value)
         {
             if (!_window.IsActivated)
                 return;
             _showFpsToggle.SetIsOnWithoutNotify(value);
         }
-
+        [Obsolete]
         public void NotifyIsVSyncOnChanged(bool value)
         {
             if (!_window.IsActivated)
@@ -132,28 +133,28 @@ namespace Deenote.UI.Windows
                 return;
             _languageDropdown.Dropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(text => text == value));
         }
-
+        [Obsolete]
         public void NotifyAutoSaveChanged(ProjectManager.AutoSaveOption option)
         {
             if (!_window.IsActivated)
                 return;
             _autoSaveDropDown.Dropdown.SetValueWithoutNotify(ProjectManager.EnumExts.ToDropdownIndex(option));
         }
-
+        [Obsolete]
         public void NotifyIsIneffectivePropertiesVisible(bool value)
         {
             if (!_window.IsActivated)
                 return;
             _showIneffectivePropertiesToggle.SetIsOnWithoutNotify(value);
         }
-
+        [Obsolete]
         public void NotifyIsPianoNoteDistinguished(bool value)
         {
             if (!_window.IsActivated)
                 return;
             _distinguishPianoNoteToggle.SetIsOnWithoutNotify(value);
         }
-
+        [Obsolete]
         public void NotifyIsAudioDataSaveInProjectChanged(bool value)
         {
             if (!_window.IsActivated)

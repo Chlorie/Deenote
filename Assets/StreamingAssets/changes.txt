@@ -94,7 +94,9 @@
   - [?] 在设置中恢复？
 
 - [ ] 按横格线间距填充Curve
-- [ ] 提供是否按Curve变化Size的开关
+- [ ] 修改Curve使用操作
+  - 选中note后生成曲线后，单击Fill生成曲线
+  - 对note的size/speed等属性，额外提供按钮对选中的note进行变换。
 
 # Settings
 

@@ -158,7 +158,8 @@ namespace Deenote.UI.Windows
             _stage.EffectVolume = Mathf.Clamp(val, 0, 100);
         }
 
-        private void OnEffectVolumeChanged(float value) => _stage.EffectVolume = Mathf.Clamp((int)value, 0, 100);
+        private void OnEffectVolumeChanged(float value)
+            => _stage.EffectVolume = Mathf.Clamp((int)value, 0, 100);
 
         private void OnMusicVolumeChanged(string text)
         {
@@ -318,7 +319,7 @@ namespace Deenote.UI.Windows
         }
 
         #region Player Notify
-
+        [Obsolete]
         public void NotifyNoteSpeedChanged(int speed)
         {
             if (!_window.IsActivated)
@@ -330,7 +331,7 @@ namespace Deenote.UI.Windows
             _noteSpeedDecButton.gameObject.SetActive(speed > 1);
             _noteSpeedIncButton.gameObject.SetActive(speed < 19);
         }
-
+        [Obsolete]
         public void NotifyMusicSpeedChanged(int speed)
         {
             if (!_window.IsActivated)
@@ -340,7 +341,7 @@ namespace Deenote.UI.Windows
             _musicSpeedDecButton.gameObject.SetActive(speed > 1);
             _musicSpeedIncButton.gameObject.SetActive(speed < 30);
         }
-
+        [Obsolete]
         public void NotifyEffectVolumeChanged(int volume)
         {
             if (!_window.IsActivated)
@@ -349,7 +350,7 @@ namespace Deenote.UI.Windows
             _effectVolumeInputField.SetTextWithoutNotify(volume.ToString());
             _effectVolumeSlider.SetValueWithoutNotify(volume);
         }
-
+        [Obsolete]
         public void NotifyMusicVolumeChanged(int volume)
         {
             if (!_window.IsActivated)
@@ -358,7 +359,7 @@ namespace Deenote.UI.Windows
             _musicVolumeInputField.SetTextWithoutNotify(volume.ToString());
             _musicVolumeSlider.SetValueWithoutNotify(volume);
         }
-
+        [Obsolete]
         public void NotifyPianoVolumeChanged(int volume)
         {
             if (!_window.IsActivated)
@@ -367,7 +368,7 @@ namespace Deenote.UI.Windows
             _pianoVolumeInputField.SetTextWithoutNotify(volume.ToString());
             _pianoVolumeSlider.SetValueWithoutNotify(volume);
         }
-
+        [Obsolete]
         public void NotifyIsShowLinksChanged(bool value)
         {
             if (!_window.IsActivated)
@@ -375,7 +376,7 @@ namespace Deenote.UI.Windows
 
             _showLinksToggle.SetIsOnWithoutNotify(value);
         }
-
+        [Obsolete]
         public void NotifySuddenPlusRangeChanged(int value)
         {
             if (!_window.IsActivated)
@@ -389,6 +390,7 @@ namespace Deenote.UI.Windows
 
         #region Placement Notify
 
+        [Obsolete]
         public void NotifyShowIndicatorChanged(bool value)
         {
             if (!_window.IsActivated)
@@ -396,7 +398,7 @@ namespace Deenote.UI.Windows
 
             _showIndicatorToggle.SetIsOnWithoutNotify(value);
         }
-
+        [Obsolete]
         public void NotifyVerticalGridCountChanged(int count)
         {
             if (!_window.IsActivated)
@@ -404,28 +406,28 @@ namespace Deenote.UI.Windows
 
             _verticalGridInputField.SetTextWithoutNotify(count.ToString());
         }
-
+        [Obsolete]
         public void NotifyVerticalGridSnapChanged(bool value)
         {
             if (!_window.IsActivated)
                 return;
             _verticalGridSnapToggle.SetIsOnWithoutNotify(value);
         }
-
+        [Obsolete]
         public void NotifyTimeGridSubBeatCountChanged(int count)
         {
             if (!_window.IsActivated)
                 return;
             _horizontalGridInputField.SetTextWithoutNotify(count.ToString());
         }
-
+        [Obsolete]
         public void NotifyTimeGridSnapChanged(bool value)
         {
             if (!_window.IsActivated)
                 return;
             _horizontalGridSnapToggle.SetIsOnWithoutNotify(value);
         }
-
+        [Obsolete]
         public void NotifyCurveOn(bool isOn)
         {
             if (!_window.IsActivated)
@@ -438,7 +440,7 @@ namespace Deenote.UI.Windows
         #endregion
 
         #region Bpm Notify
-
+        [Obsolete]
         public void NotifyNoteSelectionChanged(ReadOnlySpan<NoteModel> selectedNotes)
         {
             if (!_window.IsActivated)

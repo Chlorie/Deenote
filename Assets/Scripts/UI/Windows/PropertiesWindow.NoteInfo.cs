@@ -130,7 +130,7 @@ namespace Deenote.UI.Windows
         #endregion
 
         #region Notify
-
+        [Obsolete]
         public void NotifyNoteSelectionChanged(ReadOnlySpan<NoteModel> selectedNotes)
         {
             _selectedNotesText.text = selectedNotes.Length.ToString();
@@ -226,40 +226,40 @@ namespace Deenote.UI.Windows
                 _noteIsLinkToggle.interactable = value;
             }
         }
-
+        [Obsolete]
         public void NotifyNoteTimeChanged(float? value)
             => NotifyFloatValueChanged(_noteTimeInputField, value);
-
+        [Obsolete]
         public void NotifyNotePositionChanged(float? value)
             => NotifyFloatValueChanged(_notePositionInputField, value);
-
+        [Obsolete]
         public void NotifyNoteSizeChanged(float? value)
             => NotifyFloatValueChanged(_noteSizeInputField, value);
-
+        [Obsolete]
         public void NotifyNoteShiftChanged(float? value)
             => NotifyFloatValueChanged(_noteShiftInputField, value);
-
+        [Obsolete]
         public void NotifyNoteSpeedChanged(float? value)
             => NotifyFloatValueChanged(_noteSpeedInputField, value);
-
+        [Obsolete]
         public void NotifyNoteDurationChanged(float? value)
             => NotifyFloatValueChanged(_noteDurationInputField, value);
-
+        [Obsolete]
         public void NotifyNoteVibrateChanged(bool? value)
             => NotifyBooleanValueChanged(_noteVibrateToggle, value);
-
+        [Obsolete]
         public void NotifyNoteIsSwipeChanged(bool? value)
             => NotifyBooleanValueChanged(_noteSwipeToggle, value);
-
+        [Obsolete]
         public void NotifyNoteWarningTypeChanged(WarningType? value)
             => _noteWarningTypeInputField.SetTextWithoutNotify(value?.ToInt32().ToString() ?? "-");
-
+        [Obsolete]
         public void NotifyNoteEventIdChanged(string value)
             => _noteEventIdInputField.SetTextWithoutNotify(value ?? "-");
-
+        [Obsolete]
         public void NotifyNoteIsLinkChanged(bool? value)
             => NotifyBooleanValueChanged(_noteIsLinkToggle, value);
-
+        [Obsolete] // Not Impl new version yet
         public void NotifyNotePianoSoundsChanged(ReadOnlySpan<PianoSoundData> value)
         {
             _noteSoundsText.text = value.Length switch {

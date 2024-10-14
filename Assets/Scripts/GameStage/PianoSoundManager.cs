@@ -65,8 +65,12 @@ namespace Deenote.GameStage
         }
 
         // TODO: split playback volume and velocity
-        public UniTaskVoid PlaySoundAsync(PianoSoundData sound, float volume, float speed)
+        public UniTaskVoid PlaySoundAsync(PianoSoundValueData sound, float volume, float speed)
             => PlaySoundAsync(sound.Pitch, (int)(sound.Velocity * volume), sound.Duration, sound.Delay, speed);
+
+        public UniTaskVoid PlaySoundAsync(PianoSoundData sound, float volume, float speed)
+            => PlaySoundAsync(sound.GetValues(), volume, speed);
+
 
         public UniTaskVoid PlaySoundsAsync(ReadOnlySpan<PianoSoundData> sounds, float volume, float speed)
         {

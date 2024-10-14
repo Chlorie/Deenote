@@ -1,0 +1,44 @@
+English
+
+# Grammar of this file:
+# The FIRST LINE in the file is the language name that will display in application.
+#
+# Format 'key=value' defines a localized text, change the right part to change the display text
+# Use <br/> escape new line
+# Use {0} define parameters
+# Use 'key="""' start a multi-line text, a multiline text should end with a line that is '"""'
+#
+# An empty line or a line contains only white space is ignored
+# A line starts with '#' is ignored. (It looks like markdown but is actually not xD
+
+# Static
+
+## Menu
+
+## StatusBar
+Status_Fps=FPS: {0}
+
+# Operations
+
+## Menu
+
+OpenProjectOnOpen_MsgBox_Title=Open new project
+OpenProjectOnOpen_MsgBox_Content="""
+    Current project will be closed when you start a new project.
+    <color=#ff5555>Make sure that you have SAVED your project!</color>
+    """
+OpenProjectOnOpen_MsgBox_Y=Open
+OpenProjectOnOpen_MsgBox_N=Cancel
+OpenProjectOnOpen_Status_Loaded=Project loaded.
+
+LoadProjectFailed_MsgBox_Title=Load project file
+LoadProjectFailed_MsgBox_Content="""
+    Failed to load project file, the file may not be a Deenote project file or may be corrupted.
+    Please select another file.
+    """
+LoadProjectFailed_MsgBox_Y=OK
+LoadProjectFailed_MsgBox_N=Cancel
+
+SaveProject_Status_Saving=Project saving...
+SaveProject_Status_Saved=Project saved.
+SaveProject_Status_Failed=Failed to save project.

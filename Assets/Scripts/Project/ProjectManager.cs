@@ -118,6 +118,20 @@ namespace Deenote.Project
                 .Forget();
         }
 
+        /// <returns>Is project opened</returns>
+        public async UniTask<bool> LoadProjectFileAsync(string filePath)
+        {
+            ProjectModel proj = await LoadAsync(filePath);
+            if (proj is null)
+                return false;
+
+            CurrentProjectSaveDirectory = Path.GetDirectoryName(filePath);
+            _currentProjectFileName = Path.GetFileName(filePath);
+            CurrentProject = proj;
+            _propertyChangedNotifier.Invoke(this, NotifyProperty.CurrentProject);
+            return true;
+        }
+
         public async UniTaskVoid SaveProjectAsync()
         {
             SavePlayerPrefs();
@@ -133,9 +147,33 @@ namespace Deenote.Project
             }
             else {
                 MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_SaveProject_Saving"));
-                await SaveAsync(CurrentProject, Path.Combine(CurrentProjectSaveDirectory, _currentProjectFileName));
+                var filePath = Path.Combine(CurrentProjectSaveDirectory, _currentProjectFileName);
+                await SaveAsync(CurrentProject, filePath);
                 MainSystem.StatusBar
                     .SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
+            }
+        }
+
+        /// <returns>Save file path</returns>
+        public async UniTask<string?> SaveProjectAsync2()
+        {
+            //SavePlayerPrefs();
+            // TODO: 考虑把ProjectFilePath塞到ProjectModel里？
+            if (CurrentProject is null) {
+                Debug.Assert(false, "Save nothing");
+                return null;
+            }
+
+            if (CurrentProjectSaveDirectory is null) {
+                return await SaveAsInternalAsync();
+            }
+            else {
+                MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_SaveProject_Saving"));
+                var filePath = Path.Combine(CurrentProjectSaveDirectory, _currentProjectFileName);
+                await SaveAsync(CurrentProject, filePath);
+                MainSystem.StatusBar
+                    .SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
+                return filePath;
             }
         }
 
@@ -144,14 +182,35 @@ namespace Deenote.Project
             await SaveAsInternalAsync();
         }
 
-        private async UniTask SaveAsInternalAsync()
+        /// <returns>Save successfully</returns>
+        public async UniTask<bool> SaveCurrentProjectToAsync(string targetFilePath)
         {
             if (CurrentProject is null)
-                return;
+                return false;
+
+            if (CurrentProjectSaveDirectory is null && CurrentProject.SaveAsRefPath) {
+                CurrentProjectSaveDirectory = Path.GetDirectoryName(targetFilePath);
+                CurrentProject.AudioFileRelativePath = Path.GetRelativePath(
+                    CurrentProjectSaveDirectory, CurrentProject.AudioFileRelativePath);
+                _currentProjectFileName = Path.GetFileName(targetFilePath);
+            }
+            else {
+                CurrentProjectSaveDirectory = Path.GetDirectoryName(targetFilePath);
+                _currentProjectFileName = Path.GetFileName(targetFilePath);
+            }
+
+            await SaveAsync(CurrentProject, targetFilePath);
+            return true;
+        }
+
+        private async UniTask<string?> SaveAsInternalAsync()
+        {
+            if (CurrentProject is null)
+                return null;
 
             var res = await MainSystem.FileExplorer.OpenInputFileAsync(MainSystem.Args.DeenotePreferFileExtension);
             if (res.IsCancelled)
-                return;
+                return null;
 
             if (CurrentProjectSaveDirectory is null && CurrentProject.SaveAsRefPath) {
                 CurrentProjectSaveDirectory = Path.GetDirectoryName(res.Path);
@@ -168,12 +227,15 @@ namespace Deenote.Project
             await SaveAsync(CurrentProject, res.Path);
             MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f)
                 .Forget();
+
+            return res.Path;
         }
 
         private void SavePlayerPrefs() { }
 
         private void OnProjectChanged(int selectedChartIndex)
         {
+            _propertyChangedNotifier.Invoke(this, NotifyProperty.CurrentProject);
             _editor.NotifyProjectChanged();
             _propertiesWindow.NotifyProjectChanged(CurrentProject);
 

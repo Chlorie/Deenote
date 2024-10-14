@@ -1,24 +1,19 @@
 using Deenote.Audio;
 using Deenote.Edit;
 using Deenote.GameStage.Elements;
-using Deenote.Project.Comparers;
 using Deenote.Project.Models;
-using Deenote.Project.Models.Datas;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
-using Deenote.Utilities.Robustness;
 using Reflex.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace Deenote.GameStage
 {
-    public sealed partial class GameStageController : SingletonBehavior<GameStageController>
+    public sealed partial class GameStageController : SingletonBehavior<GameStageController>, INotifyPropertyChange<GameStageController, GameStageController.NotifyProperty>
     {
         [Header("Effect")]
         [SerializeField] SpriteRenderer _judgeLineBreathingEffectSpriteRenderer;
@@ -119,6 +114,7 @@ namespace Deenote.GameStage
             //UpdateStageNotes();
             ForceUpdateNotesDisplay();
 
+            _propertyChangedNotifier.Invoke(this, NotifyProperty.CurrentChart);
             _propertiesWindow.NotifyChartChanged(project, chartIndex);
             _perspectiveViewWindow.NotifyChartChanged(project, chart);
 
@@ -142,6 +138,12 @@ namespace Deenote.GameStage
                     }
                 }
             }
+        }
+
+        public void LoadChartInCurrentProject(ChartModel chart)
+        {
+            Debug.Assert(MainSystem.ProjectManager.CurrentProject.Charts.Contains(chart));
+            // TODO: Impl
         }
 
         #region Note
@@ -570,6 +572,32 @@ namespace Deenote.GameStage
             if (!IsActive) return;
             if (!IsMusicPlaying && _manualPlaySpeedMultiplier is not 0f)
                 _musicController.NudgePlaybackPosition(Time.deltaTime * _manualPlaySpeedMultiplier);
+        }
+
+        private PropertyChangeNotifier<GameStageController, NotifyProperty> _propertyChangedNotifier;
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<GameStageController> action)
+            => _propertyChangedNotifier.AddListener(flag, action);
+
+        public enum NotifyProperty
+        {
+            NoteSpeed,
+            MusicSpeed,
+            EffectVolume,
+            MusicVolume,
+            PianoVolume,
+            IsShowLinkLines,
+            SuddenPlus,
+
+            CurrentChart,
+            ChartName,
+            ChartDifficulty,
+            ChartLevel,
+            ChartSpeed,
+            ChartRemapMinVolume,
+            ChartRemapMaxVolume,
+
+            StageEffect,
+            DistinguishPianoNotes,
         }
     }
 }
