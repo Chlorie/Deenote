@@ -1,6 +1,7 @@
 using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -24,8 +25,8 @@ namespace Deenote.Localization
         // I have to do this because there's a huge amount of assigned components in editor...
         private LocalizableText LocalizableText
         {
-            get => _isLocalized ? LocalizableText.Localized(_textKey) : LocalizableText.Raw(_textKey);
-            set => (_isLocalized, _textKey) = (value.IsLocalized, value.TextOrKey);
+            get => _localizableText;//_isLocalized ? LocalizableText.Localized(_textKey) : LocalizableText.Raw(_textKey);
+            set => _localizableText = value;//(_isLocalized, _textKey) = (value.IsLocalized, value.TextOrKey);
         }
 
         private void Awake()
@@ -46,9 +47,12 @@ namespace Deenote.Localization
         public void SetRawText(string text)
             => SetText(LocalizableText.Raw(text));
 
-        public void SetLocalizedText(string textKey, ReadOnlySpan<string> args = default)
-            => SetText(LocalizableText.Localized(textKey), args);
+        public void SetLocalizedText(string textKey, string arg0)
+            => SetText(LocalizableText.Localized(textKey), MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
 
+        public void SetLocalizedText(string textKey)
+            => SetText(LocalizableText.Localized(textKey), default);
+        
         public void SetText(LocalizableText text, ReadOnlySpan<string> args = default)
         {
             bool valueChanged = false;

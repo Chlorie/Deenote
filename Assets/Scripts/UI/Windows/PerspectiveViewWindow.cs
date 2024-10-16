@@ -46,8 +46,8 @@ namespace Deenote.UI.Windows
         private void OnFirstActivating()
         {
             _aspectDropdown.ResetOptions(ViewAspectRatioExt.ViewAspectDropdownOptions.AsSpan());
-            _aspectDropdown.Dropdown.SetValueWithoutNotify(PerspectiveViewController.Instance.AspectRatio
-                .ToDropdownIndex());
+            _aspectDropdown.Dropdown.SetValueWithoutNotify(0);
+                //PerspectiveViewController.Instance.AspectRatio.ToDropdownIndex());
         }
 
         #region Event
@@ -55,7 +55,7 @@ namespace Deenote.UI.Windows
         private void OnAspectChanged(int value)
         {
             var aspectRatio = ViewAspectRatioExt.FromDropdownIndex(value);
-            PerspectiveViewController.Instance.AspectRatio = aspectRatio;
+            PerspectiveViewController.Instance.AspectRatio = aspectRatio.GetRatio();
         }
 
         #endregion
@@ -68,7 +68,7 @@ namespace Deenote.UI.Windows
         }
 
         #region Notify
-
+        [Obsolete]
         public void NotifyAspectRatioChanged(ViewAspectRatio aspectRatio)
         {
             _window.FixedAspectRatio = aspectRatio.GetRatio();

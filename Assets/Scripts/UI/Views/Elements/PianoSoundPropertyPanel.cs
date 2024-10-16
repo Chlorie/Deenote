@@ -104,22 +104,34 @@ namespace Deenote.UI.Views.Elements
 
             void NotifySoundsChanged(ReadOnlySpan<NoteModel> selectedNotes)
             {
-                if (selectedNotes.Length == 0) {
-                    _soundsProperty.Button.Text.SetRawText("-");
-                    goto UpdatePanel;
-                }
-                else if (SameForAll(selectedNotes, out var sounds)) {
-                    _soundsProperty.Button.Text.SetRawText(sounds.Count switch {
-                        0 => "-",
-                        1 => sounds[0].ToPitchDisplayString(),
-                        _ => sounds.Count.ToString(),
-                    });
-                }
-                else {
-                    _soundsProperty.Button.Text.SetRawText("-");
+                switch (selectedNotes.Length) {
+                    case 0:
+                        _soundsProperty.Button.Text.SetRawText("-");
+                        break;
+                    case 1: {
+                        var sounds = selectedNotes[0].Data.Sounds;
+                        _soundsProperty.Button.Text.SetRawText(sounds.Count switch {
+                            0 => "-",
+                            1 => sounds[0].ToPitchDisplayString(),
+                            _ => sounds.Count.ToString(),
+                        });
+                        break;
+                    }
+                    default: {
+                        if (SameForAll(selectedNotes, out var sounds)) {
+                            _soundsProperty.Button.Text.SetRawText(sounds.Count switch {
+                                0 => "-",
+                                1 => sounds[0].ToPitchDisplayString(),
+                                _ => sounds.Count.ToString(),
+                            });
+                        }
+                        else {
+                            _soundsProperty.Button.Text.SetRawText("-");
+                        }
+                        break;
+                    }
                 }
 
-            UpdatePanel:
                 // If edit panel is not expanded, do not update sound list.
                 if (_editPanelGameObject.activeSelf) {
                     ResetEditingNotesAndLoad(selectedNotes);

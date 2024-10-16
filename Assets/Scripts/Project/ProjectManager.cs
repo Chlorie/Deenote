@@ -4,6 +4,7 @@ using Deenote.GameStage;
 using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.UI.Windows;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -17,11 +18,13 @@ namespace Deenote.Project
         [SerializeField] EditorController _editor;
         [SerializeField] GameStageController _stage;
 
+        [Obsolete]
         private string _currentProjectFileName;
 
         /// <summary>
         /// Is <see langword="null"/> if current project hasn't been saved.
         /// </summary>
+        [Obsolete]
         public string? CurrentProjectSaveDirectory { get; private set; }
 
         public ProjectModel? CurrentProject { get; private set; }
@@ -51,6 +54,7 @@ namespace Deenote.Project
             UpdateAutoSave();
         }
 
+        [Obsolete]
         public async UniTaskVoid CreateNewProjectAsync()
         {
             if (CurrentProject is not null) {
@@ -73,6 +77,13 @@ namespace Deenote.Project
                 .Forget();
         }
 
+        public void LoadProject(ProjectModel project)
+        {
+            CurrentProject = project;
+            _propertyChangedNotifier.Invoke(this, NotifyProperty.CurrentProject);
+        }
+
+        [Obsolete]
         public async UniTaskVoid OpenProjectAsync()
         {
             if (CurrentProject is not null) {
@@ -119,22 +130,20 @@ namespace Deenote.Project
         }
 
         /// <returns>Is project opened</returns>
-        public async UniTask<bool> LoadProjectFileAsync(string filePath)
+        public async UniTask<bool> OpenLoadProjectFileAsync(string filePath)
         {
             ProjectModel proj = await LoadAsync(filePath);
             if (proj is null)
                 return false;
 
-            CurrentProjectSaveDirectory = Path.GetDirectoryName(filePath);
-            _currentProjectFileName = Path.GetFileName(filePath);
-            CurrentProject = proj;
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.CurrentProject);
+            LoadProject(proj);
             return true;
         }
-
+        
+        [Obsolete]
         public async UniTaskVoid SaveProjectAsync()
         {
-            SavePlayerPrefs();
+            return;
 
             if (CurrentProject is null) {
                 Debug.Assert(false, "Save nothing");
@@ -153,56 +162,37 @@ namespace Deenote.Project
                     .SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
             }
         }
-
-        /// <returns>Save file path</returns>
-        public async UniTask<string?> SaveProjectAsync2()
-        {
-            //SavePlayerPrefs();
-            // TODO: 考虑把ProjectFilePath塞到ProjectModel里？
-            if (CurrentProject is null) {
-                Debug.Assert(false, "Save nothing");
-                return null;
-            }
-
-            if (CurrentProjectSaveDirectory is null) {
-                return await SaveAsInternalAsync();
-            }
-            else {
-                MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_SaveProject_Saving"));
-                var filePath = Path.Combine(CurrentProjectSaveDirectory, _currentProjectFileName);
-                await SaveAsync(CurrentProject, filePath);
-                MainSystem.StatusBar
-                    .SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
-                return filePath;
-            }
-        }
-
+        [Obsolete]
         public async UniTaskVoid SaveAsAsync()
         {
             await SaveAsInternalAsync();
         }
 
-        /// <returns>Save successfully</returns>
-        public async UniTask<bool> SaveCurrentProjectToAsync(string targetFilePath)
+        public UniTask SaveCurrentProjectAsync()
         {
-            if (CurrentProject is null)
-                return false;
-
-            if (CurrentProjectSaveDirectory is null && CurrentProject.SaveAsRefPath) {
-                CurrentProjectSaveDirectory = Path.GetDirectoryName(targetFilePath);
-                CurrentProject.AudioFileRelativePath = Path.GetRelativePath(
-                    CurrentProjectSaveDirectory, CurrentProject.AudioFileRelativePath);
-                _currentProjectFileName = Path.GetFileName(targetFilePath);
-            }
-            else {
-                CurrentProjectSaveDirectory = Path.GetDirectoryName(targetFilePath);
-                _currentProjectFileName = Path.GetFileName(targetFilePath);
-            }
-
-            await SaveAsync(CurrentProject, targetFilePath);
-            return true;
+            Debug.Assert(CurrentProject.ProjectFilePath != null);
+            return SaveCurrentProjectToAsync(CurrentProject.ProjectFilePath);
         }
 
+        /// <returns>Save successfully</returns>
+        public async UniTask SaveCurrentProjectToAsync(string targetFilePath)
+        {
+            if (CurrentProject is null)
+                return;
+
+            // TODO: Handle AudioFileRelativePath ?
+
+            //if (CurrentProjectSaveDirectory is null && CurrentProject.SaveAsRefPath) {
+            //    CurrentProject.AudioFileRelativePath = Path.GetRelativePath(
+            //        CurrentProjectSaveDirectory, CurrentProject.AudioFileRelativePath);
+            //}
+            //else {
+            //}
+
+            await SaveAsync(CurrentProject, targetFilePath);
+            ProjectModel.InitializationHelper.SetProjectFilePath(CurrentProject, targetFilePath);
+        }
+        [Obsolete]
         private async UniTask<string?> SaveAsInternalAsync()
         {
             if (CurrentProject is null)
@@ -230,8 +220,6 @@ namespace Deenote.Project
 
             return res.Path;
         }
-
-        private void SavePlayerPrefs() { }
 
         private void OnProjectChanged(int selectedChartIndex)
         {

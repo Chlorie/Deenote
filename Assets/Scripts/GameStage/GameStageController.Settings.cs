@@ -21,7 +21,7 @@ namespace Deenote.GameStage
                 if (__showLinkLines == value) return;
                 __showLinkLines = value;
                 _editorController.NotifyIsShowLinkLinesChanged(__showLinkLines);
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.IsShowLinkLines);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.IsShowLinkLines);
                 _editorPropertiesWindow.NotifyIsShowLinksChanged(__showLinkLines);
             }
         }
@@ -38,7 +38,7 @@ namespace Deenote.GameStage
                 __isStageEffectOn = value;
                 if (__isStageEffectOn is false)
                     StopStageEffect();
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.StageEffect);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.StageEffect);
                 MainSystem.PreferenceWindow.NotifyIsStageEffectOnChanged(__isStageEffectOn);
             }
         }
@@ -60,7 +60,7 @@ namespace Deenote.GameStage
                 SearchForNotesFromStart();
                 //UpdateStageNotes();
                 ForceUpdateNotesDisplay();
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.NoteSpeed);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteSpeed);
                 _editorPropertiesWindow.NotifyNoteSpeedChanged(__noteSpeed);
             }
         }
@@ -80,7 +80,7 @@ namespace Deenote.GameStage
                     return;
                 __musicSpeed = value;
                 _musicController.Pitch = value / 10f;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.MusicSpeed);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.MusicSpeed);
                 _editorPropertiesWindow.NotifyMusicSpeedChanged(__musicSpeed);
             }
         }
@@ -99,7 +99,7 @@ namespace Deenote.GameStage
                 if (__effectVolume == value)
                     return;
                 __effectVolume = value;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.EffectVolume);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.EffectVolume);
                 _editorPropertiesWindow.NotifyEffectVolumeChanged(__effectVolume);
             }
         }
@@ -119,7 +119,7 @@ namespace Deenote.GameStage
                     return;
                 __musicVolume = value;
                 _musicController.Volume = __musicVolume / 100f;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.MusicVolume);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.MusicVolume);
                 _editorPropertiesWindow.NotifyMusicVolumeChanged(__musicVolume);
             }
         }
@@ -138,7 +138,7 @@ namespace Deenote.GameStage
                 if (__pianoVolume == value)
                     return;
                 __pianoVolume = value;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.PianoVolume);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.PianoVolume);
                 _editorPropertiesWindow.NotifyPianoVolumeChanged(__pianoVolume);
             }
         }
@@ -162,7 +162,7 @@ namespace Deenote.GameStage
                 ForceUpdateNotesDisplay();
                 Grids.UpdateVerticalGrids();
                 PerspectiveLinesRenderer.Instance.NotifyStageSuddenPlusChanged(__suddenPlusRange);
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.SuddenPlus);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.SuddenPlus);
                 _editorPropertiesWindow.NotifySuddenPlusRangeChanged(__suddenPlusRange);
             }
         }
@@ -177,7 +177,7 @@ namespace Deenote.GameStage
                     return;
                 __isPianoNotesDistinguished = value;
                 ForceUpdateStageNotes(false, true);
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.DistinguishPianoNotes);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.DistinguishPianoNotes);
                 MainSystem.PreferenceWindow.NotifyIsPianoNoteDistinguished(__isPianoNotesDistinguished);
             }
         }

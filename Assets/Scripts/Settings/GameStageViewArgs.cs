@@ -14,6 +14,8 @@ namespace Deenote.Settings
         public Color HardLevelTextColor;
         public Sprite ExtraDifficultyIconSprite;
         public Color ExtraLevelTextColor;
+        [Header("Combo")]
+        public int MinDisplayCombo;
         [Header("Combo Number")]
         public float ComboNumberGreyIncTime;
         public float ComboNumberGreyDecTime;

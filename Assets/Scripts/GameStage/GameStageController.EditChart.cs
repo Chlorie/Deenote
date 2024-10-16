@@ -7,14 +7,14 @@ namespace Deenote.GameStage
         public void EditChartName(string name)
         {
             Chart.Name = name;
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartName);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartName);
             _propertiesWindow.NotifyChartNameChanged(name, Chart.Difficulty);
         }
 
         public void EditChartDifficulty(Difficulty difficulty)
         {
             Chart.Difficulty = difficulty;
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartDifficulty);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartDifficulty);
             _propertiesWindow.NotifyChartDifficultyChanged(difficulty);
             _perspectiveViewWindow.NotifyChartDifficultyChanged(difficulty);
         }
@@ -22,7 +22,7 @@ namespace Deenote.GameStage
         public void EditChartLevel(string level)
         {
             Chart.Level = level;
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartLevel);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartLevel);
             _propertiesWindow.NotifyChartLevelChangd(level);
             _perspectiveViewWindow.NotifyChartLevelChanged(level);
         }
@@ -30,21 +30,21 @@ namespace Deenote.GameStage
         public void EditChartSpeed(float speed)
         {
             Chart.Data.Speed = speed;
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartSpeed);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartSpeed);
             _propertiesWindow.NotifyChartSpeedChanged(speed);
         }
 
         public void EditChartRemapVMin(int remapVMin)
         {
             Chart.Data.RemapMinVelocity = remapVMin;
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartRemapMinVolume);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartRemapMinVolume);
             _propertiesWindow.NotifyChartRemapVMinChanged(remapVMin);
         }
 
         public void EditChartRemapVMax(int remapVMax)
         {
             Chart.Data.RemapMinVelocity = remapVMax;
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartRemapMaxVolume);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartRemapMaxVolume);
             _propertiesWindow.NotifyChartRemapVMaxChanged(remapVMax);
         }
     }

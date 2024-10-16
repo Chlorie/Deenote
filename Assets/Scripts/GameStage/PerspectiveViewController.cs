@@ -1,15 +1,18 @@
+using Cysharp.Threading.Tasks;
 using Deenote.Edit;
 using Deenote.UI;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Windows;
 using Deenote.Utilities;
 using System;
+using System.Collections.Immutable;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 namespace Deenote.GameStage
 {
-    public sealed partial class PerspectiveViewController : SingletonBehavior<PerspectiveViewController>
+    public sealed partial class PerspectiveViewController : SingletonBehavior<PerspectiveViewController>, INotifyPropertyChange<PerspectiveViewController, PerspectiveViewController.NotifyProperty>
     {
         [Header("Notify")]
         [SerializeField] EditorController _editor;
@@ -37,17 +40,29 @@ namespace Deenote.GameStage
 
         public bool IsFullScreen { get; private set; }
 
-        private ViewAspectRatio __aspectRatio;
+        //private ViewAspectRatio __aspectRatio;
 
-        public ViewAspectRatio AspectRatio
+        //public ViewAspectRatio AspectRatio
+        //{
+        //    get => __aspectRatio;
+        //    set {
+        //        if (__aspectRatio == value)
+        //            return;
+        //        __aspectRatio = value;
+        //        _imageAspectFitter.AspectRatio = __aspectRatio.GetRatio();
+        //        _perspectiveViewWindow.NotifyAspectRatioChanged(__aspectRatio);
+        //    }
+        //}
+        public float AspectRatio
         {
-            get => __aspectRatio;
+            get => _imageAspectFitter.AspectRatio;
             set {
-                if (__aspectRatio == value)
+                // TODO: Next here image aspect fitter is null
+                if (_imageAspectFitter.AspectRatio == value)
                     return;
-                __aspectRatio = value;
-                _imageAspectFitter.AspectRatio = __aspectRatio.GetRatio();
-                _perspectiveViewWindow.NotifyAspectRatioChanged(__aspectRatio);
+                _imageAspectFitter.AspectRatio = value;
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.AspectRatio);
+                // _perspectiveViewWindow.NotifyAspectRatioChanged(__aspectRatio);
             }
         }
 
@@ -60,7 +75,7 @@ namespace Deenote.GameStage
             if (IsFullScreen) {
                 _fullScreenParentTransform.gameObject.SetActive(true);
                 transform.SetParent(_fullScreenParentTransform, false);
-                MainSystem.ResolutionAdjuster.SetAspectRatio(AspectRatio.GetRatio(), true);
+                MainSystem.ResolutionAdjuster.SetAspectRatio(AspectRatio, true);
             }
             else {
                 _fullScreenParentTransform.gameObject.SetActive(false);
@@ -97,20 +112,15 @@ namespace Deenote.GameStage
                 RenderTexture texture = new(1280, 720, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.None);
                 _cameraViewRawImage.texture = texture;
                 _cameraViewRawImage.enabled = true;
-                // TODO: Background stretch height and width to full texture
-                //       View stretch width and has a fixed aspect ratio(1280x720), at the bottom of texture.
                 ViewCamera.targetTexture = texture;
                 BackgroundCamera.targetTexture = texture;
 
                 _viewSize = new FrameCachedNotifyingProperty<Vector2>(GetViewSize, autoUpdate: true);
                 _viewSize.OnValueChanged += ViewSizeChanged;
                 OnViewSizeChanged += ResizeCameraTexture;
+                Debug.Log("Init");
                 _imageAspectFitter = _cameraViewRawImage.GetComponent<IntegralSizeAspectRatioFitter>();
             }
-        }
-
-        private void Update()
-        {
         }
 
         public float SuddenPlusRangeToVisibleRangePercent(int suddenPlusRange)
@@ -126,22 +136,43 @@ namespace Deenote.GameStage
             float visibleLength = h * (panelLength + z - h * tanTheta) / (h + (panelLength + z) * tanTheta) - z;
             return visibleLength / panelLength;
         }
-    }
 
+        private readonly PropertyChangeNotifier<PerspectiveViewController, NotifyProperty> _propertyChangeNotifier;
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<PerspectiveViewController> action)
+            => _propertyChangeNotifier.AddListener(flag, action);
+
+        public enum NotifyProperty
+        {
+            AspectRatio,
+        }
+    }
+    [Obsolete]
     public enum ViewAspectRatio
     {
         SixteenNine,
         FourThree
     }
 
+
+    public static class ViewAspectRatioOptions
+    {
+        public static readonly ImmutableArray<string> DropdownOptions = ImmutableArray.Create("16:9", "4:3");
+        
+        private static readonly ImmutableArray<float> _ratioValues = ImmutableArray.Create(16f / 9f, 4f / 3f);
+
+        public static float GetAspectRatio(int index) => _ratioValues[index];
+        public static int FindIndex(float aspectRatio)=>_ratioValues.IndexOf(aspectRatio);
+    }
+    [Obsolete]
     public static class ViewAspectRatioExt
     {
+        [Obsolete]
         public static readonly string[] ViewAspectDropdownOptions = { "16:9", "4:3" };
-
+        [Obsolete]
         public static int ToDropdownIndex(this ViewAspectRatio aspect) => (int)aspect;
-
+        [Obsolete]
         public static ViewAspectRatio FromDropdownIndex(int index) => (ViewAspectRatio)index;
-
+        [Obsolete]
         public static float GetRatio(this ViewAspectRatio viewAspectRatio) => viewAspectRatio switch {
             ViewAspectRatio.SixteenNine => 16f / 9f,
             ViewAspectRatio.FourThree => 4f / 3f,

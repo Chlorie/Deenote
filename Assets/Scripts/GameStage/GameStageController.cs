@@ -114,7 +114,7 @@ namespace Deenote.GameStage
             //UpdateStageNotes();
             ForceUpdateNotesDisplay();
 
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.CurrentChart);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.CurrentChart);
             _propertiesWindow.NotifyChartChanged(project, chartIndex);
             _perspectiveViewWindow.NotifyChartChanged(project, chart);
 
@@ -532,9 +532,30 @@ namespace Deenote.GameStage
 
         #endregion
 
+        public int CurrentCombo => _stageNoteManager.CurrentCombo;
+
+        /// <summary>
+        /// Non-hold's NoteModel or hold's NoteTailModel that just reached judge line,
+        /// <see langword="null"/> if current combo is 0
+        /// </summary>
+        public IStageNoteModel? PrevHitNote
+        {
+            get {
+                // Most of time the first note is the result, so the for loop is acceptable
+                // When a hold head just reached judge line, it may require iteration.
+                for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= 0; i--) {
+                    var note= _chart.Notes[i];
+                    if (note.IsComboNote())
+                        return note;
+                }
+                return null;
+            }
+        }
+
         private void OnStageNoteUpdated()
         {
             UpdateJudgeLineHitEffect();
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.StageNotesUpdated);
             GridController.Instance.NotifyGameStageProgressChanged();
             _perspectiveViewWindow.NotifyGameStageProgressChanged(GetPrevComboNoteIndex(), _stageNoteManager.CurrentCombo);
 
@@ -564,6 +585,7 @@ namespace Deenote.GameStage
 
             // TODO: Fake
             IsStageEffectOn = true;
+
         }
 
         private void Update()
@@ -574,9 +596,9 @@ namespace Deenote.GameStage
                 _musicController.NudgePlaybackPosition(Time.deltaTime * _manualPlaySpeedMultiplier);
         }
 
-        private PropertyChangeNotifier<GameStageController, NotifyProperty> _propertyChangedNotifier;
+        private PropertyChangeNotifier<GameStageController, NotifyProperty> _propertyChangeNotifier;
         public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<GameStageController> action)
-            => _propertyChangedNotifier.AddListener(flag, action);
+            => _propertyChangeNotifier.AddListener(flag, action);
 
         public enum NotifyProperty
         {
@@ -598,6 +620,7 @@ namespace Deenote.GameStage
 
             StageEffect,
             DistinguishPianoNotes,
+            StageNotesUpdated,
         }
     }
 }

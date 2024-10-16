@@ -24,6 +24,7 @@ MonoBehaviour:
   ExtraDifficultyIconSprite: {fileID: 21300000, guid: ae9f8298ce313124baa56b5830123ac9,
     type: 3}
   ExtraLevelTextColor: {r: 1, g: 1, b: 1, a: 1}
+  MinDisplayCombo: 5
   ComboNumberGreyIncTime: 0.125
   ComboNumberGreyDecTime: 0.375
   ComboShadowDuration: 0.25

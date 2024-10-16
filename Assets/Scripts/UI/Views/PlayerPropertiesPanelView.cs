@@ -1,3 +1,4 @@
+using Deenote.GameStage;
 using Deenote.UI.Controls;
 using UnityEngine;
 
@@ -5,6 +6,8 @@ namespace Deenote.UI.Views
 {
     public sealed class PlayerPropertiesPanelView : MonoBehaviour
     {
+        [SerializeField] KVDropdownProperty _aspectRatioProperty = default!;
+        [SerializeField] Button _fullScreenButton = default!;
         [SerializeField] KVNumericStepperProperty _noteSpeedProperty = default!;
         [SerializeField] KVNumericSliderProperty _effectVolumeProperty = default!;
         [SerializeField] KVNumericSliderProperty _musicVolumeProperty = default!;
@@ -14,6 +17,13 @@ namespace Deenote.UI.Views
 
         private void Start()
         {
+            _aspectRatioProperty.Dropdown.ResetOptions(ViewAspectRatioOptions.DropdownOptions.AsSpan());
+            _aspectRatioProperty.Dropdown.OnValueChanged.AddListener(
+                val => MainSystem.GameStage.PerspectiveView.AspectRatio = ViewAspectRatioOptions.GetAspectRatio(val));
+            MainSystem.GameStage.PerspectiveView.RegisterPropertyChangeNotification(
+                PerspectiveViewController.NotifyProperty.AspectRatio,
+                view => _aspectRatioProperty.Dropdown.SetValueWithoutNotify(ViewAspectRatioOptions.FindIndex(view.AspectRatio)));
+
             _noteSpeedProperty.InputParser = static input => float.TryParse(input, out var val) ? Mathf.RoundToInt(val * 2) : null;
             _noteSpeedProperty.DisplayTextSelector = static ival => ival % 2 == 0 ? $"{ival / 2}.0" : $"{ival / 2}.5";
             _noteSpeedProperty.OnValueChanged.AddListener(val => MainSystem.GameStage.NoteSpeed = val);

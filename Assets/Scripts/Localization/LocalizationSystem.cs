@@ -13,11 +13,12 @@ namespace Deenote.Localization
 
         public string CurrentLanguage
         {
-            get => _currentLanguage;
+            get => _currentLanguagePack.LanguageDisplayName;
             set {
-                if (_currentLanguage == value) return;
+                if (_currentLanguagePack.LanguageDisplayName == value) 
+                    return;
+                
                 _currentLanguagePack = GetLanguagePack(value);
-                _currentLanguage = value;
                 OnLanguageChanged?.Invoke(value);
             }
         }
@@ -35,7 +36,6 @@ namespace Deenote.Localization
             if (_languagePacks.TryAdd(DefaultLanguageCode,
                     new LanguagePack(DefaultLanguageName, new Dictionary<string, string>())))
                 Debug.LogWarning("Default language translation file is not found.");
-            _currentLanguage = DefaultLanguageCode;
             _currentLanguagePack = _defaultLanguagePack = _languagePacks[DefaultLanguageCode];
         }
 
@@ -48,7 +48,6 @@ namespace Deenote.Localization
                   _defaultLanguagePack.TryGetTranslation(text.TextOrKey) ??
                   text.TextOrKey;
 
-        private string _currentLanguage;
         private LanguagePack _currentLanguagePack;
         private LanguagePack _defaultLanguagePack;
 
@@ -64,33 +63,61 @@ namespace Deenote.Localization
 
         private void LoadLanguagePackFile(string filePath)
         {
-            using var fs = File.OpenRead(filePath);
-            using StreamReader reader = new(fs);
-            var languageCode = reader.ReadLine()!;
-            var name = reader.ReadLine()!;
+            using StreamReader reader = File.OpenText(filePath);
+            string? languageCode = reader.ReadLine();
+            if (languageCode is null) return;
+
+            string? name = reader.ReadLine();
+            if (name is null) return;
+
             var existed = _languagePacks.GetValueOrAdd(languageCode,
                 () => new LanguagePack(name, new Dictionary<string, string>()), out var pack);
-            if (!existed) _languages.Add(languageCode);
+            if (!existed) _languages.Add(name);
 
-            while (!reader.EndOfStream && reader.ReadLine() is { } line) {
+            while (reader.ReadLine() is { } line) {
                 if (line.StartsWith('#') || // Ignore comments
                     (line.IndexOf('=') is var separator && separator < 0)) // Ignore lines without '='
                     continue;
 
                 string value;
                 ReadOnlySpan<char> firstLineValueSpan = line.AsSpan(separator + 1);
-                if (firstLineValueSpan.SequenceEqual("\"\"\"")) { // Multiline text
-                    StringBuilder sb = new();
-                    while (!reader.EndOfStream && reader.ReadLine() is { } line2 and not "\"\"\"")
-                        sb.AppendLine(line2);
-                    value = sb.ToString();
-                }
+                if (firstLineValueSpan.SequenceEqual("\"\"\"")) // Multiline text
+                    value = ReadMultilineText();
                 else
                     value = firstLineValueSpan.ToString().Replace("<br/>", "\n");
 
                 string key = line[..separator];
                 if (!pack.Translations.TryAdd(key, value))
                     Debug.LogWarning($"Language pack {name} contains duplicated key: {key}");
+            }
+
+            string ReadMultilineText()
+            {
+                var lines = new List<string>();
+                int skipCount = 0;
+                while (reader.ReadLine() is { } line) {
+                    if (line.EndsWith("\"\"\"") && line.AsSpan()[..^3].IsWhiteSpace()) {
+                        skipCount = line.Length - 3;
+                        break;
+                    }
+                    lines.Add(line);
+                }
+
+                var sb = new StringBuilder();
+                foreach (var line in lines) {
+                    int actualSkipCount = GetLeadingSpaceCount(line, skipCount);
+                    sb.AppendLine(line[actualSkipCount..]);
+                }
+                return sb.ToString();
+
+                static int GetLeadingSpaceCount(string str, int max)
+                {
+                    for (int i = 0; i < str.Length; i++) {
+                        if (i >= max || !char.IsWhiteSpace(str[i]))
+                            return i;
+                    }
+                    return str.Length;
+                }
             }
         }
 

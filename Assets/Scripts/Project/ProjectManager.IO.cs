@@ -31,7 +31,9 @@ namespace Deenote.Project
             if (version != 1)
                 return null;
 
-            return IOHelper.ReadProject(br);
+            var proj = IOHelper.ReadProject(br);
+            ProjectModel.InitializationHelper.SetProjectFilePath(proj, projectFilePath);
+            return proj;
         }
 
         private static UniTask SaveAsync(ProjectModel project, string saveFilePath)

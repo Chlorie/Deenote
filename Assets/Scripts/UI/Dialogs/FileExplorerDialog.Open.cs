@@ -27,7 +27,7 @@ namespace Deenote.UI.Dialogs
             return default;
         }
 
-        public async UniTask<Result> OpenSelectDirectoryAsync(string? initialDirectory)
+        public async UniTask<Result> OpenSelectDirectoryAsync(string? initialDirectory = null)
         {
             if (await OpenAsync(PathFilter.DirectoriesOnly, initialDirectory))
                 return new Result(CurrentDirectory);
@@ -99,7 +99,7 @@ namespace Deenote.UI.Dialogs
             private readonly string? _path;
 
             public string Path => _path!;
-            
+
             public bool IsCancelled => _path is null;
 
             internal Result(string path)

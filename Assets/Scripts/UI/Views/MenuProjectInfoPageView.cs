@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
+using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.UI.Controls;
+using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
@@ -30,6 +32,11 @@ namespace Deenote.UI.Views
         [SerializeField] ChartListItem _chartListItemPrefab;
         private PooledObjectListView<ChartListItem> _charts;
 
+        private static readonly MessageBoxArgs _loadAudioFailedMsgBoxArgs = new(
+            LocalizableText.Localized("LoadAudio_MsgBox_Title"),
+            LocalizableText.Localized("LoadAudioFailed_MsgBox_Content"),
+            LocalizableText.Localized("LoadAudioFailed_MsgBox_Y"));
+
         private void Awake()
         {
             _charts = new PooledObjectListView<ChartListItem>(
@@ -45,10 +52,31 @@ namespace Deenote.UI.Views
         {
             // Project properties
             {
-                _projectAudioProperty.Button.OnClick.AddListener(UniTaskVoid () =>
+                _projectAudioProperty.Button.OnClick.AddListener(async UniTaskVoid () =>
                 {
-                    return default!;
-                }); //TODO: Impl
+                    using DisposableGuard dg = new();
+                    while (true) {
+                        var res = await MainSystem.FileExplorerDialog.OpenSelectFileAsync(MainSystem.Args.SupportLoadAudioFileExtensions);
+                        if (res.IsCancelled)
+                            return;
+
+                        var fs = dg.Set(File.OpenRead(res.Path));
+                        var clip = await AudioUtils.LoadAsync(fs, Path.GetExtension(res.Path));
+                        if (clip is null) {
+                            var btn = await MainSystem.MessageBoxDialog.OpenAsync(_loadAudioFailedMsgBoxArgs);
+                            if (btn != 0)
+                                return;
+                            // Reselect file
+                            continue;
+                        }
+                        var bytes = new byte[fs.Length];
+                        fs.Seek(0, SeekOrigin.Begin);
+                        fs.Read(bytes);
+                        MainSystem.ProjectManager.EditProjectAudio(res.Path, bytes, clip);
+                        
+                        break;
+                    }
+                });
                 _projectMusicNameProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectMusicName);
                 _projectComposerProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectComposer);
                 _projectChartDesignerProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectChartDesigner);
@@ -77,9 +105,10 @@ namespace Deenote.UI.Views
                         Level = "10",
                     };
                     MainSystem.ProjectManager.AddProjectChart(newChart);
-                    item.Initialize(newChart);
-                    item.transform.SetAsLastSibling();
                 });
+                MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+                    Project.ProjectManager.NotifyProperty.ChartList,
+                    projm => ReloadCharts(projm.CurrentProject));
             }
 
             MainSystem.ProjectManager.RegisterPropertyChangeNotification(

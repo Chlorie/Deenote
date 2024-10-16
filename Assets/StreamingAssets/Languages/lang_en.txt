@@ -1,5 +1,5 @@
-en
-English
+en2
+English_Legacy
 
 # Grammar of this file:
 # The FIRST LINE in the file is the language name that will display in application.

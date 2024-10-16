@@ -11,6 +11,7 @@ namespace Deenote.UI.Dialogs
         [SerializeField] Dialog _dialog = default!;
         [SerializeField] AboutDialogNavMenuItem[] _menuItems = default!;
 
+        [SerializeField] LocalizedText _contentTitleText = default!;
         [SerializeField] LocalizedText _contentText = default!;
 
         private void Awake()
@@ -20,9 +21,10 @@ namespace Deenote.UI.Dialogs
             }
         }
 
-        internal void LoadPageContent(LocalizableText contentText)
+        internal void LoadPage(AboutDialogNavMenuItem.Page page)
         {
-            _contentText.SetText(contentText);
+            _contentTitleText.SetText(page.Title);
+            _contentText.SetText(page.Content);
         }
 
         public void Open()

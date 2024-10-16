@@ -1,4 +1,5 @@
 using Deenote.Project.Models;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ namespace Deenote.Edit
 {
     partial class EditorController
     {
+        [Obsolete]
         public void EditProjectAudio(string filePath, byte[] bytes, AudioClip clip)
         {
             Debug.Assert(_projectManager.CurrentProject is not null);
@@ -20,7 +22,7 @@ namespace Deenote.Edit
             // Moved to ProjectManager
             _propertiesWindow.NotifyAudioFileChanged(filePath);
         }
-
+        [Obsolete]
         public void EditProjectMusicName(string name)
         {
             _projectManager.CurrentProject.MusicName = name;
@@ -28,14 +30,14 @@ namespace Deenote.Edit
             _propertiesWindow.NotifyProjectMusicNameChanged(name);
             _perspectiveViewWindow.NotifyMusicNameChanged(name);
         }
-
+        [Obsolete]
         public void EditProjectComposer(string composerName)
         {
             _projectManager.CurrentProject.Composer = composerName;
             // Moved to ProjectManager
             _propertiesWindow.NotifyProjectComposerChanged(composerName);
         }
-
+        [Obsolete]
         public void EditProjectChartDesigner(string charterName)
         {
             _projectManager.CurrentProject.ChartDesigner = charterName;
@@ -48,14 +50,14 @@ namespace Deenote.Edit
             _operationHistory.Do(_projectManager.CurrentProject.Tempos.InsertTempo(tempo, endTime)
                 .WithDoneAction(Stage.Grids.NotifyCurrentProjectTemposChanged));
         }
-
+        [Obsolete]
         public void EditChartName(string name)
         {
             Stage.Chart.Name = name;
             // Moved to GameStageController
             _propertiesWindow.NotifyChartNameChanged(name, Stage.Chart.Difficulty);
         }
-
+        [Obsolete]
         public void EditChartDifficulty(Difficulty difficulty)
         {
             Stage.Chart.Difficulty = difficulty;
@@ -63,7 +65,7 @@ namespace Deenote.Edit
             _propertiesWindow.NotifyChartDifficultyChanged(difficulty);
             _perspectiveViewWindow.NotifyChartDifficultyChanged(difficulty);
         }
-
+        [Obsolete]
         public void EditChartLevel(string level)
         {
             Stage.Chart.Level = level;
@@ -71,21 +73,21 @@ namespace Deenote.Edit
             _propertiesWindow.NotifyChartLevelChangd(level);
             _perspectiveViewWindow.NotifyChartLevelChanged(level);
         }
-
+        [Obsolete]
         public void EditChartSpeed(float speed)
         {
             Stage.Chart.Data.Speed = speed;
             // Moved to GameStageController
             _propertiesWindow.NotifyChartSpeedChanged(speed);
         }
-
+        [Obsolete]
         public void EditChartRemapVMin(int remapVMin)
         {
             Stage.Chart.Data.RemapMinVelocity = remapVMin;
             // Moved to GameStageController
             _propertiesWindow.NotifyChartRemapVMinChanged(remapVMin);
         }
-
+        [Obsolete]
         public void EditChartRemapVMax(int remapVMax)
         {
             Stage.Chart.Data.RemapMinVelocity = remapVMax;

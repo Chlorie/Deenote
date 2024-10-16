@@ -23,7 +23,7 @@ namespace Deenote.UI.Views
         [SerializeField] KVInputProperty _warningTypeProperty = default!;
         [SerializeField] KVInputProperty _eventIdProperty = default!;
 
-        [SerializeField] KVButtonProperty _soundsProperty = default!;
+        // Events and notification are set in PianoSoundPropertyPanel.Start() 
         [SerializeField] PianoSoundPropertyPanel _pianoSoundEditPanelView = default!;
 
         private bool _isIneffectivePropertiesVisible;
@@ -165,7 +165,6 @@ namespace Deenote.UI.Views
                     editor =>
                     {
                         var selectedNotes = editor.SelectedNotes;
-                        // TODO:
                         switch (selectedNotes.Length) {
                             case 0:
                                 NotifyFloatValueChanged(_positionProperty.InputField);

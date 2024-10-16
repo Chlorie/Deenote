@@ -9,6 +9,8 @@ namespace Deenote.UI.Controls
         [SerializeField] Button _closeButton = default!;
         [SerializeField] LocalizedText _titleBar = default!;
 
+        public event Action<Dialog, bool> ActiveChanged;
+
         public Button CloseButton => _closeButton;
 
         public void SetTitle(LocalizableText text, ReadOnlySpan<string> args = default)
@@ -17,9 +19,21 @@ namespace Deenote.UI.Controls
         public DialogOpenScope Open()
             => new DialogOpenScope(this);
 
+        public void Close() => gameObject.SetActive(false);
+
         private void Start()
         {
             _closeButton.OnClick.AddListener(() => gameObject.SetActive(false));
+        }
+
+        private void OnEnable()
+        {
+            ActiveChanged?.Invoke(this, true);
+        }
+
+        private void OnDisable()
+        {
+            ActiveChanged?.Invoke(this, false);
         }
 
         public readonly struct DialogOpenScope : IDisposable

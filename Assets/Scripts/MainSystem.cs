@@ -52,8 +52,11 @@ namespace Deenote
         [SerializeField] NoteInfoPanelView _noteInfoPanelView;
         [SerializeField] StatusBarView _statusBarView;
         [Header("Dialogs")]
+        [SerializeField] NewProjectDialog _newProjectDialog;
         [SerializeField] FileExplorerDialog _fileExplorerDialog;
         [SerializeField] MessageBoxDialog _messageBoxDialog;
+        [SerializeField] PreferencesDialog _preferencesDialog;
+        [SerializeField] AboutDialog _aboutDialog;
 
         [Inject] private LocalizationSystem _localizationSystem = null!;
 
@@ -88,8 +91,11 @@ namespace Deenote
         public static NoteInfoPanelView NoteInfoPanelView => Instance._noteInfoPanelView;
         public static StatusBarView StatusBarView => Instance._statusBarView;
 
+        public static NewProjectDialog NewProjectDialog => Instance._newProjectDialog;
         public static FileExplorerDialog FileExplorerDialog => Instance._fileExplorerDialog;
         public static MessageBoxDialog MessageBoxDialog => Instance._messageBoxDialog;
+        public static PreferencesDialog PreferencesDialog => Instance._preferencesDialog;
+        public static AboutDialog AboutDialog => Instance._aboutDialog;
 
         private void OnApplicationFocus(bool focus)
         {
@@ -247,8 +253,10 @@ namespace Deenote
             public static readonly string[] SupportProjectFileExtensions = { DeenotePreferFileExtension, ".dsproj", };
             public static readonly string[] SupportChartFileExtensions = { ".json", ".txt" };
 
-            public static readonly ImmutableArray<string> SupportLoadProjectFileExtensions = 
-                ImmutableArray.Create(DeenotePreferFileExtension, ".dsproj");
+            public static readonly ImmutableArray<string> SupportLoadProjectFileExtensions
+                = ImmutableArray.Create(DeenotePreferFileExtension, ".dsproj");
+            public static readonly ImmutableArray<string> SupportLoadAudioFileExtensions
+                = ImmutableArray.Create(".mp3", ".wav");
         }
     }
 }

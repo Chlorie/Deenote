@@ -16,6 +16,11 @@ namespace Deenote.UI.Controls
 
         public UnityEvent<int> OnValueChanged => _dropdown.onValueChanged;
 
+        public int FindIndex(Predicate<LocalizableText> predicate)
+        {
+            return _options.FindIndex(predicate);
+        }
+
         public void SetValueWithoutNotify(int value)
             => _dropdown.SetValueWithoutNotify(value);
 

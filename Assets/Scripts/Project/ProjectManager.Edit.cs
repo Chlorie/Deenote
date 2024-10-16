@@ -13,9 +13,7 @@ namespace Deenote.Project
             Debug.Assert(CurrentProject is not null);
             var proj = CurrentProject!;
 
-            proj.AudioFileRelativePath = CurrentProjectSaveDirectory is null
-                ? filePath
-                : Path.GetRelativePath(CurrentProjectSaveDirectory, filePath);
+            proj.AudioFileRelativePath = Path.GetRelativePath(proj.ProjectFilePath, filePath);
             proj.AudioFileData = bytes;
             proj.AudioClip = clip;
 
@@ -51,11 +49,13 @@ namespace Deenote.Project
         public void AddProjectChart(ChartModel chart)
         {
             CurrentProject.Charts.Add(chart);
+            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartList);
         }
 
         public void RemoveProjectChartAt(int chartIndex)
         {
             CurrentProject.Charts.RemoveAt(chartIndex);
+            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartList);
         }
 
         private readonly PropertyChangeNotifier<ProjectManager, NotifyProperty> _propertyChangedNotifier = new();
@@ -73,6 +73,7 @@ namespace Deenote.Project
             MusicName,
             Composer,
             ChartDesigner,
+            ChartList,
         }
     }
 }

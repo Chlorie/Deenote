@@ -22,6 +22,14 @@ namespace Deenote.Project.Models
         public TempoListProxy Tempos => new(this);
 
         // NonSerialize
+        private string _projectFilePath;
+        public string ProjectFilePath
+        {
+            get => _projectFilePath;
+            init => _projectFilePath = value;
+            // private set in InitializationHelper
+        }
+
         public AudioClip AudioClip { get; set; }
 
         public ProjectModel CloneForSave()
@@ -97,6 +105,11 @@ namespace Deenote.Project.Models
             public static void SetTempoList(ProjectModel model, List<Tempo> tempos)
             {
                 model._tempos = tempos;
+            }
+
+            public static void SetProjectFilePath(ProjectModel model, string filePath)
+            {
+                model._projectFilePath = filePath;
             }
         }
     }

@@ -41,7 +41,7 @@ namespace Deenote.UI.Views
                 _fpsFrameCount++;
                 if (_fpsTimer.IncAndTryWrap(Time.deltaTime, 1f)) {
                     string fpsStr = _fpsFrameCount.ToString();
-                    _fpsText.SetLocalizedText("Status_Fps", MemoryMarshal.CreateReadOnlySpan(ref fpsStr, 1));
+                    _fpsText.SetLocalizedText("Status_Fps", fpsStr);
                     _fpsFrameCount = 0;
                 }
             }

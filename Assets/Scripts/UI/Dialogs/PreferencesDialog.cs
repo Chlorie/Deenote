@@ -55,7 +55,11 @@ namespace Deenote.UI.Dialogs
                 _languageProperty.Dropdown.Options.Find(v => v == MainSystem.Localization.CurrentLanguage));
             _languageProperty.Dropdown.OnValueChanged.AddListener(
                 val => MainSystem.Localization.CurrentLanguage = _languageProperty.Dropdown.Options[val].TextOrKey);
-            // TODO: Notify language changed
+            MainSystem.Localization.OnLanguageChanged += val =>
+            {
+                _languageProperty.Dropdown.SetValueWithoutNotify(
+                    _languageProperty.Dropdown.FindIndex(txt => txt == MainSystem.Localization.CurrentLanguage));
+            };
 
             _autoSaveProperty.Dropdown.ResetOptions(ProjectManager.EnumExts.AutoSaveDropDownOptions.AsSpan());
             _autoSaveProperty.Dropdown.SetValueWithoutNotify(ProjectManager.EnumExts.ToDropdownIndex(MainSystem.ProjectManager.AutoSave));
@@ -79,6 +83,11 @@ namespace Deenote.UI.Dialogs
             MainSystem.ProjectManager.RegisterPropertyChangeNotification(
                 ProjectManager.NotifyProperty.SaveAudioDataInProject,
                 projm => _saveAudioInProjectProperty.CheckBox.SetValueWithoutNotify(projm.IsAudioDataSaveInProject));
+        }
+
+        public void Open()
+        {
+            _dialog.Open();
         }
     }
 }

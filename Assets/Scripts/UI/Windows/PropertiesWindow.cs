@@ -84,7 +84,7 @@ namespace Deenote.UI.Windows
             LocalizableText.Localized("Message_AudioLoadFailed_Y"),
             LocalizableText.Localized("Message_AudioLoadFailed_N"),
         };
-
+        [Obsolete]
         private async UniTaskVoid OnAudioButtonClickedAsync()
         {
             using DisposableGuard guard = new();

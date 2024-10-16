@@ -1,12 +1,16 @@
+en
 English
 
 # Grammar of this file:
-# The FIRST LINE in the file is the language name that will display in application.
+# The first line is Language code
+# The second line is the language name that will display in application.
 #
 # Format 'key=value' defines a localized text, change the right part to change the display text
 # Use <br/> escape new line
 # Use {0} define parameters
 # Use 'key="""' start a multi-line text, a multiline text should end with a line that is '"""'
+#     If the end-line mark has leading space, all lines will remove leading space with a max number of end-line's leading space
+#     (Actually similiar with c# raw string https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/raw-string
 #
 # An empty line or a line contains only white space is ignored
 # A line starts with '#' is ignored. (It looks like markdown but is actually not xD
@@ -15,23 +19,155 @@ English
 
 ## Menu
 
+LMenuBar_MenuPage=Menu
+MenuPage_File=File
+MenuPage_File_New=New
+MenuPage_File_Open=Open
+MenuPage_File_Save=Save
+MenuPage_File_SaveAs=Save as
+MenuPage_File_Recent=Recent projects
+MenuPage_Preferences=Preferences
+MenuPage_About=About
+MenuPage_CheckUpdates=CheckUpdates
+
+LMenuBar_Project=Project
+MenuProjectPage_ProjectInfo=Project Info
+MenuProjectPage_ProjectInfo_Audio=Audio
+MenuProjectPage_ProjectInfo_Name=Name
+MenuProjectPage_ProjectInfo_Composer=Composer
+MenuProjectPage_ProjectInfo_Charter=Chart Designer
+MenuProjectPage_ProjectInfo_Charts=Charts
+MenuProjectPage_ChartInfo=Chart Info
+MenuProjectPage_ChartInfo_Name=Name
+MenuProjectPage_ChartInfo_Difficulty=Difficulty
+MenuProjectPage_ChartInfo_Level=Level
+MenuProjectPage_ChartInfo_Speed=Speed
+MenuProjectPage_ChartInfo_RemapVolume=Remap Volume
+
+LMenuBar_Toolkit=Toolkit
+
+RMenuBar_Note=Note
+MenuNotePanel_Header=Note Info
+MenuNotePanel_Body_Position=Position
+MenuNotePanel_Body_Time=Time
+MenuNotePanel_Body_Size=Size
+MenuNotePanel_Body_Duration=Duration
+MenuNotePanel_Body_Shift=Shift
+MenuNotePanel_Body_Speed=Speed
+MenuNotePanel_Body_Kind=Kind
+MenuNotePanel_Body_Vibrate=Vibrate
+MenuNotePanel_Body_WarningType=Warning Type
+MenuNotePanel_Body_EventId=Event ID
+MenuNotePanel_Body_Sounds=Sounds
+MenuNotePanel_Body_Sounds_Play=Play
+MenuNotePanel_Body_Sounds_Revert=Revert
+
+RMenuBar_Player=Player
+MenuPlayerPanel_Header=Player
+MenuPlayerPanel_Body_NoteSpeed=Note Speed
+MenuPlayerPanel_Body_EffectVolume=Effect Volume
+MenuPlayerPanel_Body_MusicVolume=Music Volume
+MenuPlayerPanel_Body_PianoVolume=Piano Volume
+MenuPlayerPanel_Body_ShowLinks=Show Links
+MenuPlayerPanel_Body_SuddenPlus=Sudden +
+
+RMenuBar_Editor=Editor
+MenuEditorPanel_Header=Editor
+MenuEditorPanel_Body_MusicSpeed=Music Speed
+MenuEditorPanel_Body_ShowIndicator=Show Indicator
+MenuEditorPanel_Body_Grid_Snap=Snap
+MenuEditorPanel_Body_Curve_Linear=Linear
+MenuEditorPanel_Body_Curve_Cubic=Cubic
+MenuEditorPanel_Body_Curve_Generate=Generate
+MenuEditorPanel_Body_Curve_Disable=Disable
+MenuEditorPanel_Body_Curve_Fill=Fill
+MenuEditorPanel_Body_Curve_ApplyProperties=Apply Properties
+MenuEditorPanel_Body_Curve_ApplyProperties_Apply=Apply
+MenuEditorPanel_Body_Curve_ApplyProperties_Property_Size=Size
+MenuEditorPanel_Body_Curve_ApplyProperties_Property_Speed=Speed
+MenuEditorPanel_Body_Bpm_Time=Time
+MenuEditorPanel_Body_Bpm_TimeStart_Placeholder=Start
+MenuEditorPanel_Body_Bpm_TimeEnd_Placeholder=End
+MenuEditorPanel_Body_Bpm_Bpm=Bpm
+MenuEditorPanel_Body_Bpm_Fill=Fill
+
+## Dialogs
+
+NewProjectDialog_Title=New Project
+NewProjectDialog_ProjectName_Label=Project Name
+NewProjectDialog_ProjectName_Invalid=Invalid project name.
+NewProjectDialog_AudioFile_Label=Audio File
+NewProjectDialog_AudioFile_Invalid=Invalid audio file path.
+NewProjectDialog_Directory_Label=Directory
+NewProjectDialog_Directory_Invalid=Invalid directory name.
+NewProjectDialog_Directory_SameDirCheck=Place project file at the directory of music file.
+NewProjectDialog_Directory_CreateHint=The project will be created as "{0}"
+NewProjectDialog_ProjectName_Create=Create
+NewProjectDialog_ProjectName_Cancel=Cancel
+
+PreferencesDialog_Title=Preferences
+PreferencesDialog_Body_StageEffect=Stage Effect
+PreferencesDialog_Body_ShowFps=Show FPS
+PreferencesDialog_Body_VSync=VSync
+PreferencesDialog_Body_MouseScrollSensitivity=Mouse Scroll Sensitivity
+PreferencesDialog_Body_MouseScrollSensitivity_Reverse=Reverse
+PreferencesDialog_Body_Language=Language
+PreferencesDialog_Body_AutoSave=Auto Save
+PreferencesDialog_Body_IneffectiveProperties=Ineffective Properties
+PreferencesDialog_Body_DistinguishPianoNotes=Distinguish Piano Notes
+PreferencesDialog_Body_SaveAudioInProject=Save Audio In Project
+
+AboutDialog_Title=About
+AboutDialog_Nav_Developers=Developers
+AboutDialog_Nav_Tutorials=Tutorials
+AboutDialog_Nav_Versions=Update History
+
 ## StatusBar
 Status_Fps=FPS: {0}
 
-# Operations
+# Dynamic
 
 ## Menu
 
-OpenProjectOnOpen_MsgBox_Title=Open new project
+### File
+
+DirExists_MsgBox_Content=A directory with same name exists, please select another path.
+DirExists_MsgBox_Y=OK
+
+FileExistsOverwrite_MsgBox_Content=A file with same name exists, do you want to overwrite it?
+FileExistsOverwrite_MsgBox_Y=Yes
+FileExistsOverwrite_MsgBox_N=No
+
+#### New Project
+
+NewProject_MsgBox_Title=Create new project
+NewProject_Status_Created=New project created.
+
+NewProjectOnOpen_MsgBox_Content="""
+    Current project will be closed when you start a new project.
+    <color=#ff5555>Make sure that you have SAVED your project!</color>
+    """
+NewProjectOnOpen_MsgBox_Y=Create
+NewProjectOnOpen_MsgBox_N=Cancel
+
+NewProjectAudioLoadFailed_MsgBox_Content=Cannot load audio file, try use another file.
+NewProjectAudioLoadFailed_MsgBox_Y=OK
+
+NewProjectAudioNotExists_MsgBox_Content=Audio file not found.
+NewProjectAudioNotExists_MsgBox_Y=OK
+
+#### Open Project
+
+OpenProject_MsgBox_Title=Open project
+OpenProject_Status_Loaded=Project loaded.
+
 OpenProjectOnOpen_MsgBox_Content="""
     Current project will be closed when you start a new project.
     <color=#ff5555>Make sure that you have SAVED your project!</color>
     """
 OpenProjectOnOpen_MsgBox_Y=Open
 OpenProjectOnOpen_MsgBox_N=Cancel
-OpenProjectOnOpen_Status_Loaded=Project loaded.
 
-LoadProjectFailed_MsgBox_Title=Load project file
 LoadProjectFailed_MsgBox_Content="""
     Failed to load project file, the file may not be a Deenote project file or may be corrupted.
     Please select another file.
@@ -39,6 +175,307 @@ LoadProjectFailed_MsgBox_Content="""
 LoadProjectFailed_MsgBox_Y=OK
 LoadProjectFailed_MsgBox_N=Cancel
 
-SaveProject_Status_Saving=Project saving...
+#### Save Project
+
+SaveProject_MsgBox_Title=Save Project.
+SaveProject_Status_Saving=Saving project...
 SaveProject_Status_Saved=Project saved.
-SaveProject_Status_Failed=Failed to save project.
+
+AutoSaveProject_Status_Saving=Auto saving project...
+AutoSaveProject_Status_Saved=Project auto saved.
+
+#### Open Recent project
+
+OpenRecentProject_MsgBox_Title
+
+OpenRecentProjectFileNotFound_MsgBox_Content=File not found. Do you want to remove this path?
+OpenRecentProjectFileNotFound_MsgBox_Y=Remove
+OpenRecentProjectFileNotFound_MsgBox_X=Reselect
+OpenRecentProjectFileNotFound_MsgBox_N=Cancel
+
+### Project
+
+LoadAudio_MsgBox_Title=Load audio.
+LoadAudioFailed_MsgBox_Content=Failed to load audio. Try another file.
+LoadAudioFailed_MsgBox_Y=OK
+
+# About contents
+
+## Developers
+
+AboutDialog_Developers_HCl=HCl
+AboutDialog_Developers_HCl_Content="""
+    Deenote By HCl
+
+    *Bad English Alert*
+
+    -Things that must be mentioned-
+        Thank you for using my app!
+        Something I must mention in the beginning: This application can only be used to make fan made charts of Deemo, and it is strictly prohibited to use this app for any commercial purposes. This app is only for making fan made charts for fun, if you somehow know methods to import fan made charts into the game, DO NOT distribute the cracked/modified game to others (or even make it public). You  ll probably have a bad time if you do so.
+
+    -Random things-
+        [Self-introduction?]
+        I'm a rhythm game player known as HCl on the Internet. I'm 17 years old and currently studying Computational Mathematics in USTC (University of Science and Technology of China) for the third year.
+        [About this app?]
+        I'm making this app just for fun. Still a C#/Unity3D newbie so there may be tons of bugs in my code, but who cares? (No, everyone cares.) Since I'm still a student, and as you all know everyone is pretty busy in the third year in university, so I don't have much time to develop this thing. Don't push me please.
+        About the drag-and-drop file opener added in 0.5.6, I  m using a dll coded and compiled by my friend Schwarzer (The one working on Lanotalium, an easy-to-use Lanota chart editor. That guy does awesome works, you really should check him out.) You know who to blame and what to do if that specific thing goes wrong. XD
+        [Anything else?]
+        Just enjoy yourself making some fun charts with this app. Hope you love it.
+
+    -Known bugs-
+        Many bugs about UI and shortcut keys (for example if you try to open another project while you're still in the piano sound editing screen, the piano would probably stay there and it may cause some problems). It's not that I don't know how to fix but it's really a tedious job and it will take much time... Please give me enough time...
+        Some buttons may not work cause the functions are not yet implemented. Please wait...
+
+    -If you've found more bugs or want to suggest some new features-
+        Feel free to start an issue on Deenote's github repository, the link is: https://github.com/Chlorie/Deenote/issues . You'd better not to contact me by QQ or E-mail or something...
+     
+    -Special thanks-
+        Thanks to the developers of Cytunity and Deemo Note Memory for inspiration.
+        Thanks to Schwarzer for the drag-and-drop library he made!
+        Millions of thanks to rkevin and     for technical support! 
+
+    - HCl
+    - 2 Dec 2017
+    """
+
+AboutDialog_Developers_NachtgeistW=NachtgeistW
+AboutDialog_Developers_NachtgeistW_Content="""
+    *Bad English Alert*
+
+        This is NachtgeistW, or you can call me Nightwheel. For some reasons, I forked this project and tried to learn C# while fixing deenote.
+        I'm a junior in a Chinese University. Origin developer HCl has graduated with excellent grades, now he is a graduate student.
+        Version 0.7.3 gets the help from Blurring Shadow. Thank you.
+        I don't know what I will bring for this project, so... don't expect.
+        Last of all. Thank you for using Deenote.
+
+    - NachtgeistW
+    - 31 Jan 2020
+    """
+
+AboutDialog_Developers_Trarizon=Trarizon
+AboutDialog_Developers_Trarizon_Content="""
+    TODO:
+    """
+
+## Tutorials
+
+AboutDialog_Tutorials_Tutorial=Tutorial
+AboutDialog_Tutorials_Tutorial_Content=<color=#800000ff>Full English tutorial coming soon</color>
+
+AboutDialog_Tutorials_Shortcuts=Shortcuts
+AboutDialog_Tutorials_Shortcuts_Content="""
+    -Project-
+
+    [Ctrl+N] Create a new project file
+    [Ctrl+O] Open a project file
+    [Ctrl+S] Save current project
+    [Ctrl+Shift+S] Save the project as another file
+    [Ctrl+E] Export all charts created in this project to JSON files
+    [Ctrl+Q] Quit the program
+
+    -Stage-
+
+    [Enter] Toggle play/stop state
+    [Space] Instant play (Play while holding space, stop and go back to where you started playing when you release space)
+    [Home] Jump to the start of the song
+    [End] Jump to the end of the song
+    [Esc] Exit full screen mode
+    [Ctrl+Up/Down] Adjust note falling speed
+    [Alt+Up/Down] Adjust music playing speed
+    [Up/Down or Mouse wheel scroll] Scroll the chart backward/forward
+    [Shift+Up/Down] Scroll the chart faster
+
+    -Editor-
+
+    [Ctrl+Z] Undo (Max undo steps: 100)
+    [Ctrl+Shift+Z] Redo
+    [Delete] Delete select notes
+    [G] Toggle whether or not to snap to grid
+    [Ctrl+A] Select all notes
+    [L] Link selected notes (Change to slide notes)
+    [U] Unlink selected notes (Change back to click notes)
+    [P] Add empty sound to no-sound selected notes (Change to piano notes)
+    [Ctrl+P] Remove sounds (Change to no sound notes)
+    [Q] Quantize selected notes to the grids
+    [A/D] Adjust selected notes' position values left/right by 0.01
+    [W/S] Adjust selected notes' time values up/down by 1ms
+    [Shift+W/A/S/D] Adjust selected notes' position/time by 0.1/10ms
+    [Z/X] Adjust selected notes' size values by -0.01/0.01
+    [Shift+Z/X] Adjust selected notes' size values by -0.1/0.1
+    [M] Reflect selected notes across the middle line (position = 0 line)
+    [Ctrl+X] Cut selected notes
+    [Ctrl+C] Copy selected notes
+    [Ctrl+V] Paste notes from the clipboard
+    [I] Form a curve passing selected notes (natural cubic spline interpolation)
+    [Shift+I] Form a curve passing selected notes (linear interpolation)
+    [Ctrl+I] Delete the curve
+    [F] Fill notes on the curve
+    """
+
+AboutDialog_Tutorials_UpgradeGuide=Upgrade Guide
+AboutDialog_Tutorials_UpgradeGuide_Content="""
+    TODO
+    """
+
+## Update History
+
+AboutDialog_Versions_Dnt_1_0=Deenote 1.0
+AboutDialog_Versions_Dnt_1_0_Content=Now developing...
+
+AboutDialog_Versions_Dnt_0_7_3=Deenote 0.7.3
+AboutDialog_Versions_Dnt_0_7_3_Content=Added function of saving selected resolution.<br/>Replace the font of song title, now numbers and some punctuations look official.
+
+AboutDialog_Versions_Dnt_0_7_2=Deenote 0.7.2
+AboutDialog_Versions_Dnt_0_7_2_Content=Fixed the issue in version checker.<br/>Added settings for auto-saving json charts.
+
+AboutDialog_Versions_Dnt_0_7_1=Deenote 0.7.1
+AboutDialog_Versions_Dnt_0_7_1_Content=Fixed a bug in the new feature in version 0.7.
+
+AboutDialog_Versions_Dnt_0_7=Deenote 0.7
+AboutDialog_Versions_Dnt_0_7_Content=Added chart concatenating function for medley making.
+
+AboutDialog_Versions_Dnt_0_6_12=Deenote 0.6.12
+AboutDialog_Versions_Dnt_0_6_12_Content="""
+    Changed the color of the charming glow effects. Now it is more of an orange color instead of yellow.
+    Now exception messages are shown and saved to file whenever an unhandled exception is caught.
+    Bug reporting should be simpler.
+    Removed support for .ogg audio files.
+    If exception is caught during audio file loading, the user is forced to select another audio file.
+    """
+
+AboutDialog_Versions_Dnt_0_6_11=Deenote 0.6.11
+AboutDialog_Versions_Dnt_0_6_11_Content=Final changed the shader used for charming glow effects. Now the glows should be much prettier than before.
+
+AboutDialog_Versions_Dnt_0_6_10=Deenote 0.6.10
+AboutDialog_Versions_Dnt_0_6_10_Content=Now the lost frame of mp3 audio is partially "fixed" by adding an empty frame before the samples. There won't be a weird 26ms offset between Deenote and the correct value(from Audition).
+
+AboutDialog_Versions_Dnt_0_6_9=Deenote 0.6.9
+AboutDialog_Versions_Dnt_0_6_9_Content=Fixed the issue that projects cannot be loaded.<br/>Fixed update checker.
+
+AboutDialog_Versions_Dnt_0_6_8=Deenote 0.6.8
+AboutDialog_Versions_Dnt_0_6_8_Content="""
+    Fixed the problem of beat lines disappearing when importing charts from JSON files.
+    Fixed the problem where inserting notes in a large project may cause stack overflow.
+    """
+
+AboutDialog_Versions_Dnt_0_6_7=Deenote 0.6.7
+AboutDialog_Versions_Dnt_0_6_7_Content="""
+    Added localization support for Chinese.
+    Fixed some minor bugs.
+    Collided notes are tinted red now.
+    """
+
+AboutDialog_Versions_Dnt_0_6_6=Deenote 0.6.6
+AboutDialog_Versions_Dnt_0_6_6_Content=Optimized the file format so that the project file won't take much space.
+
+AboutDialog_Versions_Dnt_0_6_5=Deenote 0.6.5
+AboutDialog_Versions_Dnt_0_6_5_Content="""
+    Added "mirror" function.
+    Added shortcut for adjusting note size.
+    Now when you paste while Shift key is held, the notes will stay in the exact horizontal position as the copied notes.
+    """
+
+AboutDialog_Versions_Dnt_0_6_4=Deenote 0.6.4
+AboutDialog_Versions_Dnt_0_6_4_Content="""
+    Added "Note ID" field in selected note info panel.
+    Bug fix: Slide notes not exported correctly.
+    Bug fix: Export file name is not correct.
+    """
+
+AboutDialog_Versions_Dnt_0_6_3=Deenote 0.6.3
+AboutDialog_Versions_Dnt_0_6_3_Content=Now the app should not have problem closing itself.<br/>Added options for resizing the window.
+
+AboutDialog_Versions_Dnt_0_6_2=Deenote 0.6.2
+AboutDialog_Versions_Dnt_0_6_2_Content=Bug fix: After opening the tutorial all the inputs are ignored.
+
+AboutDialog_Versions_Dnt_0_6_1=Deenote 0.6.1
+AboutDialog_Versions_Dnt_0_6_1_Content=Added Chinese tutorial to this app. English tutorial coming soon.
+
+AboutDialog_Versions_Dnt_0_6=Deenote 0.6
+AboutDialog_Versions_Dnt_0_6_Content=Added curve forming function.
+
+AboutDialog_Versions_Dnt_0_5_10=Deenote 0.5.10
+AboutDialog_Versions_Dnt_0_5_10_Content="""
+    Now saving and loading files won't block the main thread.
+    Fixed the serious bug about music playback repositioning.
+    """
+
+AboutDialog_Versions_Dnt_0_5_9=Deenote 0.5.9
+AboutDialog_Versions_Dnt_0_5_9_Content=Separated update history from about.<br/>Added update checker.<br/>Minor bug fixes about UI.
+
+AboutDialog_Versions_Dnt_0_5_8=Deenote 0.5.8
+AboutDialog_Versions_Dnt_0_5_8_Content="""
+    Now you can change the music file used in the project.
+    When creating a new file in the file selector, files with the target extension will appear.
+    """
+
+AboutDialog_Versions_Dnt_0_5_7=Deenote 0.5.7
+AboutDialog_Versions_Dnt_0_5_7_Content="""
+    Bug fix: File cannot be opened.
+    Bug fix: Link lines cannot be toggled off.
+    Deleted Schwarzer  s famous words because I don  t want to die. XD
+    """
+
+AboutDialog_Versions_Dnt_0_5_6=Deenote 0.5.6
+AboutDialog_Versions_Dnt_0_5_6_Content=Added drag-and-drop file opener. (Thanks to Schwarzer!)
+
+AboutDialog_Versions_Dnt_0_5_5=Deenote 0.5.5
+AboutDialog_Versions_Dnt_0_5_5_Content=Added support for mp3 music files.
+
+AboutDialog_Versions_Dnt_0_5_4=Deenote 0.5.4
+AboutDialog_Versions_Dnt_0_5_4_Content=Completely reworked on the code of line displaying.
+
+AboutDialog_Versions_Dnt_0_5_3=Deenote 0.5.3
+AboutDialog_Versions_Dnt_0_5_3_Content=Added toggle for VSync.<br/>Now editor settings are saved as well.
+
+AboutDialog_Versions_Dnt_0_5_2=Deenote 0.5.2
+AboutDialog_Versions_Dnt_0_5_2_Content=Changed default volume of piano sounds from 127 to 0.<br/>Now you can import ogg music files.
+
+AboutDialog_Versions_Dnt_0_5_1=Deenote 0.5.1
+AboutDialog_Versions_Dnt_0_5_1_Content=Fixed the bug when deleting slide notes the remaining slide notes are incorrectly linked.
+
+AboutDialog_Versions_Dnt_0_5=Deenote 0.5
+AboutDialog_Versions_Dnt_0_5_Content=Copy/Paste functions.<br/>Quantize notes.
+
+AboutDialog_Versions_Dnt_0_4=Deenote 0.4
+AboutDialog_Versions_Dnt_0_4_Content=Full edit function of note properties.
+
+AboutDialog_Versions_Dnt_0_3_1=Deenote 0.3.1
+AboutDialog_Versions_Dnt_0_3_1_Content=File extension association.
+
+AboutDialog_Versions_Dnt_0_3_0_2=Deenote 0.3 build 2
+AboutDialog_Versions_Dnt_0_3_0_2_Content=Minor changes to beat line saving.<br/>Edit panel UI redesigned.
+
+AboutDialog_Versions_Dnt_0_3_0_1=Deenote 0.3 build 1
+AboutDialog_Versions_Dnt_0_3_0_1_Content=Bug fixes.
+
+AboutDialog_Versions_Dnt_0_2_1=Deenote 0.2.1
+AboutDialog_Versions_Dnt_0_2_1_Content=Add new notes.<br/>Link/Unlink selected notes.<br/>Note placement indicator.
+
+AboutDialog_Versions_Dnt_0_2=Deenote 0.2
+AboutDialog_Versions_Dnt_0_2_Content=Added color tint for selected notes.<br/>Remove notes.<br/>Beat line filling field auto-fill.
+
+AboutDialog_Versions_Dnt_0_1=Deenote 0.1
+AboutDialog_Versions_Dnt_0_1_Content="""
+    Added all visual effects for chart viewing function.
+    Added a manual BPM calculator.
+    Volume control for the sounds.
+    Beat line filling and displaying.
+    Link lines between slide notes.
+    Undo/Redo functions.
+    Fixed a few bugs.
+    Select notes.
+    (Hidden feature: Convert Cytus v2 charts into Deemo charts. In my opinion no one would like to use this or even care about this.)
+    """
+
+AboutDialog_Versions_DCE_0_2=Deemo Chart Editor 0.2
+AboutDialog_Versions_DCE_0_2_Content="""
+    Added some shortcuts.
+    JSON file exporting.
+    "Save as" feature.
+    Added some visual effects (Lowered alpha values for the notes that are far away, added frame-by-frame disappearing animation and shock wave/circle animation for notes that hit the judge line).
+    Fixed a few bugs.
+    """
+
+AboutDialog_Versions_DCE_0_1=Deemo Chart Editor 0.1
+AboutDialog_Versions_DCE_0_1_Content=Chart viewing function finished. No effects yet.

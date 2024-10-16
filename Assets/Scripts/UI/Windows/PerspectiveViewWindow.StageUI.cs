@@ -2,6 +2,7 @@ using Deenote.Audio;
 using Deenote.Project.Models;
 using Deenote.Utilities;
 using Reflex.Attributes;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,6 +52,7 @@ namespace Deenote.UI.Windows
 
         #region Notify
 
+        [Obsolete]
         public void NotifyMusicNameChanged(string name)
         {
             if (!_window.IsActivated)
@@ -58,7 +60,7 @@ namespace Deenote.UI.Windows
             _musicNameText.text = name;
             _backgroundStaveText.text = name;
         }
-
+        [Obsolete]
         public void NotifyChartLevelChanged(string level)
         {
             if (!_window.IsActivated)
@@ -69,7 +71,7 @@ namespace Deenote.UI.Windows
 
             _levelText.text = $"{_currentDifficulty.ToDisplayString()} Lv {level}";
         }
-
+        [Obsolete]
         public void NotifyChartDifficultyChanged(Difficulty difficulty)
         {
             if (!_window.IsActivated)
@@ -95,7 +97,7 @@ namespace Deenote.UI.Windows
             };
             _levelText.text = $"{difficulty.ToDisplayString()} Lv {_currentLevel}";
         }
-
+        [Obsolete]
         public void NotifyChartChanged(ProjectModel project, ChartModel chart)
         {
             if (!_window.IsActivated)
@@ -123,7 +125,7 @@ namespace Deenote.UI.Windows
             NotifyChartLevelChanged(chart.Level);
             NotifyChartDifficultyChanged(chart.Difficulty);
         }
-
+        [Obsolete]
         public void NotifyGameStageProgressChanged(int prevHitComboNoteIndex, int combo)
         {
             UpdateScore(combo);

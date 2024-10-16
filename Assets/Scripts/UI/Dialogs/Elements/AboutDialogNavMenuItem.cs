@@ -34,7 +34,7 @@ namespace Deenote.UI.Dialogs.Elements
                 var btn = _pageButtons[i];
                 var page = _pages[i];
                 btn.Text.SetText(page.Title);
-                btn.OnClick.AddListener(() => Parent.LoadPageContent(page.Content));
+                btn.OnClick.AddListener(() => Parent.LoadPage(page));
             }
         }
 

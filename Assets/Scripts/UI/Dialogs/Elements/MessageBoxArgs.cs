@@ -9,8 +9,16 @@ namespace Deenote.UI.Dialogs.Elements
         ImmutableArray<LocalizableText> Buttons)
     {
         public MessageBoxArgs(LocalizableText title, LocalizableText content,
+            LocalizableText button0)
+            : this(title, content, ImmutableArray.Create(button0))
+        { }
+        public MessageBoxArgs(LocalizableText title, LocalizableText content,
             LocalizableText button0, LocalizableText button1)
             : this(title, content, ImmutableArray.Create(button0, button1))
+        { }
+        public MessageBoxArgs(LocalizableText title, LocalizableText content,
+            LocalizableText button0, LocalizableText button1, LocalizableText button2)
+            : this(title, content, ImmutableArray.Create(button0, button1, button2))
         { }
     }
 }

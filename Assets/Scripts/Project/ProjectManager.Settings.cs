@@ -44,6 +44,7 @@ namespace Deenote.Project
         }
 
         private float _lastAutoSaveTime;
+        private const string AutoSaveDirName = $"$Deenote_AutoSave";
 
         private void UpdateAutoSave()
         {
@@ -55,27 +56,32 @@ namespace Deenote.Project
                     if (CurrentProject == null)
                         return;
                     if (_lastAutoSaveTime.IncAndTryWrap(Time.deltaTime, AutoSaveIntervalTime_s)) {
-                        _ = SaveProjectAsync();
+                        MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("AutoSaveProject_Status_Saving"));
+                        SaveProjectAsync().Forget();
+                        SaveCurrentProjectAsync();
+                        MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("AutoSaveProject_Status_Saved"));
                     }
                     break;
                 case AutoSaveOption.OnAndSaveJson:
                     if (CurrentProject == null)
                         return;
                     if (_lastAutoSaveTime.IncAndTryWrap(Time.deltaTime, AutoSaveIntervalTime_s)) {
-                        _ = SaveProjectAsync();
+                        MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("AutoSaveProject_Status_Saving"));
+                        SaveProjectAsync().Forget();
+                        SaveCurrentProjectAsync();
 
-                        string timeStr = DateTime.Now.ToString("yyMMddHHmmss");
-                        string dir = Path.Combine(CurrentProjectSaveDirectory, $"{_currentProjectFileName}_$autosave");
-                        var filename = Path.GetFileNameWithoutExtension(_currentProjectFileName);
+                        DateTime time = DateTime.Now; 
+                        string dir = Path.Combine(Path.GetDirectoryName(CurrentProject.ProjectFilePath), AutoSaveDirName);
+                        string filename = Path.GetFileNameWithoutExtension(CurrentProject.ProjectFilePath);
                         if (!Directory.Exists(dir))
                             Directory.CreateDirectory(dir);
 
                         foreach (var chart in CurrentProject.Charts) {
                             File.WriteAllText(
-                                Path.Combine(dir, $"{filename}.{chart.Difficulty.ToLowerCaseString()}.{timeStr}.json"),
+                                Path.Combine(dir, $"{filename}.{chart.Name ?? chart.Difficulty.ToLowerCaseString()}.{time:yyMMddHHmmss}.json"),
                                 chart.Data.ToJsonString());
-                            chart.Data.ToJsonString();
                         }
+                        MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("AutoSaveProject_Status_Saved"));
                     }
                     break;
             }

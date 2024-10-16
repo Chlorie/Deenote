@@ -23,12 +23,11 @@ namespace Deenote.GameStage
             list.AddGlobalBinding(new KeyBinding(KeyCode.KeypadEnter));
         }
 
-
         void IPointerMoveHandler.OnPointerMove(PointerEventData eventData)
         {
             if (!_stage.IsActive)
                 return;
-
+            
             // Note selection
             if (_editor.IsSelecting) {
                 if (TryConvertScreenPointToNoteCoord(eventData.position, out var coord)) {
