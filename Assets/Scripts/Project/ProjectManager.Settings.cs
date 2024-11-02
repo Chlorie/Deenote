@@ -14,17 +14,19 @@ namespace Deenote.Project
 
         [Header("Args")]
         [SerializeField]
-        private AutoSaveOption _autoSave;
+        private ProjectAutoSaveOption _autoSave;
 
-        public AutoSaveOption AutoSave
+        public ProjectAutoSaveOption AutoSave
         {
             get => _autoSave;
             set {
                 if (_autoSave == value)
                     return;
                 _autoSave = value;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.AutoSave);
-                MainSystem.PreferenceWindow.NotifyAutoSaveChanged(_autoSave);
+
+                if (_autoSave is ProjectAutoSaveOption.Off)
+                    _lastAutoSaveTime = 0f;
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.AutoSave);
             }
         }
 
@@ -38,40 +40,34 @@ namespace Deenote.Project
                 if (__isAudioDataSaveInProject == value)
                     return;
                 __isAudioDataSaveInProject = value;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.SaveAudioDataInProject);
-                MainSystem.PreferenceWindow.NotifyIsAudioDataSaveInProjectChanged(value);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.SaveAudioDataInProject);
             }
         }
 
         private float _lastAutoSaveTime;
-        private const string AutoSaveDirName = $"$Deenote_AutoSave";
+        private const string AutoSaveJsonDirName = $"$Deenote_AutoSave";
 
-        private void UpdateAutoSave()
+        private void Update_AutoSave()
         {
             switch (AutoSave) {
-                case AutoSaveOption.Off:
-                    _lastAutoSaveTime = 0f;
-                    return;
-                case AutoSaveOption.On:
+                case ProjectAutoSaveOption.On:
                     if (CurrentProject == null)
                         return;
                     if (_lastAutoSaveTime.IncAndTryWrap(Time.deltaTime, AutoSaveIntervalTime_s)) {
                         MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("AutoSaveProject_Status_Saving"));
-                        SaveProjectAsync().Forget();
                         SaveCurrentProjectAsync();
                         MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("AutoSaveProject_Status_Saved"));
                     }
                     break;
-                case AutoSaveOption.OnAndSaveJson:
+                case ProjectAutoSaveOption.OnAndSaveJson:
                     if (CurrentProject == null)
                         return;
                     if (_lastAutoSaveTime.IncAndTryWrap(Time.deltaTime, AutoSaveIntervalTime_s)) {
                         MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("AutoSaveProject_Status_Saving"));
-                        SaveProjectAsync().Forget();
                         SaveCurrentProjectAsync();
 
                         DateTime time = DateTime.Now; 
-                        string dir = Path.Combine(Path.GetDirectoryName(CurrentProject.ProjectFilePath), AutoSaveDirName);
+                        string dir = Path.Combine(Path.GetDirectoryName(CurrentProject.ProjectFilePath), AutoSaveJsonDirName);
                         string filename = Path.GetFileNameWithoutExtension(CurrentProject.ProjectFilePath);
                         if (!Directory.Exists(dir))
                             Directory.CreateDirectory(dir);
@@ -85,25 +81,6 @@ namespace Deenote.Project
                     }
                     break;
             }
-        }
-
-        public enum AutoSaveOption
-        {
-            Off,
-            On,
-            OnAndSaveJson,
-        }
-
-        public static class EnumExts
-        {
-            public static ImmutableArray<LocalizableText> AutoSaveDropDownOptions = ImmutableArray.Create(
-                LocalizableText.Localized("Window_Preferences_AutoSave_Off"),
-                LocalizableText.Localized("Window_Preferences_AutoSave_On"),
-                LocalizableText.Localized("Window_Preferences_AutoSave_OnAndSaveJson"));
-
-            public static AutoSaveOption AutoSaveOptionFromDropdownIndex(int index) => (AutoSaveOption)index;
-
-            public static int ToDropdownIndex(AutoSaveOption option) => (int)option;
         }
     }
 }

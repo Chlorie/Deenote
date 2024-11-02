@@ -6,12 +6,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Deenote.Project.Models
 {
     public sealed partial class ChartModel
     {
-        public string Name { get; set; } = "";
+        // Nullable, display Difficulty.ToString() on placeholder when null
+        public string? Name { get; set; }
 
         public Difficulty Difficulty { get; set; }
 
@@ -119,80 +121,23 @@ namespace Deenote.Project.Models
 
             NoteTimeComparer.AssertInOrder(_visibleNotes);
             NoteTimeComparer.AssertInOrder(_backgroundNotes);
-            var notes = Data.Notes;
+            var notes = chart.Data.Notes;
             notes.Capacity = _visibleNotes.Count + _backgroundNotes.Count;
-            foreach (var note in MergeNotes()) {
+            var iterNotes = _visibleNotes
+                .OfType<NoteModel>()
+                .Select(n => n.Data)
+                .Merge(_backgroundNotes, NoteTimeComparer.Instance);
+            foreach (var note in iterNotes) {
                 notes.Add(CloneNote(note));
             }
             return chart;
 
-            NoteData CloneNote(NoteData note)
+            static NoteData CloneNote(NoteData note)
             {
                 var clone = note.Clone();
                 if (clone.IsSwipe)
                     clone.Duration = 0f;
                 return clone;
-            }
-
-            IEnumerable<NoteData> MergeNotes()
-            {
-                using var fg = _visibleNotes.GetEnumerator();
-                using var bg = _backgroundNotes.GetEnumerator();
-
-                static bool MoveNextOfNoteHeadModel(in List<IStageNoteModel>.Enumerator enumerator, [NotNullWhen(true)] out NoteData? noteData)
-                {
-                    while (enumerator.MoveNext()) {
-                        if (enumerator.Current is NoteModel m) {
-                            noteData = m.Data;
-                            return true;
-                        }
-                        else
-                            continue;
-                    }
-                    noteData = null;
-                    return false;
-                }
-
-                NoteData f, b;
-
-                switch (MoveNextOfNoteHeadModel(fg, out f), bg.MoveNext()) {
-                    case (true, true): goto CompareAndNext;
-                    case (true, false): goto IterForeground;
-                    case (false, true): goto IterBackground;
-                    case (false, false): yield break;
-                }
-
-            CompareAndNext:
-                b = bg.Current;
-                while (true) {
-                    if (f.Time <= b.Time) {
-                        yield return f;
-                        if (MoveNextOfNoteHeadModel(fg, out f)) {
-                            continue;
-                        }
-                        goto IterBackground;
-                    }
-                    else {
-                        yield return b;
-                        if (bg.MoveNext()) {
-                            b = bg.Current;
-                            continue;
-                        }
-                        goto IterForeground;
-                    }
-                }
-
-            IterForeground:
-                do {
-                    yield return f;
-                } while (MoveNextOfNoteHeadModel(fg, out f));
-                yield break;
-
-            IterBackground:
-                do {
-                    yield return bg.Current;
-                } while (bg.MoveNext());
-                yield break;
             }
         }
 

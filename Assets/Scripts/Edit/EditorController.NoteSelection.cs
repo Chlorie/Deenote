@@ -30,7 +30,7 @@ namespace Deenote.Edit
 
         public void SelectAllNotes()
         {
-            OnNoteSelectionChanging();
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
             _noteSelectionController.ClearSelection();
             foreach (var note in Stage.Chart.Notes.EnumerateSelectableModels()) {
                 _noteSelectionController.SelectNote(note);
@@ -43,7 +43,7 @@ namespace Deenote.Edit
             if (!IsInNoteSelectionArea(startCoord))
                 return;
 
-            OnNoteSelectionChanging();
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
             _noteSelectionController.StartNoteSelection(startCoord, toggleMode);
             OnNotesChanged(false, true);
         }
@@ -53,7 +53,7 @@ namespace Deenote.Edit
             if (!IsInNoteSelectionArea(endCoord))
                 return;
 
-            OnNoteSelectionChanging();
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
             _noteSelectionController.UpdateNoteSelection(endCoord);
             OnNotesChanged(false, true);
         }

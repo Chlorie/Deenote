@@ -11,6 +11,8 @@ namespace Deenote.UI
         [Header("FileListItem")]
         public Sprite FileListItemFolderSprite;
         public Sprite FileListItemFileSprite;
+        public Sprite FileExplorerPinSprite;
+        public Sprite FileExplorerUnpinSprite;
         [Header("Note Infos")]
         public Sprite NoteInfoSoundsEditSprite;
         public Sprite NoteInfoSoundsAcceptSprite;

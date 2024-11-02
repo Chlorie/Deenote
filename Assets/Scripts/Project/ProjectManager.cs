@@ -1,10 +1,7 @@
 using Cysharp.Threading.Tasks;
-using Deenote.Edit;
-using Deenote.GameStage;
 using Deenote.Localization;
 using Deenote.Project.Models;
-using Deenote.UI.Windows;
-using System;
+using Deenote.Utilities;
 using System.IO;
 using UnityEngine;
 
@@ -12,22 +9,20 @@ namespace Deenote.Project
 {
     public sealed partial class ProjectManager : MonoBehaviour
     {
-        [Header("Notify")]
-        [SerializeField] PropertiesWindow _propertiesWindow;
-        [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
-        [SerializeField] EditorController _editor;
-        [SerializeField] GameStageController _stage;
-
-        [Obsolete]
-        private string _currentProjectFileName;
-
+        private ProjectModel? __currentProject;
         /// <summary>
-        /// Is <see langword="null"/> if current project hasn't been saved.
+        /// Maybe null on loading project
         /// </summary>
-        [Obsolete]
-        public string? CurrentProjectSaveDirectory { get; private set; }
-
-        public ProjectModel? CurrentProject { get; private set; }
+        public ProjectModel CurrentProject
+        {
+            get => __currentProject;
+            set {
+                if (__currentProject == value)
+                    return;
+                __currentProject = value;
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.CurrentProject);
+            }
+        }
 
         private static readonly LocalizableText[] _newProjMsgBtnTxt = {
             LocalizableText.Localized("Message_NewProjectOnOpen_Y"),
@@ -42,91 +37,15 @@ namespace Deenote.Project
             LocalizableText.Localized("Message_OpenProjectFailed_N"),
         };
 
-        private async void Start()
+        private void Start()
         {
             // TODO: Fake
-            CurrentProject = await Fake.GetProject();
-            OnProjectChanged(0);
+            CurrentProject = Fake.GetProject();
         }
 
         private void Update()
         {
-            UpdateAutoSave();
-        }
-
-        [Obsolete]
-        public async UniTaskVoid CreateNewProjectAsync()
-        {
-            if (CurrentProject is not null) {
-                var clicked = await MainSystem.MessageBox.ShowAsync(
-                    LocalizableText.Localized("Message_NewProjectOnOpen_Title"),
-                    LocalizableText.Localized("Message_NewProjectOnOpen_Content"),
-                    _newProjMsgBtnTxt);
-                if (clicked != 0)
-                    return;
-            }
-
-            var result = await MainSystem.ProjectProperties.OpenNewProjectAsync();
-            if (result.IsCancelled)
-                return;
-
-            CurrentProjectSaveDirectory = null;
-            CurrentProject = result.Project;
-            OnProjectChanged(result.ConfirmedChartIndex);
-            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_NewProject_Completed"), 3f)
-                .Forget();
-        }
-
-        public void LoadProject(ProjectModel project)
-        {
-            CurrentProject = project;
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.CurrentProject);
-        }
-
-        [Obsolete]
-        public async UniTaskVoid OpenProjectAsync()
-        {
-            if (CurrentProject is not null) {
-                var clicked = await MainSystem.MessageBox.ShowAsync(
-                    LocalizableText.Localized("Message_OpenProjectOnOpen_Title"),
-                    LocalizableText.Localized("Message_OpenProjectOnOpen_Content"),
-                    _openProjMsgBtnTxt);
-                if (clicked != 0)
-                    return;
-            }
-
-            FileExplorerWindow.Result result;
-            ProjectModel? proj;
-            while (true) {
-                result = await MainSystem.FileExplorer.OpenSelectFileAsync(
-                    MainSystem.Args.SupportProjectFileExtensions);
-                if (result.IsCancelled)
-                    return;
-
-                MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_OpenProject_Loading"));
-                if ((proj = await LoadAsync(result.Path)) is null) {
-                    var clicked = await MainSystem.MessageBox.ShowAsync(
-                        LocalizableText.Localized("Message_OpenProjectFailed_Title"),
-                        LocalizableText.Localized("Message_OpenProjectFailed_Content"),
-                        _openProjFailMsgBtnTxt);
-                    if (clicked != 0)
-                        return;
-                    continue;
-                }
-                break;
-            }
-
-            var res = await MainSystem.ProjectProperties.OpenLoadProjectAsync(proj);
-            if (res.IsCancelled) {
-                return;
-            }
-
-            CurrentProjectSaveDirectory = Path.GetDirectoryName(result.Path);
-            _currentProjectFileName = Path.GetFileName(result.Path);
-            CurrentProject = res.Project;
-            OnProjectChanged(res.ConfirmedChartIndex);
-            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_OpenProject_Completed"), 3f)
-                .Forget();
+            Update_AutoSave();
         }
 
         /// <returns>Is project opened</returns>
@@ -136,36 +55,12 @@ namespace Deenote.Project
             if (proj is null)
                 return false;
 
-            LoadProject(proj);
+            using var ms = new MemoryStream(proj.AudioFileData);
+            var clip = await AudioUtils.LoadAsync(ms, Path.GetExtension(proj.AudioFileRelativePath));
+            proj.AudioClip = clip;
+
+            CurrentProject = proj;
             return true;
-        }
-        
-        [Obsolete]
-        public async UniTaskVoid SaveProjectAsync()
-        {
-            return;
-
-            if (CurrentProject is null) {
-                Debug.Assert(false, "Save nothing");
-                return;
-            }
-
-            if (CurrentProjectSaveDirectory is null) {
-                await SaveAsInternalAsync();
-                return;
-            }
-            else {
-                MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_SaveProject_Saving"));
-                var filePath = Path.Combine(CurrentProjectSaveDirectory, _currentProjectFileName);
-                await SaveAsync(CurrentProject, filePath);
-                MainSystem.StatusBar
-                    .SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f).Forget();
-            }
-        }
-        [Obsolete]
-        public async UniTaskVoid SaveAsAsync()
-        {
-            await SaveAsInternalAsync();
         }
 
         public UniTask SaveCurrentProjectAsync()
@@ -174,7 +69,6 @@ namespace Deenote.Project
             return SaveCurrentProjectToAsync(CurrentProject.ProjectFilePath);
         }
 
-        /// <returns>Save successfully</returns>
         public async UniTask SaveCurrentProjectToAsync(string targetFilePath)
         {
             if (CurrentProject is null)
@@ -191,44 +85,6 @@ namespace Deenote.Project
 
             await SaveAsync(CurrentProject, targetFilePath);
             ProjectModel.InitializationHelper.SetProjectFilePath(CurrentProject, targetFilePath);
-        }
-        [Obsolete]
-        private async UniTask<string?> SaveAsInternalAsync()
-        {
-            if (CurrentProject is null)
-                return null;
-
-            var res = await MainSystem.FileExplorer.OpenInputFileAsync(MainSystem.Args.DeenotePreferFileExtension);
-            if (res.IsCancelled)
-                return null;
-
-            if (CurrentProjectSaveDirectory is null && CurrentProject.SaveAsRefPath) {
-                CurrentProjectSaveDirectory = Path.GetDirectoryName(res.Path);
-                CurrentProject.AudioFileRelativePath = Path.GetRelativePath(CurrentProjectSaveDirectory,
-                    CurrentProject.AudioFileRelativePath);
-                _currentProjectFileName = Path.GetFileName(res.Path);
-            }
-            else {
-                CurrentProjectSaveDirectory = Path.GetDirectoryName(res.Path);
-                _currentProjectFileName = Path.GetFileName(res.Path);
-            }
-
-            MainSystem.StatusBar.SetStatusMessage(LocalizableText.Localized("Status_SaveProject_Saving"));
-            await SaveAsync(CurrentProject, res.Path);
-            MainSystem.StatusBar.SetStatusMessageAsync(LocalizableText.Localized("Status_SaveProject_Completed"), 3f)
-                .Forget();
-
-            return res.Path;
-        }
-
-        private void OnProjectChanged(int selectedChartIndex)
-        {
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.CurrentProject);
-            _editor.NotifyProjectChanged();
-            _propertiesWindow.NotifyProjectChanged(CurrentProject);
-
-            _stage.LoadChart(CurrentProject, selectedChartIndex);
-            _perspectiveViewWindow.Window.IsActivated = true;
         }
     }
 }

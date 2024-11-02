@@ -1,6 +1,7 @@
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Controls;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
@@ -26,9 +27,9 @@ namespace Deenote.UI.Views.Elements
         [SerializeField] Transform _soundPropertyItemParentTransform;
 
         [Header("Prefabs")]
-        [SerializeField] SoundPropertyItem _soundPropertyItemPrefab;
+        [SerializeField] PianoSoundPropertyItem _soundPropertyItemPrefab;
 
-        private PooledObjectListView<SoundPropertyItem> _soundItems;
+        private PooledObjectListView<PianoSoundPropertyItem> _soundItems;
 
         private readonly List<NoteData> _editingNotes = new();
 
@@ -59,7 +60,7 @@ namespace Deenote.UI.Views.Elements
                 var cpitch = i * PianoOctaveView.OctaveKeyCount;
                 _quickScrollButtons[i].OnClick.AddListener(() => ScrollTo(cpitch));
             }
-            _soundItems = new PooledObjectListView<SoundPropertyItem>(
+            _soundItems = new PooledObjectListView<PianoSoundPropertyItem>(
                 UnityUtils.CreateObjectPool(() =>
                 {
                     var item = Instantiate(_soundPropertyItemPrefab, _soundPropertyItemParentTransform);
@@ -83,6 +84,7 @@ namespace Deenote.UI.Views.Elements
                     _soundsProperty.Button.Image.sprite = MainSystem.Args.KnownIconsArgs.NoteInfoSoundsCollapseSprite;
                 }
             });
+            _soundsProperty.Button.OnClick.Invoke();
             _playButton.OnClick.AddListener(() =>
             {
                 foreach (var item in _soundItems) {
@@ -91,14 +93,14 @@ namespace Deenote.UI.Views.Elements
             });
             _revertButton.OnClick.AddListener(LoadEditingNotesSoundDatas);
 
-            MainSystem.Editor.RegisterPropertyChangeNotification(
+            MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                 Edit.EditorController.NotifyProperty.NoteSounds,
                 editor => NotifySoundsChanged(editor.SelectedNotes));
 
-            MainSystem.Editor.RegisterPropertyChangeNotification(
+            MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                 Edit.EditorController.NotifyProperty.SelectedNotes_Changing,
                 editor => SaveDataToEditingNotes());
-            MainSystem.Editor.RegisterPropertyChangeNotification(
+            MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                 Edit.EditorController.NotifyProperty.SelectedNotes,
                 editor => NotifySoundsChanged(editor.SelectedNotes));
 
@@ -178,7 +180,7 @@ namespace Deenote.UI.Views.Elements
             IsDirty = true;
         }
 
-        internal void RemoveSoundItem(SoundPropertyItem item)
+        internal void RemoveSoundItem(PianoSoundPropertyItem item)
         {
             _soundItems.Remove(item);
             IsDirty = true;

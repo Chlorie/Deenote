@@ -35,11 +35,7 @@ namespace Deenote.UI.Controls
 
         private void Awake()
         {
-            _slider.onValueChanged.AddListener(val =>
-            {
-                var text = DisplayTextSelector?.Invoke(val) ?? val.ToString("F3");
-                _valueInput.SetTextWithoutNotify(text);
-            });
+            _slider.onValueChanged.AddListener(val => _valueInput.SetTextWithoutNotify(FormatDisplayText(val)));
             _valueInput.onEndEdit.AddListener(input =>
             {
                 float? nval;
@@ -54,10 +50,17 @@ namespace Deenote.UI.Controls
                     _slider.value = val;
                 }
                 else {
-                    var text = DisplayTextSelector?.Invoke(_slider.value) ?? _slider.value.ToString("F3");
-                    _valueInput.SetTextWithoutNotify(text);
+                    _valueInput.SetTextWithoutNotify(FormatDisplayText(_slider.value));
                 }
             });
         }
+
+        private void Start()
+        {
+            _valueInput.SetTextWithoutNotify(FormatDisplayText(_slider.value));
+        }
+
+        private string FormatDisplayText(float value)
+            => DisplayTextSelector?.Invoke(value) ?? value.ToString("F3");
     }
 }

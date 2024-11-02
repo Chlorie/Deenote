@@ -1,16 +1,11 @@
 using Deenote.UI.ComponentModel;
-using Deenote.UI.Windows;
 using Deenote.Utilities;
 using System;
-using UnityEngine;
 
 namespace Deenote.GameStage
 {
     public sealed partial class GridController : SingletonBehavior<GridController>, INotifyPropertyChange<GridController, GridController.NotifyProperty>
     {
-        [Header("Notify")]
-        [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
-
         /// <returns>
         /// Note that if given time is earlier than first time grid,
         /// returns the original time
@@ -33,6 +28,19 @@ namespace Deenote.GameStage
             _verticalGridGenerationKind = VerticalGridGenerationKind.ByKeyCount;
             VerticalGridCount = 9;
             TimeGridSubBeatCount = 1;
+
+            MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+                Project.ProjectManager.NotifyProperty.Tempos,
+                projm => UpdateTimeGrids());
+            MainSystem.GameStage.RegisterPropertyChangeNotification(
+               GameStageController.NotifyProperty.StageNotesUpdated,
+               stage =>
+               {
+                   UpdateTimeGrids();
+                   UpdateCurveLine();
+               });
+            UpdateTimeGrids();
+            UpdateCurveLine();
         }
 
         private void Update()
@@ -42,24 +50,9 @@ namespace Deenote.GameStage
             DrawCurve();
         }
 
-        #region Notify
-
-        public void NotifyGameStageProgressChanged()
-        {
-            UpdateTimeGrids();
-            UpdateCurveLine();
-        }
-
-        public void NotifyCurrentProjectTemposChanged()
-        {
-            UpdateTimeGrids();
-        }
-
-        #endregion
-
-        private PropertyChangeNotifier<GridController, NotifyProperty> _propertyChangedNotifier;
-        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<GridController> action)
-            => _propertyChangedNotifier.AddListener(flag, action);
+        private PropertyChangeNotifier<GridController, NotifyProperty> _propertyChangeNotifier;
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<GridController> action) 
+            => _propertyChangeNotifier.AddListener(flag, action);
 
         public enum NotifyProperty
         {

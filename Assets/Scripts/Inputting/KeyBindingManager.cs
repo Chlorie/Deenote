@@ -1,6 +1,4 @@
-using Deenote.UI.Windows;
 using Deenote.Utilities;
-using Reflex.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +32,6 @@ namespace Deenote.Inputting
         public bool CheckKeyBinding(KeyBinding binding) =>
             binding.IsActive(_activeModifiers.Value) && !_inputFieldIsSelected.Value;
 
-        [Inject] private WindowsManager _windowsManager = null!;
         private Dictionary<string, Func<bool>> _actions = new();
         private Dictionary<string, ContextualKeyBindingList> _bindings = new();
         private FrameCachedProperty<KeyModifiers> _activeModifiers = new(KeyboardUtils.GetPressedModifierKeys);

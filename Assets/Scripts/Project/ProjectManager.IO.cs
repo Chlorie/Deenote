@@ -24,11 +24,11 @@ namespace Deenote.Project
             using var br = new BinaryReader(fs);
 
             var header = br.ReadUInt16();
-            if (header != 0xDEE0)
+            if (header != MainSystem.Args.DeenoteProjectFileHeader)
                 return null;
 
             var version = br.ReadByte();
-            if (version != 1)
+            if (version != MainSystem.Args.DeenoteProjectFileVersionMark)
                 return null;
 
             var proj = IOHelper.ReadProject(br);
@@ -56,14 +56,12 @@ namespace Deenote.Project
         {
             public static void WriteProject(BinaryWriter writer, ProjectModel project)
             {
-                writer.Write(project.MusicName);
-                writer.Write(project.Composer);
-                writer.Write(project.ChartDesigner);
+                writer.Write(project.MusicName ?? "");
+                writer.Write(project.Composer ?? "");
+                writer.Write(project.ChartDesigner ?? "");
                 writer.Write(project.SaveAsRefPath);
-                if (project.SaveAsRefPath) {
-                    writer.Write(project.AudioFileRelativePath);
-                }
-                else {
+                writer.Write(project.AudioFileRelativePath ?? "");
+                if (!project.SaveAsRefPath) {
                     writer.Write(project.AudioFileData.Length);
                     writer.Write(project.AudioFileData);
                 }
@@ -86,10 +84,8 @@ namespace Deenote.Project
                     ChartDesigner = reader.ReadString(),
                     SaveAsRefPath = reader.ReadBoolean(),
                 };
-                if (project.SaveAsRefPath) {
-                    project.AudioFileRelativePath = reader.ReadString();
-                }
-                else {
+                project.AudioFileRelativePath = reader.ReadString();
+                if (!project.SaveAsRefPath) {
                     var len = reader.ReadInt32();
                     project.AudioFileData = reader.ReadBytes(len);
                 }
@@ -112,6 +108,9 @@ namespace Deenote.Project
 
             private static void WriteChart(BinaryWriter writer, ChartModel chart)
             {
+                writer.Write(chart.Name is not null);
+                if (chart.Name is not null)
+                    writer.Write(chart.Name);
                 writer.Write(chart.Difficulty.ToInt32());
                 writer.Write(chart.Level);
                 WriteChartData(writer, chart.Data);
@@ -119,11 +118,13 @@ namespace Deenote.Project
 
             private static ChartModel ReadChart(BinaryReader reader)
             {
-                var diff = (Difficulty)reader.ReadInt32();
+                var hasName = reader.ReadBoolean();
+                string? name = hasName ? reader.ReadString() : null;
+                var diff = DifficultyExt.FromInt32(reader.ReadInt32());
                 var level = reader.ReadString();
                 var data = ReadChartData(reader);
 
-                return new ChartModel(data) { Difficulty = diff, Level = level, };
+                return new ChartModel(data) { Name = name, Difficulty = diff, Level = level, };
             }
 
             private static void WriteChartData(BinaryWriter writer, ChartData chart)
@@ -153,7 +154,7 @@ namespace Deenote.Project
             private static ChartData ReadChartData(BinaryReader reader)
             {
                 var chart = new ChartData() {
-                    Speed = reader.ReadInt32(),
+                    Speed = reader.ReadSingle(),
                     MinVelocity = reader.ReadInt32(),
                     MaxVelocity = reader.ReadInt32(),
                     RemapMinVelocity = reader.ReadInt32(),
@@ -187,7 +188,7 @@ namespace Deenote.Project
                 writer.Write(note.Vibrate);
                 writer.Write(note.IsSwipe);
                 writer.Write((int)note.WarningType);
-                writer.Write(note.EventId);
+                writer.Write(note.EventId ?? "");
                 writer.Write(note.IsSlide);
                 if (note.PrevLink != null)
                     writer.Write(linkDict[note.PrevLink]);

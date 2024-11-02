@@ -8,6 +8,16 @@ namespace Deenote.UI.ComponentModel
         void RegisterPropertyChangeNotification(TFlag flag, Action<TSelf> action);
     }
 
+    public static class INotifyPropertyChangExt
+    {
+        public static void RegisterPropertyChangeNotificationAndInvoke<TSelf, TFlag>(this TSelf self, TFlag flag, Action<TSelf> action)
+            where TSelf : INotifyPropertyChange<TSelf, TFlag>
+        {
+            self.RegisterPropertyChangeNotification(flag, action);
+            action.Invoke(self);
+        }
+    }
+
     public struct PropertyChangeNotifier<TSender, TFlag>
     {
         private List<(TFlag, Action<TSender>)>? _invokers;

@@ -30,17 +30,45 @@ namespace Deenote
                         return;
                     _isVSyncOn = value;
                     QualitySettings.vSyncCount = _isVSyncOn ? 1 : 0;
-                    _propertyChangedNotifier.Invoke(this, NotifyProperty.VSync);
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.VSync);
                 }
             }
 
-            private readonly PropertyChangeNotifier<Settings, NotifyProperty> _propertyChangedNotifier = new();
-            public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<Settings> action)
-                => _propertyChangedNotifier.AddListener(flag, action);
+            private bool _isIneffectivePropertiesVisible;
+            public bool IsIneffectivePropertiesVisible
+            {
+                get => _isIneffectivePropertiesVisible;
+                set {
+                    if (_isIneffectivePropertiesVisible == value)
+                        return;
+
+                    _isIneffectivePropertiesVisible = value;
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.IneffectivePropertiesVisiblility);
+                }
+            }
+
+            private bool _isFpsShown;
+            public bool IsFpsShown
+            {
+                get => _isFpsShown;
+                set {
+                    if (_isFpsShown == value)
+                        return;
+
+                    _isFpsShown = value;
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.FpsShown);
+                }
+            }
+
+            private PropertyChangeNotifier<Settings, NotifyProperty> _propertyChangeNotifier = new();
+            public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<Settings> action) 
+                => _propertyChangeNotifier.AddListener(flag, action);
 
             public enum NotifyProperty
             {
                 VSync,
+                IneffectivePropertiesVisiblility,
+                FpsShown,
             }
         }
     }

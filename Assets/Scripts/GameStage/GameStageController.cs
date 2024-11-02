@@ -1,9 +1,7 @@
 using Deenote.Audio;
-using Deenote.Edit;
 using Deenote.GameStage.Elements;
 using Deenote.Project.Models;
 using Deenote.UI.ComponentModel;
-using Deenote.UI.Windows;
 using Deenote.Utilities;
 using Reflex.Attributes;
 using System;
@@ -19,12 +17,6 @@ namespace Deenote.GameStage
         [SerializeField] SpriteRenderer _judgeLineBreathingEffectSpriteRenderer;
         [SerializeField] SpriteRenderer _judgeLineHitEffectSpriteRenderer;
         [SerializeField] Image _backgroundBreathingMaskImage;
-
-        [Header("Notify")]
-        [SerializeField] EditorController _editorController;
-        [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
-        [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
-        [SerializeField] PropertiesWindow _propertiesWindow;
         [SerializeField] PerspectiveViewController _perspectiveViewController;
 
         [Header("Prefabs")]
@@ -51,6 +43,9 @@ namespace Deenote.GameStage
 
         public PerspectiveViewController PerspectiveView => _perspectiveViewController;
 
+        /// <summary>
+        /// Maybe null if ProjectManager.CurrentProject is null
+        /// </summary>
         public ChartModel Chart => _chart;
 
         public bool IsActive => Chart is not null;
@@ -84,7 +79,6 @@ namespace Deenote.GameStage
         private void OnMusicTimeChanged(float oldTime, float newTime, bool isManuallyChanged)
         {
             SearchForNotesOnStage(oldTime, newTime);
-            //UpdateStageNotesRelatively(forward: newTime > oldTime);
             if (isManuallyChanged) ForceUpdateNotesDisplay();
         }
 
@@ -96,27 +90,22 @@ namespace Deenote.GameStage
 
         #endregion
 
-        public void LoadChart(ProjectModel project, int chartIndex)
+        public void LoadChartInCurrentProject(ChartModel? chart)
         {
-            var chart = project.Charts[chartIndex];
+            Debug.Assert(chart is null || MainSystem.ProjectManager.CurrentProject.Charts.Contains(chart));
 
             _musicController.Stop();
-            // TODO: try out streaming clip provider
-            _musicController.ReplaceClip(new DecodedClipProvider(project.AudioClip));
-
-            _chart = chart;
-
-            _stageNoteManager.ResetIndices();
-            CheckCollision();
-
             _musicController.Time = 0f;
-            SearchForNotesFromStart();
-            //UpdateStageNotes();
-            ForceUpdateNotesDisplay();
+            _chart = chart!;
+            _stageNoteManager.ResetIndices();
 
+            if (chart is not null) {
+                CheckCollision();
+                SearchForNotesFromStart();
+            }
+
+            ForceUpdateNotesDisplay();
             _propertyChangeNotifier.Invoke(this, NotifyProperty.CurrentChart);
-            _propertiesWindow.NotifyChartChanged(project, chartIndex);
-            _perspectiveViewWindow.NotifyChartChanged(project, chart);
 
             void CheckCollision()
             {
@@ -138,12 +127,6 @@ namespace Deenote.GameStage
                     }
                 }
             }
-        }
-
-        public void LoadChartInCurrentProject(ChartModel chart)
-        {
-            Debug.Assert(MainSystem.ProjectManager.CurrentProject.Charts.Contains(chart));
-            // TODO: Impl
         }
 
         #region Note
@@ -544,7 +527,7 @@ namespace Deenote.GameStage
                 // Most of time the first note is the result, so the for loop is acceptable
                 // When a hold head just reached judge line, it may require iteration.
                 for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= 0; i--) {
-                    var note= _chart.Notes[i];
+                    var note = _chart.Notes[i];
                     if (note.IsComboNote())
                         return note;
                 }
@@ -556,17 +539,8 @@ namespace Deenote.GameStage
         {
             UpdateJudgeLineHitEffect();
             _propertyChangeNotifier.Invoke(this, NotifyProperty.StageNotesUpdated);
-            GridController.Instance.NotifyGameStageProgressChanged();
-            _perspectiveViewWindow.NotifyGameStageProgressChanged(GetPrevComboNoteIndex(), _stageNoteManager.CurrentCombo);
-
-            int GetPrevComboNoteIndex()
-            {
-                for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= 0; i--) {
-                    if (_chart.Notes[i].IsComboNote())
-                        return i;
-                }
-                return -1;
-            }
+            //GridController.Instance.NotifyGameStageProgressChanged();
+            //_perspectiveViewWindow.NotifyGameStageProgressChanged(GetPrevComboNoteIndex(), _stageNoteManager.CurrentCombo);
         }
 
         protected override void Awake()
@@ -586,6 +560,30 @@ namespace Deenote.GameStage
             // TODO: Fake
             IsStageEffectOn = true;
 
+            MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
+                Project.ProjectManager.NotifyProperty.CurrentProject,
+                projm =>
+                {
+                    var proj = projm.CurrentProject;
+                    if (proj is null) {
+                        LoadChartInCurrentProject(null);
+                        return;
+                    }
+
+                    // TODO: try out streaming clip provider
+                    _musicController.ReplaceClip(new DecodedClipProvider(proj.AudioClip));
+
+                    if (proj.Charts.Count == 0) {
+                        LoadChartInCurrentProject(null);
+                    }
+                    else {
+                        LoadChartInCurrentProject(proj.Charts[0]);
+                    }
+                });
+
+            MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+                Project.ProjectManager.NotifyProperty.Audio,
+                projm => _musicController.ReplaceClip(new DecodedClipProvider(projm.CurrentProject.AudioClip)));
         }
 
         private void Update()

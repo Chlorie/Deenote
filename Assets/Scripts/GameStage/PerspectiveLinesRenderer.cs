@@ -1,3 +1,4 @@
+using Deenote.UI.ComponentModel;
 using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
@@ -81,7 +82,13 @@ namespace Deenote.GameStage
             base.Awake();
             _meshRenderer.sortingLayerName = "Lines";
             _props = new MaterialPropertyBlock();
-            NotifyStageSuddenPlusChanged(0);
+        }
+
+        private void Start()
+        {
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
+                GameStageController.NotifyProperty.SuddenPlus,
+                stage => NotifyStageSuddenPlusChanged(stage.SuddenPlusRange));
         }
 
         private Mesh GenerateMesh()

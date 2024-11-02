@@ -33,8 +33,7 @@ namespace Deenote.GameStage
                 if (_isCurveOn == value)
                     return;
                 _isCurveOn = value;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.IsCurveOn);
-                _editorPropertiesWindow.NotifyCurveOn(_isCurveOn);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.IsCurveOn);
             }
         }
 

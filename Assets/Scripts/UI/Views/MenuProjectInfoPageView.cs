@@ -1,18 +1,23 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.Project.Models;
+using Deenote.Project.Models.Datas;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Controls;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
 using System.IO;
+using TMPro;
 using UnityEngine;
 
 namespace Deenote.UI.Views
 {
     public sealed class MenuProjectInfoPageView : MonoBehaviour
     {
+        [SerializeField] GameObject _noProjectLoadedTextGameObject = default!;
+        [SerializeField] Collapsable _projectInfoCollapsable = default!;
         [SerializeField] KVButtonProperty _projectAudioProperty = default!;
         [SerializeField] KVInputProperty _projectMusicNameProperty = default!;
         [SerializeField] KVInputProperty _projectComposerProperty = default!;
@@ -20,8 +25,10 @@ namespace Deenote.UI.Views
 
         [SerializeField] Collapsable _projectCharts = default!;
         [SerializeField] Button _projectAddChartButton = default!;
+        [SerializeField] Button _projectLoadChartButton = default!;
         [SerializeField] Transform _projectChartListParentTransform = default!;
 
+        [SerializeField] Collapsable _chartInfoCollapsable = default!;
         [SerializeField] KVInputProperty _chartNameProperty = default!;
         [SerializeField] KVDropdownProperty _chartDifficultyProperty = default!;
         [SerializeField] KVInputProperty _chartLevelProperty = default!;
@@ -36,6 +43,11 @@ namespace Deenote.UI.Views
             LocalizableText.Localized("LoadAudio_MsgBox_Title"),
             LocalizableText.Localized("LoadAudioFailed_MsgBox_Content"),
             LocalizableText.Localized("LoadAudioFailed_MsgBox_Y"));
+
+        private static readonly MessageBoxArgs _loadChartFailedMsgBoxArgs = new(
+            LocalizableText.Localized("LoadChart_MsgBox_Title"),
+            LocalizableText.Localized("LoadChartFailed_MsgBox_Content"),
+            LocalizableText.Localized("LoadChartFailed_MsgBox_Y"));
 
         private void Awake()
         {
@@ -56,7 +68,9 @@ namespace Deenote.UI.Views
                 {
                     using DisposableGuard dg = new();
                     while (true) {
-                        var res = await MainSystem.FileExplorerDialog.OpenSelectFileAsync(MainSystem.Args.SupportLoadAudioFileExtensions);
+                        var res = await MainSystem.FileExplorerDialog.OpenSelectFileAsync(
+                            LocalizableText.Localized("SelectAudio_FileExplorer_Title"),
+                            MainSystem.Args.SupportLoadAudioFileExtensions);
                         if (res.IsCancelled)
                             return;
 
@@ -73,7 +87,7 @@ namespace Deenote.UI.Views
                         fs.Seek(0, SeekOrigin.Begin);
                         fs.Read(bytes);
                         MainSystem.ProjectManager.EditProjectAudio(res.Path, bytes, clip);
-                        
+
                         break;
                     }
                 });
@@ -81,22 +95,23 @@ namespace Deenote.UI.Views
                 _projectComposerProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectComposer);
                 _projectChartDesignerProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectChartDesigner);
 
-                MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+                MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.Audio,
                     proj => NotifyAudioFileChanged(proj.CurrentProject));
-                MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+                MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.MusicName,
                     proj => _projectMusicNameProperty.InputField.SetValueWithoutNotify(proj.CurrentProject.MusicName));
-                MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+                MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.Composer,
                     proj => _projectComposerProperty.InputField.SetValueWithoutNotify(proj.CurrentProject.Composer));
-                MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+                MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.ChartDesigner,
                     proj => _projectChartDesignerProperty.InputField.SetValueWithoutNotify(proj.CurrentProject.ChartDesigner));
             }
 
             // Project Charts
             {
+                // Add Chart
                 _projectAddChartButton.OnClick.AddListener(() =>
                 {
                     _charts.Add(out var item);
@@ -105,22 +120,56 @@ namespace Deenote.UI.Views
                         Level = "10",
                     };
                     MainSystem.ProjectManager.AddProjectChart(newChart);
+                    LoadChartToStage(newChart);
                 });
-                MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+
+                // LoadChart
+                _projectLoadChartButton.OnClick.AddListener(async UniTaskVoid () =>
+                {
+                    var res = await MainSystem.FileExplorerDialog.OpenSelectFileAsync(
+                        LocalizableText.Localized("SelectChart_FileExplorer_Title"),
+                        MainSystem.Args.SupportLoadChartFileExtensions);
+                    if (res.IsCancelled)
+                        return;
+
+                    if (!ChartData.TryLoad(File.ReadAllText(res.Path), out var chartData)) {
+                        await MainSystem.MessageBoxDialog.OpenAsync(_loadChartFailedMsgBoxArgs);
+                        return;
+                    }
+
+                    var newChart = new ChartModel(chartData) {
+                        Difficulty = Difficulty.Hard,
+                        Level = "10",
+                    };
+                    MainSystem.ProjectManager.AddProjectChart(newChart);
+                    LoadChartToStage(newChart);
+                    MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("LoadChart_Status_Loaded"));
+                });
+
+                // Notify chart list changed
+                MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.ChartList,
                     projm => ReloadCharts(projm.CurrentProject));
             }
 
-            MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+            MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 Project.ProjectManager.NotifyProperty.CurrentProject,
                 projm =>
                 {
                     var proj = projm.CurrentProject;
-                    NotifyAudioFileChanged(proj);
-                    _projectMusicNameProperty.InputField.SetValueWithoutNotify(proj.MusicName);
-                    _projectComposerProperty.InputField.SetValueWithoutNotify(proj.Composer);
-                    _projectChartDesignerProperty.InputField.SetValueWithoutNotify(proj.ChartDesigner);
-                    ReloadCharts(proj);
+                    if (proj is null) {
+                        _noProjectLoadedTextGameObject.SetActive(true);
+                        _projectInfoCollapsable.gameObject.SetActive(false);
+                    }
+                    else {
+                        _noProjectLoadedTextGameObject.SetActive(false);
+                        _projectInfoCollapsable.gameObject.SetActive(true);
+                        NotifyAudioFileChanged(proj);
+                        _projectMusicNameProperty.InputField.SetValueWithoutNotify(proj.MusicName);
+                        _projectComposerProperty.InputField.SetValueWithoutNotify(proj.Composer);
+                        _projectChartDesignerProperty.InputField.SetValueWithoutNotify(proj.ChartDesigner);
+                        ReloadCharts(proj);
+                    }
                 });
 
             // Chart properties
@@ -152,43 +201,69 @@ namespace Deenote.UI.Views
                         _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(MainSystem.GameStage.Chart.Data.RemapMaxVelocity.ToString());
                 });
 
-                MainSystem.GameStage.RegisterPropertyChangeNotification(
+                MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartName,
-                    stage => _chartNameProperty.InputField.SetValueWithoutNotify(stage.Chart.Name));
-                MainSystem.GameStage.RegisterPropertyChangeNotification(
+                    stage =>
+                    {
+                        _chartNameProperty.InputField.SetValueWithoutNotify(stage.Chart.Name);
+                        RefreshCharts();
+                    });
+                MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartDifficulty,
-                    stage => _chartDifficultyProperty.Dropdown.SetValueWithoutNotify(stage.Chart.Difficulty.ToInt32()));
-                MainSystem.GameStage.RegisterPropertyChangeNotification(
+                    stage =>
+                    {
+                        var difficulty = stage.Chart.Difficulty;
+                        _chartDifficultyProperty.Dropdown.SetValueWithoutNotify(difficulty.ToInt32());
+                        _chartNameProperty.InputField.PlaceHolderText = difficulty.ToDisplayString();
+                        RefreshCharts();
+                    });
+                MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartLevel,
-                    stage => _chartLevelProperty.InputField.SetValueWithoutNotify(stage.Chart.Level));
-                MainSystem.GameStage.RegisterPropertyChangeNotification(
+                    stage =>
+                    {
+                        _chartLevelProperty.InputField.SetValueWithoutNotify(stage.Chart.Level);
+                        RefreshCharts();
+                    });
+                MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
+                    GameStage.GameStageController.NotifyProperty.ChartSpeed,
+                    stage => _chartSpeedProperty.InputField.SetValueWithoutNotify(stage.Chart.Data.Speed.ToString("F3")));
+                MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartRemapMinVolume,
                     stage => _chartRemapVolumeProperty.LowerInputField.SetValueWithoutNotify(stage.Chart.Data.RemapMinVelocity.ToString()));
-                MainSystem.GameStage.RegisterPropertyChangeNotification(
+                MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartRemapMaxVolume,
                     stage => _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(stage.Chart.Data.RemapMaxVelocity.ToString()));
 
-                MainSystem.GameStage.RegisterPropertyChangeNotification(
+                MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.CurrentChart,
                     stage =>
                     {
-                        var chart = stage.Chart;
-                        _chartNameProperty.InputField.PlaceHolderText = chart.Difficulty.ToDisplayString();
-                        _chartNameProperty.InputField.SetValueWithoutNotify(chart.Name);
-                        _chartDifficultyProperty.Dropdown.SetValueWithoutNotify(chart.Difficulty.ToInt32());
-                        _chartLevelProperty.InputField.SetValueWithoutNotify(chart.Level);
-                        _chartRemapVolumeProperty.LowerInputField.SetValueWithoutNotify(chart.Data.RemapMinVelocity.ToString());
-                        _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(chart.Data.RemapMaxVelocity.ToString());
+                        if (stage.Chart is null) {
+                            _chartInfoCollapsable.gameObject.SetActive(false);
+                        }
+                        else {
+                            _chartInfoCollapsable.gameObject.SetActive(true);
+                            var chart = stage.Chart;
+                            _chartNameProperty.InputField.PlaceHolderText = chart.Difficulty.ToDisplayString();
+                            _chartNameProperty.InputField.SetValueWithoutNotify(chart.Name);
+                            _chartDifficultyProperty.Dropdown.SetValueWithoutNotify(chart.Difficulty.ToInt32());
+                            _chartLevelProperty.InputField.SetValueWithoutNotify(chart.Level);
+                            _chartRemapVolumeProperty.LowerInputField.SetValueWithoutNotify(chart.Data.RemapMinVelocity.ToString());
+                            _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(chart.Data.RemapMaxVelocity.ToString());
+                        }
                     });
             }
 
             void NotifyAudioFileChanged(ProjectModel proj)
             {
-                if (proj.AudioFileRelativePath is null)
-                    _projectAudioProperty.Button.Text.SetLocalizedText("Window_Properties_ProjectInfo_Audio_Embeded");
-                else
+                if (proj.AudioFileRelativePath is null) {
+                    _projectAudioProperty.Button.Text.SetLocalizedText("MenuProjectPage_ProjectInfo_Audio_Embeded");
+                    _projectAudioProperty.Button.Text.Text.horizontalAlignment = HorizontalAlignmentOptions.Center;
+                }
+                else {
                     _projectAudioProperty.Button.Text.SetRawText(Path.GetFileName(proj.AudioFileRelativePath));
-
+                    _projectAudioProperty.Button.Text.Text.horizontalAlignment = HorizontalAlignmentOptions.Left;
+                }
             }
 
             void ReloadCharts(ProjectModel proj)
@@ -200,9 +275,22 @@ namespace Deenote.UI.Views
                     }
                 }
                 _charts.SetSiblingIndicesInOrder();
-                // Add button is sibling of chart items, make sure add button is the first
-                _projectAddChartButton.transform.SetAsFirstSibling();
             }
+        }
+
+        /// <summary>
+        /// Update display datas of chart items
+        /// </summary>
+        private void RefreshCharts()
+        {
+            foreach (var chart in _charts) {
+                chart.Refresh();
+            }
+        }
+
+        internal void LoadChartToStage(ChartModel chart)
+        {
+            MainSystem.GameStage.LoadChartInCurrentProject(chart);
         }
 
         internal void RemoveChartListItem(ChartListItem item)

@@ -17,5 +17,10 @@ namespace Deenote.UI.Controls.Specialized
         {
             _toggleButton.onValueChanged.AddListener(_navPageGameObject.SetActive);
         }
+
+        private void Start()
+        {
+            _toggleButton.SetIsOnWithoutNotify(_navPageGameObject.activeSelf);
+        }
     }
 }

@@ -1,8 +1,8 @@
+using Newtonsoft.Json.Linq;
 using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace Deenote.UI.Controls
 {
@@ -21,7 +21,7 @@ namespace Deenote.UI.Controls
         {
             get => _value;
             set {
-                value = Math.Clamp(value, MinValue, MaxValue);
+                value = Mathf.Clamp(value, MinValue, MaxValue);
                 if (_value != value) {
                     _value = value;
 
@@ -30,15 +30,15 @@ namespace Deenote.UI.Controls
                     _incrementButton.gameObject.SetActive(_value < MaxValue);
                 }
                 // Text may still be different after clamp
-                _valueInput.SetTextWithoutNotify(DisplayTextSelector?.Invoke(Value) ?? Value.ToString());
+                _valueInput.SetTextWithoutNotify(FormatDisplayText(value));
             }
         }
 
         [field: SerializeField]
-        public int MaxValue { get; private set; }
+        public int MinValue { get; private set; }
 
         [field: SerializeField]
-        public int MinValue { get; private set; }
+        public int MaxValue { get; private set; }
 
         public UnityEvent<int> OnValueChanged { get; } = new();
 
@@ -74,10 +74,17 @@ namespace Deenote.UI.Controls
                     Value = val;
                 }
                 else {
-                    var text = DisplayTextSelector?.Invoke(Value) ?? Value.ToString();
-                    _valueInput.SetTextWithoutNotify(text);
+                    _valueInput.SetTextWithoutNotify(FormatDisplayText(Value));
                 }
             });
+        }
+
+        private void Start()
+        {
+            _value = Mathf.Clamp(_value, MinValue, MaxValue);
+            _decrementButton.gameObject.SetActive(_value > MinValue);
+            _incrementButton.gameObject.SetActive(_value < MaxValue);
+            _valueInput.SetTextWithoutNotify(FormatDisplayText(_value));
         }
 
         public void SetValueWithoutNotify(int value)
@@ -85,5 +92,8 @@ namespace Deenote.UI.Controls
             _value = Math.Clamp(value, MinValue, MaxValue);
             _valueInput.SetTextWithoutNotify(DisplayTextSelector?.Invoke(Value) ?? Value.ToString());
         }
+
+        private string FormatDisplayText(int value)
+            => DisplayTextSelector?.Invoke(Value) ?? Value.ToString();
     }
 }

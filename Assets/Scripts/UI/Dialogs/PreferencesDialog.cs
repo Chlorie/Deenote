@@ -1,4 +1,5 @@
 using Deenote.Project;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Controls;
 using Deenote.Utilities;
 using UnityEngine;
@@ -25,17 +26,17 @@ namespace Deenote.UI.Dialogs
         private void Start()
         {
             _stageEffectProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.GameStage.IsStageEffectOn = val ?? false);
-            MainSystem.GameStage.RegisterPropertyChangeNotification(
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.StageEffect,
                 stage => _stageEffectProperty.CheckBox.SetValueWithoutNotify(stage.IsStageEffectOn));
 
-            _showFpsProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.StatusBarView.IsFpsShown = val ?? false);
-            MainSystem.StatusBarView.RegisterPropertyChangeNotification(
-                Views.StatusBarView.NotifyProperty.FpsShown,
-                bar => _showFpsProperty.CheckBox.SetValueWithoutNotify(bar.IsFpsShown));
+            _showFpsProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.GlobalSettings.IsFpsShown = val ?? false);
+            MainSystem.GlobalSettings.RegisterPropertyChangeNotificationAndInvoke(
+                MainSystem.Settings.NotifyProperty.FpsShown,
+                settings => _showFpsProperty.CheckBox.SetValueWithoutNotify(settings.IsFpsShown));
 
             _vSyncProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.GlobalSettings.IsVSyncOn = val ?? false);
-            MainSystem.GlobalSettings.RegisterPropertyChangeNotification(
+            MainSystem.GlobalSettings.RegisterPropertyChangeNotificationAndInvoke(
                 MainSystem.Settings.NotifyProperty.VSync,
                 settings => _vSyncProperty.CheckBox.SetValueWithoutNotify(settings.IsVSyncOn));
 
@@ -48,7 +49,9 @@ namespace Deenote.UI.Dialogs
             });
             _mouseSensitivityReverseButton.OnClick.AddListener(
                 () => MainSystem.Input.MouseScrollSensitivity = -MainSystem.Input.MouseScrollSensitivity);
-            // TODO: Mouse sensiti.. notify /其实不用吧，就这一个入口
+            MainSystem.Input.RegisterPropertyChangeNotificationAndInvoke(
+                Inputting.InputController.NotifyProperty.MouseScrollSensitivity,
+                input => _mouseSensitivityProperty.InputField.SetValueWithoutNotify(MainSystem.Input.MouseScrollSensitivity.ToString("F1")));
 
             _languageProperty.Dropdown.ResetOptions(MainSystem.Localization.Languages);
             _languageProperty.Dropdown.SetValueWithoutNotify(
@@ -61,26 +64,26 @@ namespace Deenote.UI.Dialogs
                     _languageProperty.Dropdown.FindIndex(txt => txt == MainSystem.Localization.CurrentLanguage));
             };
 
-            _autoSaveProperty.Dropdown.ResetOptions(ProjectManager.EnumExts.AutoSaveDropDownOptions.AsSpan());
-            _autoSaveProperty.Dropdown.SetValueWithoutNotify(ProjectManager.EnumExts.ToDropdownIndex(MainSystem.ProjectManager.AutoSave));
+            _autoSaveProperty.Dropdown.ResetOptions(ProjectAutoSaveOptionExt.DropDownOptions.AsSpan());
+            _autoSaveProperty.Dropdown.SetValueWithoutNotify(MainSystem.ProjectManager.AutoSave.ToDropdownIndex());
             _autoSaveProperty.Dropdown.OnValueChanged.AddListener(
-                val => MainSystem.ProjectManager.AutoSave = ProjectManager.EnumExts.AutoSaveOptionFromDropdownIndex(val));
-            MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+                val => MainSystem.ProjectManager.AutoSave = ProjectAutoSaveOptionExt.FromDropdownIndex(val));
+            MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 ProjectManager.NotifyProperty.AutoSave,
-                projm => _autoSaveProperty.Dropdown.SetValueWithoutNotify(ProjectManager.EnumExts.ToDropdownIndex(projm.AutoSave)));
+                projm => _autoSaveProperty.Dropdown.SetValueWithoutNotify(projm.AutoSave.ToDropdownIndex()));
 
-            _ineffectiveProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.NoteInfoPanelView.IsIneffectivePropertiesVisible = val ?? false);
-            MainSystem.NoteInfoPanelView.RegisterPropertyChangeNotification(
-                Views.NoteInfoPanelView.NotifyProperty.IneffectivePropertiesVisiblility,
-                view => _ineffectiveProperty.CheckBox.SetValueWithoutNotify(view.IsIneffectivePropertiesVisible));
+            _ineffectiveProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.GlobalSettings.IsIneffectivePropertiesVisible = val ?? false);
+            MainSystem.GlobalSettings.RegisterPropertyChangeNotificationAndInvoke(
+                MainSystem.Settings.NotifyProperty.IneffectivePropertiesVisiblility,
+                settings => _ineffectiveProperty.CheckBox.SetValueWithoutNotify(settings.IsIneffectivePropertiesVisible));
 
             _distinguishPianoNotesProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.GameStage.IsPianoNotesDistinguished = val ?? false);
-            MainSystem.GameStage.RegisterPropertyChangeNotification(
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.DistinguishPianoNotes,
                 stage => _distinguishPianoNotesProperty.CheckBox.SetValueWithoutNotify(stage.IsPianoNotesDistinguished));
 
             _saveAudioInProjectProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.ProjectManager.IsAudioDataSaveInProject = val ?? false);
-            MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+            MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 ProjectManager.NotifyProperty.SaveAudioDataInProject,
                 projm => _saveAudioInProjectProperty.CheckBox.SetValueWithoutNotify(projm.IsAudioDataSaveInProject));
         }

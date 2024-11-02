@@ -16,6 +16,10 @@ MonoBehaviour:
     type: 3}
   FileListItemFileSprite: {fileID: 21300000, guid: 3c3065b5b6e92c74f9fc1c2fa53cc6be,
     type: 3}
+  FileExplorerPinSprite: {fileID: 21300000, guid: 659b937f6b33ffc4b854529c7fe25991,
+    type: 3}
+  FileExplorerUnpinSprite: {fileID: 21300000, guid: 66b29da8b5de0d24a9e6d34b6af1df9f,
+    type: 3}
   NoteInfoSoundsEditSprite: {fileID: 21300000, guid: 949b9de9409ddeb4193e41f2ead2c588,
     type: 3}
   NoteInfoSoundsAcceptSprite: {fileID: 21300000, guid: 4e3d7bfd8b14e554298a5b333bb2304c,

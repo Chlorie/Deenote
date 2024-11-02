@@ -67,8 +67,7 @@ namespace Deenote.GameStage
 
                 __verticalGridCount = value;
                 UpdateVerticalGrids();
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.VerticalGridCount);
-                _editorPropertiesWindow.NotifyVerticalGridCountChanged(__verticalGridCount);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.VerticalGridCount);
             }
         }
 

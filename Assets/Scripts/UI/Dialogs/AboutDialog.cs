@@ -21,15 +21,18 @@ namespace Deenote.UI.Dialogs
             }
         }
 
-        internal void LoadPage(AboutDialogNavMenuItem.Page page)
+        internal void LoadPage(in AboutDialogNavMenuItem.Page page)
         {
             _contentTitleText.SetText(page.Title);
             _contentText.SetText(page.Content);
         }
 
-        public void Open()
+        public void Open(int sectionIndex)
         {
             _dialog.Open();
+            var menuItem = _menuItems[sectionIndex];
+            LoadPage(menuItem.Pages[0]);
+            menuItem.SetCollapsableState(expanded: true);
         }
     }
 }

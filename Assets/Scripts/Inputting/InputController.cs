@@ -1,12 +1,14 @@
 using Deenote.Audio;
 using Deenote.Edit;
+using Deenote.UI.ComponentModel;
 using Deenote.Utilities;
 using Reflex.Attributes;
+using System;
 using UnityEngine;
 
 namespace Deenote.Inputting
 {
-    public sealed class InputController : MonoBehaviour
+    public sealed class InputController : MonoBehaviour, INotifyPropertyChange<InputController, InputController.NotifyProperty>
     {
         [SerializeField, Range(-10, 10)]
         private float __mouseScrollSensitivity;
@@ -19,7 +21,7 @@ namespace Deenote.Inputting
                 if (__mouseScrollSensitivity == value)
                     return;
                 __mouseScrollSensitivity = value;
-                MainSystem.PreferenceWindow.NotifyMouseScrollSensitivityChanged(__mouseScrollSensitivity);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.MouseScrollSensitivity);
             }
         }
 
@@ -141,6 +143,16 @@ namespace Deenote.Inputting
                 MainSystem.GameStage.StagePlaySpeed = 5.0f;
             else if (UnityUtils.IsKeyUp(KeyCode.DownArrow) || UnityUtils.IsKeyUp(KeyCode.DownArrow, shift: true))
                 MainSystem.GameStage.StagePlaySpeed = 0f;
+        }
+
+        private PropertyChangeNotifier<InputController, NotifyProperty> _propertyChangeNotifier;
+
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<InputController> action)
+            => _propertyChangeNotifier.AddListener(flag, action);
+
+        public enum NotifyProperty
+        {
+            MouseScrollSensitivity,
         }
     }
 }

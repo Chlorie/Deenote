@@ -11,6 +11,9 @@ namespace Deenote.Project.Models
         public string Composer;
         public string ChartDesigner;
 
+        // SaveAsRefPath indicates whether AudioFileData has value
+        // but AudioFileRelativePath always has value, we need this
+        // to get audio file type(by extension)
         public bool SaveAsRefPath;
         public byte[] AudioFileData;
         public string AudioFileRelativePath;

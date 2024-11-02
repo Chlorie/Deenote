@@ -1,4 +1,5 @@
 using Deenote.Localization;
+using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
 using TMPro;

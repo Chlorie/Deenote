@@ -48,7 +48,7 @@ namespace Deenote.ApplicationManaging
             using var sw = new StreamWriter(LogFile, append: true);
             var msg = MainSystem.Localization.GetText(LocalizableText.Localized("Misc_UnhandledExceptionMessage"));
             sw.WriteLine(msg, message, stackTrace);
-            MainSystem.StatusBar.ShowToastAsync(LocalizableText.Localized("Toast_UnhandledException"), 3f).Forget();
+            MainSystem.StatusBarView.ShowToastAsync(LocalizableText.Localized("Toast_UnhandledException"), 3f).Forget();
         }
     }
 }

@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _iconImage: {fileID: 1052978877969522160}
-  _headerText: {fileID: 0}
+  _headerText: {fileID: 49203387545869424}
   _toggleButton: {fileID: 7314422325184541142}
   _navPageGameObject: {fileID: 0}
 --- !u!1 &8388035013030393592
@@ -436,8 +436,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d0c49745113b84a823d2ab7fde56c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _textKey: 
-  _isLocalized: 0
   _localizableText:
     _isLocalized: 0
     _textOrKey: 

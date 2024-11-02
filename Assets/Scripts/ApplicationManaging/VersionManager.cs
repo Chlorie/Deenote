@@ -1,5 +1,7 @@
+using CommunityToolkit.HighPerformance.Buffers;
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
+using Deenote.UI.Dialogs.Elements;
 using Octokit;
 using Semver;
 using System;
@@ -15,7 +17,7 @@ namespace Deenote.ApplicationManaging
         {
             if (Application.internetReachability == NetworkReachability.NotReachable) {
                 if (notifyWhenNoInternet)
-                    MainSystem.StatusBar.ShowToastAsync(LocalizableText.Localized("Toast_Version_NoInternet"), 3f)
+                    MainSystem.StatusBarView.ShowToastAsync(LocalizableText.Localized("Toast_Version_NoInternet"), 3f)
                         .Forget();
                 return;
             }
@@ -26,14 +28,11 @@ namespace Deenote.ApplicationManaging
             _current ??= SemVersion.Parse(Application.version, VersionStyles);
             if (_current.ComparePrecedenceTo(latest) >= 0) {
                 if (notifyWhenUpToDate)
-                    MainSystem.StatusBar.ShowToastAsync(LocalizableText.Localized("Toast_UpToDate"), 3f).Forget();
+                    MainSystem.StatusBarView.ShowToastAsync(LocalizableText.Localized("Toast_UpToDate"), 3f).Forget();
                 return;
             }
 
-            var clicked = await MainSystem.MessageBox.ShowAsync(
-                LocalizableText.Localized("Message_NewVersion_Title"),
-                LocalizableText.Localized("Message_NewVersion_Content"),
-                _updMsgBtnTxt);
+            var clicked = await MainSystem.MessageBoxDialog.OpenAsync(_updMsgBoxArgs, _current.ToString(), latest.ToString());
             switch (clicked) {
                 case 0:
                     Process.Start(RepoLatestReleaseUrl);
@@ -51,10 +50,12 @@ namespace Deenote.ApplicationManaging
         private const string RepoDownloadUrl =
             "https://github.com/Chlorie/Deenote/releases/download/v{0}/Deenote-{0}{1}.zip";
 
-        private static readonly LocalizableText[] _updMsgBtnTxt = {
-            LocalizableText.Localized("Message_NewVersion_1"), LocalizableText.Localized("Message_NewVersion_2"),
-            LocalizableText.Localized("Message_NewVersion_N"),
-        };
+        private static readonly MessageBoxArgs _updMsgBoxArgs = new(
+            LocalizableText.Localized("NewVersion_MsgBox_Title"),
+            LocalizableText.Localized("NewVersion_MsgBox_Content"),
+            LocalizableText.Localized("NewVersion_MsgBox_1"),
+            LocalizableText.Localized("NewVersion_MsgBox_2"),
+            LocalizableText.Localized("NewVersion_MsgBox_N"));
         private static SemVersion? _current;
     }
 }

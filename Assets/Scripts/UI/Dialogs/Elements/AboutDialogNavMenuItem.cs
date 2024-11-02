@@ -1,6 +1,8 @@
 using Deenote.Localization;
 using Deenote.UI.Controls;
 using System;
+using System.Collections.Immutable;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Deenote.UI.Dialogs.Elements
@@ -14,17 +16,20 @@ namespace Deenote.UI.Dialogs.Elements
         [Header("Prefabs")]
         [SerializeField] Button _sectionPrefab = default!;
 
-        private Button[] _pageButtons = default!;
+        private ImmutableArray<Button> _pageButtons = default!;
 
         public AboutDialog Parent { get; internal set; } = default!;
+
+        public ImmutableArray<Page> Pages => ImmutableCollectionsMarshal.AsImmutableArray(_pages);
 
         private void Awake()
         {
             var parentTransform = _sectionTitle.Content.transform;
-            _pageButtons = new Button[_pages.Length];
-            foreach (ref var btn in _pageButtons.AsSpan()) {
+            var buttonsBuilder = new Button[_pages.Length];
+            foreach (ref var btn in buttonsBuilder.AsSpan()) {
                 btn = Instantiate(_sectionPrefab, parentTransform);
             }
+            _pageButtons = ImmutableCollectionsMarshal.AsImmutableArray(buttonsBuilder);
         }
 
         private void Start()
@@ -36,6 +41,11 @@ namespace Deenote.UI.Dialogs.Elements
                 btn.Text.SetText(page.Title);
                 btn.OnClick.AddListener(() => Parent.LoadPage(page));
             }
+        }
+
+        internal void SetCollapsableState(bool expanded)
+        {
+            _sectionTitle.Content.SetActive(expanded);
         }
 
         [Serializable]

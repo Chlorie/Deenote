@@ -93,6 +93,51 @@ PrefabInstance:
       propertyPath: m_Colors.m_NormalColor.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_PressedColor.a
+      value: 0.49803922
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_PressedColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_PressedColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_PressedColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_SelectedColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7335754673520910990, guid: ce292a5e19d0263449dad7ce45cfd8ed,
         type: 3}
       propertyPath: m_ChildAlignment

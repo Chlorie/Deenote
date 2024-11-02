@@ -9,11 +9,9 @@ using UnityEngine;
 namespace Deenote.Localization
 {
     [RequireComponent(typeof(TMP_Text))]
+    [DisallowMultipleComponent]
     public sealed class LocalizedText : MonoBehaviour
     {
-        [SerializeField] private string _textKey = "";
-        [SerializeField] private bool _isLocalized;
-
         [SerializeField] private LocalizableText _localizableText;
         private List<string> _args = new();
 
@@ -60,7 +58,7 @@ namespace Deenote.Localization
                 LocalizableText = text;
                 valueChanged = true;
             }
-            if (args.SequenceEqual(_args.AsSpan())) {
+            if (!args.SequenceEqual(_args.AsSpan())) {
                 _args.Clear();
                 _args.AddRange(args);
                 valueChanged = true;

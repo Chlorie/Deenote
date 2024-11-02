@@ -12,8 +12,13 @@ namespace Deenote.UI.Controls
         [SerializeField] Sprite _indeterminateSprite = default!;
         private bool? _status;
 
-
         public Toggle UnityToggle => _toggle;
+
+        public bool IsInteractable
+        {
+            get => _toggle.interactable;
+            set => _toggle.interactable = value;
+        }
 
         public bool? Value
         {
@@ -44,7 +49,7 @@ namespace Deenote.UI.Controls
 
         private void Awake()
         {
-            _toggle.onValueChanged.AddListener(val => SetValueWithoutNotify(val));
+            _toggle.onValueChanged.AddListener(val => Value = val);
         }
 
         public void SetValueWithoutNotify(bool? value)

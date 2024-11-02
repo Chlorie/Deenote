@@ -6,7 +6,6 @@ using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -82,8 +81,7 @@ namespace Deenote.Edit
                     _noteIndicatorList.Clear();
                 }
 
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.IsIndicatorOn);
-                _editorPropertiesWindow.NotifyShowIndicatorChanged(__isNoteIndicatorOn);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.IsIndicatorOn);
             }
         }
 
@@ -94,8 +92,7 @@ namespace Deenote.Edit
                 if (__snapToPositionGrid == value)
                     return;
                 __snapToPositionGrid = value;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.SnapToPositionGrid); 
-                _editorPropertiesWindow.NotifyVerticalGridSnapChanged(value);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.SnapToPositionGrid);
             }
         }
 
@@ -106,8 +103,7 @@ namespace Deenote.Edit
                 if (__snapToTimeGrid == value)
                     return;
                 __snapToTimeGrid = value;
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.SnapToTimeGrid);
-                _editorPropertiesWindow.NotifyTimeGridSnapChanged(value);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.SnapToTimeGrid);
             }
         }
 
@@ -181,14 +177,14 @@ namespace Deenote.Edit
                 _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(coord, _clipBoardNotes.AsSpan())
                     .WithRedoneAction(notes =>
                     {
-                        OnNoteSelectionChanging();
+                        _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
                         _noteSelectionController.ClearSelection();
                         _noteSelectionController.SelectNotes(notes.OfType<NoteModel>());
                         OnNotesChanged(true, true);
                     })
                     .WithUndoneAction(notes =>
                     {
-                        OnNoteSelectionChanging();
+                        _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
                         _noteSelectionController.DeselectNotes(notes.OfType<NoteModel>());
                         OnNotesChanged(true, true);
                     }));
@@ -206,7 +202,7 @@ namespace Deenote.Edit
                 _operationHistory.Do(Stage.Chart.Notes.AddNote(placeCoord, _placeNoteTemplate)
                     .WithRedoneAction(() =>
                     {
-                        OnNoteSelectionChanging();
+                        _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
                         _noteSelectionController.ClearSelection();
                         OnNotesChanged(true, true);
                         NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
@@ -225,14 +221,14 @@ namespace Deenote.Edit
                 _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(coord, span)
                     .WithRedoneAction(notes =>
                     {
-                        OnNoteSelectionChanging();
+                        _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
                         _noteSelectionController.ClearSelection();
                         _noteSelectionController.SelectNotes(notes.OfType<NoteModel>());
                         OnNotesChanged(true, true);
                     })
                     .WithUndoneAction(notes =>
                     {
-                        OnNoteSelectionChanging();
+                        _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
                         _noteSelectionController.DeselectNotes(notes.OfType<NoteModel>());
                         OnNotesChanged(true, true);
                     }));
@@ -462,19 +458,16 @@ namespace Deenote.Edit
             _operationHistory.Do(Stage.Chart.Notes.RemoveNotes(SelectedNotes)
                 .WithRedoneAction(() =>
                 {
-                    OnNoteSelectionChanging();
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
                     _noteSelectionController.ClearSelection();
-                    _propertyChangedNotifier.Invoke(this, NotifyProperty.NoteKind);
-                    _propertiesWindow.NotifyNoteIsLinkChanged(false);
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteKind);
                     OnNotesChanged(true, true, noteDataChangedExceptTime: true);
                 })
                 .WithUndoneAction((removedNotes) =>
                 {
-                    OnNoteSelectionChanging();
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
                     _noteSelectionController.SelectNotes(removedNotes.OfType<NoteModel>());
-                    _propertyChangedNotifier.Invoke(this, NotifyProperty.NoteKind);
-                    _propertiesWindow.NotifyNoteIsLinkChanged(
-                        SelectedNotes.IsSameForAll(n => n.Data.IsSlide, out var slide) ? slide : null);
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteKind);
                     OnNotesChanged(true, true, noteDataChangedExceptTime: true);
                 }));
 
@@ -498,14 +491,13 @@ namespace Deenote.Edit
             _operationHistory.Do(Stage.Chart.Notes.AddMultipleNotes(new NoteCoord(startTime, 0f), list.AsSpan())
                 .WithRedoneAction(notes =>
                 {
-                    OnNoteSelectionChanging();
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
                     _noteSelectionController.ClearSelection();
                     _noteSelectionController.SelectNotes(notes.OfType<NoteModel>());
                     OnNotesChanged(true, true);
                 })
                 .WithUndoneAction(notes =>
                 {
-                    OnNoteSelectionChanging();
                     _noteSelectionController.DeselectNotes(notes.OfType<NoteModel>());
                     OnNotesChanged(true, true);
                 }));
@@ -602,18 +594,32 @@ namespace Deenote.Edit
 
         #region Notify
 
-        public void NotifyIsShowLinkLinesChanged(bool value)
-        {
-            foreach (var note in _noteIndicatorList) {
-                note.UpdateLinkLineVisibility(value);
-            }
-        }
-
         public void NotifyCurveGeneratedWithSelectedNotes()
         {
-            _noteSelectionController.DeselectNoteAt(^1);
-            _noteSelectionController.DeselectNoteAt(0);
-            RemoveSelectedNotes();
+            if (SelectedNotes.Length < 2)
+                return;
+
+            NoteModel first = SelectedNotes[0];
+            NoteModel last = SelectedNotes[^1];
+
+            _operationHistory.Do(Stage.Chart.Notes.RemoveNotes(SelectedNotes[1..^1])
+                .WithRedoneAction(() =>
+                {
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
+                    _noteSelectionController.ClearSelection();
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteKind);
+                    OnNotesChanged(true, true, noteDataChangedExceptTime: true);
+                })
+                .WithUndoneAction(removedNotes =>
+                {
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
+                    _noteSelectionController.SelectNote(first);
+                    _noteSelectionController.SelectNotes(removedNotes.OfType<NoteModel>());
+                    _noteSelectionController.SelectNote(last);
+                    _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteKind);
+                    OnNotesChanged(true, true, noteDataChangedExceptTime: true);
+                }));
+            NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
         }
 
         #endregion

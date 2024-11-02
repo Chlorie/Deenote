@@ -65,7 +65,8 @@ namespace Deenote.UI.Views.Elements
                         return;
                     case 1: { // Reselect
                         var res = await MainSystem.FileExplorerDialog.OpenSelectFileAsync(
-                            MainSystem.Args.SupportLoadAudioFileExtensions,
+                            LocalizableText.Localized("OpenProject_FileExplorer_Title"),
+                            MainSystem.Args.SupportLoadProjectFileExtensions,
                             Path.GetDirectoryName(FilePath));
                         if (res.IsCancelled)
                             return;

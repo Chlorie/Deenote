@@ -150,18 +150,23 @@ namespace Deenote.GameStage.Elements
             }
             // Holding
             else if (Model.Data.IsHold && -timeDelta < Model.Data.Duration) {
+                if (State < NoteState.Holding) {
+                    if (playSoundOnHit) {
+                        PlayNoteSounds();
+                    }
+                }
                 State = NoteState.Holding;
                 OnHolding();
             }
             // Hit effect or released
             else {
                 _linkLine = null;
-                if (State != NoteState.HitEffect) {
+                if (State < NoteState.Holding) {
                     if (playSoundOnHit) {
                         PlayNoteSounds();
                     }
-                    State = NoteState.HitEffect;
                 }
+                State = NoteState.HitEffect;
                 OnHitEffect();
             }
             return;

@@ -7,11 +7,8 @@ using Deenote.Localization;
 using Deenote.Project;
 using Deenote.Project.Models.Datas;
 using Deenote.UI.Dialogs;
-using Deenote.UI.MenuBar;
-using Deenote.UI.StatusBar;
-using Deenote.UI.ToolBar;
+using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views;
-using Deenote.UI.Windows;
 using Deenote.Utilities;
 using Reflex.Attributes;
 using System.Collections.Immutable;
@@ -23,35 +20,16 @@ namespace Deenote
     {
         private readonly ResolutionAdjuster _resolutionAdjuster = new();
 
-        [Header("UI")]
-        [SerializeField] MenuBarController _menuBarController;
-        [SerializeField] ToolBarController _toolBarController;
-        [SerializeField] StatusBarController _statusBarController;
-
-        [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
-        [SerializeField] EditorPropertiesWindow _editorPropertiesWindow;
-        [SerializeField] PianoSoundEditWindow _pianoSoundEditWindow;
-        [SerializeField] PreferencesWindow _preferenceWindow;
-        [SerializeField] PropertiesWindow _propertiesWindow;
-        [SerializeField] AboutWindow _aboutWindow;
-
-        [SerializeField] FileExplorerWindow _fileExplorerWindow;
-        [SerializeField] ProjectPropertiesWindow _projectPropertiesWindow;
-        [SerializeField] MessageBoxWindow _messageBoxWindow;
-
         [Header("System")]
         [SerializeField] InputController _inputController;
-        [SerializeField] WindowsManager _windowsManager;
 
         [SerializeField] ProjectManager _projectManager;
         [SerializeField] GameStageController _gameStageController;
         [SerializeField] EditorController _editorController;
         [SerializeField] PianoSoundManager _pianoSoundManager;
 
-        [Header("Views")]
-        [SerializeField] NoteInfoPanelView _noteInfoPanelView;
+        [Header("UI")]
         [SerializeField] StatusBarView _statusBarView;
-        [Header("Dialogs")]
         [SerializeField] NewProjectDialog _newProjectDialog;
         [SerializeField] FileExplorerDialog _fileExplorerDialog;
         [SerializeField] MessageBoxDialog _messageBoxDialog;
@@ -64,31 +42,14 @@ namespace Deenote
 
         public static ResolutionAdjuster ResolutionAdjuster => Instance._resolutionAdjuster;
 
-        public static MenuBarController MenuBar => Instance._menuBarController;
-        public static ToolBarController ToolBar => Instance._toolBarController;
-        public static StatusBarController StatusBar => Instance._statusBarController;
-
-        public static PerspectiveViewWindow PerspectiveView => Instance._perspectiveViewWindow;
-        public static EditorPropertiesWindow EditorProperties => Instance._editorPropertiesWindow;
-        public static PianoSoundEditWindow PianoSoundEdit => Instance._pianoSoundEditWindow;
-        public static PreferencesWindow PreferenceWindow => Instance._preferenceWindow;
-        public static PropertiesWindow PropertiesWindow => Instance._propertiesWindow;
-        public static AboutWindow AboutWindow => Instance._aboutWindow;
-
-        public static FileExplorerWindow FileExplorer => Instance._fileExplorerWindow;
-        public static ProjectPropertiesWindow ProjectProperties => Instance._projectPropertiesWindow;
-        public static MessageBoxWindow MessageBox => Instance._messageBoxWindow;
-
         public static LocalizationSystem Localization => Instance._localizationSystem;
         public static InputController Input => Instance._inputController;
-        public static WindowsManager WindowsManager => Instance._windowsManager;
-
+        
         public static ProjectManager ProjectManager => Instance._projectManager;
         public static GameStageController GameStage => Instance._gameStageController;
         public static EditorController Editor => Instance._editorController;
         public static PianoSoundManager PianoSoundManager => Instance._pianoSoundManager;
 
-        public static NoteInfoPanelView NoteInfoPanelView => Instance._noteInfoPanelView;
         public static StatusBarView StatusBarView => Instance._statusBarView;
 
         public static NewProjectDialog NewProjectDialog => Instance._newProjectDialog;
@@ -113,16 +74,18 @@ namespace Deenote
         }
 #endif
 
-        private static readonly LocalizableText[] _quitMessageButtons = {
-            LocalizableText.Localized("Message_Quit_Y"), LocalizableText.Localized("Message_Quit_N"),
-        };
+        private static readonly MessageBoxArgs _quitUnsavedMsgBoxArgs = new(
+            LocalizableText.Localized("Quit_MsgBox_Title"),
+            LocalizableText.Localized("QuitUnsaved_MsgBox_Content"),
+            LocalizableText.Localized("Quit_MsgBox_Y"),
+            LocalizableText.Localized("Quit_MsgBox_N"));
 
         public static async UniTask<bool> ConfirmQuitAsync()
         {
-            var res = await MessageBox.ShowAsync(
-                LocalizableText.Localized("Message_Quit_Title"),
-                LocalizableText.Localized("Message_Quit_Content"),
-                _quitMessageButtons);
+            if (!Editor.HasUnsavedChange) {
+                return true;
+            }
+            var res = await MessageBoxDialog.OpenAsync(_quitUnsavedMsgBoxArgs);
             return res == 0;
         }
 
@@ -249,14 +212,12 @@ namespace Deenote
             public const ushort DeenoteProjectFileHeader = 0xDEE0;
             public const byte DeenoteProjectFileVersionMark = 1;
 
-            public static readonly string[] SupportAudioFileExtensions = { ".mp3", ".wav", };
-            public static readonly string[] SupportProjectFileExtensions = { DeenotePreferFileExtension, ".dsproj", };
-            public static readonly string[] SupportChartFileExtensions = { ".json", ".txt" };
-
             public static readonly ImmutableArray<string> SupportLoadProjectFileExtensions
                 = ImmutableArray.Create(DeenotePreferFileExtension, ".dsproj");
             public static readonly ImmutableArray<string> SupportLoadAudioFileExtensions
                 = ImmutableArray.Create(".mp3", ".wav");
+            public static readonly ImmutableArray<string> SupportLoadChartFileExtensions
+                = ImmutableArray.Create(".json", ".txt");
         }
     }
 }

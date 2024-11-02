@@ -1,5 +1,6 @@
 using Deenote.GameStage;
 using Deenote.Project.Models;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Controls;
 using UnityEngine;
 
@@ -47,10 +48,10 @@ namespace Deenote.UI.Views
                 _musicSpeedProperty.OnValueChanged.AddListener(val => MainSystem.GameStage.MusicSpeed = val);
                 _showIndicatorProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.IsNoteIndicatorOn = val ?? false);
 
-                MainSystem.GameStage.RegisterPropertyChangeNotification(
+                MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.MusicSpeed,
                     stage => _musicSpeedProperty.SetValueWithoutNotify(stage.MusicSpeed));
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.IsIndicatorOn,
                     editor => _showIndicatorProperty.CheckBox.SetValueWithoutNotify(editor.IsNoteIndicatorOn));
             }
@@ -74,16 +75,16 @@ namespace Deenote.UI.Views
                 _horizontalGridSnapProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.SnapToTimeGrid = val ?? false);
                 _verticalGridSnapProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.SnapToPositionGrid = val ?? false);
 
-                MainSystem.GameStage.Grids.RegisterPropertyChangeNotification(
+                MainSystem.GameStage.Grids.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GridController.NotifyProperty.TimeGridSubBeatCount,
                     grids => _horizontalGridCountProperty.InputField.SetValueWithoutNotify(grids.TimeGridSubBeatCount.ToString()));
-                MainSystem.GameStage.Grids.RegisterPropertyChangeNotification(
+                MainSystem.GameStage.Grids.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GridController.NotifyProperty.VerticalGridCount,
                     grids => _verticalGridCountProperty.InputField.SetValueWithoutNotify(grids.VerticalGridCount.ToString()));
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.SnapToTimeGrid,
                     editor => _horizontalGridSnapProperty.CheckBox.SetValueWithoutNotify(editor.SnapToTimeGrid));
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.SnapToPositionGrid,
                     editor => _verticalGridSnapProperty.CheckBox.SetValueWithoutNotify(editor.SnapToPositionGrid));
             }
@@ -126,13 +127,10 @@ namespace Deenote.UI.Views
                     () => MainSystem.Editor.ApplySelectedNotesWithCurveTransform(GridController.CurveApplyProperty.Speed));
                 _curveSpeedAutoApplyProperty.CheckBox.OnValueChanged.AddListener(val => _curveAutoApplySpeed = val ?? false);
 
-                MainSystem.GameStage.Grids.RegisterPropertyChangeNotification(
+                MainSystem.GameStage.Grids.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GridController.NotifyProperty.IsCurveOn,
-                    grids =>
-                    {
-                        _curveDisableButton.IsInteractable = grids.IsCurveOn;
-                    });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                    grids => _curveDisableButton.IsInteractable = grids.IsCurveOn);
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.SelectedNotes,
                     editor =>
                     {
@@ -168,7 +166,7 @@ namespace Deenote.UI.Views
                 });
                 _bpmFillButton.OnClick.AddListener(() => MainSystem.Editor.InsertTempo(new Tempo(_bpm, _bpmTimeStart), _bpmTimeEnd));
 
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.SelectedNotes,
                     editor =>
                     {

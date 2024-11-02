@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Deenote.Project.Models;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Deenote.GameStage
@@ -21,8 +21,7 @@ namespace Deenote.GameStage
                     return;
                 __timeGridSubBeatCount = value;
                 UpdateTimeGrids();
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.TimeGridSubBeatCount);
-                _editorPropertiesWindow.NotifyTimeGridSubBeatCountChanged(__timeGridSubBeatCount);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.TimeGridSubBeatCount);
             }
         }
 

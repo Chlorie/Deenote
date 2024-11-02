@@ -1,3 +1,4 @@
+using Deenote.Edit.Operations;
 using Deenote.Project.Models;
 using Deenote.UI.ComponentModel;
 using System;
@@ -17,51 +18,52 @@ namespace Deenote.Project
             proj.AudioFileData = bytes;
             proj.AudioClip = clip;
 
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.Audio);
-            _propertiesWindow.NotifyAudioFileChanged(filePath);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.Audio);
         }
 
         public void EditProjectMusicName(string name)
         {
             CurrentProject.MusicName = name;
 
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.MusicName);
-            _propertiesWindow.NotifyProjectMusicNameChanged(name);
-            _perspectiveViewWindow.NotifyMusicNameChanged(name);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.MusicName);
         }
 
         public void EditProjectComposer(string composerName)
         {
             CurrentProject.Composer = composerName;
 
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.Composer);
-            _propertiesWindow.NotifyProjectComposerChanged(composerName);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.Composer);
         }
 
         public void EditProjectChartDesigner(string charterName)
         {
             CurrentProject.ChartDesigner = charterName;
 
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartDesigner);
-            _propertiesWindow.NotifyProjectChartDesignerChanged(charterName);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartDesigner);
         }
 
         public void AddProjectChart(ChartModel chart)
         {
             CurrentProject.Charts.Add(chart);
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartList);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartList);
         }
 
         public void RemoveProjectChartAt(int chartIndex)
         {
             CurrentProject.Charts.RemoveAt(chartIndex);
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.ChartList);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartList);
         }
 
-        private readonly PropertyChangeNotifier<ProjectManager, NotifyProperty> _propertyChangedNotifier = new();
+        internal IUndoableOperation DoInsertTempoOperation(Tempo tempo, float endTime)
+        {
+            return CurrentProject.Tempos.InsertTempo(tempo, endTime)
+                .WithDoneAction(() => _propertyChangeNotifier.Invoke(this, NotifyProperty.Tempos));
+        }
 
-        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<ProjectManager> action)
-            => _propertyChangedNotifier.AddListener(flag, action);
+        private PropertyChangeNotifier<ProjectManager, NotifyProperty> _propertyChangeNotifier = new();
+
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<ProjectManager> action) 
+            => _propertyChangeNotifier.AddListener(flag, action);
 
         public enum NotifyProperty
         {
@@ -74,6 +76,7 @@ namespace Deenote.Project
             Composer,
             ChartDesigner,
             ChartList,
+            Tempos,
         }
     }
 }

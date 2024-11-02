@@ -28,11 +28,15 @@ MenuPage_File_SaveAs=Save as
 MenuPage_File_Recent=Recent projects
 MenuPage_Preferences=Preferences
 MenuPage_About=About
+MenuPage_UpdateHistory=Update History
+MenuPage_Tutorials=Tutorials
 MenuPage_CheckUpdates=CheckUpdates
 
 LMenuBar_Project=Project
+MenuProjectPage_NoProject=No Project Loaded.
 MenuProjectPage_ProjectInfo=Project Info
 MenuProjectPage_ProjectInfo_Audio=Audio
+MenuProjectPage_ProjectInfo_Audio_Embeded=Embeded
 MenuProjectPage_ProjectInfo_Name=Name
 MenuProjectPage_ProjectInfo_Composer=Composer
 MenuProjectPage_ProjectInfo_Charter=Chart Designer
@@ -64,6 +68,7 @@ MenuNotePanel_Body_Sounds_Revert=Revert
 
 RMenuBar_Player=Player
 MenuPlayerPanel_Header=Player
+MenuPlayerPanel_Body_View=View
 MenuPlayerPanel_Body_NoteSpeed=Note Speed
 MenuPlayerPanel_Body_EffectVolume=Effect Volume
 MenuPlayerPanel_Body_MusicVolume=Music Volume
@@ -89,18 +94,22 @@ MenuEditorPanel_Body_Bpm_Time=Time
 MenuEditorPanel_Body_Bpm_TimeStart_Placeholder=Start
 MenuEditorPanel_Body_Bpm_TimeEnd_Placeholder=End
 MenuEditorPanel_Body_Bpm_Bpm=Bpm
+MenuEditorPanel_Body_Bpm_Bpm_PlaceHolder=Bpm
 MenuEditorPanel_Body_Bpm_Fill=Fill
 
 ## Dialogs
 
 NewProjectDialog_Title=New Project
 NewProjectDialog_ProjectName_Label=Project Name
+NewProjectDialog_ProjectName_PlaceHolder=Enter project name...
 NewProjectDialog_ProjectName_Invalid=Invalid project name.
 NewProjectDialog_AudioFile_Label=Audio File
+NewProjectDialog_AudioFile_PlaceHolder=Enter audio file path...
 NewProjectDialog_AudioFile_Invalid=Invalid audio file path.
 NewProjectDialog_Directory_Label=Directory
+NewProjectDialog_Directory_PlaceHolder=Enter directory path...
 NewProjectDialog_Directory_Invalid=Invalid directory name.
-NewProjectDialog_Directory_SameDirCheck=Place project file at the directory of music file.
+NewProjectDialog_Directory_SameDirCheck=Place project file at the directory of audio file.
 NewProjectDialog_Directory_CreateHint=The project will be created as "{0}"
 NewProjectDialog_ProjectName_Create=Create
 NewProjectDialog_ProjectName_Cancel=Cancel
@@ -113,6 +122,9 @@ PreferencesDialog_Body_MouseScrollSensitivity=Mouse Scroll Sensitivity
 PreferencesDialog_Body_MouseScrollSensitivity_Reverse=Reverse
 PreferencesDialog_Body_Language=Language
 PreferencesDialog_Body_AutoSave=Auto Save
+PreferencesDialog_Body_AutoSave_Off=Off
+PreferencesDialog_Body_AutoSave_On=On
+PreferencesDialog_Body_AutoSave_OnAndSaveJson=On & Save Json
 PreferencesDialog_Body_IneffectiveProperties=Ineffective Properties
 PreferencesDialog_Body_DistinguishPianoNotes=Distinguish Piano Notes
 PreferencesDialog_Body_SaveAudioInProject=Save Audio In Project
@@ -122,10 +134,26 @@ AboutDialog_Nav_Developers=Developers
 AboutDialog_Nav_Tutorials=Tutorials
 AboutDialog_Nav_Versions=Update History
 
+FileExplorerDialog_Button_Confirm=Confirm
+FileExplorerDialog_Button_Cancel=Cancel
+
 ## StatusBar
 Status_Fps=FPS: {0}
 
-# Dynamic
+# Dynamic / MessageBox
+
+## System
+
+Quit_MsgBox_Title=Quit
+QuitUnsaved_MsgBox_Content=Project unsaved, are you sure to quit?
+Quit_MsgBox_Y=Quit
+Quit_MsgBox_N=Cancel
+
+NewVersion_MsgBox_Title=New version detected.
+NewVersion_MsgBox_Content=Current version: {0}<br/>Latest version: {1}
+NewVersion_MsgBox_1=Go to release page
+NewVersion_MsgBox_2=Go to download page
+NewVersion_MsgBox_N=Update later
 
 ## Menu
 
@@ -138,10 +166,18 @@ FileExistsOverwrite_MsgBox_Content=A file with same name exists, do you want to 
 FileExistsOverwrite_MsgBox_Y=Yes
 FileExistsOverwrite_MsgBox_N=No
 
+#### FileExplorer Pin
+
+PinDirNotFound_MsgBox_Title=Directory not found.
+PinDirNotFound_MsgBox_Content=Pinned directory not found, do you want to unpin this directory?
+PinDirNotFound_MsgBox_Y=Unpin
+PinDirNotFound_MsgBox_N=Cancel
+
 #### New Project
 
 NewProject_MsgBox_Title=Create new project
 NewProject_Status_Created=New project created.
+NewProject_FileExplorer_SelectDirectory_Title=Select directory.
 
 NewProjectOnOpen_MsgBox_Content="""
     Current project will be closed when you start a new project.
@@ -160,6 +196,9 @@ NewProjectAudioNotExists_MsgBox_Y=OK
 
 OpenProject_MsgBox_Title=Open project
 OpenProject_Status_Loaded=Project loaded.
+OpenProject_Status_Loading=Loading project...
+OpenProject_Status_LoadFailed=Loading project failed.
+OpenProject_FileExplorer_Title=Open project.
 
 OpenProjectOnOpen_MsgBox_Content="""
     Current project will be closed when you start a new project.
@@ -180,6 +219,8 @@ LoadProjectFailed_MsgBox_N=Cancel
 SaveProject_MsgBox_Title=Save Project.
 SaveProject_Status_Saving=Saving project...
 SaveProject_Status_Saved=Project saved.
+SaveProject_FileExplorer_Title=Save Project.
+SaveAsProject_FileExplorer_Title=Save as...
 
 AutoSaveProject_Status_Saving=Auto saving project...
 AutoSaveProject_Status_Saved=Project auto saved.
@@ -195,9 +236,20 @@ OpenRecentProjectFileNotFound_MsgBox_N=Cancel
 
 ### Project
 
-LoadAudio_MsgBox_Title=Load audio.
+LoadAudio_MsgBox_Title=Load Audio.
 LoadAudioFailed_MsgBox_Content=Failed to load audio. Try another file.
 LoadAudioFailed_MsgBox_Y=OK
+SelectAudio_FileExplorer_Title=Select audio file.
+
+LoadChart_MsgBox_Title=Load Chart.
+LoadChart_Status_Loaded=Chart loaded.
+SelectChart_FileExplorer_Title=Select chart file.
+LoadChartFailed_MsgBox_Content=Failed to load chart. Try another file.
+LoadChartFailed_MsgBox_Y=OK
+
+ExportChart_Status_Exporting=Exporting chart.
+ExportChart_Status_Exported=Chart exported.
+ExportChart_FileExplorer_Title=Export chart to...
 
 # About contents
 

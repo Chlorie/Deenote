@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Deenote.ApplicationManaging;
 using Deenote.Localization;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Controls;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
@@ -19,7 +20,7 @@ namespace Deenote.UI.Views
         [SerializeField] Button _openButton;
         [SerializeField] Button _saveButton;
         [SerializeField] Button _saveAsButton;
-        [SerializeField] Transform _recentFilesParentTransform;
+        [SerializeField] Collapsable _recentFilesCollapsable;
 
         [SerializeField] Button _preferenceButton;
 
@@ -67,7 +68,7 @@ namespace Deenote.UI.Views
             _recentFiles = new PooledObjectListView<RecentFileItem>(
                 UnityUtils.CreateObjectPool(() =>
                 {
-                    var item = Instantiate(_recentFileItemPrefab, _recentFilesParentTransform);
+                    var item = Instantiate(_recentFileItemPrefab, _recentFilesCollapsable.Content.transform);
                     item.Parent = this;
                     return item;
                 }, maxSize: MaxRecentFilesCount));
@@ -84,8 +85,10 @@ namespace Deenote.UI.Views
                 }
 
                 var result = await MainSystem.NewProjectDialog.OpenCreateNewAsync();
-                MainSystem.ProjectManager.LoadProject(result);
-                MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("NewProject_Status_Created"));
+                if (result is not null) {
+                    MainSystem.ProjectManager.CurrentProject = result;
+                    MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("NewProject_Status_Created"));
+                }
             });
             _openButton.OnClick.AddListener(async UniTaskVoid () =>
             {
@@ -97,16 +100,20 @@ namespace Deenote.UI.Views
 
             SelectFile:
                 var feRes = await MainSystem.FileExplorerDialog.OpenSelectFileAsync(
+                    LocalizableText.Localized("OpenProject_FileExplorer_Title"),
                     MainSystem.Args.SupportLoadProjectFileExtensions);
                 if (feRes.IsCancelled)
                     return;
 
+                MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("OpenProject_Status_Loading"));
+                MainSystem.ProjectManager.CurrentProject = null;
                 bool isLoaded = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(feRes.Path);
                 if (isLoaded) {
                     AddToRecentFile(feRes.Path);
                     MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("OpenProject_Status_Loaded"));
                 }
                 else {
+                    MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("OpenProject_Status_LoadFailed"));
                     var res = await MainSystem.MessageBoxDialog.OpenAsync(_loadProjFailedMsgBoxArgs);
                     if (res == 0)
                         goto SelectFile;
@@ -124,6 +131,7 @@ namespace Deenote.UI.Views
             {
             SelectFile:
                 var feRes = await MainSystem.FileExplorerDialog.OpenInputFileAsync(
+                    LocalizableText.Localized("SaveAsProject_FileExplorer_Title"),
                     MainSystem.Args.DeenotePreferFileExtension);
                 if (feRes.IsCancelled)
                     return;
@@ -147,13 +155,14 @@ namespace Deenote.UI.Views
 
             _preferenceButton.OnClick.AddListener(MainSystem.PreferencesDialog.Open);
 
-            _aboutButton.OnClick.AddListener(MainSystem.AboutDialog.Open);
-            //_updatesButton.OnClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(Windows.AboutWindow.AboutPage.UpdateHistory));
-            //_turorialsButton.OnClick.AddListener(() => MainSystem.AboutWindow.OpenWindow(Windows.AboutWindow.AboutPage.Tutorials));
+            // TODO: Hardcoded page index, i'm trying to find a better way to impl this.
+            _aboutButton.OnClick.AddListener(() => MainSystem.AboutDialog.Open(0));
+            _updatesButton.OnClick.AddListener(() => MainSystem.AboutDialog.Open(1));
+            _turorialsButton.OnClick.AddListener(() => MainSystem.AboutDialog.Open(2));
 
             _checkUpdateButton.OnClick.AddListener(() => VersionChecker.CheckUpdateAsync(true, true).Forget());
 
-            MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+            MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 Project.ProjectManager.NotifyProperty.CurrentProject,
                 projm =>
                 {
@@ -165,7 +174,7 @@ namespace Deenote.UI.Views
 
         internal void AddToRecentFile(string filePath)
         {
-            int findIndex = _recentFiles.Find(filePath, static (item, fp) => item.FilePath == fp);
+            int findIndex = _recentFiles.FindIndex(filePath, static (item, fp) => item.FilePath == fp);
             if (findIndex < 0) {
                 if (_recentFiles.Count >= MaxRecentFilesCount) {
                     _recentFiles.MoveTo(^1, 0);

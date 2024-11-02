@@ -1,4 +1,5 @@
 using Deenote.Project.Models;
+using Deenote.UI.ComponentModel;
 using Deenote.UI.Views.Elements;
 using TMPro;
 using UnityEngine;
@@ -8,20 +9,18 @@ namespace Deenote.UI.Views
 {
     public sealed class PerspectiveViewPanelView : MonoBehaviour
     {
-        [Header("UI")]
+        [SerializeField] AspectRatioFitter _aspectRatioFitter;
+        [Header("Stage UI")]
         [SerializeField] TMP_Text _musicNameText;
         [SerializeField] TMP_Text _scoreText;
         [SerializeField] Slider _timeSlider;
         [SerializeField] Image _difficultyImage;
         [SerializeField] TMP_Text _levelText;
         [SerializeField] Button _pauseButton;
-        [SerializeField] PerspectiveViewComboController _combo; // Update in itself
+        [SerializeField] PerspectiveViewComboController _combo;
         [SerializeField] TMP_Text _backgroundStaveText;
-        [Header("Args")]
 
         private Difficulty __difficulty;
-        private string __level;
-
         private Difficulty Difficulty
         {
             get => __difficulty;
@@ -42,6 +41,7 @@ namespace Deenote.UI.Views
             }
         }
 
+        private string __level;
         private string Level
         {
             get => __level;
@@ -53,55 +53,58 @@ namespace Deenote.UI.Views
             }
         }
 
-        public float AspectRatio
-        {
-            get;set;
-        }
-
-        // PerspectiveViewController;
-
-        // TODO: 关于Size Ratio，这部分从PerspectiveWindow迁移过来
-
         private void Start()
         {
+            MainSystem.GameStage.PerspectiveView.RegisterPropertyChangeNotificationAndInvoke(
+                GameStage.PerspectiveViewController.NotifyProperty.AspectRatio,
+                view => _aspectRatioFitter.aspectRatio = view.AspectRatio);
+
+            // Stage UI
+
             _timeSlider.onValueChanged.AddListener(val => MainSystem.GameStage.MusicController.Time = val);
             _pauseButton.onClick.AddListener(MainSystem.GameStage.MusicController.TogglePlayingState);
 
-            MainSystem.GameStage.MusicController.OnTimeChanged += (_, time, _) => _timeSlider.SetValueWithoutNotify(time);
             MainSystem.GameStage.MusicController.OnClipChanged += len => _timeSlider.maxValue = len;
+            MainSystem.GameStage.MusicController.OnTimeChanged += (_, time, _) => _timeSlider.SetValueWithoutNotify(time);
+            _timeSlider.maxValue = MainSystem.GameStage.MusicController.Length;
+            _timeSlider.SetValueWithoutNotify(MainSystem.GameStage.MusicController.Time);
 
-            MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+            MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 Project.ProjectManager.NotifyProperty.MusicName,
                 projm => _musicNameText.text = _backgroundStaveText.text = projm.CurrentProject.MusicName);
 
-            MainSystem.ProjectManager.RegisterPropertyChangeNotification(
+            MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 Project.ProjectManager.NotifyProperty.CurrentProject,
-                projm => _musicNameText.text = projm.CurrentProject?.MusicName ?? "");
+                projm => _musicNameText.text =_backgroundStaveText.text = projm.CurrentProject?.MusicName ?? "");
 
-            MainSystem.GameStage.RegisterPropertyChangeNotification(
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.ChartLevel,
                 stage => Level = stage.Chart.Level);
 
-            MainSystem.GameStage.RegisterPropertyChangeNotification(
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.ChartDifficulty,
                 stage => Difficulty = stage.Chart.Difficulty);
 
-            MainSystem.GameStage.RegisterPropertyChangeNotification(
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.CurrentChart,
                 stage =>
                 {
                     var chart = stage.Chart;
                     if (chart is null) {
-                        Level = "";
-                        Difficulty = Difficulty.Hard;
+                        gameObject.SetActive(false);
                     }
                     else {
                         Level = chart.Level;
                         Difficulty = chart.Difficulty;
+                        gameObject.SetActive(true);
                     }
                 });
-            
-            MainSystem.GameStage.RegisterPropertyChangeNotification(
+
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
+                GameStage.GameStageController.NotifyProperty.StageNotesUpdated,
+                _combo.UpdateComboRegistrant);
+
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.StageNotesUpdated,
                 stage => // Update score
                 {

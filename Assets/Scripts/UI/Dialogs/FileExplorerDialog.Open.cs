@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnityEngine;
 
@@ -18,18 +17,21 @@ namespace Deenote.UI.Dialogs
         /// list the last explored dir if <see langword="null" />
         /// </param>
         /// <returns></returns>
-        public async UniTask<Result> OpenSelectFileAsync(ImmutableArray<string> extensionFilters, string initialDirectory = null)
+        public async UniTask<Result> OpenSelectFileAsync(LocalizableText dialogTitle, ImmutableArray<string> extensionFilters, string initialDirectory = null)
         {
-            if (await OpenAsync(PathFilter.FilterByExtensions(extensionFilters), initialDirectory)) {
-                Debug.Assert(CurrentSelectedPath != null);
-                return new Result(CurrentSelectedPath);
+            PathFilter filter = extensionFilters.IsDefaultOrEmpty
+                ? PathFilter.NoFilter
+                : PathFilter.FilterByExtensions(extensionFilters);
+            if (await OpenAsync(dialogTitle, filter, initialDirectory)) {
+                Debug.Assert(CurrentSelectedFilePath != null);
+                return new Result(CurrentSelectedFilePath);
             }
             return default;
         }
 
-        public async UniTask<Result> OpenSelectDirectoryAsync(string? initialDirectory = null)
+        public async UniTask<Result> OpenSelectDirectoryAsync(LocalizableText dialogTitle, string? initialDirectory = null)
         {
-            if (await OpenAsync(PathFilter.DirectoriesOnly, initialDirectory))
+            if (await OpenAsync(dialogTitle, PathFilter.DirectoriesOnly, initialDirectory))
                 return new Result(CurrentDirectory);
             return default;
         }
@@ -40,16 +42,20 @@ namespace Deenote.UI.Dialogs
         /// <param name="fileExtension">The extension of inputted file</param>
         /// <param name="initialDirectory"></param>
         /// <returns></returns>
-        public async UniTask<Result> OpenInputFileAsync(string? fileExtension = null, string? initialDirectory = null)
+        public async UniTask<Result> OpenInputFileAsync(LocalizableText dialogTitle, string? fileExtension = null, string? initialDirectory = null)
         {
-            if (await OpenAsync(PathFilter.NoFilter, initialDirectory, inputMode: true, inputModeExtension: fileExtension))
+            PathFilter filter = fileExtension is null
+                ? PathFilter.NoFilter
+                : PathFilter.FilterByExtensions(ImmutableArray.Create(fileExtension));
+            if (await OpenAsync(dialogTitle, filter, initialDirectory, inputMode: true, inputModeExtension: fileExtension))
                 return new Result(Path.Combine(CurrentDirectory, $"{_fileNameInput.Value}{fileExtension}"));
             return default;
         }
 
-        private async UniTask<bool> OpenAsync(PathFilter filter, string initialDirectory = null, bool inputMode = false, string? inputModeExtension = null)
+        private async UniTask<bool> OpenAsync(LocalizableText dialogTitle, PathFilter filter, string initialDirectory = null, bool inputMode = false, string? inputModeExtension = null)
         {
             using var s_dialogOpen = _dialog.Open();
+            _dialog.SetTitle(dialogTitle);
 
             using var comfirmHandler = _confirmButton.GetAsyncClickEventHandler();
             using var cancelHandler = _cancelButton.GetAsyncClickEventHandler();

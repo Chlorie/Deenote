@@ -3,7 +3,6 @@ using Deenote.UI.Dialogs.Elements;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using TMPro;
 using UnityEngine;
@@ -30,18 +29,25 @@ namespace Deenote.UI.Dialogs
 
         private PathFilter _pathFilter;
 
-        private string? __currentSelectedPath;
+        private string? __currentSelectedFilePath;
         /// <summary>
-        /// Current selected full file path
+        /// Current selected file full path
         /// </summary>
-        private string? CurrentSelectedPath
+        private string? CurrentSelectedFilePath
         {
-            get => __currentSelectedPath;
+            get => __currentSelectedFilePath;
             set {
-                if (__currentSelectedPath == value)
+                if (__currentSelectedFilePath == value)
                     return;
-                __currentSelectedPath = value;
-                _fileNameInput.Value = value;
+                __currentSelectedFilePath = value;
+                if (value is not null) {
+                    _fileNameInput.Value = _extensionText.gameObject.activeSelf
+                        ? Path.GetFileNameWithoutExtension(value)
+                        : Path.GetFileName(value);
+                }
+                else {
+                    _fileNameInput.Value = "";
+                }
             }
         }
 
@@ -73,18 +79,17 @@ namespace Deenote.UI.Dialogs
                     return item;
                 }));
             CurrentDirectory = Directory.GetCurrentDirectory();
+
+            Awake_Pinned();
         }
 
         private void Start()
         {
             _directoryInput.OnEndEdit.AddListener(path =>
             {
-                if (Directory.Exists(path)) {
-                    CurrentDirectory = path;
-                    RefreshFileList();
-                }
-                else
-                    _directoryInput.SetValueWithoutNotify(CurrentDirectory);
+                if (TryNavigateToDirectory(path))
+                    return;
+                _directoryInput.SetValueWithoutNotify(CurrentDirectory);
             });
             _fileNameInput.OnValueChanged.AddListener(fileName =>
             {
@@ -96,6 +101,16 @@ namespace Deenote.UI.Dialogs
         {
             // We choose to clear pool because in most of time, we needn't use file explorer
             _fileItems.Clear(clearPool: true);
+        }
+
+        public bool TryNavigateToDirectory(string directory)
+        {
+            if (Directory.Exists(directory)) {
+                CurrentDirectory = directory;
+                RefreshFileList();
+                return true;
+            }
+            return false;
         }
 
         private void RefreshFileList()
@@ -149,8 +164,13 @@ namespace Deenote.UI.Dialogs
                 RefreshFileList();
             }
             else {
-                CurrentSelectedPath = Path.GetFileName(item.Path);
+                CurrentSelectedFilePath = item.Path;
             }
+        }
+
+        private void Reset()
+        {
+            CurrentSelectedFilePath = null;
         }
 
         public enum PathFilterKind
@@ -168,9 +188,9 @@ namespace Deenote.UI.Dialogs
             {
                 get {
                     if (_filters.IsDefault)
-                        return PathFilterKind.NoFilter;
-                    if (_filters.IsEmpty)
                         return PathFilterKind.DirectoriesOnly;
+                    if (_filters.IsEmpty)
+                        return PathFilterKind.NoFilter;
                     return PathFilterKind.FilterByExtensions;
                 }
             }
@@ -182,9 +202,9 @@ namespace Deenote.UI.Dialogs
                 _filters = filters;
             }
 
-            public static PathFilter NoFilter => default;
+            public static PathFilter NoFilter => new(ImmutableArray<string>.Empty);
 
-            public static PathFilter DirectoriesOnly => new(ImmutableArray<string>.Empty);
+            public static PathFilter DirectoriesOnly => default;
 
             public static PathFilter FilterByExtensions(ImmutableArray<string> extensionFilters)
                 => extensionFilters.IsDefaultOrEmpty ? default : new(extensionFilters);

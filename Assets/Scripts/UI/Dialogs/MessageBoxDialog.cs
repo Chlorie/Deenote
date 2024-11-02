@@ -1,11 +1,12 @@
+using CommunityToolkit.HighPerformance.Buffers;
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.UI.Controls;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
+using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading;
 using UnityEngine;
 
@@ -25,48 +26,67 @@ namespace Deenote.UI.Dialogs
         private PooledObjectListView<Button> _buttons;
         private readonly List<UniTask> _buttonClickTasks = new();
 
-        private void Awake()
+        private bool _awaked;
+
+        // OpenAsync cannot be async method as its parameter contains ROS<string>,
+        // and MonoBehaviour.Awake() will invoke in OpenAsyncImpl(), before which we
+        // should initialize the buttonTexts with ROS<string>, so we use a manual Awake method
+        // instead of MonoBehaviour.Awake()
+        private void EnsureAwake()
         {
-            _buttons = new PooledObjectListView<Button>(
-                UnityUtils.CreateObjectPool(_buttonPrefab, _buttonsParentTransform, defaultCapacity: 4));
+            if (!_awaked) {
+                _buttons = new PooledObjectListView<Button>(
+                    UnityUtils.CreateObjectPool(_buttonPrefab, _buttonsParentTransform, defaultCapacity: 4));
+                _awaked = true;
+            }
         }
 
-        public UniTask<int> OpenAsync(in MessageBoxArgs data)
-            => OpenAsync(data.Title, data.Content, data.Buttons);
-
-        /// <returns>
-        /// The index of clicked button, -1 if close button
-        /// </returns>
-        public async UniTask<int> OpenAsync(LocalizableText title, LocalizableText content, ImmutableArray<LocalizableText> buttonTexts)
+        public UniTask<int> OpenAsync(in MessageBoxArgs data, ReadOnlySpan<string> contentArgs = default)
         {
-            using var s_open = _dialog.Open();
+            EnsureAwake();
 
-            _dialog.SetTitle(title);
-            _content.SetText(content);
+            _dialog.SetTitle(data.Title);
+            _content.SetText(data.Content, contentArgs);
 
-            using (var resettingButtons = _buttons.Resetting(buttonTexts.Length)) {
-                foreach (var text in buttonTexts) {
+            using (var resettingButtons = _buttons.Resetting(data.Buttons.Length)) {
+                foreach (var text in data.Buttons) {
                     resettingButtons.Add(out var button);
                     button.Text.SetText(text);
                 }
             }
             _buttons.SetSiblingIndicesInOrder();
 
-            var cts = new CancellationTokenSource();
-            var btns = _buttonClickTasks;
-            Debug.Assert(btns.Count == 0);
+            return OpenAsyncImpl();
 
-            btns.Add(_dialog.CloseButton.OnClickAsync(cts.Token));
-            foreach (var btn in _buttons) {
-                btns.Add(btn.OnClickAsync(cts.Token));
+            async UniTask<int> OpenAsyncImpl()
+            {
+                using var s_open = _dialog.Open();
+
+                var cts = new CancellationTokenSource();
+                var btns = _buttonClickTasks;
+                Debug.Assert(btns.Count == 0);
+
+                btns.Add(_dialog.CloseButton.OnClickAsync(cts.Token));
+                foreach (var btn in _buttons) {
+                    btns.Add(btn.OnClickAsync(cts.Token));
+                }
+
+                var clickedIndex = await UniTask.WhenAny(btns);
+                cts.Cancel();
+                btns.Clear();
+                _buttons.Clear();
+
+                return clickedIndex - 1;
             }
+        }
 
-            var clickedIndex = await UniTask.WhenAny(btns);
-            cts.Cancel();
-            btns.Clear();
-            _buttons.Clear();
-
-            return clickedIndex - 1;
+        public UniTask<int> OpenAsync(in MessageBoxArgs data, string contentArg0, string contentArg1)
+        {
+            using var so = SpanOwner<string>.Allocate(2);
+            var span = so.Span;
+            span[0] = contentArg0;
+            span[1] = contentArg1;
+            return OpenAsync(data, span);
         }
     }
 }

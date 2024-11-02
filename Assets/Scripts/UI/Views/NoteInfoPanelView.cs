@@ -9,8 +9,9 @@ using UnityEngine;
 
 namespace Deenote.UI.Views
 {
-    public sealed class NoteInfoPanelView : MonoBehaviour, INotifyPropertyChange<NoteInfoPanelView, NoteInfoPanelView.NotifyProperty>
+    public sealed class NoteInfoPanelView : MonoBehaviour
     {
+        // TODO: Selected notes statistics
         [SerializeField] KVInputProperty _positionProperty = default!;
         [SerializeField] KVInputProperty _timeProperty = default!;
         [SerializeField] KVInputProperty _sizeProperty = default!;
@@ -26,28 +27,21 @@ namespace Deenote.UI.Views
         // Events and notification are set in PianoSoundPropertyPanel.Start() 
         [SerializeField] PianoSoundPropertyPanel _pianoSoundEditPanelView = default!;
 
-        private bool _isIneffectivePropertiesVisible;
-        public bool IsIneffectivePropertiesVisible
-        {
-            get => _isIneffectivePropertiesVisible;
-            set {
-                if (_isIneffectivePropertiesVisible == value)
-                    return;
-
-                _isIneffectivePropertiesVisible = value;
-                _shiftProperty.gameObject.SetActive(_isIneffectivePropertiesVisible);
-                _vibrateProperty.gameObject.SetActive(_isIneffectivePropertiesVisible);
-                _warningTypeProperty.gameObject.SetActive(_isIneffectivePropertiesVisible);
-                _eventIdProperty.gameObject.SetActive(_isIneffectivePropertiesVisible);
-
-                _propertyChangeNotifier.Invoke(this, NotifyProperty.IneffectivePropertiesVisiblility);
-            }
-        }
-
         private void Start()
         {
             const string MultipleValueText = "-";
             const int Kind_Click = 0, Kind_Slide = 1, Kind_Swipe = 2;
+
+            MainSystem.GlobalSettings.RegisterPropertyChangeNotificationAndInvoke(
+                MainSystem.Settings.NotifyProperty.IneffectivePropertiesVisiblility,
+                settings =>
+                {
+                    var visible = settings.IsIneffectivePropertiesVisible;
+                    _shiftProperty.gameObject.SetActive(visible);
+                    _vibrateProperty.gameObject.SetActive(visible);
+                    _warningTypeProperty.gameObject.SetActive(visible);
+                    _eventIdProperty.gameObject.SetActive(visible);
+                });
 
             // Properties
             {
@@ -58,7 +52,7 @@ namespace Deenote.UI.Views
                     else
                         NotifyFloatValueChanged(_positionProperty.InputField);
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NotePosition,
                     editor => NotifyMultiFloatValueChanged(_positionProperty.InputField, editor.SelectedNotes, n => n.Data.Position));
 
@@ -69,7 +63,7 @@ namespace Deenote.UI.Views
                     else
                         NotifyFloatValueChanged(_timeProperty.InputField);
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteTime,
                     editor => NotifyMultiFloatValueChanged(_timeProperty.InputField, editor.SelectedNotes, n => n.Data.Time));
 
@@ -80,7 +74,7 @@ namespace Deenote.UI.Views
                     else
                         NotifyFloatValueChanged(_sizeProperty.InputField);
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteSize,
                     editor => NotifyMultiFloatValueChanged(_sizeProperty.InputField, editor.SelectedNotes, n => n.Data.Size));
 
@@ -91,7 +85,7 @@ namespace Deenote.UI.Views
                     else
                         NotifyFloatValueChanged(_durationProperty.InputField);
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteDuration,
                     editor => NotifyMultiFloatValueChanged(_durationProperty.InputField, editor.SelectedNotes, n => n.Data.Duration));
 
@@ -102,7 +96,7 @@ namespace Deenote.UI.Views
                     else
                         NotifyFloatValueChanged(_shiftProperty.InputField);
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteShift,
                     editor => NotifyMultiFloatValueChanged(_shiftProperty.InputField, editor.SelectedNotes, n => n.Data.Shift));
 
@@ -113,7 +107,7 @@ namespace Deenote.UI.Views
                     else
                         NotifyFloatValueChanged(_speedProperty.InputField);
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteSpeed,
                     editor => NotifyMultiFloatValueChanged(_speedProperty.InputField, editor.SelectedNotes, n => n.Data.Speed));
 
@@ -126,7 +120,7 @@ namespace Deenote.UI.Views
                         _ => default!,
                     });
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteKind,
                     editor => _kindProperty.ToggleList.SetSelectedIndexWithoutNotify(editor.SelectedNotes.IsSameForAll(n => n.Data.Kind, out var kind) ? ToInt(kind) : -1));
 
@@ -136,7 +130,7 @@ namespace Deenote.UI.Views
                         return;
                     MainSystem.Editor.EditSelectedNotesVibrate(toggle);
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteVibrate,
                     editor => _vibrateProperty.CheckBox.SetValueWithoutNotify(editor.SelectedNotes.IsSameForAll(n => n.Data.Vibrate, out var flag) ? flag : null));
 
@@ -147,12 +141,12 @@ namespace Deenote.UI.Views
                     else
                         _warningTypeProperty.InputField.SetValueWithoutNotify(MultipleValueText);
                 });
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteWarningType,
                     editor => _warningTypeProperty.InputField.SetValueWithoutNotify(editor.SelectedNotes.IsSameForAll(n => n.Data.WarningType, out var wt) ? wt.ToInt32().ToString() : MultipleValueText));
 
                 _eventIdProperty.InputField.OnEndEdit.AddListener(val => MainSystem.Editor.EditSelectedNotesEventId(val));
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.NoteEventId,
                     editor => _eventIdProperty.InputField.SetValueWithoutNotify(editor.SelectedNotes.IsSameForAll(n => n.Data.EventId, out var evId) ? evId : ""));
             }
@@ -160,7 +154,7 @@ namespace Deenote.UI.Views
             // Universal
             {
                 // Selected Notes
-                MainSystem.Editor.RegisterPropertyChangeNotification(
+                MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.SelectedNotes,
                     editor =>
                     {
@@ -245,16 +239,6 @@ namespace Deenote.UI.Views
                 NoteData.NoteKind.Swipe => Kind_Swipe,
                 _ => -1,
             };
-        }
-
-        private PropertyChangeNotifier<NoteInfoPanelView, NotifyProperty> _propertyChangeNotifier;
-
-        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<NoteInfoPanelView> action)
-            => _propertyChangeNotifier.AddListener(flag, action);
-
-        public enum NotifyProperty
-        {
-            IneffectivePropertiesVisiblility
         }
     }
 }

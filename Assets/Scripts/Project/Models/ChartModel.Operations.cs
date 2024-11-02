@@ -5,7 +5,9 @@ using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -92,7 +94,8 @@ namespace Deenote.Project.Models
                     insertIndices[i] = iModel;
                 }
 
-                return new AddMultipleNotesOperation(insertIndices, _chartModel, insertModels);
+                return new AddMultipleNotesOperation(
+                    ImmutableCollectionsMarshal.AsImmutableArray(insertIndices), _chartModel, insertModels);
             }
 
             public RemoveNotesOperation RemoveNotes(ReadOnlySpan<NoteModel> notesInTimeOrder)
@@ -117,8 +120,6 @@ namespace Deenote.Project.Models
 
                     iModel = i + 1;
                 }
-
-                //CollectionUtils.InsertionSortAsc(removeIndices.AsSpan());
 
                 return new RemoveNotesOperation(removeIndices, _chartModel);
             }
@@ -147,7 +148,8 @@ namespace Deenote.Project.Models
                     var note = notes[i];
                     contexts[i] = (note, valueGetter(note.Data));
                 }
-                return new EditNotesPropertyOperation<T>(_chartModel, contexts, value, valueSetter);
+                return new EditNotesPropertyOperation<T>(_chartModel,
+                    ImmutableCollectionsMarshal.AsImmutableArray(contexts), value, valueSetter);
             }
 
             public EditNotesPropertyOperation<T> EditNotes<T>(ReadOnlySpan<NoteModel> notes,
@@ -158,7 +160,8 @@ namespace Deenote.Project.Models
                     var note = notes[i];
                     contexts[i] = (note, valueGetter(notes[i].Data));
                 }
-                return new EditNotesPropertyOperation<T>(_chartModel, contexts, valueSelector, valueSetter);
+                return new EditNotesPropertyOperation<T>(_chartModel,
+                    ImmutableCollectionsMarshal.AsImmutableArray(contexts), valueSelector, valueSetter);
             }
 
             public EditNotesCoordPropertyOperation EditNotesCoord(ReadOnlySpan<NoteModel> notes,
@@ -169,7 +172,8 @@ namespace Deenote.Project.Models
                     var note = notes[i];
                     contexts[i] = (note, note.Data.PositionCoord);
                 }
-                return new EditNotesCoordPropertyOperation(_chartModel, contexts, newCoord, editingTime);
+                return new EditNotesCoordPropertyOperation(_chartModel,
+                    ImmutableCollectionsMarshal.AsImmutableArray(contexts), newCoord, editingTime);
             }
 
             public EditNotesCoordPropertyOperation EditNotesCoord(ReadOnlySpan<NoteModel> notes,
@@ -180,7 +184,8 @@ namespace Deenote.Project.Models
                     var note = notes[i];
                     contexts[i] = (note, note.Data.PositionCoord);
                 }
-                return new EditNotesCoordPropertyOperation(_chartModel, contexts, valueSelector, editingTime);
+                return new EditNotesCoordPropertyOperation(_chartModel,
+                    ImmutableCollectionsMarshal.AsImmutableArray(contexts), valueSelector, editingTime);
             }
 
             public EditNotesDurationPropertyOperation EditNotesDuration(ReadOnlySpan<NoteModel> notes, float newDuration)
@@ -190,24 +195,26 @@ namespace Deenote.Project.Models
                     var note = notes[i];
                     contexts[i] = (note, note.Data.Duration);
                 }
-                return new EditNotesDurationPropertyOperation(_chartModel, contexts, newDuration);
+                return new EditNotesDurationPropertyOperation(_chartModel,
+                    ImmutableCollectionsMarshal.AsImmutableArray(contexts), newDuration);
             }
 
             public EditNotesSoundsOperation EditNotesSounds(ReadOnlySpan<NoteModel> notes,
                 ReadOnlySpan<PianoSoundValueData> valueData)
             {
-                var contexts = new (NoteModel, PianoSoundValueData[])[notes.Length];
+                var contexts = new (NoteModel, ImmutableArray<PianoSoundValueData> OldValues)[notes.Length];
                 for (int i = 0; i < notes.Length; i++) {
                     var note = notes[i];
                     var sounds = note.Data.Sounds;
                     var datas = sounds.Count == 0 ? Array.Empty<PianoSoundValueData>() : new PianoSoundValueData[sounds.Count];
                     for (int j = 0; j < sounds.Count; j++) {
-                        datas[j] = sounds[i].GetValues();
+                        datas[j] = sounds[j].GetValues();
                     }
-                    contexts[i] = (note, datas);
+                    contexts[i] = (note, ImmutableCollectionsMarshal.AsImmutableArray(datas));
                 }
 
-                return new EditNotesSoundsOperation(_chartModel, contexts, valueData);
+                return new EditNotesSoundsOperation(_chartModel,
+                    ImmutableCollectionsMarshal.AsImmutableArray(contexts), valueData);
             }
 
             #region Operation implementation
@@ -301,7 +308,7 @@ namespace Deenote.Project.Models
 
             public sealed class AddMultipleNotesOperation : IUndoableOperation
             {
-                private readonly int[] _insertIndices;
+                private readonly ImmutableArray<int> _insertIndices;
                 private readonly ChartModel _chartModel;
                 private readonly IReadOnlyList<IStageNoteModel> _notes;
 
@@ -316,7 +323,7 @@ namespace Deenote.Project.Models
                 /// </summary>
                 private readonly IReadOnlyList<NoteModel>?[] _collidedNotes;
 
-                public AddMultipleNotesOperation(int[] insertIndices, ChartModel chartModel, IReadOnlyList<IStageNoteModel> noteModels)
+                public AddMultipleNotesOperation(ImmutableArray<int> insertIndices, ChartModel chartModel, IReadOnlyList<IStageNoteModel> noteModels)
                 {
                     Debug.Assert(insertIndices.Length == noteModels.Count);
                     _insertIndices = insertIndices;
@@ -403,7 +410,7 @@ namespace Deenote.Project.Models
                 private readonly ChartModel _chartModel;
 
                 private readonly IReadOnlyList<int> _removeIndices;
-                private readonly IStageNoteModel[] _removeModels;
+                private readonly ImmutableArray<IStageNoteModel> _removeModels;
 
                 private readonly int _holdCount;
                 private readonly UnlinkNotesOperation _unlinkOperation;
@@ -421,16 +428,17 @@ namespace Deenote.Project.Models
                 {
                     _removeIndices = removeIndices;
                     _chartModel = chartModel;
-                    _removeModels = new IStageNoteModel[removeIndices.Count];
+                    var removeModelsBuilder = new IStageNoteModel[removeIndices.Count];
                     for (int i = 0; i < _removeModels.Length; i++) {
                         var model = _chartModel._visibleNotes[_removeIndices[i]];
-                        _removeModels[i] = model;
+                        removeModelsBuilder[i] = model;
                         if (model is NoteTailModel)
                             _holdCount++;
                     }
+                    _removeModels = ImmutableCollectionsMarshal.AsImmutableArray(removeModelsBuilder);
                     _collidedNotes = new IReadOnlyList<NoteModel>?[_removeIndices.Count];
 
-                    _unlinkOperation = new UnlinkNotesOperation(_removeModels.OfType<NoteModel>().ToArray());
+                    _unlinkOperation = new UnlinkNotesOperation(_removeModels.OfType<NoteModel>().ToList());
                 }
 
                 public RemoveNotesOperation WithRedoneAction(Action action)
@@ -502,21 +510,22 @@ namespace Deenote.Project.Models
 
             public sealed class LinkNotesOperation : IUndoableOperation
             {
-                private readonly NoteModel[] _notes;
-                private readonly (bool IsSlide, NoteData? Prev, NoteData? Next)[] _oldValues;
+                private readonly IReadOnlyList<NoteModel> _notes;
+                private readonly ImmutableArray<(bool IsSlide, NoteData? Prev, NoteData? Next)> _oldValues;
 
                 private Action? _onRedone;
                 private Action? _onUndone;
 
-                public LinkNotesOperation(NoteModel[] notes)
+                public LinkNotesOperation(IReadOnlyList<NoteModel> notes)
                 {
                     _notes = notes;
-                    _oldValues = new (bool IsSlide, NoteData? Prev, NoteData? Next)[_notes.Length];
 
-                    for (int i = 0; i < _notes.Length; i++) {
+                    var oldValuesBuilder = new (bool IsSlide, NoteData? Prev, NoteData? Next)[_notes.Count];
+                    for (int i = 0; i < _notes.Count; i++) {
                         var data = _notes[i].Data;
-                        _oldValues[i] = (data.IsSlide, data.PrevLink, data.NextLink);
+                        oldValuesBuilder[i] = (data.IsSlide, data.PrevLink, data.NextLink);
                     }
+                    _oldValues = ImmutableCollectionsMarshal.AsImmutableArray(oldValuesBuilder);
                 }
 
                 public LinkNotesOperation WithRedoneAction(Action action)
@@ -533,7 +542,7 @@ namespace Deenote.Project.Models
 
                 void IUndoableOperation.Redo()
                 {
-                    for (int i = 0; i < _notes.Length; i++) {
+                    for (int i = 0; i < _notes.Count; i++) {
                         var data = _notes[i].Data;
                         if (data.IsSlide) {
                             data.UnlinkWithoutCutLinkChain();
@@ -551,7 +560,7 @@ namespace Deenote.Project.Models
 
                 void IUndoableOperation.Undo()
                 {
-                    for (int i = 0; i < _notes.Length; i++) {
+                    for (int i = 0; i < _notes.Count; i++) {
                         var data = _notes[i].Data;
                         var (isSlide, prev, next) = _oldValues[i];
                         Debug.Assert(data.IsSlide);
@@ -573,21 +582,22 @@ namespace Deenote.Project.Models
 
             public sealed class UnlinkNotesOperation : IUndoableOperation
             {
-                private readonly NoteModel[] _notes;
-                private readonly (bool IsSlide, NoteData? Prev, NoteData? Next)[] _oldValues;
+                private readonly IReadOnlyList<NoteModel> _notes;
+                private readonly ImmutableArray<(bool IsSlide, NoteData? Prev, NoteData? Next)> _oldValues;
 
                 private Action? _onRedone;
                 private Action? _onUndone;
 
-                public UnlinkNotesOperation(NoteModel[] contexts)
+                public UnlinkNotesOperation(IReadOnlyList<NoteModel> contexts)
                 {
                     _notes = contexts;
-                    _oldValues = new (bool IsSlide, NoteData? Prev, NoteData? Next)[_notes.Length];
 
-                    for (int i = 0; i < _notes.Length; i++) {
+                    var oldValuesBuilder = new (bool IsSlide, NoteData? Prev, NoteData? Next)[_notes.Count];
+                    for (int i = 0; i < _notes.Count; i++) {
                         var data = _notes[i].Data;
-                        _oldValues[i] = (data.IsSlide, data.PrevLink, data.NextLink);
+                        oldValuesBuilder[i] = (data.IsSlide, data.PrevLink, data.NextLink);
                     }
+                    _oldValues = ImmutableCollectionsMarshal.AsImmutableArray(oldValuesBuilder);
                 }
 
                 public UnlinkNotesOperation WithRedoneAction(Action action)
@@ -604,7 +614,7 @@ namespace Deenote.Project.Models
 
                 void IUndoableOperation.Redo()
                 {
-                    for (int i = 0; i < _notes.Length; i++) {
+                    for (int i = 0; i < _notes.Count; i++) {
                         var data = _notes[i].Data;
                         if (data.IsSlide) {
                             data.UnlinkWithoutCutLinkChain();
@@ -615,7 +625,7 @@ namespace Deenote.Project.Models
 
                 void IUndoableOperation.Undo()
                 {
-                    for (int i = 0; i < _notes.Length; i++) {
+                    for (int i = 0; i < _notes.Count; i++) {
                         var data = _notes[i].Data;
                         var (isSlide, prev, next) = _oldValues[i];
 
@@ -637,7 +647,7 @@ namespace Deenote.Project.Models
             {
                 protected readonly ChartModel _chartModel;
 
-                protected readonly (NoteModel Note, T OldValue)[] _contexts;
+                protected readonly ImmutableArray<(NoteModel Note, T OldValue)> _contexts;
                 protected readonly T _newValue;
                 protected readonly Func<T, T>? _newValueSelector;
 
@@ -645,7 +655,7 @@ namespace Deenote.Project.Models
                 private Action _onDone;
 
                 protected EditNotesPropertyOperationBase(ChartModel chartModel,
-                    (NoteModel Note, T OldValue)[] contexts, T? newValue, Func<T, T>? newValueSelector)
+                    ImmutableArray<(NoteModel Note, T OldValue)> contexts, T? newValue, Func<T, T>? newValueSelector)
                 {
                     _chartModel = chartModel;
                     _contexts = contexts;
@@ -698,589 +708,17 @@ namespace Deenote.Project.Models
                 protected virtual void OnUndone() { }
             }
 
-            /*
-            public sealed class EditNotesPropertyOperation<T> : IUndoableOperation
-            {
-                private readonly (NoteModel Note, T OldValue)[] _contexts;
-                private readonly T _newValue;
-                private readonly Func<T, T> _newValueSelector;
-                private readonly Action<NoteData, T> _valueSetter;
-                private readonly ChartModel _chartModel;
-
-                private Action? _onDone;
-
-                private SpecialProperties _specialProperties;
-                private bool RequiresSort => _specialProperties.HasFlag(SpecialProperties.Time);
-                private bool RequiresUpdateCollision => (_specialProperties & (SpecialProperties.Time | SpecialProperties.Position)) != SpecialProperties.None;
-                private bool RequiresEditHoldTail => _specialProperties.HasFlag(SpecialProperties.Duration);
-
-                //private bool _isRequireSortNotes;
-                //private bool _isRequireUpdateCollision;
-                //private int[]? _beforeNoteIndices;
-                //private int[]? _afterNoteIndices;
-                //private ListReadOnlyView<NoteModel>[]? _beforeCollidedNotes;
-                //private ListReadOnlyView<NoteModel>[]? _afterCollidedNotes;
-                //private (bool? IsInsertBefore, NoteData BeforeRefNote, NoteData AfterRefNote)[] _linkChangeDatas;
-
-                private int[] _noteIndicesBeforeSort;
-                private int[] _noteIndicesAfterSort;
-                private (bool? InsertBefore, NoteData NoteRefBeforeSort, NoteData NoteRefAfterSort)[] _linkChangeInfosOnSorting;
-
-                private ReadOnlyMemory<NoteModel>[] _collidedNotesBeforeUpdate = default!; // Lazy init in EnsureExtraHandlingInitialized
-                private ReadOnlyMemory<NoteModel>[] _collidedNotesAfterUpdate = default!;  // Lazy init in EnsureExtraHandlingInitialized
-
-                public EditNotesPropertyOperation((NoteModel, T OldValue)[] contexts, T newValue,
-                    Action<NoteData, T> edit, ChartModel chartModel)
-                {
-                    _contexts = contexts;
-                    _newValue = newValue;
-                    _valueSetter = edit;
-                    _chartModel = chartModel;
-                    Debug.Assert(_contexts.Length > 0);
-                    NoteTimeComparer.AssertInOrder(_contexts.Select(v => v.Note));
-                }
-
-                public EditNotesPropertyOperation((NoteModel, T OldValue)[] contexts, Func<T, T> newValueSelector,
-                    Action<NoteData, T> valueSetter, ChartModel chartModel)
-                {
-                    _contexts = contexts;
-                    _newValueSelector = newValueSelector;
-                    _valueSetter = valueSetter;
-                    _chartModel = chartModel;
-                    Debug.Assert(_contexts.Length > 0);
-                    NoteTimeComparer.AssertInOrder(_contexts.Select(v => v.Note));
-                }
-
-
-                public EditNotesPropertyOperation<T> WithExtraHandlings(bool editTime = false, bool editPosition = false, bool editDuration = false)
-                {
-                    if (editTime)
-                        _specialProperties |= SpecialProperties.Time;
-                    if (editPosition)
-                        _specialProperties |= SpecialProperties.Position;
-                    if (editDuration)
-                        _specialProperties |= SpecialProperties.Duration;
-                    return this;
-                }
-
-                public EditNotesPropertyOperation<T> WithDoneAction(Action action)
-                {
-                    _onDone = action;
-                    return this;
-                }
-
-                // - Initialize datas
-                //   - Index in chart
-                //   - collision datas
-                // - Edit
-                // - Sort notes & relink
-                // - check collisions
-                void IUndoableOperation.Redo()
-                {
-                    //EnsureBeforeAdjustInited(out var requiresLaterInit);
-                    EnsureExtraHandlingInitialized();
-
-                    for (int i = 0; i < _contexts.Length; i++) {
-                        var (note, oldValue) = _contexts[i];
-                        _valueSetter(note.Data,
-                            _newValueSelector is null ? _newValue : _newValueSelector.Invoke(oldValue));
-                        InitializeSortingContextsAfterValueSetting(i);
-                        //if (requiresLaterInit)
-                        //    InitAfterSortNotesDatas(i);
-                    }
-                    OnRedoneSortNotes();
-
-                    InitializeCollisionUpdatingContext();
-                    //if (requiresLaterInit)
-                    //    InitAfterCollisionDatas();
-                    OnRedoneUpdateCollisions();
-
-                    _onDone?.Invoke();
-                }
-
-                void IUndoableOperation.Undo()
-                {
-                    foreach (var (note, oldVal) in _contexts) {
-                        _valueSetter(note.Data, oldVal);
-                    }
-                    OnUndone();
-
-                    _onDone?.Invoke();
-                }
-
-
-                private void EnsureExtraHandlingInitialized()
-                {
-                    // Init note indices before sort
-                    switch (RequiresSort, RequiresUpdateCollision) {
-                        case (true, true): {
-                            InitNoteIndices(fillCurrentInidicesIntoAfter: false);
-                            _linkChangeInfosOnSorting ??= new (bool?, NoteData, NoteData)[_contexts.Length];
-                            InitCollidedNotesContext();
-                            break;
-                        }
-                        case (true, false): {
-                            InitNoteIndices(fillCurrentInidicesIntoAfter: false);
-                            _linkChangeInfosOnSorting ??= new (bool?, NoteData, NoteData)[_contexts.Length];
-                            break;
-                        }
-                        case (false, true): {
-                            InitNoteIndices(true);
-                            InitCollidedNotesContext();
-                            break;
-                        }
-                        case (false, false):
-                            break;
-                    }
-
-                    void InitNoteIndices(bool fillCurrentInidicesIntoAfter)
-                    {
-                        if (_noteIndicesBeforeSort is not null)
-                            return;
-                        _noteIndicesBeforeSort = new int[_contexts.Length];
-                        InitCurrentIndices(_noteIndicesBeforeSort);
-
-                        if (fillCurrentInidicesIntoAfter)
-                            _noteIndicesAfterSort = _noteIndicesBeforeSort;
-                        else
-                            _noteIndicesAfterSort ??= new int[_contexts.Length];
-
-                        void InitCurrentIndices(int[] indices)
-                        {
-                            int iContext = 0;
-                            NoteModel currentNote = _contexts[iContext].Note;
-
-                            int iModel = _chartModel.Notes.Search(currentNote);
-                            Debug.Assert(iModel >= 0);
-
-                            for (; iModel < _chartModel.Notes.Count; iModel++) {
-                                var note = _chartModel.Notes[iModel];
-                                if (!ReferenceEquals(note, currentNote))
-                                    continue;
-
-                                indices[iContext] = iModel;
-                                iContext++;
-                                if (iContext >= _contexts.Length)
-                                    break;
-                                currentNote = _contexts[iContext].Note;
-                            }
-                        }
-                    }
-
-                    void InitCollidedNotesContext()
-                    {
-                        if (_collidedNotesBeforeUpdate is null) {
-                            _collidedNotesBeforeUpdate = new ReadOnlyMemory<NoteModel>[_contexts.Length];
-                            for (int i = 0; i < _contexts.Length; i++) {
-                                _collidedNotesBeforeUpdate[i] = _chartModel.Notes.GetCollidedNotesTo(_noteIndicesBeforeSort[i]);
-                            }
-                        }
-                        _collidedNotesAfterUpdate ??= new ReadOnlyMemory<NoteModel>[_contexts.Length];
-                    }
-                }
-
-                private void InitializeSortingContextsAfterValueSetting(int contextIndex)
-                {
-                    if (!RequiresSort)
-                        return;
-
-                    Debug.Assert(_noteIndicesBeforeSort is not null);
-                    Debug.Assert(_noteIndicesAfterSort is not null);
-                    Debug.Assert(_linkChangeInfosOnSorting is not null);
-
-                    var fromIndex = _noteIndicesBeforeSort[contextIndex];
-                    var toIndex = GetExpectedIndexAfterSort(fromIndex);
-                    _noteIndicesAfterSort[contextIndex] = toIndex;
-
-                    var note = _contexts[contextIndex].Note;
-                    if (note.Data.IsSlide) {
-                        _linkChangeInfosOnSorting[contextIndex] = GetLinkChangInfos(note);
-                    }
-
-                    int GetExpectedIndexAfterSort(int fromIndex)
-                    {
-                        var note = _chartModel.Notes[fromIndex];
-
-                        int newIndex = fromIndex - 1;
-
-                        // Search backward
-                        for (; newIndex >= 0; newIndex--) {
-                            var prevNote = _chartModel.Notes[newIndex];
-                            if (prevNote.Time <= note.Time)
-                                break;
-                        }
-                        newIndex++;
-                        if (newIndex != fromIndex)
-                            // The note is moved backward
-                            return newIndex;
-
-                        newIndex = fromIndex + 1;
-                        for (; newIndex < _chartModel.Notes.Count; newIndex++) {
-                            var nextNote = _chartModel.Notes[newIndex];
-                            if (nextNote.Time >= note.Time)
-                                break;
-                        }
-                        newIndex--;
-                        if (newIndex != fromIndex)
-                            // The note is moved forward
-                            return newIndex;
-
-                        // The note doesn't need move
-                        return fromIndex;
-                    }
-
-                    static (bool? InsertBefore, NoteData NoteRefBeforeSort, NoteData NoteRefAfterSort) GetLinkChangInfos(NoteModel note)
-                    {
-                        if (note.Data.PrevLink is not null) {
-                            // Find the first note in link that has time greater than current note,
-                            // And move current note before target note
-                            NoteData target = note.Data;
-                            for (; target.PrevLink != null; target = target.PrevLink) {
-                                if (target.PrevLink.Time <= note.Data.Time)
-                                    break;
-                            }
-                            if (target != note.Data) {
-                                return (true, note.Data.NextLink, target);
-                            }
-                        }
-
-                        if (note.Data.NextLink is not null) {
-                            NoteData target = note.Data;
-                            for (; target.NextLink != null; target = target.NextLink) {
-                                if (target.NextLink.Time >= note.Data.Time)
-                                    break;
-                            }
-                            if (target != note.Data)
-                                return (false, note.Data.PrevLink, target);
-                        }
-
-                        return (null, null!, null!);
-                    }
-                }
-
-                private void OnRedoneSortNotes()
-                {
-                    if (!RequiresSort)
-                        return;
-
-                    Debug.Assert(_noteIndicesBeforeSort is not null);
-                    Debug.Assert(_noteIndicesAfterSort is not null);
-                    Debug.Assert(_linkChangeInfosOnSorting is not null);
-
-                    for (int i = 0; i < _contexts.Length; i++) {
-                        // Sort time
-                        _chartModel._visibleNotes.MoveTo(_noteIndicesBeforeSort[i], _noteIndicesAfterSort[i]);
-
-                        // Update link order
-                        var curNote = _contexts[i].Note.Data;
-                        var (insertBefore, _, target) = _linkChangeInfosOnSorting[i];
-                        switch (insertBefore) {
-                            case true:
-                                curNote.InsertAsLinkBefore(target);
-                                break;
-                            case false:
-                                curNote.InsertAsLinkAfter(target);
-                                break;
-                            case null:
-                                break;
-                        }
-                    }
-                }
-
-                private void InitializeCollisionUpdatingContext()
-                {
-                    if (!RequiresUpdateCollision)
-                        return;
-
-                    Debug.Assert(_noteIndicesAfterSort is not null);
-                    Debug.Assert(_collidedNotesAfterUpdate is not null);
-
-                    for (int i = 0; i < _contexts.Length; i++) {
-                        _collidedNotesAfterUpdate[i] = _chartModel.Notes.GetCollidedNotesTo(_noteIndicesAfterSort[i]);
-                    }
-                }
-
-                private void OnRedoneUpdateCollisions()
-                {
-                    if (!RequiresUpdateCollision)
-                        return;
-
-                    Debug.Assert(_collidedNotesBeforeUpdate is not null);
-                    Debug.Assert(_collidedNotesAfterUpdate is not null);
-
-                    for (int i = 0; i < _contexts.Length; i++) {
-                        var curNote = _contexts[i].Note;
-                        curNote.CollisionCount += _collidedNotesAfterUpdate[i].Length - _collidedNotesBeforeUpdate[i].Length;
-                        foreach (var note in _collidedNotesBeforeUpdate[i].Span)
-                            note.CollisionCount--;
-                        foreach (var note in _collidedNotesAfterUpdate[i].Span)
-                            note.CollisionCount++;
-                    }
-                }
-
-                private void OnUndone()
-                {
-                    if (RequiresSort) {
-                        for (int i = _contexts.Length - 1; i >= 0; i--) {
-                            _chartModel._visibleNotes.MoveTo(_noteIndicesAfterSort[i], _noteIndicesBeforeSort[i]);
-
-                            var curNote = _contexts[i].Note.Data;
-                            var (insertBefore, target, _) = _linkChangeInfosOnSorting[i];
-                            switch (insertBefore) {
-                                case true: curNote.InsertAsLinkBefore(target); break;
-                                case false: curNote.InsertAsLinkAfter(target); break;
-                                case null: break;
-                            }
-                        }
-                    }
-
-                    if (RequiresUpdateCollision) {
-                        for (int i = _contexts.Length - 1; i >= 0; i--) {
-                            var curNote = _contexts[i].Note;
-                            curNote.CollisionCount += _collidedNotesBeforeUpdate[i].Length - _collidedNotesAfterUpdate[i].Length;
-                            foreach (var note in _collidedNotesAfterUpdate[i].Span)
-                                note.CollisionCount--;
-                            foreach (var note in _collidedNotesBeforeUpdate[i].Span)
-                                note.CollisionCount++;
-                        }
-                    }
-                }
-                /*
-                private void EnsureBeforeAdjustInited(out bool requiresLaterInit)
-                {
-                    requiresLaterInit = false;
-
-                    if (_beforeNoteIndices is null && (_isRequireUpdateCollision || _isRequireSortNotes)) {
-                        requiresLaterInit = true;
-
-                        _beforeNoteIndices = new int[_contexts.Length];
-                        int iContext = 0;
-                        NoteModel currentNote = _contexts[iContext].Note;
-
-                        int iModel = _chartModel.Notes.Search(currentNote);
-                        Debug.Assert(iModel >= 0);
-                        for (; iModel < _chartModel.Notes.Count; iModel++) {
-                            var note = _chartModel.Notes[iModel];
-                            if (!ReferenceEquals(note, currentNote))
-                                continue;
-
-                            _beforeNoteIndices[iContext] = iModel;
-                            iContext++;
-                            if (iContext >= _contexts.Length)
-                                break;
-                            currentNote = _contexts[iContext].Note;
-                        }
-                    }
-
-                    if (_afterNoteIndices is null) {
-                        if (_isRequireSortNotes)
-                            _afterNoteIndices = new int[_contexts.Length];
-                        else if (_isRequireUpdateCollision)
-                            _afterNoteIndices = _beforeNoteIndices;
-                    }
-
-                    if (_beforeCollidedNotes is null && _isRequireUpdateCollision) {
-                        _beforeCollidedNotes = new ListReadOnlyView<NoteModel>[_contexts.Length];
-                        for (int i = 0; i < _contexts.Length; i++) {
-                            _beforeCollidedNotes[i] = _chartModel.Notes.GetCollidedNotesTo(_beforeNoteIndices[i]);
-                        }
-
-                        _afterCollidedNotes = new ListReadOnlyView<NoteModel>[_contexts.Length];
-                    }
-
-                    if (_linkChangeDatas is null && _isRequireSortNotes) {
-                        _linkChangeDatas =
-                            new (bool? IsInsertBefore, NoteData BeforeRefNote, NoteData AfterRefNote)[_contexts.Length];
-                    }
-                }
-
-                private void InitAfterSortNotesDatas(int contextIndex)
-                {
-                    if (_isRequireSortNotes) {
-                        var fromIndex = _beforeNoteIndices[contextIndex];
-                        var toIndex = GetIndexAfterSort(fromIndex);
-                        _afterNoteIndices[contextIndex] = toIndex;
-
-                        var note = _contexts[contextIndex].Note;
-                        if (note.Data.IsSlide) {
-                            _linkChangeDatas[contextIndex] = GetLinkChangeDatas(note);
-                        }
-                    }
-
-                    int GetIndexAfterSort(int index)
-                    {
-                        var note = _chartModel.Notes[index];
-
-                        int newIndex = index - 1;
-                        for (; newIndex >= 0; newIndex--) {
-                            var prevNote = _chartModel._visibleNotes[newIndex];
-                            if (prevNote.Data.Time <= note.Data.Time) {
-                                break;
-                            }
-                        }
-                        newIndex++;
-                        if (newIndex != index) {
-                            return newIndex;
-                        }
-
-                        newIndex = index + 1;
-                        for (; newIndex < _chartModel._visibleNotes.Count; newIndex++) {
-                            var nextNote = _chartModel._visibleNotes[newIndex];
-                            if (nextNote.Data.Time >= note.Data.Time) {
-                                break;
-                            }
-                        }
-                        newIndex--;
-                        if (newIndex != index) {
-                            return newIndex;
-                        }
-
-                        return index;
-                    }
-
-                    (bool? InsertBefore, NoteData Before, NoteData After) GetLinkChangeDatas(NoteModel note)
-                    {
-                        if (note.Data.PrevLink is not null) {
-                            NoteData next = note.Data;
-                            for (; next.PrevLink != null; next = next.PrevLink) {
-                                if (next.PrevLink.Time <= note.Data.Time) {
-                                    break;
-                                }
-                            }
-                            if (next != note.Data) {
-                                return (true, note.Data.NextLink, next);
-                            }
-                        }
-
-                        if (note.Data.NextLink is not null) {
-                            NoteData prev = note.Data;
-                            for (; prev.NextLink != null; prev = prev.NextLink) {
-                                if (prev.NextLink.Time >= note.Data.Time) {
-                                    break;
-                                }
-                            }
-                            if (prev != note.Data) {
-                                return (false, note.Data.PrevLink, prev);
-                            }
-                        }
-
-                        return (null, null, null);
-                    }
-                }
-
-                private void InitAfterCollisionDatas()
-                {
-                    if (_isRequireUpdateCollision) {
-                        for (int i = 0; i < _contexts.Length; i++) {
-                            _afterCollidedNotes[i] = _chartModel.Notes.GetCollidedNotesTo(_afterNoteIndices[i]);
-                        }
-                    }
-                }
-
-                private void OnRedoneSortNotes_()
-                {
-                    if (!_isRequireSortNotes)
-                        return;
-
-                    for (int i = 0; i < _contexts.Length; i++) {
-                        // Sort time order
-                        _chartModel._visibleNotes.MoveTo(_beforeNoteIndices[i], _afterNoteIndices[i]);
-
-                        // Update link order
-                        var curNote = _contexts[i].Note;
-                        var (isBefore, _, linkTarget) = _linkChangeDatas[i];
-                        switch (isBefore) {
-                            case true:
-                                curNote.Data.UnlinkWithoutCutLinkChain();
-                                curNote.Data.InsertAsLinkBefore(linkTarget);
-                                break;
-                            case false:
-                                curNote.Data.UnlinkWithoutCutLinkChain();
-                                curNote.Data.InsertAsLinkAfter(linkTarget);
-                                break;
-                            case null:
-                                break;
-                        }
-                    }
-                }
-
-                private void OnRedoneUpdateCollisions_()
-                {
-                    if (!_isRequireUpdateCollision)
-                        return;
-
-                    for (int i = 0; i < _contexts.Length; i++) {
-                        // Update collision
-                        var curNote = _contexts[i].Note;
-                        curNote.CollisionCount += _afterCollidedNotes[i].Count - _beforeCollidedNotes[i].Count;
-                        foreach (var note in _beforeCollidedNotes[i]) {
-                            note.CollisionCount--;
-                        }
-                        foreach (var note in _afterCollidedNotes[i]) {
-                            note.CollisionCount++;
-                        }
-                    }
-                }
-
-                private void OnUndone_()
-                {
-                    if (_isRequireSortNotes) {
-                        for (int i = _contexts.Length - 1; i >= 0; i--) {
-                            _chartModel._visibleNotes.MoveTo(_afterNoteIndices[i], _beforeNoteIndices[i]);
-
-                            var curNote = _contexts[i].Note;
-                            var (isBefore, linkTarget, _) = _linkChangeDatas[i];
-                            switch (isBefore) {
-                                case null:
-                                    break;
-                                case true:
-                                    curNote.Data.UnlinkWithoutCutLinkChain();
-                                    curNote.Data.InsertAsLinkBefore(linkTarget);
-                                    break;
-                                case false:
-                                    curNote.Data.UnlinkWithoutCutLinkChain();
-                                    curNote.Data.InsertAsLinkAfter(linkTarget);
-                                    break;
-                            }
-                        }
-                    }
-
-                    if (_isRequireUpdateCollision) {
-                        for (int i = _contexts.Length - 1; i >= 0; i--) {
-                            var curNote = _contexts[i].Note;
-                            curNote.CollisionCount += _beforeCollidedNotes[i].Count - _afterCollidedNotes[i].Count;
-                            foreach (var note in _afterCollidedNotes[i]) {
-                                note.CollisionCount--;
-                            }
-                            foreach (var note in _beforeCollidedNotes[i]) {
-                                note.CollisionCount++;
-                            }
-                        }
-                    }
-                }
-                
-                [Flags]
-                public enum SpecialProperties
-                {
-                    None = 0,
-                    Time = 1,
-                    Position = 1 << 1,
-                    Duration = 1 << 2,
-                }
-            }
-            */
-
             public sealed class EditNotesPropertyOperation<T> : EditNotesPropertyOperationBase<T>
             {
                 private readonly Action<NoteData, T> _valueSetter;
 
                 public EditNotesPropertyOperation(ChartModel chartModel,
-                    (NoteModel Note, T OldValue)[] contexts, T newValue, Action<NoteData, T> valueSetter)
+                    ImmutableArray<(NoteModel Note, T OldValue)> contexts, T newValue, Action<NoteData, T> valueSetter)
                     : base(chartModel, contexts, newValue, null)
                 { _valueSetter = valueSetter; }
 
                 public EditNotesPropertyOperation(ChartModel chartModel,
-                    (NoteModel Note, T OldValue)[] contexts, Func<T, T> newValueSelector, Action<NoteData, T> valueSetter)
+                    ImmutableArray<(NoteModel Note, T OldValue)> contexts, Func<T, T> newValueSelector, Action<NoteData, T> valueSetter)
                     : base(chartModel, contexts, default, newValueSelector)
                 { _valueSetter = valueSetter; }
 
@@ -1290,7 +728,7 @@ namespace Deenote.Project.Models
             public sealed class EditNotesCoordPropertyOperation : EditNotesPropertyOperationBase<NoteCoord>
             {
                 public EditNotesCoordPropertyOperation(ChartModel chartModel,
-                    (NoteModel Note, NoteCoord OldValue)[] contexts, NoteCoord newValue,
+                    ImmutableArray<(NoteModel Note, NoteCoord OldValue)> contexts, NoteCoord newValue,
                     bool timeEditing)
                     : base(chartModel, contexts, newValue, null)
                 {
@@ -1299,7 +737,7 @@ namespace Deenote.Project.Models
                 }
 
                 public EditNotesCoordPropertyOperation(ChartModel chartModel,
-                    (NoteModel Note, NoteCoord OldValue)[] contexts, Func<NoteCoord, NoteCoord> newValueSelector,
+                    ImmutableArray<(NoteModel Note, NoteCoord OldValue)> contexts, Func<NoteCoord, NoteCoord> newValueSelector,
                     bool timeEditing)
                     : base(chartModel, contexts, default, newValueSelector)
                 {
@@ -1538,7 +976,7 @@ namespace Deenote.Project.Models
                 private int _holdCountDelta;
 
                 public EditNotesDurationPropertyOperation(ChartModel chartModel,
-                    (NoteModel Note, float OldValue)[] contexts, float newValue)
+                    ImmutableArray<(NoteModel Note, float OldValue)> contexts, float newValue)
                     : base(chartModel, contexts, newValue, null)
                 {
                     _tails = new (NoteTailModel Tail, int FromIndex, int ToIndex)[contexts.Length];
@@ -1631,14 +1069,15 @@ namespace Deenote.Project.Models
                 }
             }
 
-            public sealed class EditNotesSoundsOperation : EditNotesPropertyOperationBase<PianoSoundValueData[]>
+            public sealed class EditNotesSoundsOperation : EditNotesPropertyOperationBase<ImmutableArray<PianoSoundValueData>>
             {
-                public EditNotesSoundsOperation(ChartModel chartModel, (NoteModel Note, PianoSoundValueData[] OldValues)[] contexts,
+                public EditNotesSoundsOperation(ChartModel chartModel,
+                    ImmutableArray<(NoteModel Note, ImmutableArray<PianoSoundValueData> OldValues)> contexts,
                     ReadOnlySpan<PianoSoundValueData> newValue)
-                    : base(chartModel, contexts, newValue.ToArray(), null)
+                    : base(chartModel, contexts, newValue.ToImmutableArray(), null)
                 { }
 
-                protected override void SetValue(NoteModel note, PianoSoundValueData[] value)
+                protected override void SetValue(NoteModel note, ImmutableArray<PianoSoundValueData> value)
                 {
                     var sounds = note.Data.Sounds;
                     if (value.Length < sounds.Count) {

@@ -15,7 +15,7 @@ namespace Deenote
 
         private const string TestMusic = "finale";
 
-        public static async UniTask<ProjectModel> GetProject()
+        public static ProjectModel GetProject()
         {
             if (_project is not null) return _project;
 
@@ -26,13 +26,14 @@ namespace Deenote
                 Debug.LogError("Load audio failed");
             }
 
-            _project = new ProjectModel { AudioClip = clip! };
+            _project = new ProjectModel { AudioClip = clip!, ProjectFilePath = "D:/" };
             var chartData = ChartData.Load(Resources.Load<TextAsset>($"Test/{TestMusic}.hard").text);
             chartData.Notes.First(n => n.IsVisible).Duration = 0.375f;
             _project.Charts.Add(
                 new ChartModel(chartData) {
                     // Name = "<Cht> name",
-                    Level = "10", Difficulty = Difficulty.Hard,
+                    Level = "10",
+                    Difficulty = Difficulty.Hard,
                 });
             ProjectModel.InitializationHelper.SetTempoList(_project, new List<Tempo> { new(160f, 1.5f) });
             return _project;

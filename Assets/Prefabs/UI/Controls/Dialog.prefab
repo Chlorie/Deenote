@@ -574,8 +574,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d0c49745113b84a823d2ab7fde56c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _textKey: 
-  _isLocalized: 0
   _localizableText:
     _isLocalized: 0
     _textOrKey: 
@@ -593,6 +591,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1747621794384953353}
     m_Modifications:
+    - target: {fileID: 1581781362794385575, guid: ce292a5e19d0263449dad7ce45cfd8ed,
+        type: 3}
+      propertyPath: _text
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 1652105218280520051, guid: ce292a5e19d0263449dad7ce45cfd8ed,
         type: 3}
       propertyPath: m_IsActive
@@ -652,7 +655,7 @@ PrefabInstance:
     - target: {fileID: 4886251483692502835, guid: ce292a5e19d0263449dad7ce45cfd8ed,
         type: 3}
       propertyPath: m_Name
-      value: Button
+      value: Close Button
       objectReference: {fileID: 0}
     - target: {fileID: 5555772690811798341, guid: ce292a5e19d0263449dad7ce45cfd8ed,
         type: 3}
@@ -839,8 +842,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedComponents:
+    - {fileID: 7335754673520910990, guid: ce292a5e19d0263449dad7ce45cfd8ed, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 8136131435097175978, guid: ce292a5e19d0263449dad7ce45cfd8ed, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ce292a5e19d0263449dad7ce45cfd8ed, type: 3}

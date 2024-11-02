@@ -20,9 +20,7 @@ namespace Deenote.GameStage
             set {
                 if (__showLinkLines == value) return;
                 __showLinkLines = value;
-                _editorController.NotifyIsShowLinkLinesChanged(__showLinkLines);
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.IsShowLinkLines);
-                _editorPropertiesWindow.NotifyIsShowLinksChanged(__showLinkLines);
             }
         }
 
@@ -39,7 +37,6 @@ namespace Deenote.GameStage
                 if (__isStageEffectOn is false)
                     StopStageEffect();
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.StageEffect);
-                MainSystem.PreferenceWindow.NotifyIsStageEffectOnChanged(__isStageEffectOn);
             }
         }
 
@@ -61,7 +58,6 @@ namespace Deenote.GameStage
                 //UpdateStageNotes();
                 ForceUpdateNotesDisplay();
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteSpeed);
-                _editorPropertiesWindow.NotifyNoteSpeedChanged(__noteSpeed);
             }
         }
 
@@ -81,7 +77,6 @@ namespace Deenote.GameStage
                 __musicSpeed = value;
                 _musicController.Pitch = value / 10f;
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.MusicSpeed);
-                _editorPropertiesWindow.NotifyMusicSpeedChanged(__musicSpeed);
             }
         }
 
@@ -100,7 +95,6 @@ namespace Deenote.GameStage
                     return;
                 __effectVolume = value;
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.EffectVolume);
-                _editorPropertiesWindow.NotifyEffectVolumeChanged(__effectVolume);
             }
         }
 
@@ -120,7 +114,6 @@ namespace Deenote.GameStage
                 __musicVolume = value;
                 _musicController.Volume = __musicVolume / 100f;
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.MusicVolume);
-                _editorPropertiesWindow.NotifyMusicVolumeChanged(__musicVolume);
             }
         }
 
@@ -139,7 +132,6 @@ namespace Deenote.GameStage
                     return;
                 __pianoVolume = value;
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.PianoVolume);
-                _editorPropertiesWindow.NotifyPianoVolumeChanged(__pianoVolume);
             }
         }
 
@@ -161,9 +153,8 @@ namespace Deenote.GameStage
                 //UpdateStageNotes();
                 ForceUpdateNotesDisplay();
                 Grids.UpdateVerticalGrids();
-                PerspectiveLinesRenderer.Instance.NotifyStageSuddenPlusChanged(__suddenPlusRange);
+                //PerspectiveLinesRenderer.Instance.NotifyStageSuddenPlusChanged(__suddenPlusRange);
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.SuddenPlus);
-                _editorPropertiesWindow.NotifySuddenPlusRangeChanged(__suddenPlusRange);
             }
         }
 
@@ -178,7 +169,6 @@ namespace Deenote.GameStage
                 __isPianoNotesDistinguished = value;
                 ForceUpdateStageNotes(false, true);
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.DistinguishPianoNotes);
-                MainSystem.PreferenceWindow.NotifyIsPianoNoteDistinguished(__isPianoNotesDistinguished);
             }
         }
     }

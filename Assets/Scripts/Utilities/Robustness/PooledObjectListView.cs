@@ -25,13 +25,22 @@ namespace Deenote.Utilities.Robustness
 
         public int IndexOf(T item) => _items.IndexOf(item);
 
-        public int Find<TArgs>(TArgs args, Func<T, TArgs, bool> predicate)
+        public int FindIndex<TArgs>(TArgs args, Func<T, TArgs, bool> predicate)
         {
             for (int i = 0; i < _items.Count; i++) {
                 if (predicate(_items[i], args))
                     return i;
             }
             return -1;
+        }
+
+        public T? Find<TArgs>(TArgs args,Func<T, TArgs, bool> predicate)
+        {
+            foreach (var item in this) {
+                if (predicate(item, args))
+                    return item;
+            }
+            return null;
         }
 
         public void Add(out T item)

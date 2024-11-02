@@ -1,8 +1,6 @@
 using Deenote.Edit.Operations;
 using Deenote.GameStage;
-using Deenote.Project;
 using Deenote.UI.ComponentModel;
-using Deenote.UI.Windows;
 using System;
 using UnityEngine;
 
@@ -14,14 +12,7 @@ namespace Deenote.Edit
     /// </summary>
     public sealed partial class EditorController : MonoBehaviour, INotifyPropertyChange<EditorController, EditorController.NotifyProperty>
     {
-        [SerializeField] private ProjectManager _projectManager = null!;
         private GameStageController Stage => GameStageController.Instance;
-
-        [Header("Notify")]
-        [SerializeField] private PropertiesWindow _propertiesWindow = null!;
-        [SerializeField] private EditorPropertiesWindow _editorPropertiesWindow = null!;
-        [SerializeField] private PianoSoundEditWindow _pianoSoundEditWindow = null!;
-        [SerializeField] private PerspectiveViewWindow _perspectiveViewWindow = null!;
 
         [Header("Note Edit")]
         private UndoableOperationHistory _operationHistory = new(100);
@@ -39,11 +30,19 @@ namespace Deenote.Edit
             SnapToPositionGrid = SnapToTimeGrid = true;
             IsNoteIndicatorOn = true;
             Start_NotePlacement();
-        }
 
-        private void OnNoteSelectionChanging()
-        {
-            _pianoSoundEditWindow.NotifySelectedNotesChanging(SelectedNotes);
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
+                GameStageController.NotifyProperty.CurrentChart,
+                stage => ResetEditorStatus());
+            MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
+                GameStageController.NotifyProperty.IsShowLinkLines,
+                stage =>
+                {
+                    bool show = stage.IsShowLinkLines;
+                    foreach (var note in _noteIndicatorList) {
+                        note.UpdateLinkLineVisibility(show);
+                    }
+                });
         }
 
         private void OnNotesChanged(bool notesOrderChanged, bool selectionChanged,
@@ -54,14 +53,11 @@ namespace Deenote.Edit
             if (selectionChanged) {
                 // Keep sync with NotifyProjectChanged()
                 // Stage is required to update when selection changed unless project changed
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.SelectedNotes);
-                _editorPropertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
-                _propertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
-                _pianoSoundEditWindow.NotifySelectedNotesChanged(SelectedNotes);
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes);
             }
         }
 
-        public void NotifyProjectChanged()
+        private void ResetEditorStatus()
         {
             _operationHistory.Clear();
 
@@ -70,11 +66,7 @@ namespace Deenote.Edit
             RefreshNoteIndicator();
 
             _noteSelectionController.ClearSelection();
-            // Keep sync with OnNoteChanged()
-            _propertyChangedNotifier.Invoke(this, NotifyProperty.SelectedNotes);
-            _editorPropertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
-            _propertiesWindow.NotifyNoteSelectionChanged(SelectedNotes);
-            _pianoSoundEditWindow.NotifySelectedNotesChanged(SelectedNotes);
+            _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes);
         }
 
         #region Undo
@@ -85,10 +77,10 @@ namespace Deenote.Edit
 
         #endregion
 
-        private PropertyChangeNotifier<EditorController, NotifyProperty> _propertyChangedNotifier;
+        private PropertyChangeNotifier<EditorController, NotifyProperty> _propertyChangeNotifier;
 
-        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<EditorController> action)
-            => _propertyChangedNotifier.AddListener(flag, action);
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<EditorController> action) 
+            => _propertyChangeNotifier.AddListener(flag, action);
 
         public enum NotifyProperty
         {

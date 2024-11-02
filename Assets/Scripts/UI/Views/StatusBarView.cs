@@ -1,32 +1,18 @@
+using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.UI.ComponentModel;
 using Deenote.Utilities;
 using System;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Deenote.UI.Views
 {
-    public sealed class StatusBarView : MonoBehaviour, INotifyPropertyChange<StatusBarView, StatusBarView.NotifyProperty>
+    public sealed class StatusBarView : MonoBehaviour
     {
         [SerializeField] LocalizedText _statusMessageText;
         [SerializeField] LocalizedText _fpsText;
 
-        private bool _isFpsShown;
-        public bool IsFpsShown
-        {
-            get => _isFpsShown;
-            set {
-                if (_isFpsShown == value)
-                    return;
-
-                _isFpsShown = value;
-                _fpsText.gameObject.SetActive(value);
-                _propertyChangedNotifier.Invoke(this, NotifyProperty.FpsShown);
-                MainSystem.PreferenceWindow.NotifyIsFpsShownChanged(value);
-            }
-        }
-
+        private bool _isFpsUpdate;
         private float _fpsTimer;
         private int _fpsFrameCount;
 
@@ -35,9 +21,22 @@ namespace Deenote.UI.Views
             _statusMessageText.SetText(message, args);
         }
 
+        public UniTaskVoid ShowToastAsync(LocalizableText message, float duration_s)
+        {
+            // TODO: impl
+            return default!;
+        }
+
+        private void Start()
+        {
+            MainSystem.GlobalSettings.RegisterPropertyChangeNotificationAndInvoke(
+                MainSystem.Settings.NotifyProperty.FpsShown,
+                settings => _fpsText.gameObject.SetActive(_isFpsUpdate = settings.IsFpsShown));
+        }
+
         private void Update()
         {
-            if (IsFpsShown) {
+            if (_isFpsUpdate) {
                 _fpsFrameCount++;
                 if (_fpsTimer.IncAndTryWrap(Time.deltaTime, 1f)) {
                     string fpsStr = _fpsFrameCount.ToString();
@@ -45,15 +44,6 @@ namespace Deenote.UI.Views
                     _fpsFrameCount = 0;
                 }
             }
-        }
-
-        private readonly PropertyChangeNotifier<StatusBarView, NotifyProperty> _propertyChangedNotifier = new();
-        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<StatusBarView> action)
-            => _propertyChangedNotifier.AddListener(flag, action);
-
-        public enum NotifyProperty
-        {
-            FpsShown
         }
     }
 }

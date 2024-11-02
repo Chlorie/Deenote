@@ -1,8 +1,6 @@
-using Cysharp.Threading.Tasks;
 using Deenote.Edit;
 using Deenote.UI;
 using Deenote.UI.ComponentModel;
-using Deenote.UI.Windows;
 using Deenote.Utilities;
 using System;
 using System.Collections.Immutable;
@@ -17,7 +15,6 @@ namespace Deenote.GameStage
         [Header("Notify")]
         [SerializeField] EditorController _editor;
         [SerializeField] GameStageController _stage;
-        [SerializeField] PerspectiveViewWindow _perspectiveViewWindow;
 
         [Header("")]
         [SerializeField] RawImage _cameraViewRawImage;
@@ -37,32 +34,16 @@ namespace Deenote.GameStage
         private RectTransform _cameraViewTransform = null!;
         [SerializeField] private IntegralSizeAspectRatioFitter _imageAspectFitter = null!;
 
-
         public bool IsFullScreen { get; private set; }
 
-        //private ViewAspectRatio __aspectRatio;
-
-        //public ViewAspectRatio AspectRatio
-        //{
-        //    get => __aspectRatio;
-        //    set {
-        //        if (__aspectRatio == value)
-        //            return;
-        //        __aspectRatio = value;
-        //        _imageAspectFitter.AspectRatio = __aspectRatio.GetRatio();
-        //        _perspectiveViewWindow.NotifyAspectRatioChanged(__aspectRatio);
-        //    }
-        //}
         public float AspectRatio
         {
             get => _imageAspectFitter.AspectRatio;
             set {
-                // TODO: Next here image aspect fitter is null
                 if (_imageAspectFitter.AspectRatio == value)
                     return;
                 _imageAspectFitter.AspectRatio = value;
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.AspectRatio);
-                // _perspectiveViewWindow.NotifyAspectRatioChanged(__aspectRatio);
             }
         }
 
@@ -119,7 +100,6 @@ namespace Deenote.GameStage
                 _viewSize.OnValueChanged += ViewSizeChanged;
                 OnViewSizeChanged += ResizeCameraTexture;
                 Debug.Log("Init");
-                _imageAspectFitter = _cameraViewRawImage.GetComponent<IntegralSizeAspectRatioFitter>();
             }
         }
 
@@ -137,7 +117,7 @@ namespace Deenote.GameStage
             return visibleLength / panelLength;
         }
 
-        private readonly PropertyChangeNotifier<PerspectiveViewController, NotifyProperty> _propertyChangeNotifier;
+        private PropertyChangeNotifier<PerspectiveViewController, NotifyProperty> _propertyChangeNotifier;
         public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<PerspectiveViewController> action)
             => _propertyChangeNotifier.AddListener(flag, action);
 
