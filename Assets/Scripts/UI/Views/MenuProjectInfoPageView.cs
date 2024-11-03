@@ -97,6 +97,7 @@ namespace Deenote.UI.Views
                 _projectComposerProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectComposer);
                 _projectChartDesignerProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectChartDesigner);
 
+                // TODO: 如果是在加载中第一次打开这个页面，currentproject 是null
                 MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.Audio,
                     proj => NotifyAudioFileChanged(proj.CurrentProject));
@@ -177,7 +178,7 @@ namespace Deenote.UI.Views
             // Chart properties
             {
                 _chartNameProperty.InputField.OnEndEdit.AddListener(MainSystem.GameStage.EditChartName);
-                _chartDifficultyProperty.Dropdown.ResetOptions(DifficultyExt.DropdownOptions);
+                _chartDifficultyProperty.Dropdown.ResetOptions(DifficultyExt.DropdownOptions.AsSpan());
                 _chartDifficultyProperty.Dropdown.OnValueChanged.AddListener(
                     val => MainSystem.GameStage.EditChartDifficulty(DifficultyExt.FromInt32(val)));
                 _chartLevelProperty.InputField.OnEndEdit.AddListener(MainSystem.GameStage.EditChartLevel);
@@ -207,7 +208,7 @@ namespace Deenote.UI.Views
                     GameStage.GameStageController.NotifyProperty.ChartName,
                     stage =>
                     {
-                        _chartNameProperty.InputField.SetValueWithoutNotify(stage.Chart.Name);
+                        _chartNameProperty.InputField.SetValueWithoutNotify(stage.Chart.Name ?? "");
                         RefreshCharts();
                     });
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
@@ -258,14 +259,8 @@ namespace Deenote.UI.Views
 
             void NotifyAudioFileChanged(ProjectModel proj)
             {
-                if (proj.AudioFileRelativePath is null) {
-                    _projectAudioProperty.Button.Text.SetLocalizedText("MenuProjectPage_ProjectInfo_Audio_Embeded");
-                    _projectAudioProperty.Button.Text.Text.horizontalAlignment = HorizontalAlignmentOptions.Center;
-                }
-                else {
-                    _projectAudioProperty.Button.Text.SetRawText(Path.GetFileName(proj.AudioFileRelativePath));
-                    _projectAudioProperty.Button.Text.Text.horizontalAlignment = HorizontalAlignmentOptions.Left;
-                }
+                _projectAudioProperty.Button.Text.SetRawText(Path.GetFileName(proj.AudioFileRelativePath));
+                _projectAudioProperty.Button.Text.Text.horizontalAlignment = HorizontalAlignmentOptions.Left;
             }
 
             void ReloadCharts(ProjectModel proj)

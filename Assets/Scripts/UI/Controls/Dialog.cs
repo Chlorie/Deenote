@@ -11,7 +11,7 @@ namespace Deenote.UI.Controls
         [SerializeField] Button _closeButton = default!;
         [SerializeField] LocalizedText _titleBar = default!;
 
-        public event Action<Dialog, bool> ActiveChanged;
+        public event Action<Dialog, bool>? ActiveChanged;
 
         public Button CloseButton => _closeButton;
 

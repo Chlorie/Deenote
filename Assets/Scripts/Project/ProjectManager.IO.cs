@@ -61,8 +61,8 @@ namespace Deenote.Project
                 writer.Write(project.MusicName ?? "");
                 writer.Write(project.Composer ?? "");
                 writer.Write(project.ChartDesigner ?? "");
-                writer.Write(project.SaveAsRefPath);
                 writer.Write(project.AudioFileRelativePath ?? "");
+                writer.Write(project.SaveAsRefPath);
                 if (!project.SaveAsRefPath) {
                     writer.Write(project.AudioFileData.Length);
                     writer.Write(project.AudioFileData);
@@ -84,10 +84,11 @@ namespace Deenote.Project
                     MusicName = reader.ReadString(),
                     Composer = reader.ReadString(),
                     ChartDesigner = reader.ReadString(),
-                    SaveAsRefPath = reader.ReadBoolean(),
+                    AudioFileRelativePath = reader.ReadString(),
+                    ProjectFilePath = "", // Late init
                 };
-                project.AudioFileRelativePath = reader.ReadString();
-                if (!project.SaveAsRefPath) {
+                var saveAsRefPath = reader.ReadBoolean();
+                if (!saveAsRefPath) {
                     var len = reader.ReadInt32();
                     project.AudioFileData = reader.ReadBytes(len);
                 }

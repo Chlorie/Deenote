@@ -25,7 +25,7 @@ namespace Deenote
                 Debug.LogError("Load audio failed");
             }
 
-            _project = new ProjectModel { AudioClip = clip!, ProjectFilePath = "D:/" };
+            _project = new ProjectModel { AudioClip = clip!, ProjectFilePath = "D:/", AudioFileRelativePath = "Fake.mp3" };
             var chartData = ChartData.Load(Resources.Load<TextAsset>($"Test/{TestMusic}.hard").text);
             chartData.Notes.First(n => n.IsVisible).Duration = 0.375f;
             _project.Charts.Add(

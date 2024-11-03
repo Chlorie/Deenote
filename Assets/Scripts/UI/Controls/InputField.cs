@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Diagnostics.CodeAnalysis;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -23,6 +24,7 @@ namespace Deenote.UI.Controls
         public string Value
         {
             get => _input.text;
+            [param: AllowNull]
             set => _input.text = value;
         }
 
@@ -36,7 +38,7 @@ namespace Deenote.UI.Controls
 
         public UnityEvent<string> OnValueChanged => _input.onValueChanged;
 
-        public void SetValueWithoutNotify(string value)
-            => _input.SetTextWithoutNotify(value);
+        public void SetValueWithoutNotify([AllowNull] string value)
+            => _input.SetTextWithoutNotify(value!);
     }
 }

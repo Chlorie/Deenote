@@ -1,8 +1,8 @@
 #nullable enable
 
+using Deenote.GameStage;
 using System.Collections.Generic;
 using UnityEngine;
-using Deenote.GameStage;
 
 namespace Deenote.Project.Models
 {

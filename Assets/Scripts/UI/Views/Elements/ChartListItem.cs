@@ -6,6 +6,7 @@ using Deenote.Project.Models;
 using Deenote.UI.Controls;
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -61,7 +62,7 @@ namespace Deenote.UI.Views.Elements
                 Difficulty.Normal => MainSystem.Args.GameStageViewArgs.NormalDifficultyIconSprite,
                 Difficulty.Hard => MainSystem.Args.GameStageViewArgs.HardDifficultyIconSprite,
                 Difficulty.Extra => MainSystem.Args.GameStageViewArgs.ExtraDifficultyIconSprite,
-                _ => null,
+                _ => null!,
             };
             _levelText.color = _nameText.color = _chart.Difficulty switch {
                 Difficulty.Easy => MainSystem.Args.GameStageViewArgs.EasyLevelTextColor,

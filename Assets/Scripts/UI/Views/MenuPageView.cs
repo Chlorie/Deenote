@@ -108,7 +108,7 @@ namespace Deenote.UI.Views
                     return;
 
                 MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("OpenProject_Status_Loading"));
-                MainSystem.ProjectManager.CurrentProject = null;
+                MainSystem.ProjectManager.CurrentProject = null!;
                 bool isLoaded = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(feRes.Path);
                 if (isLoaded) {
                     AddToRecentFile(feRes.Path);

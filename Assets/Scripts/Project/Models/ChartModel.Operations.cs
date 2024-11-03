@@ -8,6 +8,7 @@ using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -228,9 +229,9 @@ namespace Deenote.Project.Models
 
                 private IReadOnlyList<NoteModel>? _collidedNotes;
 
+                [MemberNotNullWhen(true, nameof(_noteTailModel))]
                 private bool RequiresInsertTail => _holdTailInsertIndex >= 0;
 
-                // Unity 什么时候支持 C#12.jpg
                 public AddNoteOperation(int modelInsertIndex, ChartModel chartModel, NoteData note, int holdTailInsertIndex)
                 {
                     Debug.Assert((holdTailInsertIndex >= 0) == (note.IsHold));
@@ -239,7 +240,7 @@ namespace Deenote.Project.Models
                     _chartModel = chartModel;
                     _note = new NoteModel(note);
                     _holdTailInsertIndex = holdTailInsertIndex;
-                    if (_holdTailInsertIndex >= 0)
+                    if (RequiresInsertTail)
                         _noteTailModel = new NoteTailModel(_note);
                 }
 

@@ -16,7 +16,7 @@ namespace Deenote.UI.Dialogs.Elements
 
         public FileExplorerDialog Parent { get; internal set; } = default!;
 
-        public string Directory { get; private set; }
+        public string Directory { get; private set; } = default!; // Init in Initialize()
 
         private readonly MessageBoxArgs _dirNotFoundMsgBoxArgs = new(
             LocalizableText.Localized("DirNotFound_MsgBox_Title"),

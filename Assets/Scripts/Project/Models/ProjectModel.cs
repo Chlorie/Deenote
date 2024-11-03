@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace Deenote.Project.Models
@@ -9,16 +10,21 @@ namespace Deenote.Project.Models
     //[JsonObject(MemberSerialization.OptIn)]
     public sealed partial class ProjectModel
     {
-        public string MusicName;
-        public string Composer;
-        public string ChartDesigner;
+        public string MusicName = "";
+        public string Composer = "";
+        public string ChartDesigner = "";
 
         // SaveAsRefPath indicates whether AudioFileData has value
         // but AudioFileRelativePath always has value, we need this
         // to get audio file type(by extension)
-        public bool SaveAsRefPath;
-        public byte[] AudioFileData;
-        public string AudioFileRelativePath;
+        [MemberNotNullWhen(false, nameof(AudioFileData))]
+        public bool SaveAsRefPath => AudioFileData is null;
+        public byte[]? AudioFileData;
+        /// <summary>
+        /// Relative to ProjectFilePath, is not used if not <see cref="SaveAsRefPath"/>, but
+        /// still requires this to get the audio type (file extension)
+        /// </summary>
+        public /*required*/ string AudioFileRelativePath = default!;
 
         public List<ChartModel> Charts { get; } = new();
         // string AudioType
@@ -27,15 +33,21 @@ namespace Deenote.Project.Models
         public TempoListProxy Tempos => new(this);
 
         // NonSerialize
-        private string _projectFilePath;
-        public string ProjectFilePath
+        private string _projectFilePath = default!;
+        public /*required*/ string ProjectFilePath
         {
             get => _projectFilePath;
             init => _projectFilePath = value;
             // private set in InitializationHelper
         }
 
-        public AudioClip AudioClip { get; set; }
+        private AudioClip _audioClip = default!;
+        public AudioClip AudioClip
+        {
+            get => _audioClip;
+            init => _audioClip = value;
+            // private set in InitializationHelper
+        }
 
         public ProjectModel CloneForSave()
         {
@@ -43,9 +55,10 @@ namespace Deenote.Project.Models
                 MusicName = MusicName,
                 Composer = Composer,
                 ChartDesigner = ChartDesigner,
-                SaveAsRefPath = SaveAsRefPath,
                 AudioFileData = AudioFileData,
                 AudioFileRelativePath = AudioFileRelativePath,
+
+                ProjectFilePath = ProjectFilePath,
             };
             proj.Charts.Capacity = Charts.Count;
             foreach (var chart in Charts) {
@@ -115,6 +128,11 @@ namespace Deenote.Project.Models
             public static void SetProjectFilePath(ProjectModel model, string filePath)
             {
                 model._projectFilePath = filePath;
+            }
+
+            public static void SetAudioClip(ProjectModel model, AudioClip clip)
+            {
+                model._audioClip = clip;
             }
         }
     }

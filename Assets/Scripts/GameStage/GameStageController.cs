@@ -94,17 +94,21 @@ namespace Deenote.GameStage
 
         public void LoadChartInCurrentProject(ChartModel? chart)
         {
-            Debug.Assert(chart is null || MainSystem.ProjectManager.CurrentProject.Charts.Contains(chart));
+            if (chart is null) {
+                _chart = chart!;
+                _propertyChangeNotifier.Invoke(this, NotifyProperty.CurrentChart);
+                return;
+            }
+
+            Debug.Assert(MainSystem.ProjectManager.CurrentProject.Charts.Contains(chart));
 
             _musicController.Stop();
             _musicController.Time = 0f;
             _chart = chart!;
             _stageNoteManager.ResetIndices();
 
-            if (chart is not null) {
-                CheckCollision();
-                SearchForNotesFromStart();
-            }
+            CheckCollision();
+            SearchForNotesFromStart();
 
             ForceUpdateNotesDisplay();
             _propertyChangeNotifier.Invoke(this, NotifyProperty.CurrentChart);

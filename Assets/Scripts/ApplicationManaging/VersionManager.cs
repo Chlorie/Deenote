@@ -1,6 +1,5 @@
 #nullable enable
 
-using CommunityToolkit.HighPerformance.Buffers;
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.UI.Dialogs.Elements;

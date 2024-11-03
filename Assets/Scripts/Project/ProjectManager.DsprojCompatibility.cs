@@ -22,11 +22,17 @@ namespace Deenote.Project
                 using var fs = File.OpenRead(filePath);
                 var obj = LegacyProjectSerialization.Formatter.Deserialize(fs);
                 project = obj switch {
-                    LegacyProjectSerialization.SerializableProjectData v1 => LegacyProjectSerialization.ToVer3(v1),
-                    LegacyProjectSerialization.FullProjectDataV2 v2 => LegacyProjectSerialization.ToVer3(v2),
+                    LegacyProjectSerialization.SerializableProjectData v1 => LegacyProjectSerialization.ToVer3(v1, filePath),
+                    LegacyProjectSerialization.FullProjectDataV2 v2 => LegacyProjectSerialization.ToVer3(v2, filePath),
                     _ => null,
                 };
-                return project is not null;
+                if (project is not null) {
+                    ProjectModel.InitializationHelper.SetProjectFilePath(project, filePath);
+                    return true;
+                }
+                else {
+                    return false;
+                }
             } catch (Exception ex) {
                 Debug.LogError(ex.Message);
                 project = null;
@@ -81,11 +87,10 @@ namespace Deenote.Project
                 return dataV2;
             }
 
-            public static ProjectModel ToVer3(SerializableProjectData dataV1)
+            public static ProjectModel ToVer3(SerializableProjectData dataV1, string projectFilePath)
             {
-                var proj = ToVer3(dataV1.project);
+                var proj = ToVer3(dataV1.project, projectFilePath, $"Embeded Audio.wav");
                 proj.Composer = "Unknown";
-                proj.SaveAsRefPath = false;
 
                 AudioUtils.EncodeToWav(dataV1.channel, dataV1.frequency, dataV1.length, dataV1.sampleData,
                     out var audioFileData);
@@ -94,27 +99,32 @@ namespace Deenote.Project
                 return proj;
             }
 
-            public static ProjectModel ToVer3(FullProjectDataV2 dataV2)
+            public static ProjectModel ToVer3(FullProjectDataV2 dataV2, string projectFilePath)
             {
-                var proj = ToVer3(dataV2.project);
+                var proj = ToVer3(dataV2.project, projectFilePath, $"Embedded Audio{dataV2.audioType}");
                 proj.Composer = "Unknown";
-                proj.SaveAsRefPath = false;
-                proj.AudioFileRelativePath = $"Embedded Audio{dataV2.audioType}";
                 proj.AudioFileData = dataV2.audio;
 
                 return proj;
             }
 
-            private static ProjectModel ToVer3(Project oldProject)
+            private static ProjectModel ToVer3(Project oldProject, string projectFilePath, string audioFileRelativePath)
             {
-                var project = new ProjectModel { MusicName = oldProject.name, ChartDesigner = oldProject.chartMaker, };
+                var project = new ProjectModel {
+                    MusicName = oldProject.name,
+                    ChartDesigner = oldProject.chartMaker,
+
+                    AudioFileRelativePath = audioFileRelativePath,
+                    ProjectFilePath = projectFilePath, // Late init
+                };
 
                 Debug.Assert(oldProject.charts.Length == 4);
                 foreach (var oldChart in oldProject.charts) {
                     if (oldChart.notes.Count == 0)
                         continue;
                     var chartModel = new ChartModel(ToVer3(oldChart)) {
-                        Difficulty = DifficultyExt.FromInt32(oldChart.difficulty), Level = oldChart.level,
+                        Difficulty = DifficultyExt.FromInt32(oldChart.difficulty),
+                        Level = oldChart.level,
                     };
                     project.Charts.Add(chartModel);
                 }
@@ -168,6 +178,8 @@ namespace Deenote.Project
             }
 
             #region Types
+#nullable disable
+#pragma warning disable CS0649
 
             [Serializable]
             public class SerializableProjectData //Saves all the project data including the audio clip data
@@ -230,7 +242,7 @@ namespace Deenote.Project
                 public int pitch; //p
                 public int volume; //v
             }
-
+#nullable restore
             #endregion
         }
     }

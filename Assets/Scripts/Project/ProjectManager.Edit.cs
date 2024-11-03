@@ -18,7 +18,7 @@ namespace Deenote.Project
 
             proj.AudioFileRelativePath = Path.GetRelativePath(proj.ProjectFilePath, filePath);
             proj.AudioFileData = bytes;
-            proj.AudioClip = clip;
+            ProjectModel.InitializationHelper.SetAudioClip(proj, clip);
 
             _propertyChangeNotifier.Invoke(this, NotifyProperty.Audio);
         }
@@ -64,7 +64,7 @@ namespace Deenote.Project
 
         private PropertyChangeNotifier<ProjectManager, NotifyProperty> _propertyChangeNotifier = new();
 
-        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<ProjectManager> action) 
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<ProjectManager> action)
             => _propertyChangeNotifier.AddListener(flag, action);
 
         public enum NotifyProperty

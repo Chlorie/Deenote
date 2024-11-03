@@ -19,14 +19,14 @@ namespace Deenote.UI.Dialogs
         /// list the last explored dir if <see langword="null" />
         /// </param>
         /// <returns></returns>
-        public async UniTask<Result> OpenSelectFileAsync(LocalizableText dialogTitle, ImmutableArray<string> extensionFilters, string initialDirectory = null)
+        public async UniTask<Result> OpenSelectFileAsync(LocalizableText dialogTitle, ImmutableArray<string> extensionFilters, string? initialDirectory = null)
         {
             PathFilter filter = extensionFilters.IsDefaultOrEmpty
                 ? PathFilter.NoFilter
                 : PathFilter.FilterByExtensions(extensionFilters);
             if (await OpenAsync(dialogTitle, filter, initialDirectory)) {
                 Debug.Assert(CurrentSelectedFilePath != null);
-                return new Result(CurrentSelectedFilePath);
+                return new Result(CurrentSelectedFilePath!);
             }
             return default;
         }
@@ -54,7 +54,7 @@ namespace Deenote.UI.Dialogs
             return default;
         }
 
-        private async UniTask<bool> OpenAsync(LocalizableText dialogTitle, PathFilter filter, string initialDirectory = null, bool inputMode = false, string? inputModeExtension = null)
+        private async UniTask<bool> OpenAsync(LocalizableText dialogTitle, PathFilter filter, string? initialDirectory = null, bool inputMode = false, string? inputModeExtension = null)
         {
             using var s_dialogOpen = _dialog.Open();
             _dialog.SetTitle(dialogTitle);

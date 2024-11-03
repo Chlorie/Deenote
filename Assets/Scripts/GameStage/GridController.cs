@@ -15,12 +15,11 @@ namespace Deenote.GameStage
         public NoteCoord Quantize(NoteCoord coord, bool snapPosition, bool snapTime)
         {
             float snappedTime = snapTime ? GetNearestTimeGridTime(coord.Time) ?? coord.Time : coord.Time;
-            float snappedPos = (snapPosition, IsCurveOn) switch {
-                (true, true) => _curveLineData.GetValue(snappedTime) ??
-                                GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
-                (true, false) => GetNearestVerticalGridPosition(coord.Position) ?? coord.Position,
-                (false, _) => coord.Position,
-            };
+            float snappedPos = snapPosition
+                ? IsCurveOn && _curveLineData.GetValue(snappedTime) is { } pos
+                    ? pos
+                    : GetNearestVerticalGridPosition(coord.Position) ?? coord.Position
+                : coord.Position;
             return NoteCoord.ClampPosition(snappedTime, snappedPos);
         }
 
@@ -53,7 +52,7 @@ namespace Deenote.GameStage
         }
 
         private PropertyChangeNotifier<GridController, NotifyProperty> _propertyChangeNotifier;
-        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<GridController> action) 
+        public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<GridController> action)
             => _propertyChangeNotifier.AddListener(flag, action);
 
         public enum NotifyProperty

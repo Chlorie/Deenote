@@ -307,7 +307,7 @@ namespace Deenote.Utilities
                 _comparer = comparer;
             }
 
-            public int CompareTo(T? other) => _comparer.Compare(_value, other);
+            public int CompareTo(T? other) => _comparer.Compare(_value, other!);
         }
     }
 }

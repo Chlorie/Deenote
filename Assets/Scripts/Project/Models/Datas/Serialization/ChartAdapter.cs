@@ -35,9 +35,9 @@ namespace Deenote.Project.Models.Datas.Serialization
 
             // Cast $ref to string, 
             // or else deserialization failed, idk why
-            foreach (var lkTok in jobj["links"]) {
-                foreach (var refTok in lkTok["notes"]) {
-                    refTok["$ref"] = refTok["ref"].ToString();
+            foreach (var lkTok in jobj["links"]!) {
+                foreach (var refTok in lkTok["notes"]!) {
+                    refTok["$ref"] = refTok["ref"]!.ToString();
                 }
             }
 
@@ -48,7 +48,10 @@ namespace Deenote.Project.Models.Datas.Serialization
             // Convert to general chart
 
             List<NoteData> notes = chart.notes.Select(note => new NoteData {
-                Position = note.pos, Size = note.size, Time = note._time, Sounds = note.sounds,
+                Position = note.pos,
+                Size = note.size,
+                Time = note._time,
+                Sounds = note.sounds,
             }).ToList();
 
             IEnumerable<Link.Deserialzier> links = chart.links.Select(link => new Link.Deserialzier(link.notes.Select(
@@ -59,37 +62,37 @@ namespace Deenote.Project.Models.Datas.Serialization
                         return notes[index];
                     else
                         throw new FormatException("Wrong note id");
-                }) ?? null));
+                }) ?? Array.Empty<NoteData>()));
 
             return new ChartData(chart.speed, 10, 70, notes, links, null);
         }
 
         private sealed class DeV3Chart
         {
-            public List<DeV3Note> notes;
-            public IEnumerable<DeV3Link> links;
-            public float speed;
+            public List<DeV3Note> notes = default!;
+            public IEnumerable<DeV3Link> links = default!;
+            public float speed = default;
         }
 
         private sealed class DeV3Link
         {
-            public IEnumerable<NoteRef> notes;
+            public IEnumerable<NoteRef> notes = default!;
 
             public sealed class NoteRef
             {
                 [JsonProperty("$ref")]
-                public int id;
+                public int id = default;
             }
         }
 
         private sealed class DeV3Note
         {
-            public float _time;
+            public float _time = default;
             [JsonProperty("$id")]
-            public int id;
-            public List<PianoSoundData> sounds;
-            public float pos;
-            public float size;
+            public int id = default;
+            public List<PianoSoundData> sounds = default!;
+            public float pos = default;
+            public float size = default;
         }
     }
 }

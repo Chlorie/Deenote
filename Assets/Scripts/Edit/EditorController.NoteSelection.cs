@@ -68,8 +68,8 @@ namespace Deenote.Edit
         [Serializable]
         private sealed class NoteSelectionController
         {
-            [SerializeField] EditorController _editor;
-            [SerializeField] RectTransform _noteSelectionIndicatorImageTransform;
+            [SerializeField] EditorController _editor = default!;
+            [SerializeField] RectTransform _noteSelectionIndicatorImageTransform = default!;
             private NoteCoord _noteSelectionIndicatorStartCoord;
             private bool _isSelecting;
             private readonly List<NoteModel> _selectedNotes = new();

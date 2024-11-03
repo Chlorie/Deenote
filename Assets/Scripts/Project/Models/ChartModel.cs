@@ -47,6 +47,7 @@ namespace Deenote.Project.Models
         }
 
 
+        [MemberNotNull(nameof(Data))]
         private void SetData(ChartData data)
         {
             Data = data;

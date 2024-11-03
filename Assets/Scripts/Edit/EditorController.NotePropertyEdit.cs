@@ -7,6 +7,7 @@ using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine.Pool;
 
 namespace Deenote.Edit
@@ -380,7 +381,7 @@ namespace Deenote.Edit
                         _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteSpeed);
                         OnNotesChanged(false, false, noteDataChangedExceptTime: true);
                     }),
-                _ => null,
+                _ => throw new SwitchExpressionException(property),
             };
             _operationHistory.Do(operation);
         }
@@ -397,7 +398,7 @@ namespace Deenote.Edit
                     OnNotesChanged(true, false, noteDataChangedExceptTime: true);
                 }));
         }
-    
+
         public void InsertTempo(Tempo tempo, float endTime)
         {
             _operationHistory.Do(MainSystem.ProjectManager.DoInsertTempoOperation(tempo, endTime));

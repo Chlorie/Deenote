@@ -4,7 +4,6 @@ using Deenote.UI.Controls;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Immutable;
 using System.IO;
@@ -41,7 +40,7 @@ namespace Deenote.UI.Dialogs
         /// <summary>
         /// Current exploring directory
         /// </summary>
-        private string CurrentDirectory { get; [Obsolete("Use TryNavigateToDirectory() instead of setting this")] set; }
+        private string CurrentDirectory { get; [Obsolete("Use TryNavigateToDirectory() instead of setting this")] set; } = default!;
 
 
         private void Awake()
@@ -101,7 +100,7 @@ namespace Deenote.UI.Dialogs
             }
             else {
                 if (Directory.Exists(directory)) {
-                    NavigateToDirectoryInternal(directory);
+                    NavigateToDirectoryInternal(directory!);
                     return true;
                 }
                 return false;

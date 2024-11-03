@@ -1,7 +1,8 @@
 #nullable enable
+#pragma warning disable CS0649
 
-using System.Runtime.CompilerServices;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Deenote.Utilities
 {

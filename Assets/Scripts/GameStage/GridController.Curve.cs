@@ -7,6 +7,7 @@ using Deenote.Project.Models.Datas;
 using Deenote.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -28,6 +29,7 @@ namespace Deenote.GameStage
         private bool _shouldRenderCurve;
         private bool _isCurveOn;
 
+        [MemberNotNullWhen(true, nameof(_curveLineData))]
         public bool IsCurveOn
         {
             get => _isCurveOn;
@@ -60,7 +62,7 @@ namespace Deenote.GameStage
             _curveLineData = kind switch {
                 CurveKind.Cubic => CurveLineData.Cubic(_curveGenerationContext.InterpolationNotes.AsSpan(), n => n.Position),
                 CurveKind.Linear => CurveLineData.Linear(_curveGenerationContext.InterpolationNotes.AsSpan(), n => n.Position),
-                _ => null,
+                _ => throw new SwitchExpressionException(kind),
             };
             _sizeCurveData = null;
             _speedCurveData = null;
@@ -81,19 +83,19 @@ namespace Deenote.GameStage
             switch (property) {
                 case CurveApplyProperty.Size: curveData = ref _sizeCurveData; break;
                 case CurveApplyProperty.Speed: curveData = ref _speedCurveData; break;
-                default: Debug.Assert(false, "Unknown CurveApplyProperty."); return null!;
+                default: throw new SwitchExpressionException(property);
             }
 
             if (curveData is null) {
                 Func<NoteData, float> selector = property switch {
                     CurveApplyProperty.Size => n => n.Size,
                     CurveApplyProperty.Speed => n => n.Speed,
-                    _ => null!,
+                    _ => throw new SwitchExpressionException(property),
                 };
                 curveData = _curveGenerationContext.Kind switch {
                     CurveKind.Cubic => CurveLineData.Cubic(_curveGenerationContext.InterpolationNotes.AsSpan(), selector),
                     CurveKind.Linear => CurveLineData.Linear(_curveGenerationContext.InterpolationNotes.AsSpan(), selector),
-                    _ => null!
+                    _ => throw new SwitchExpressionException(_curveGenerationContext.Kind),
                 };
             }
 
@@ -261,7 +263,7 @@ namespace Deenote.GameStage
                 var span = coords.Span;
                 for (int i = 0; i < CubicCurveSegmentCount; i++) {
                     float time = Mathf.Lerp(min, max, (float)i / CubicCurveSegmentCount);
-                    float pos = GetValue(time).Value;
+                    float pos = GetValue(time)!.Value;
                     span[i] = NoteCoord.ClampPosition(time, pos);
                 }
                 return coords;

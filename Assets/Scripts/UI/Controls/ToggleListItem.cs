@@ -11,7 +11,7 @@ namespace Deenote.UI.Controls
     {
         [SerializeField] Toggle _toggle = default!;
 
-        private ToggleList _list;
+        private ToggleList _list = default!; // Init in BindToList
         private int _selfIndex;
 
         public Toggle UnityToggle => _toggle;
@@ -32,7 +32,7 @@ namespace Deenote.UI.Controls
         public void SetValueWithoutNotify(bool value)
             => _toggle.SetIsOnWithoutNotify(value);
 
-        public void BindToList(ToggleList list,int index)
+        public void BindToList(ToggleList list, int index)
         {
             _list = list;
             _selfIndex = index;

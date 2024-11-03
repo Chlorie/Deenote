@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.Collections.Immutable;
+
 namespace Deenote.Project.Models
 {
     public enum Difficulty
@@ -12,10 +14,11 @@ namespace Deenote.Project.Models
 
     public static class DifficultyExt
     {
-        public static readonly string[] DropdownOptions = new[] {
-            Difficulty.Easy.ToDisplayString(), Difficulty.Normal.ToDisplayString(), Difficulty.Hard.ToDisplayString(),
-            Difficulty.Extra.ToDisplayString(),
-        };
+        public static readonly ImmutableArray<string> DropdownOptions = ImmutableArray.Create(
+            Difficulty.Easy.ToDisplayString(), 
+            Difficulty.Normal.ToDisplayString(), 
+            Difficulty.Hard.ToDisplayString(),
+            Difficulty.Extra.ToDisplayString());
 
         public static Difficulty FromInt32(int value) => (Difficulty)value;
 

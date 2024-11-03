@@ -3,7 +3,6 @@
 using Deenote.GameStage;
 using Deenote.Project.Models.Datas;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace Deenote.Edit.Elements
 {

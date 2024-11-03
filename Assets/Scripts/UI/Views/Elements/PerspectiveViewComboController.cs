@@ -30,7 +30,7 @@ namespace Deenote.UI.Views.Elements
             Debug.Assert(prevHitNote?.IsComboNote() ?? false);
 
             gameObject.SetActive(true);
-            var deltaTime = stage.CurrentMusicTime - prevHitNote.Time;
+            var deltaTime = stage.CurrentMusicTime - prevHitNote!.Time;
             Debug.Assert(deltaTime >= 0, $"actual delta time:{deltaTime}");
             _numberText.text = _shadowText.text = combo.ToString();
 

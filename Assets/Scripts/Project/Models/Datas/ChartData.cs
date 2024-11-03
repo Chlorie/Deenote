@@ -63,8 +63,8 @@ namespace Deenote.Project.Models.Datas
         {
         }
 
-        private ChartData(float speed, int remapMinVelocity, int remapMaxVelocity, List<NoteData> notes,
-            List<SpeedLine> lines)
+        private ChartData(float speed, int remapMinVelocity, int remapMaxVelocity, List<NoteData>? notes,
+            List<SpeedLine>? lines)
         {
             Speed = speed;
             RemapMinVelocity = remapMinVelocity;
@@ -78,15 +78,15 @@ namespace Deenote.Project.Models.Datas
         }
 
         [JsonConstructor]
-        internal ChartData(float speed, int remapMinVelocity, int remapMaxVelocity, List<NoteData> notes,
-            IEnumerable<Link.Deserialzier> links, List<SpeedLine> speedLines) :
+        internal ChartData(float speed, int remapMinVelocity, int remapMaxVelocity, List<NoteData>? notes,
+            IEnumerable<Link.Deserialzier>? links, List<SpeedLine>? speedLines) :
             this(speed, remapMinVelocity, remapMaxVelocity, notes, speedLines)
         {
             if (links is null)
                 return;
 
             foreach (var link in links) {
-                NoteData prev = null;
+                NoteData? prev = null;
                 foreach (var note in link.Notes) {
                     note.IsSlide = true;
                     note.PrevLink = prev;

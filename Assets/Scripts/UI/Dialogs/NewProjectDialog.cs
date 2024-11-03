@@ -36,10 +36,8 @@ namespace Deenote.UI.Dialogs
 
         private bool IsSaveToAudioDirectory => _sameDirectoryCheckBox.Value.GetValueOrDefault();
 
-        private string __savePath;
-        private string SavePath => __savePath;
-
-        private ProjectModel? _resultProject;
+        private string? __savePath;
+        private string? SavePath => __savePath;
 
         private static readonly MessageBoxArgs _audioNotExistsMsgBoxArgs = new(
             LocalizableText.Localized("NewProject_MsgBox_Title"),
@@ -62,7 +60,7 @@ namespace Deenote.UI.Dialogs
             LocalizableText.Localized("FileExistsOverwrite_MsgBox_Y"),
             LocalizableText.Localized("FileExistsOverwrite_MsgBox_N"));
 
-        private UniTaskCompletionSource<ProjectModel> _tcs;
+        private UniTaskCompletionSource<ProjectModel> _tcs = default!; // Init on Open
         private CancellationTokenSource? _sharedCts;
 
 
@@ -146,8 +144,8 @@ namespace Deenote.UI.Dialogs
                 UpdateSavePath(null);
             });
 
-            _projectNameInput.Value = null;
-            _audioFileInput.Value = null;
+            _projectNameInput.Value = "";
+            _audioFileInput.Value = "";
             _directoryInput.OnValueChanged.Invoke(_directoryInput.Value);
             _sameDirectoryCheckBox.Value = false;
 
@@ -155,18 +153,18 @@ namespace Deenote.UI.Dialogs
 
             _createButton.OnClick.AddListener(async UniTaskVoid () =>
             {
-                Debug.Assert(_tcs is not null);
-
                 string audioFilePath = _audioFileInput.Value;
                 if (!File.Exists(audioFilePath)) {
                     await MainSystem.MessageBoxDialog.OpenAsync(_audioNotExistsMsgBoxArgs);
                     return;
                 }
-                if (Directory.Exists(SavePath)) {
+                Debug.Assert(SavePath is not null);
+                string savePath = SavePath!;
+                if (Directory.Exists(savePath)) {
                     await MainSystem.MessageBoxDialog.OpenAsync(_dirExistsMsgBoxArgs);
                     return;
                 }
-                if (File.Exists(SavePath)) {
+                if (File.Exists(savePath)) {
                     var res = await MainSystem.MessageBoxDialog.OpenAsync(_fileExistsMsgBoxArgs);
                     if (res != 0)
                         return;
@@ -203,14 +201,13 @@ namespace Deenote.UI.Dialogs
                     AudioClip = clip,
                     AudioFileData = audioBytes,
                     MusicName = _projectNameInput.Value,
-                    ProjectFilePath = SavePath,
-                    AudioFileRelativePath = Path.GetRelativePath(SavePath, audioFilePath),
+                    ProjectFilePath = savePath!,
+                    AudioFileRelativePath = Path.GetRelativePath(savePath, audioFilePath),
                 };
                 proj.Charts.Add(new ChartModel(new()) {
                     Difficulty = Difficulty.Hard,
                     Level = "10",
                 });
-                _resultProject = proj;
 
                 _tcs.TrySetResult(proj);
             });
@@ -257,7 +254,7 @@ namespace Deenote.UI.Dialogs
                     goto SetInvalid;
             }
             __savePath = Path.Combine(dir, $"{_projectNameInput.Value}.dnt");
-            _createHintText.SetLocalizedText("NewProjectDialog_Directory_CreateHint", SavePath);
+            _createHintText.SetLocalizedText("NewProjectDialog_Directory_CreateHint", __savePath);
             _createButton.IsInteractable = true;
             return;
 
@@ -281,7 +278,7 @@ namespace Deenote.UI.Dialogs
                 Debug.Log("Create new project cancelled.");
                 return null;
             } finally {
-                _tcs = null;
+                _tcs = null!;
             }
         }
     }

@@ -181,12 +181,9 @@ namespace Deenote.GameStage
 
             public readonly void PrependOnStageNotes(ReadOnlySpan<NoteModel> notes)
             {
-                var oldCount = _onStageNotes.Count;
-                for (int i = 0; i < notes.Length; i++)
-                    _onStageNotes.Add(null);
+                PreserveSpaceFromStart(_onStageNotes, notes.Length);
 
                 var span = _onStageNotes.AsSpan();
-                span[..oldCount].CopyTo(span[notes.Length..]);
                 for (int i = 0; i < notes.Length; i++) {
                     // To keep _onStageNotes in order
                     NoteModel note = notes[i];
@@ -203,6 +200,16 @@ namespace Deenote.GameStage
                         item.Initialize(note);
                         destination = item;
                     }
+                }
+
+                static void PreserveSpaceFromStart(List<StageNoteController> list, int count)
+                {
+                    var oldCount = list.Count;
+                    for (int i = 0; i < count; i++) {
+                        list.Add(default!);
+                    }
+                    var span = list.AsSpan();
+                    span[..oldCount].CopyTo(span[count..]);
                 }
             }
 

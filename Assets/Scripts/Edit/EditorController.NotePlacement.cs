@@ -546,7 +546,6 @@ namespace Deenote.Edit
             if (SelectedNotes.IsEmpty)
                 return;
 
-            // __selectedNotes.Sort(NoteTimeComparer.Instance);
             NoteData baseNote = SelectedNotes[0].Data;
             _clipBoardBasePosition = baseNote.Position;
 
@@ -560,15 +559,16 @@ namespace Deenote.Edit
                 if (data.IsSlide) {
                     slideNotes.Add(note.Data, data);
 
-                    NoteData prevLinkNote = note.Data.PrevLink;
-                    NoteData copiedPrev = null;
+                    NoteData? prevLinkNote = note.Data.PrevLink;
+                    NoteData copiedPrev = default!;
                     while (prevLinkNote != null && !slideNotes.TryGetValue(prevLinkNote, out copiedPrev))
                         prevLinkNote = prevLinkNote.PrevLink;
 
                     // prevLink is null || copiedPrev is not null
                     if (prevLinkNote != null) {
+                        Debug.Assert(copiedPrev is not null);
                         data.PrevLink = copiedPrev;
-                        copiedPrev.NextLink = data;
+                        copiedPrev!.NextLink = data;
                     }
                 }
             }

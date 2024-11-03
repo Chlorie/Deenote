@@ -36,7 +36,6 @@ LMenuBar_Project=Project
 MenuProjectPage_NoProject=No Project Loaded.
 MenuProjectPage_ProjectInfo=Project Info
 MenuProjectPage_ProjectInfo_Audio=Audio
-MenuProjectPage_ProjectInfo_Audio_Embeded=Embeded
 MenuProjectPage_ProjectInfo_Name=Name
 MenuProjectPage_ProjectInfo_Composer=Composer
 MenuProjectPage_ProjectInfo_Charter=Chart Designer
