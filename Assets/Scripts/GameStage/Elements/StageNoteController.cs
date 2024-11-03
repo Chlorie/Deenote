@@ -232,7 +232,7 @@ namespace Deenote.GameStage.Elements
                 float noteSize = _note.Data.Size;
                 _explosionHitEffectSpriteRenderer.transform.localScale =
                     noteSize * hitEffectPrefabs.ExplosionScale * Vector3.one;
-                _explosionHitEffectSpriteRenderer.sprite = hitEffectPrefabs.Explosions[5];
+                _explosionHitEffectSpriteRenderer.sprite = hitEffectPrefabs.Explosions[8];
             }
 
             void OnHitEffect()

@@ -168,7 +168,7 @@ FileExistsOverwrite_MsgBox_N=No
 
 #### FileExplorer Pin
 
-PinDirNotFound_MsgBox_Title=Directory not found.
+DirNotFound_MsgBox_Title=Directory not found.
 PinDirNotFound_MsgBox_Content=Pinned directory not found, do you want to unpin this directory?
 PinDirNotFound_MsgBox_Y=Unpin
 PinDirNotFound_MsgBox_N=Cancel

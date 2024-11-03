@@ -17,7 +17,7 @@ namespace Deenote.UI.Dialogs.Elements
         public string Directory { get; private set; }
 
         private readonly MessageBoxArgs _dirNotFoundMsgBoxArgs = new(
-            LocalizableText.Localized("PinDirNotFound_MsgBox_Title"),
+            LocalizableText.Localized("DirNotFound_MsgBox_Title"),
             LocalizableText.Localized("PinDirNotFound_MsgBox_Content"),
             LocalizableText.Localized("PinDirNotFound_MsgBox_Y"),
             LocalizableText.Localized("PinDirNotFound_MsgBox_N"));

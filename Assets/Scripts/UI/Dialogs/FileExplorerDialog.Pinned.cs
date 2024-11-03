@@ -35,8 +35,8 @@ namespace Deenote.UI.Dialogs
 
         internal void UnpinDirectory(FileExplorerPinnedDirListItem item)
         {
-            Debug.Assert(_pinnedDirs.IndexOf(item) != -1);
-            _pinnedDirs.Remove(item);
+            var removed = _pinnedDirs.Remove(item);
+            Debug.Assert(removed == true);
         }
 
         internal void PinDirectory(FileExplorerListItem item)

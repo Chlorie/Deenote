@@ -48,7 +48,7 @@ namespace Deenote.UI.Dialogs
                 ? PathFilter.NoFilter
                 : PathFilter.FilterByExtensions(ImmutableArray.Create(fileExtension));
             if (await OpenAsync(dialogTitle, filter, initialDirectory, inputMode: true, inputModeExtension: fileExtension))
-                return new Result(Path.Combine(CurrentDirectory, $"{_fileNameInput.Value}{fileExtension}"));
+                return new Result(Path.Combine(CurrentDirectory, $"{CurrentInputFileName}{fileExtension}"));
             return default;
         }
 
@@ -67,7 +67,6 @@ namespace Deenote.UI.Dialogs
                 case PathFilterKind.NoFilter:
                 case PathFilterKind.FilterByExtensions:
                     _fileNameColumnGameObject.SetActive(true);
-                    _fileNameInput.Value = "";
                     if (inputMode == true) {
                         _fileNameInput.IsInteractable = true;
                         if (inputModeExtension is null)
@@ -90,10 +89,9 @@ namespace Deenote.UI.Dialogs
                     break;
             }
 
-            // Self assign to ensure update file list
-            if (initialDirectory is not null)
-                CurrentDirectory = initialDirectory;
-            RefreshFileList();
+            if (!TryNavigateToDirectory(initialDirectory)) {
+                RefreshWithCurrentDirectory();
+            }
 
             int click = await clickTask;
             Debug.Log($@"In {nameof(FileExplorerDialog)} clicked {click switch { 0 => "Confirm", 1 => "Cancel", _ => "Close", }}");

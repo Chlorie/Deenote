@@ -2,6 +2,8 @@ using Deenote.UI.Controls;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Immutable;
 using System.IO;
 using TMPro;
@@ -29,45 +31,16 @@ namespace Deenote.UI.Dialogs
 
         private PathFilter _pathFilter;
 
-        private string? __currentSelectedFilePath;
+        private string CurrentInputFileName { get; [Obsolete("This property is bind to _fileNameInput.Value")] set; }
         /// <summary>
         /// Current selected file full path
         /// </summary>
-        private string? CurrentSelectedFilePath
-        {
-            get => __currentSelectedFilePath;
-            set {
-                if (__currentSelectedFilePath == value)
-                    return;
-                __currentSelectedFilePath = value;
-                if (value is not null) {
-                    _fileNameInput.Value = _extensionText.gameObject.activeSelf
-                        ? Path.GetFileNameWithoutExtension(value)
-                        : Path.GetFileName(value);
-                }
-                else {
-                    _fileNameInput.Value = "";
-                }
-            }
-        }
-
-        private string __currentDirectory = default!;
+        private string? CurrentSelectedFilePath { get; [Obsolete("Use SelectItem() instead of setting this")] set; }
         /// <summary>
         /// Current exploring directory
         /// </summary>
-        /// <remarks>
-        /// Requires call <see cref="RefreshFileList"/>
-        /// </remarks>
-        private string CurrentDirectory
-        {
-            get => __currentDirectory;
-            set {
-                if (__currentDirectory == value)
-                    return;
-                __currentDirectory = value;
-                _directoryInput.SetValueWithoutNotify(value);
-            }
-        }
+        private string CurrentDirectory { get; [Obsolete("Use TryNavigateToDirectory() instead of setting this")] set; }
+
 
         private void Awake()
         {
@@ -78,7 +51,6 @@ namespace Deenote.UI.Dialogs
                     item.Parent = this;
                     return item;
                 }));
-            CurrentDirectory = Directory.GetCurrentDirectory();
 
             Awake_Pinned();
         }
@@ -94,7 +66,19 @@ namespace Deenote.UI.Dialogs
             _fileNameInput.OnValueChanged.AddListener(fileName =>
             {
                 _confirmButton.IsInteractable = Utils.IsValidFileName(fileName);
+#pragma warning disable CS0618
+                CurrentInputFileName = fileName;
+#pragma warning restore CS0618
             });
+        }
+
+        private void OnEnable()
+        {
+            RefreshWithCurrentDirectory();
+#pragma warning disable CS0618
+            CurrentSelectedFilePath = "";
+            _fileNameInput.Value = "";
+#pragma warning restore CS0618
         }
 
         private void OnDisable()
@@ -103,19 +87,57 @@ namespace Deenote.UI.Dialogs
             _fileItems.Clear(clearPool: true);
         }
 
-        public bool TryNavigateToDirectory(string directory)
+        public bool TryNavigateToDirectory(string? directory, bool toParentDirIfNotExists = false)
         {
-            if (Directory.Exists(directory)) {
-                CurrentDirectory = directory;
-                RefreshFileList();
+            if (toParentDirIfNotExists) {
+                while (directory is not null && !Directory.Exists(directory))
+                    directory = Path.GetDirectoryName(directory);
+                if (directory is null)
+                    return false;
+                NavigateToDirectoryInternal(directory);
                 return true;
             }
-            return false;
+            else {
+                if (Directory.Exists(directory)) {
+                    NavigateToDirectoryInternal(directory);
+                    return true;
+                }
+                return false;
+            }
         }
 
-        private void RefreshFileList()
+        /// <summary>
+        /// Refresh file list in current directory
+        /// </summary>
+        /// <remarks>
+        /// If current directory doesnt exist, try load its parent directory.
+        /// <br/>
+        /// if current directory is root, use <see cref="Directory.GetCurrentDirectory"/>
+        /// </remarks>
+        private void RefreshWithCurrentDirectory()
         {
-            var directory = CurrentDirectory;
+            string? directory = CurrentDirectory;
+            while (directory is not null && !TryNavigateToDirectory(directory)) {
+                directory = Path.GetDirectoryName(directory);
+            }
+
+            if (directory is null) {
+                NavigateToDirectoryInternal(Directory.GetCurrentDirectory());
+            }
+        }
+
+        private void NavigateToDirectoryInternal(string directory)
+        {
+            Debug.Assert(Directory.Exists(directory));
+
+            if (CurrentDirectory != directory) {
+#pragma warning disable CS0618
+                CurrentDirectory = directory;
+#pragma warning restore CS0618
+                _directoryInput.SetValueWithoutNotify(directory);
+            }
+
+            // Refresh files
 
             using (var resettingFileItems = _fileItems.Resetting()) {
                 // If is not root directory, The first item is parent directory
@@ -157,20 +179,21 @@ namespace Deenote.UI.Dialogs
         internal void SelectItem(FileExplorerListItem item)
         {
             if (item.IsDirectory) {
-                if (item.Path == "..")
-                    CurrentDirectory = Path.GetDirectoryName(item.Path);
-                else
-                    CurrentDirectory = item.Path;
-                RefreshFileList();
+                if (TryNavigateToDirectory(item.Path, toParentDirIfNotExists: true))
+                    return;
+                Debug.Assert(false, "Cannot find parent of current directory");
+                throw new DirectoryNotFoundException($"Cannot find dir or parent dir of {item.Path}");
             }
             else {
+                if (CurrentSelectedFilePath == item.Path)
+                    return;
+#pragma warning disable CS0618
                 CurrentSelectedFilePath = item.Path;
+#pragma warning restore CS0618
+                _fileNameInput.Value = _extensionText.gameObject.activeSelf
+                    ? Path.GetFileNameWithoutExtension(item.Path)
+                    : Path.GetFileName(item.Path);
             }
-        }
-
-        private void Reset()
-        {
-            CurrentSelectedFilePath = null;
         }
 
         public enum PathFilterKind
