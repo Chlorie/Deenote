@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.GameStage;
 using Deenote.Project.Models.Datas;
 using UnityEngine;

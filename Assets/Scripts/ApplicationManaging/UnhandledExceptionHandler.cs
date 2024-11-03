@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Localization;
 using System;
 using System.IO;

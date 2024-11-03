@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Utilities;
 using UnityEngine;
 using UnityEngine.UI;

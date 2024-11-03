@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Localization;
 using Deenote.UI.Controls;
 using Deenote.UI.Dialogs.Elements;

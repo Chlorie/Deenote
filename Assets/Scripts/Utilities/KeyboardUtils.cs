@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Inputting;
 using System;
 using UnityEngine;

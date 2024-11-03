@@ -1,3 +1,5 @@
+#nullable enable
+
 using CommunityToolkit.HighPerformance;
 using Deenote.Edit.Operations;
 using Deenote.Project.Comparers;

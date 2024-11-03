@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Edit.Operations;
 using Deenote.Utilities;
 using System;

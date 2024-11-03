@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Deenote.Edit.Operations
 {
     public sealed class CombinedOperation : IUndoableOperation

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Audio;
 using Deenote.Inputting;
 using Deenote.Localization;

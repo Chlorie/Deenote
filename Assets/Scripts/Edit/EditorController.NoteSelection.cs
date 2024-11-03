@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;
 using Deenote.Utilities;

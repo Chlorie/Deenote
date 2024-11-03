@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.GameStage.Elements;
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;

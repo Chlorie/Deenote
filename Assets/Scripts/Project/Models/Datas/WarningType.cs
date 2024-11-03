@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Deenote.Project.Models.Datas
 {
     public enum WarningType

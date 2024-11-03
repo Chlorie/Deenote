@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.UI.Dialogs.Elements;
 using Deenote.Utilities;
 using Deenote.Utilities.Robustness;

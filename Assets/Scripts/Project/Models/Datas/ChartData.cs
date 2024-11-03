@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Project.Comparers;
 using Deenote.Project.Models.Datas.Serialization;
 using Newtonsoft.Json;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Project.Models.Datas;
 using System;
 using System.Collections.Generic;

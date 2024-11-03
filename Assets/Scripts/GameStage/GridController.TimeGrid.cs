@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Project.Models;
 using System.Collections.Generic;
 using UnityEngine;

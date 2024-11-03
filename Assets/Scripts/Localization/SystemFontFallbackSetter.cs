@@ -1,3 +1,5 @@
+#nullable enable
+
 using Reflex.Attributes;
 using System.Collections.Generic;
 using System.IO;

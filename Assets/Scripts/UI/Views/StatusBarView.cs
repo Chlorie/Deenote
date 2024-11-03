@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.UI.ComponentModel;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;

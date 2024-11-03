@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Project.Models;
 
 namespace Deenote.GameStage

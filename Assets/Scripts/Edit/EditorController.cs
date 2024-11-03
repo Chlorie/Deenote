@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Edit.Operations;
 using Deenote.GameStage;
 using Deenote.UI.ComponentModel;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Project.Models;
 using Deenote.UI.ComponentModel;
 using Deenote.UI.Views.Elements;

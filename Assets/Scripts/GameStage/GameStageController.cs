@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Audio;
 using Deenote.GameStage.Elements;
 using Deenote.Project.Models;

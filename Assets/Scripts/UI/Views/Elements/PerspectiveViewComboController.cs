@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.GameStage;
 using Deenote.Utilities;
 using TMPro;

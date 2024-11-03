@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Deenote.Project.Models.Datas;
 using Deenote.Utilities;

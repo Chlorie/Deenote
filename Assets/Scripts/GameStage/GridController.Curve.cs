@@ -1,3 +1,5 @@
+#nullable enable
+
 using CommunityToolkit.HighPerformance.Buffers;
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;

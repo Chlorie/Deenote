@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Audio;
 using Deenote.Edit;
 using Deenote.UI.ComponentModel;

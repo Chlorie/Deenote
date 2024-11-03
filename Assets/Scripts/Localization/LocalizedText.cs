@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Utilities;
 using System;
 using System.Collections.Generic;

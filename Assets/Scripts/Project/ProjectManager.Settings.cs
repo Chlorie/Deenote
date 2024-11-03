@@ -1,3 +1,5 @@
+#nullable enable
+
 using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.Utilities;
