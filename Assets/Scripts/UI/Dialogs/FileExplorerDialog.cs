@@ -32,7 +32,7 @@ namespace Deenote.UI.Dialogs
 
         private PathFilter _pathFilter;
 
-        private string CurrentInputFileName { get; [Obsolete("This property is bind to _fileNameInput.Value")] set; }
+        private string CurrentInputFileName { get; [Obsolete("This property is bind to _fileNameInput.Value")] set; } = default!;
         /// <summary>
         /// Current selected file full path
         /// </summary>

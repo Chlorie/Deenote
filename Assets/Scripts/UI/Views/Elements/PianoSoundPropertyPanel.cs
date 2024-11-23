@@ -18,18 +18,18 @@ namespace Deenote.UI.Views.Elements
     {
         private const int WhiteKeyCount = 75;
 
-        [SerializeField] KVButtonProperty _soundsProperty;
-        [SerializeField] GameObject _editPanelGameObject;
-        [SerializeField] Button _playButton;
-        [SerializeField] Button _revertButton;
-        [SerializeField] UnityEngine.UI.ScrollRect _scrollRect;
-        [SerializeField] PianoOctaveView[] _octaves;
-        [SerializeField] Button[] _quickScrollButtons;
+        [SerializeField] KVButtonProperty _soundsProperty = default!;
+        [SerializeField] GameObject _editPanelGameObject = default!;
+        [SerializeField] Button _playButton = default!;
+        [SerializeField] Button _revertButton = default!;
+        [SerializeField] UnityEngine.UI.ScrollRect _scrollRect = default!;
+        [SerializeField] PianoOctaveView[] _octaves = default!;
+        [SerializeField] Button[] _quickScrollButtons = default!;
 
-        [SerializeField] Transform _soundPropertyItemParentTransform;
+        [SerializeField] Transform _soundPropertyItemParentTransform = default!;
 
         [Header("Prefabs")]
-        [SerializeField] PianoSoundPropertyItem _soundPropertyItemPrefab;
+        [SerializeField] PianoSoundPropertyItem _soundPropertyItemPrefab = default!;
 
         private PooledObjectListView<PianoSoundPropertyItem> _soundItems;
 

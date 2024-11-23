@@ -11,8 +11,8 @@ namespace Deenote.UI.Views
 {
     public sealed class StatusBarView : MonoBehaviour
     {
-        [SerializeField] LocalizedText _statusMessageText;
-        [SerializeField] LocalizedText _fpsText;
+        [SerializeField] LocalizedText _statusMessageText = default!;
+        [SerializeField] LocalizedText _fpsText = default!;
 
         private bool _isFpsUpdate;
         private float _fpsTimer;

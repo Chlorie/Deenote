@@ -11,7 +11,7 @@ namespace Deenote.UI.Controls
 {
     public sealed class Dropdown : MonoBehaviour
     {
-        [SerializeField] TMP_Dropdown _dropdown;
+        [SerializeField] TMP_Dropdown _dropdown = default!;
         private readonly List<LocalizableText> _options = new();
 
         public IReadOnlyList<LocalizableText> Options => _options;

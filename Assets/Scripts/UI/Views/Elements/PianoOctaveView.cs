@@ -13,7 +13,7 @@ namespace Deenote.UI.Views.Elements
         public const int Octave8KeyCount = 8;
 
         [SerializeField, Range(-2, 8)] int _number;
-        [SerializeField] Button[] _pianoKeys;
+        [SerializeField] Button[] _pianoKeys = default!;
 
         public PianoSoundPropertyPanel Parent { get; internal set; } = default!;
 
@@ -25,7 +25,7 @@ namespace Deenote.UI.Views.Elements
             int cPitch = (_number + 2) * _pianoKeys.Length;
             for (int i = 0; i < _pianoKeys.Length; i++) {
                 int pitch = cPitch + i;
-                Debug.Assert(pitch >= 0 && pitch < 128,$"Pitch {pitch} out of range.");
+                Debug.Assert(pitch >= 0 && pitch < 128, $"Pitch {pitch} out of range.");
                 _pianoKeys[i].OnClick.AddListener(() =>
                 {
                     MainSystem.PianoSoundManager.PlaySoundAsync(pitch, 95, null, 0f, 1f).Forget();

@@ -15,14 +15,14 @@ namespace Deenote.GameStage
     public sealed partial class PerspectiveViewController : SingletonBehavior<PerspectiveViewController>, INotifyPropertyChange<PerspectiveViewController, PerspectiveViewController.NotifyProperty>
     {
         [Header("Notify")]
-        [SerializeField] EditorController _editor;
-        [SerializeField] GameStageController _stage;
+        [SerializeField] EditorController _editor = default!;
+        [SerializeField] GameStageController _stage = default!;
 
         [Header("")]
-        [SerializeField] RawImage _cameraViewRawImage;
+        [SerializeField] RawImage _cameraViewRawImage = default!;
         [Header("Full Screen")]
-        [SerializeField] Transform _windowScreenParentTransform;
-        [SerializeField] Transform _fullScreenParentTransform;
+        [SerializeField] Transform _windowScreenParentTransform = default!;
+        [SerializeField] Transform _fullScreenParentTransform = default!;
 
         [field: Header("Aspect Ratio Adjust")]
         [field: SerializeField] public Camera ViewCamera { get; private set; } = null!;
@@ -139,11 +139,11 @@ namespace Deenote.GameStage
     public static class ViewAspectRatioOptions
     {
         public static readonly ImmutableArray<string> DropdownOptions = ImmutableArray.Create("16:9", "4:3");
-        
+
         private static readonly ImmutableArray<float> _ratioValues = ImmutableArray.Create(16f / 9f, 4f / 3f);
 
         public static float GetAspectRatio(int index) => _ratioValues[index];
-        public static int FindIndex(float aspectRatio)=>_ratioValues.IndexOf(aspectRatio);
+        public static int FindIndex(float aspectRatio) => _ratioValues.IndexOf(aspectRatio);
     }
     [Obsolete]
     public static class ViewAspectRatioExt

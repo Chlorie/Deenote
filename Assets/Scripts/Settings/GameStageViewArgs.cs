@@ -8,13 +8,13 @@ namespace Deenote.Settings
     public sealed class GameStageViewArgs : ScriptableObject
     {
         [Header("Difficulty Resources")]
-        public Sprite EasyDifficultyIconSprite;
+        public Sprite EasyDifficultyIconSprite = default!;
         public Color EasyLevelTextColor;
-        public Sprite NormalDifficultyIconSprite;
+        public Sprite NormalDifficultyIconSprite = default!;
         public Color NormalLevelTextColor;
-        public Sprite HardDifficultyIconSprite;
+        public Sprite HardDifficultyIconSprite = default!;
         public Color HardLevelTextColor;
-        public Sprite ExtraDifficultyIconSprite;
+        public Sprite ExtraDifficultyIconSprite = default!;
         public Color ExtraLevelTextColor;
         [Header("Combo")]
         public int MinDisplayCombo;

@@ -10,7 +10,7 @@ namespace Deenote.UI.Controls
     [RequireComponent(typeof(ToggleGroup))]
     public sealed class ToggleList : MonoBehaviour
     {
-        [SerializeField] ToggleGroup _group;
+        [SerializeField] ToggleGroup _group = default!;
         private int _selectedIndex;
         private readonly List<ToggleListItem> _items = new();
 

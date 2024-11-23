@@ -11,16 +11,16 @@ namespace Deenote.UI.Views
 {
     public sealed class PerspectiveViewPanelView : MonoBehaviour
     {
-        [SerializeField] AspectRatioFitter _aspectRatioFitter;
+        [SerializeField] AspectRatioFitter _aspectRatioFitter = default!;
         [Header("Stage UI")]
-        [SerializeField] TMP_Text _musicNameText;
-        [SerializeField] TMP_Text _scoreText;
-        [SerializeField] Slider _timeSlider;
-        [SerializeField] Image _difficultyImage;
-        [SerializeField] TMP_Text _levelText;
-        [SerializeField] Button _pauseButton;
-        [SerializeField] PerspectiveViewComboController _combo;
-        [SerializeField] TMP_Text _backgroundStaveText;
+        [SerializeField] TMP_Text _musicNameText = default!;
+        [SerializeField] TMP_Text _scoreText = default!;
+        [SerializeField] Slider _timeSlider = default!;
+        [SerializeField] Image _difficultyImage = default!;
+        [SerializeField] TMP_Text _levelText = default!;
+        [SerializeField] Button _pauseButton = default!;
+        [SerializeField] PerspectiveViewComboController _combo = default!;
+        [SerializeField] TMP_Text _backgroundStaveText = default!;
 
         private Difficulty __difficulty;
         private Difficulty Difficulty
@@ -39,19 +39,19 @@ namespace Deenote.UI.Views
                     Difficulty.Extra => (args.ExtraDifficultyIconSprite, args.ExtraLevelTextColor),
                     _ => (args.HardDifficultyIconSprite, Color.white),
                 };
-                _levelText.text = $"{value.ToDisplayString()} Lv {Level}";
+                UpdateLevelText();
             }
         }
 
-        private string __level;
+        private string? __level;
         private string Level
         {
-            get => __level;
+            get => __level!;
             set {
                 if (__level == value)
                     return;
                 __level = value;
-                _levelText.text = $"{Difficulty.ToDisplayString()} Lv {value}";
+                UpdateLevelText();
             }
         }
 
@@ -77,7 +77,7 @@ namespace Deenote.UI.Views
 
             MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 Project.ProjectManager.NotifyProperty.CurrentProject,
-                projm => _musicNameText.text =_backgroundStaveText.text = projm.CurrentProject?.MusicName ?? "");
+                projm => _musicNameText.text = _backgroundStaveText.text = projm.CurrentProject?.MusicName ?? "");
 
             MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.ChartLevel,
@@ -127,6 +127,11 @@ namespace Deenote.UI.Views
                     float score = accScore * 80_00f + comboScore * 20_00f;
                     _scoreText.text = $"{Mathf.Floor(score) / 100f:F2} %";
                 });
+        }
+
+        private void UpdateLevelText()
+        {
+            _levelText.text = $"{Difficulty.ToDisplayString()} Lv {Level}";
         }
     }
 }

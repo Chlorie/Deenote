@@ -11,8 +11,8 @@ namespace Deenote.UI.Dialogs.Elements
 {
     public sealed partial class FileExplorerPinnedDirListItem : MonoBehaviour
     {
-        [SerializeField] Button _button;
-        [SerializeField] Button _unpinButton;
+        [SerializeField] Button _button = default!;
+        [SerializeField] Button _unpinButton = default!;
 
         public FileExplorerDialog Parent { get; internal set; } = default!;
 

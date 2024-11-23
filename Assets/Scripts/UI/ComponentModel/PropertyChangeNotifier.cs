@@ -31,9 +31,9 @@ namespace Deenote.UI.ComponentModel
 
         public readonly void Invoke(TSender sender, TFlag flag)
         {
-            if (_invokers is null || _invokers is null)
+            if (_invokers is null)
                 return;
-
+            
             foreach (var (f, invoker) in _invokers) {
                 if (EqualityComparer<TFlag>.Default.Equals(f, flag))
                     invoker.Invoke(sender);

@@ -10,8 +10,8 @@ namespace Deenote.UI.Dialogs
     partial class FileExplorerDialog
     {
         [Header("Pinned Directories")]
-        [SerializeField] FileExplorerPinnedDirListItem _pinnedDirListItemPrefab;
-        [SerializeField] Transform _pinnedDirParentTransform;
+        [SerializeField] FileExplorerPinnedDirListItem _pinnedDirListItemPrefab = default!;
+        [SerializeField] Transform _pinnedDirParentTransform = default!;
         private PooledObjectListView<FileExplorerPinnedDirListItem> _pinnedDirs;
 
         private void Awake_Pinned()

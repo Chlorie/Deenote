@@ -12,7 +12,7 @@ namespace Deenote.Edit
     partial class EditorController
     {
         [Header("Note Selection")]
-        [SerializeField] NoteSelectionController _noteSelectionController;
+        [SerializeField] NoteSelectionController _noteSelectionController = default!;
 
         public bool IsSelecting => _noteSelectionController.IsSelecting;
 

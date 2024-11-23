@@ -16,19 +16,19 @@ namespace Deenote.GameStage
     public sealed partial class GameStageController : SingletonBehavior<GameStageController>, INotifyPropertyChange<GameStageController, GameStageController.NotifyProperty>
     {
         [Header("Effect")]
-        [SerializeField] SpriteRenderer _judgeLineBreathingEffectSpriteRenderer;
-        [SerializeField] SpriteRenderer _judgeLineHitEffectSpriteRenderer;
-        [SerializeField] Image _backgroundBreathingMaskImage;
-        [SerializeField] PerspectiveViewController _perspectiveViewController;
+        [SerializeField] SpriteRenderer _judgeLineBreathingEffectSpriteRenderer = default!;
+        [SerializeField] SpriteRenderer _judgeLineHitEffectSpriteRenderer = default!;
+        [SerializeField] Image _backgroundBreathingMaskImage = default!;
+        [SerializeField] PerspectiveViewController _perspectiveViewController = default!;
 
         [Header("Prefabs")]
-        [SerializeField] Transform _noteParentTransform;
-        [SerializeField] StageNoteController _notePrefab;
+        [SerializeField] Transform _noteParentTransform = default!;
+        [SerializeField] StageNoteController _notePrefab = default!;
 
         [SerializeField] private StageNoteManager _stageNoteManager;
 
         [Header("Settings")]
-        private ChartModel _chart;
+        private ChartModel? _chart;
 
         /// <remarks>
         /// If music is paused, maually set music time by this value,

@@ -259,6 +259,7 @@ namespace Deenote.UI.Views
 
             void NotifyAudioFileChanged(ProjectModel proj)
             {
+                // TODO: proj为null时报错
                 _projectAudioProperty.Button.Text.SetRawText(Path.GetFileName(proj.AudioFileRelativePath));
                 _projectAudioProperty.Button.Text.Text.horizontalAlignment = HorizontalAlignmentOptions.Left;
             }

@@ -16,7 +16,7 @@ namespace Deenote.Project
         /// </summary>
         public ProjectModel CurrentProject
         {
-            get => __currentProject!;
+            get => __currentProject;
             set {
                 if (__currentProject == value)
                     return;

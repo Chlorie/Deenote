@@ -8,8 +8,8 @@ namespace Deenote.UI.Dialogs
 {
     public sealed class DialogManager : MonoBehaviour
     {
-        [SerializeField] GameObject _blocker;
-        [SerializeField] Dialog[] _dialogs;
+        [SerializeField] GameObject _blocker = default!;
+        [SerializeField] Dialog[] _dialogs = default!;
 
         private readonly Stack<Dialog> _activeDialogs = new();
 

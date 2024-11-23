@@ -24,8 +24,8 @@ namespace Deenote.Settings
         public float BackgroundMaskPeriod;
         public float JudgeLineHitEffectAlphaDecTime;
         [Header("Note")]
-        public StageNoteController NoteControllerPrefab;
-        public AudioClip EffectSoundAudioClip;
+        public StageNoteController NoteControllerPrefab = default!;
+        public AudioClip EffectSoundAudioClip = default!;
         public NoteSpritePrefab BlackNoteSpritePrefab;
         public NoteSpritePrefab NoSoundNoteSpritePrefab;
         public NoteSpritePrefab SlideNoteSpritePrefab;

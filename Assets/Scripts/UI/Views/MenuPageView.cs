@@ -18,22 +18,22 @@ namespace Deenote.UI.Views
     {
         private const int MaxRecentFilesCount = 5;
 
-        [SerializeField] Button _newButton;
-        [SerializeField] Button _openButton;
-        [SerializeField] Button _saveButton;
-        [SerializeField] Button _saveAsButton;
-        [SerializeField] Collapsable _recentFilesCollapsable;
+        [SerializeField] Button _newButton = default!;
+        [SerializeField] Button _openButton = default!;
+        [SerializeField] Button _saveButton = default!;
+        [SerializeField] Button _saveAsButton = default!;
+        [SerializeField] Collapsable _recentFilesCollapsable = default!;
 
-        [SerializeField] Button _preferenceButton;
+        [SerializeField] Button _preferenceButton = default!;
 
-        [SerializeField] Button _aboutButton;
-        [SerializeField] Button _updatesButton;
-        [SerializeField] Button _turorialsButton;
+        [SerializeField] Button _aboutButton = default!;
+        [SerializeField] Button _updatesButton = default!;
+        [SerializeField] Button _turorialsButton = default!;
 
-        [SerializeField] Button _checkUpdateButton;
+        [SerializeField] Button _checkUpdateButton = default!;
 
         [Header("Prefabs")]
-        [SerializeField] RecentFileItem _recentFileItemPrefab;
+        [SerializeField] RecentFileItem _recentFileItemPrefab = default!;
         private PooledObjectListView<RecentFileItem> _recentFiles;
 
         private static readonly MessageBoxArgs _newProjectOnOpenMsgBoxArgs = new(

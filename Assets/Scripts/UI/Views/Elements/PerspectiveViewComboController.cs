@@ -10,11 +10,11 @@ namespace Deenote.UI.Views.Elements
 {
     public sealed class PerspectiveViewComboController : MonoBehaviour
     {
-        [SerializeField] TMP_Text _numberText;
-        [SerializeField] TMP_Text _shadowText;
-        [SerializeField] Image _shockWaveCircleImage;
-        [SerializeField] Image _shockWaveImage;
-        [SerializeField] Image _charmingImage;
+        [SerializeField] TMP_Text _numberText = default!;
+        [SerializeField] TMP_Text _shadowText = default!;
+        [SerializeField] Image _shockWaveCircleImage = default!;
+        [SerializeField] Image _shockWaveImage = default!;
+        [SerializeField] Image _charmingImage = default!;
 
         internal void UpdateComboRegistrant(GameStageController stage)
         {

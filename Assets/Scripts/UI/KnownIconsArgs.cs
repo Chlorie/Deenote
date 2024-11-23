@@ -11,13 +11,13 @@ namespace Deenote.UI
     {
         // Considering should i move these into their owning classes..
         [Header("FileListItem")]
-        public Sprite FileListItemFolderSprite;
-        public Sprite FileListItemFileSprite;
-        public Sprite FileExplorerPinSprite;
-        public Sprite FileExplorerUnpinSprite;
+        public Sprite FileListItemFolderSprite = default!;
+        public Sprite FileListItemFileSprite = default!;
+        public Sprite FileExplorerPinSprite = default!;
+        public Sprite FileExplorerUnpinSprite = default!;
         [Header("Note Infos")]
-        public Sprite NoteInfoSoundsEditSprite;
-        public Sprite NoteInfoSoundsAcceptSprite;
-        public Sprite NoteInfoSoundsCollapseSprite;
+        public Sprite NoteInfoSoundsEditSprite = default!;
+        public Sprite NoteInfoSoundsAcceptSprite = default!;
+        public Sprite NoteInfoSoundsCollapseSprite = default!;
     }
 }

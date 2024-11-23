@@ -11,8 +11,8 @@ namespace Deenote
     partial class MainSystem
     {
         [Header("Args")]
-        [SerializeField] GameStageViewArgs _gameStageViewArgs;
-        [SerializeField] KnownIconsArgs _knownIconsArgs;
+        [SerializeField] GameStageViewArgs _gameStageViewArgs = default!;
+        [SerializeField] KnownIconsArgs _knownIconsArgs = default!;
 
         partial class Args
         {
@@ -63,7 +63,7 @@ namespace Deenote
             }
 
             private PropertyChangeNotifier<Settings, NotifyProperty> _propertyChangeNotifier = new();
-            public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<Settings> action) 
+            public void RegisterPropertyChangeNotification(NotifyProperty flag, Action<Settings> action)
                 => _propertyChangeNotifier.AddListener(flag, action);
 
             public enum NotifyProperty

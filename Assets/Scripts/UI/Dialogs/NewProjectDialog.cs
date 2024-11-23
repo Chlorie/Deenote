@@ -18,21 +18,21 @@ namespace Deenote.UI.Dialogs
     {
         [SerializeField] Dialog _dialog = default!;
 
-        [SerializeField] InputField _projectNameInput;
-        [SerializeField] LocalizedText _projectNameErrorText;
+        [SerializeField] InputField _projectNameInput = default!;
+        [SerializeField] LocalizedText _projectNameErrorText = default!;
 
-        [SerializeField] InputField _audioFileInput;
-        [SerializeField] Button _audioFileExploreButton;
-        [SerializeField] LocalizedText _audioFileErrorText;
+        [SerializeField] InputField _audioFileInput = default!;
+        [SerializeField] Button _audioFileExploreButton = default!;
+        [SerializeField] LocalizedText _audioFileErrorText = default!;
 
-        [SerializeField] InputField _directoryInput;
-        [SerializeField] Button _directoryExploreButton;
-        [SerializeField] LocalizedText _directoryErrorText;
-        [SerializeField] CheckBox _sameDirectoryCheckBox;
+        [SerializeField] InputField _directoryInput = default!;
+        [SerializeField] Button _directoryExploreButton = default!;
+        [SerializeField] LocalizedText _directoryErrorText = default!;
+        [SerializeField] CheckBox _sameDirectoryCheckBox = default!;
 
-        [SerializeField] LocalizedText _createHintText;
-        [SerializeField] Button _createButton;
-        [SerializeField] Button _cancelButton;
+        [SerializeField] LocalizedText _createHintText = default!;
+        [SerializeField] Button _createButton = default!;
+        [SerializeField] Button _cancelButton = default!;
 
         private bool IsSaveToAudioDirectory => _sameDirectoryCheckBox.Value.GetValueOrDefault();
 

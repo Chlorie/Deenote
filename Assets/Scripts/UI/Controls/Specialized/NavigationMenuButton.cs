@@ -13,7 +13,7 @@ namespace Deenote.UI.Controls.Specialized
         [SerializeField] LocalizedText _headerText = default!;
         [SerializeField] Toggle _toggleButton = default!;
 
-        [SerializeField] GameObject _navPageGameObject;
+        [SerializeField] GameObject _navPageGameObject = default!;
 
         private void Awake()
         {
