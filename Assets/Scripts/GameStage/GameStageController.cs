@@ -27,14 +27,12 @@ namespace Deenote.GameStage
 
         [SerializeField] private StageNoteManager _stageNoteManager;
 
-        [Header("Settings")]
-        private ChartModel? _chart;
-
         /// <remarks>
         /// If music is paused, maually set music time by this value,
         /// <br />
         /// If playing, this value should sync to _musicSource.velocity
         /// </remarks>
+        [Header("Settings")]
         [SerializeField] private float _manualPlaySpeedMultiplier;
 
         [Inject] private MusicController _musicController = null!;
@@ -48,7 +46,7 @@ namespace Deenote.GameStage
         /// <summary>
         /// Maybe null if ProjectManager.CurrentProject is null
         /// </summary>
-        public ChartModel Chart => _chart;
+        public ChartModel? Chart { get; private set; }
 
         public bool IsActive => Chart is not null;
 
@@ -95,16 +93,17 @@ namespace Deenote.GameStage
         public void LoadChartInCurrentProject(ChartModel? chart)
         {
             if (chart is null) {
-                _chart = chart!;
+                Chart = chart!;
                 _propertyChangeNotifier.Invoke(this, NotifyProperty.CurrentChart);
                 return;
             }
 
-            Debug.Assert(MainSystem.ProjectManager.CurrentProject.Charts.Contains(chart));
+            Debug.Assert(MainSystem.ProjectManager.CurrentProject is not null);
+            Debug.Assert(MainSystem.ProjectManager.CurrentProject!.Charts.Contains(chart));
 
             _musicController.Stop();
             _musicController.Time = 0f;
-            _chart = chart!;
+            Chart = chart!;
             _stageNoteManager.ResetIndices();
 
             CheckCollision();
@@ -115,12 +114,12 @@ namespace Deenote.GameStage
 
             void CheckCollision()
             {
-                for (int i = 0; i < _chart.Notes.Count; i++) {
-                    if (_chart.Notes[i] is not NoteModel note)
+                for (int i = 0; i < Chart.Notes.Count; i++) {
+                    if (Chart.Notes[i] is not NoteModel note)
                         continue;
 
-                    for (int j = i + 1; j < _chart.Notes.Count; j++) {
-                        if (_chart.Notes[j] is not NoteModel noteCmp)
+                    for (int j = i + 1; j < Chart.Notes.Count; j++) {
+                        if (Chart.Notes[j] is not NoteModel noteCmp)
                             continue;
 
                         if (!MainSystem.Args.IsTimeCollided(note.Data, noteCmp.Data))
@@ -170,6 +169,8 @@ namespace Deenote.GameStage
         /// </param>
         private void SearchForNotesOnStage(float oldTime, float newTime)
         {
+            if (Chart is null)
+                return;
             Debug.Assert(newTime == CurrentMusicTime);
 
             if (newTime > oldTime) OnPlayForward();
@@ -203,7 +204,7 @@ namespace Deenote.GameStage
                 else {
                     int iController = 0;
                     for (int i = _stageNoteManager.NextDisappearNoteIndex; i < newNextDisappearNoteIndex; i++) {
-                        IStageNoteModel note = _chart.Notes[i];
+                        IStageNoteModel note = Chart.Notes[i];
                         if (note is NoteTailModel noteTail) {
                             // For note tail
                             NoteModel noteHead = noteTail.HeadModel;
@@ -240,7 +241,7 @@ namespace Deenote.GameStage
                 IterateNotesUntil(ref newNextHitNoteIndex, CurrentMusicTime);
                 int newCombo = _stageNoteManager.CurrentCombo;
                 for (int i = _stageNoteManager.NextHitNoteIndex; i < newNextHitNoteIndex; i++) {
-                    var note = _chart.Notes[i];
+                    var note = Chart.Notes[i];
                     if (note.IsComboNote())
                         _stageNoteManager.CurrentCombo++;
                 }
@@ -256,7 +257,7 @@ namespace Deenote.GameStage
                 IterateNotesUntil(ref newNextAppearNoteIndex, appearNoteTime);
 
                 for (int i = appendStartIndex; i < newNextAppearNoteIndex; i++) {
-                    IStageNoteModel note = _chart.Notes[i];
+                    IStageNoteModel note = Chart.Notes[i];
                     if (note is NoteTailModel noteTail) {
                         // For note tail
                         NoteModel noteHead = noteTail.HeadModel;
@@ -285,8 +286,8 @@ namespace Deenote.GameStage
 
                 void IterateNotesUntil(ref int index, float compareTime)
                 {
-                    for (; index < _chart.Notes.Count; index++) {
-                        var note = _chart.Notes[index];
+                    for (; index < Chart.Notes.Count; index++) {
+                        var note = Chart.Notes[index];
                         if (note.Time > compareTime)
                             break;
                     }
@@ -314,7 +315,7 @@ namespace Deenote.GameStage
                 else {
                     int iController = _stageNoteManager.OnStageNotes.Length - 1;
                     for (int i = _stageNoteManager.NextAppearNoteIndex - 1; i >= newNextAppearNoteIndex; i--) {
-                        IStageNoteModel note = _chart.Notes[i];
+                        IStageNoteModel note = Chart.Notes[i];
                         if (note is NoteModel) {
                             iController--;
                         }
@@ -331,7 +332,7 @@ namespace Deenote.GameStage
                 IterateNotesUntil(ref newNextHitNoteIndex, CurrentMusicTime);
                 int newCombo = _stageNoteManager.CurrentCombo;
                 for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= newNextHitNoteIndex; i--) {
-                    var note = _chart.Notes[i];
+                    var note = Chart.Notes[i];
                     if (note.IsComboNote())
                         _stageNoteManager.CurrentCombo--;
                 }
@@ -347,7 +348,7 @@ namespace Deenote.GameStage
 
                 using var _n = ListPool<NoteModel>.Get(out var buffer);
                 for (int i = prependStartIndex - 1; i >= newNextDisappearNoteIndex; i--) {
-                    IStageNoteModel note = _chart.Notes[i];
+                    IStageNoteModel note = Chart.Notes[i];
                     if (note is NoteTailModel noteTail) {
                         // For note tail
                         NoteModel noteHead = noteTail.HeadModel;
@@ -373,7 +374,7 @@ namespace Deenote.GameStage
                 {
                     index--;
                     for (; index >= 0; index--) {
-                        var note = _chart.Notes[index];
+                        var note = Chart.Notes[index];
                         if (note.Time <= compareTime) {
                             break;
                         }
@@ -389,6 +390,7 @@ namespace Deenote.GameStage
         /// </summary>
         private void SearchForNotesFromStart()
         {
+            Debug.Assert(Chart is not null);
             _stageNoteManager.ClearAll();
 
             var appearNoteTime = CurrentMusicTime + StageNoteAheadTime;
@@ -396,16 +398,16 @@ namespace Deenote.GameStage
             int index = 0;
             int combo = 0;
 
-            for (; index < _chart.Notes.Count; index++) {
-                var note = _chart.Notes[index];
+            for (; index < Chart!.Notes.Count; index++) {
+                var note = Chart.Notes[index];
                 if (note.Time > disappearNoteTime)
                     break;
                 AdjustCombo(note);
             }
             _stageNoteManager.NextDisappearNoteIndex = index;
 
-            for (; index < _chart.Notes.Count; index++) {
-                var note = _chart.Notes[index];
+            for (; index < Chart.Notes.Count; index++) {
+                var note = Chart.Notes[index];
                 if (note.Time > CurrentMusicTime)
                     break;
                 AdjustCombo(note);
@@ -414,8 +416,8 @@ namespace Deenote.GameStage
             _stageNoteManager.NextHitNoteIndex = index;
             _stageNoteManager.CurrentCombo = combo;
 
-            for (; index < _chart.Notes.Count; ++index) {
-                var note = _chart.Notes[index];
+            for (; index < Chart.Notes.Count; ++index) {
+                var note = Chart.Notes[index];
                 if (note.Time > appearNoteTime)
                     break;
                 AdjustDisplay(note);
@@ -489,6 +491,8 @@ namespace Deenote.GameStage
 
         private void UpdateJudgeLineHitEffect()
         {
+            Debug.Assert(Chart is not null);
+
             var previousHitNote = GetPreviousHitNote();
             if (previousHitNote is null) {
                 _judgeLineHitEffectSpriteRenderer.color = Color.clear;
@@ -511,7 +515,7 @@ namespace Deenote.GameStage
             NoteModel? GetPreviousHitNote()
             {
                 for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= 0; i--) {
-                    if (_chart.Notes[i] is NoteModel noteModel) {
+                    if (Chart!.Notes[i] is NoteModel noteModel) {
                         return noteModel;
                     }
                 }
@@ -530,10 +534,11 @@ namespace Deenote.GameStage
         public IStageNoteModel? PrevHitNote
         {
             get {
+                Debug.Assert(Chart is not null);
                 // Most of time the first note is the result, so the for loop is acceptable
                 // When a hold head just reached judge line, it may require iteration.
                 for (int i = _stageNoteManager.NextHitNoteIndex - 1; i >= 0; i--) {
-                    var note = _chart.Notes[i];
+                    var note = Chart!.Notes[i];
                     if (note.IsComboNote())
                         return note;
                 }
@@ -589,7 +594,7 @@ namespace Deenote.GameStage
 
             MainSystem.ProjectManager.RegisterPropertyChangeNotification(
                 Project.ProjectManager.NotifyProperty.Audio,
-                projm => _musicController.ReplaceClip(new DecodedClipProvider(projm.CurrentProject.AudioClip)));
+                projm => _musicController.ReplaceClip(new DecodedClipProvider(projm.CurrentProject!.AudioClip)));
         }
 
         private void Update()

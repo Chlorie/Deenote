@@ -25,6 +25,8 @@ namespace Deenote.Project
 
         public void EditProjectMusicName(string name)
         {
+            if (CurrentProject is null)
+                return;
             CurrentProject.MusicName = name;
 
             _propertyChangeNotifier.Invoke(this, NotifyProperty.MusicName);
@@ -32,6 +34,8 @@ namespace Deenote.Project
 
         public void EditProjectComposer(string composerName)
         {
+            if (CurrentProject is null)
+                return;
             CurrentProject.Composer = composerName;
 
             _propertyChangeNotifier.Invoke(this, NotifyProperty.Composer);
@@ -39,6 +43,8 @@ namespace Deenote.Project
 
         public void EditProjectChartDesigner(string charterName)
         {
+            if (CurrentProject is null)
+                return;
             CurrentProject.ChartDesigner = charterName;
 
             _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartDesigner);
@@ -46,18 +52,24 @@ namespace Deenote.Project
 
         public void AddProjectChart(ChartModel chart)
         {
+            if (CurrentProject is null)
+                return;
             CurrentProject.Charts.Add(chart);
             _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartList);
         }
 
         public void RemoveProjectChartAt(int chartIndex)
         {
+            if (CurrentProject is null)
+                return;
             CurrentProject.Charts.RemoveAt(chartIndex);
             _propertyChangeNotifier.Invoke(this, NotifyProperty.ChartList);
         }
 
-        internal IUndoableOperation DoInsertTempoOperation(Tempo tempo, float endTime)
+        internal IUndoableOperation? DoInsertTempoOperation(Tempo tempo, float endTime)
         {
+            if (CurrentProject is null)
+                return null;
             return CurrentProject.Tempos.InsertTempo(tempo, endTime)
                 .WithDoneAction(() => _propertyChangeNotifier.Invoke(this, NotifyProperty.Tempos));
         }

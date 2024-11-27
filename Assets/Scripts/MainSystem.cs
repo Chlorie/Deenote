@@ -23,20 +23,20 @@ namespace Deenote
         private readonly ResolutionAdjuster _resolutionAdjuster = new();
 
         [Header("System")]
-        [SerializeField] InputController _inputController;
+        [SerializeField] InputController _inputController = default!;
 
-        [SerializeField] ProjectManager _projectManager;
-        [SerializeField] GameStageController _gameStageController;
-        [SerializeField] EditorController _editorController;
-        [SerializeField] PianoSoundManager _pianoSoundManager;
+        [SerializeField] ProjectManager _projectManager = default!;
+        [SerializeField] GameStageController _gameStageController = default!;
+        [SerializeField] EditorController _editorController = default!;
+        [SerializeField] PianoSoundManager _pianoSoundManager = default!;
 
         [Header("UI")]
-        [SerializeField] StatusBarView _statusBarView;
-        [SerializeField] NewProjectDialog _newProjectDialog;
-        [SerializeField] FileExplorerDialog _fileExplorerDialog;
-        [SerializeField] MessageBoxDialog _messageBoxDialog;
-        [SerializeField] PreferencesDialog _preferencesDialog;
-        [SerializeField] AboutDialog _aboutDialog;
+        [SerializeField] StatusBarView _statusBarView = default!;
+        [SerializeField] NewProjectDialog _newProjectDialog = default!;
+        [SerializeField] FileExplorerDialog _fileExplorerDialog = default!;
+        [SerializeField] MessageBoxDialog _messageBoxDialog = default!;
+        [SerializeField] PreferencesDialog _preferencesDialog = default!;
+        [SerializeField] AboutDialog _aboutDialog = default!;
 
         [Inject] private LocalizationSystem _localizationSystem = null!;
 
@@ -46,7 +46,7 @@ namespace Deenote
 
         public static LocalizationSystem Localization => Instance._localizationSystem;
         public static InputController Input => Instance._inputController;
-        
+
         public static ProjectManager ProjectManager => Instance._projectManager;
         public static GameStageController GameStage => Instance._gameStageController;
         public static EditorController Editor => Instance._editorController;

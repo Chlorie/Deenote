@@ -32,6 +32,9 @@ namespace Deenote.Edit
 
         public void SelectAllNotes()
         {
+            if (Stage.Chart is null)
+                return;
+
             _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
             _noteSelectionController.ClearSelection();
             foreach (var note in Stage.Chart.Notes.EnumerateSelectableModels()) {

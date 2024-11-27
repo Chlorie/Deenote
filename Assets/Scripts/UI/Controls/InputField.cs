@@ -1,5 +1,7 @@
 #nullable enable
 
+using Deenote.UI.ComponentModel;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using TMPro;
 using UnityEngine;
@@ -40,5 +42,12 @@ namespace Deenote.UI.Controls
 
         public void SetValueWithoutNotify([AllowNull] string value)
             => _input.SetTextWithoutNotify(value!);
+
+        public void BindOnEndEdit<TNotifiable, TFlag>(TNotifiable notifiable, TFlag flag, UnityAction<TNotifiable, string> setter, Func<TNotifiable, string> getter)
+            where TNotifiable : INotifyPropertyChange<TNotifiable, TFlag>
+        {
+            OnEndEdit.AddListener(val => setter(notifiable, val));
+            notifiable.RegisterPropertyChangeNotificationAndInvoke(flag, notifiable => SetValueWithoutNotify(getter(notifiable)));
+        }
     }
 }

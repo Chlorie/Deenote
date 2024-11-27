@@ -2,6 +2,7 @@
 
 using CommunityToolkit.HighPerformance.Buffers;
 using Deenote.Edit.Elements;
+using Deenote.GameStage;
 using Deenote.Project.Comparers;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
@@ -156,6 +157,8 @@ namespace Deenote.Edit
 
         public void EndPlaceNote(NoteCoord coord)
         {
+            if (Stage.Chart is null)
+                return;
             switch (_placeState) {
                 case PlacementState.Pasting: PasteNote(); break;
                 case PlacementState.Placing: PlaceNote(); break;
@@ -453,6 +456,8 @@ namespace Deenote.Edit
 
         public void RemoveSelectedNotes()
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -476,8 +481,10 @@ namespace Deenote.Edit
             NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
         }
 
-        public void AddNotesSnappingToCurve(int count)
+        public void AddNotesSnappingToCurve(int count, ReadOnlySpan<GridController.CurveApplyProperty> applyProperties = default)
         {
+            if (Stage.Chart is null)
+                return;
             var curveTime = Stage.Grids.CurveTime;
             if (curveTime is null)
                 return;
@@ -505,6 +512,7 @@ namespace Deenote.Edit
                 }));
 
             ListPool<NoteData>.Release(list);
+            // TODO: Apply applyproperties
         }
 
         /// <summary>
@@ -598,6 +606,8 @@ namespace Deenote.Edit
 
         public void NotifyCurveGeneratedWithSelectedNotes()
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.Length < 2)
                 return;
 

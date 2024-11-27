@@ -73,7 +73,11 @@ namespace Deenote.UI.Views
 
             MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 Project.ProjectManager.NotifyProperty.MusicName,
-                projm => _musicNameText.text = _backgroundStaveText.text = projm.CurrentProject.MusicName);
+                projm =>
+                {
+                    if (projm.CurrentProject is { } proj)
+                        _musicNameText.text = _backgroundStaveText.text = proj.MusicName;
+                });
 
             MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                 Project.ProjectManager.NotifyProperty.CurrentProject,
@@ -81,11 +85,19 @@ namespace Deenote.UI.Views
 
             MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.ChartLevel,
-                stage => Level = stage.Chart.Level);
+                stage =>
+                {
+                    if (stage.Chart is { } chart)
+                        Level = chart.Level;
+                });
 
             MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.ChartDifficulty,
-                stage => Difficulty = stage.Chart.Difficulty);
+                stage =>
+                {
+                    if (stage.Chart is { } chart)
+                        Difficulty = chart.Difficulty;
+                });
 
             MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                 GameStage.GameStageController.NotifyProperty.CurrentChart,
@@ -110,13 +122,16 @@ namespace Deenote.UI.Views
                 GameStage.GameStageController.NotifyProperty.StageNotesUpdated,
                 stage => // Update score
                 {
+                    if (stage.Chart is not { } chart)
+                        return;
+
                     var currentCombo = stage.CurrentCombo;
                     if (currentCombo <= 0) {
                         _scoreText.text = "0.00 %";
                         return;
                     }
 
-                    int noteCount = stage.Chart.Notes.NoteCount;
+                    int noteCount = chart.Notes.NoteCount;
                     float accScore = (float)currentCombo / noteCount;
                     // comboActual = Sum(1..judgeNoteCount);
                     // comboTotal = Sum(1..noteCount)

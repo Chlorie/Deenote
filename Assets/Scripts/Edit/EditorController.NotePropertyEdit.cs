@@ -21,6 +21,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesPositionCoord(Func<NoteCoord, NoteCoord> valueSelector)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -36,6 +38,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesTime(Func<float, float> valueSelector)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -51,6 +55,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesTime(float newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -66,6 +72,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesPosition(Func<float, float> valueSelector)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -80,6 +88,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesPosition(float newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -94,6 +104,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesSize(Func<float, float> valueSelector)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -109,6 +121,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesSize(float newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -123,6 +137,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesShift(float newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -137,6 +153,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesSpeed(float newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -151,6 +169,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesDuration(float newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -165,6 +185,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesVibrate(bool newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -179,6 +201,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesIsSwipe(bool newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -193,6 +217,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesKind(NoteData.NoteKind kind)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -262,6 +288,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesWarningType(WarningType newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -276,6 +304,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNotesEventId(string newValue)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -294,6 +324,8 @@ namespace Deenote.Edit
 
         public void LinkSelectedNotes()
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -312,6 +344,8 @@ namespace Deenote.Edit
 
         public void UnlinkSelectedNotes()
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -330,6 +364,8 @@ namespace Deenote.Edit
 
         public void SoundifySelectedNotes()
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
             using var _en = ListPool<NoteModel>.Get(out var editNotes);
@@ -349,6 +385,8 @@ namespace Deenote.Edit
 
         public void DesoundifySelectedNotes()
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 
@@ -364,6 +402,9 @@ namespace Deenote.Edit
 
         public void ApplySelectedNotesWithCurveTransform(GridController.CurveApplyProperty property)
         {
+            if (Stage.Chart is null)
+                return;
+
             IUndoableOperation operation = property switch {
                 GridController.CurveApplyProperty.Size => Stage.Chart.Notes.EditNotes(SelectedNotes,
                     v => MainSystem.GameStage.Grids.GetCurveTransformedValue(v, GridController.CurveApplyProperty.Size) ?? v,
@@ -388,6 +429,8 @@ namespace Deenote.Edit
 
         public void EditSelectedNoteSounds(ReadOnlySpan<PianoSoundValueData> values)
         {
+            if (Stage.Chart is null)
+                return;
             if (SelectedNotes.IsEmpty)
                 return;
 

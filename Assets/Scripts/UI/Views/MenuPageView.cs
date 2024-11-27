@@ -125,8 +125,11 @@ namespace Deenote.UI.Views
             });
             _saveButton.OnClick.AddListener(async UniTaskVoid () =>
             {
+                Debug.Assert(MainSystem.ProjectManager.CurrentProject is not null);
+                var proj = MainSystem.ProjectManager.CurrentProject!;
+
                 await MainSystem.ProjectManager.SaveCurrentProjectAsync();
-                AddToRecentFile(MainSystem.ProjectManager.CurrentProject.ProjectFilePath);
+                AddToRecentFile(proj.ProjectFilePath);
                 MainSystem.StatusBarView.SetStatusMessage(LocalizableText.Localized("SaveProject_Status_Saved"));
             });
             _saveAsButton.OnClick.AddListener(async UniTaskVoid () =>

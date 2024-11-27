@@ -4,6 +4,7 @@ using Deenote.GameStage;
 using Deenote.Project.Models;
 using Deenote.UI.ComponentModel;
 using Deenote.UI.Controls;
+using System;
 using UnityEngine;
 
 namespace Deenote.UI.Views
@@ -45,14 +46,18 @@ namespace Deenote.UI.Views
         {
             // Stage
             {
+                // Music Speed
+
                 _musicSpeedProperty.InputParser = static input => float.TryParse(input, out var val) ? Mathf.RoundToInt(val * 2) : null;
                 _musicSpeedProperty.DisplayTextSelector = static ival => ival % 2 == 0 ? $"{ival / 2}.0" : $"{ival / 2}.5";
                 _musicSpeedProperty.OnValueChanged.AddListener(val => MainSystem.GameStage.MusicSpeed = val);
-                _showIndicatorProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.IsNoteIndicatorOn = val ?? false);
-
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.MusicSpeed,
                     stage => _musicSpeedProperty.SetValueWithoutNotify(stage.MusicSpeed));
+
+                // Show Indicator
+
+                _showIndicatorProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.IsNoteIndicatorOn = val ?? false);
                 MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.IsIndicatorOn,
                     editor => _showIndicatorProperty.CheckBox.SetValueWithoutNotify(editor.IsNoteIndicatorOn));
@@ -60,6 +65,8 @@ namespace Deenote.UI.Views
 
             // Grids
             {
+                // Time Grid Count
+
                 _horizontalGridCountProperty.InputField.OnEndEdit.AddListener(val =>
                 {
                     if (int.TryParse(val, out var ival))
@@ -67,6 +74,12 @@ namespace Deenote.UI.Views
                     else
                         _horizontalGridCountProperty.InputField.SetValueWithoutNotify(MainSystem.GameStage.Grids.TimeGridSubBeatCount.ToString());
                 });
+                MainSystem.GameStage.Grids.RegisterPropertyChangeNotificationAndInvoke(
+                    GameStage.GridController.NotifyProperty.TimeGridSubBeatCount,
+                    grids => _horizontalGridCountProperty.InputField.SetValueWithoutNotify(grids.TimeGridSubBeatCount.ToString()));
+            
+                // Position Grid count
+
                 _verticalGridCountProperty.InputField.OnEndEdit.AddListener(val =>
                 {
                     if (int.TryParse(val, out var ival))
@@ -74,18 +87,20 @@ namespace Deenote.UI.Views
                     else
                         _verticalGridCountProperty.InputField.SetValueWithoutNotify(MainSystem.GameStage.Grids.VerticalGridCount.ToString());
                 });
-                _horizontalGridSnapProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.SnapToTimeGrid = val ?? false);
-                _verticalGridSnapProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.SnapToPositionGrid = val ?? false);
-
-                MainSystem.GameStage.Grids.RegisterPropertyChangeNotificationAndInvoke(
-                    GameStage.GridController.NotifyProperty.TimeGridSubBeatCount,
-                    grids => _horizontalGridCountProperty.InputField.SetValueWithoutNotify(grids.TimeGridSubBeatCount.ToString()));
                 MainSystem.GameStage.Grids.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GridController.NotifyProperty.VerticalGridCount,
                     grids => _verticalGridCountProperty.InputField.SetValueWithoutNotify(grids.VerticalGridCount.ToString()));
+               
+                // Time snap
+
+                _horizontalGridSnapProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.SnapToTimeGrid = val ?? false);
                 MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.SnapToTimeGrid,
                     editor => _horizontalGridSnapProperty.CheckBox.SetValueWithoutNotify(editor.SnapToTimeGrid));
+           
+                // Position snap
+
+                _verticalGridSnapProperty.CheckBox.OnValueChanged.AddListener(val => MainSystem.Editor.SnapToPositionGrid = val ?? false);
                 MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.SnapToPositionGrid,
                     editor => _verticalGridSnapProperty.CheckBox.SetValueWithoutNotify(editor.SnapToPositionGrid));
@@ -108,6 +123,10 @@ namespace Deenote.UI.Views
                     MainSystem.Editor.NotifyCurveGeneratedWithSelectedNotes();
                 });
                 _curveDisableButton.OnClick.AddListener(MainSystem.GameStage.Grids.HideCurve);
+                MainSystem.GameStage.Grids.RegisterPropertyChangeNotificationAndInvoke(
+                    GameStage.GridController.NotifyProperty.IsCurveOn,
+                    grids => _curveDisableButton.IsInteractable = grids.IsCurveOn);
+          
                 _curveFillAmountInput.OnEndEdit.AddListener(val =>
                 {
                     if (int.TryParse(val, out var ival)) {
@@ -121,17 +140,25 @@ namespace Deenote.UI.Views
                     }
                     _curveFillAmountInput.SetValueWithoutNotify(_curveFillAmount.ToString());
                 });
-                _curveFillButton.OnClick.AddListener(() => MainSystem.Editor.AddNotesSnappingToCurve(_curveFillAmount));
+                _curveFillButton.OnClick.AddListener(() =>
+                {
+                    Span<GridController.CurveApplyProperty> applyProps = stackalloc GridController.CurveApplyProperty[2];
+                    int index = 0;
+                    if (_curveAutoApplySize)
+                        applyProps[index++] = GridController.CurveApplyProperty.Size;
+                    if (_curveAutoApplySpeed)
+                        applyProps[index++] = GridController.CurveApplyProperty.Speed;
+
+                    MainSystem.Editor.AddNotesSnappingToCurve(_curveFillAmount, applyProps[..index]);
+                });
                 _curveSizeApplyProperty.Button.OnClick.AddListener(
                     () => MainSystem.Editor.ApplySelectedNotesWithCurveTransform(GridController.CurveApplyProperty.Size));
                 _curveSizeAutoApplyProperty.CheckBox.OnValueChanged.AddListener(val => _curveAutoApplySize = val ?? false);
+
                 _curveSpeedApplyProperty.Button.OnClick.AddListener(
                     () => MainSystem.Editor.ApplySelectedNotesWithCurveTransform(GridController.CurveApplyProperty.Speed));
                 _curveSpeedAutoApplyProperty.CheckBox.OnValueChanged.AddListener(val => _curveAutoApplySpeed = val ?? false);
 
-                MainSystem.GameStage.Grids.RegisterPropertyChangeNotificationAndInvoke(
-                    GameStage.GridController.NotifyProperty.IsCurveOn,
-                    grids => _curveDisableButton.IsInteractable = grids.IsCurveOn);
                 MainSystem.Editor.RegisterPropertyChangeNotificationAndInvoke(
                     Edit.EditorController.NotifyProperty.SelectedNotes,
                     editor =>

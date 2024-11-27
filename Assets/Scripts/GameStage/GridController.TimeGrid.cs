@@ -27,7 +27,7 @@ namespace Deenote.GameStage
             }
         }
 
-        private ProjectModel.TempoListProxy CurrentProjectTempos => MainSystem.ProjectManager.CurrentProject.Tempos;
+        private ProjectModel.TempoListProxy CurrentProjectTempos => MainSystem.ProjectManager.CurrentProject!.Tempos;
 
         private void DrawTimeGrids()
         {

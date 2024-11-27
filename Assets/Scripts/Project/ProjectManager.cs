@@ -3,6 +3,7 @@
 using Cysharp.Threading.Tasks;
 using Deenote.Project.Models;
 using Deenote.Utilities;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -12,9 +13,9 @@ namespace Deenote.Project
     {
         private ProjectModel? __currentProject;
         /// <summary>
-        /// Maybe null on loading project
+        /// Maybe null on application start or loading project
         /// </summary>
-        public ProjectModel CurrentProject
+        public ProjectModel? CurrentProject
         {
             get => __currentProject;
             set {
@@ -59,12 +60,23 @@ namespace Deenote.Project
         }
 
         public UniTask SaveCurrentProjectAsync()
-            => SaveCurrentProjectToAsync(CurrentProject.ProjectFilePath);
-
-        public async UniTask SaveCurrentProjectToAsync(string targetFilePath)
         {
             if (CurrentProject is null)
-                return;
+                throw new InvalidOperationException("Cannot save project, current project is null");
+            return SaveCurrentProjectToAsync(CurrentProject.ProjectFilePath);
+        }
+
+        public UniTask SaveCurrentProjectToAsync(string targetFilePath)
+        {
+            if (CurrentProject is null)
+                throw new InvalidOperationException("Cannot save project, current project is null");
+            return SaveCurrentProjectInternalAsync(targetFilePath);
+        }
+
+        private async UniTask SaveCurrentProjectInternalAsync(string targetFilePath)
+        {
+            Debug.Assert(CurrentProject is not null);
+            var curProject = CurrentProject!;
 
             // TODO: Handle AudioFileRelativePath ?
 
@@ -75,8 +87,8 @@ namespace Deenote.Project
             //else {
             //}
 
-            await SaveAsync(CurrentProject, targetFilePath);
-            ProjectModel.InitializationHelper.SetProjectFilePath(CurrentProject, targetFilePath);
+            await SaveAsync(curProject, targetFilePath);
+            ProjectModel.InitializationHelper.SetProjectFilePath(curProject, targetFilePath);
         }
     }
 }

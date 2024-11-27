@@ -25,8 +25,11 @@ namespace Deenote.Edit.Operations
             _count = 0;
         }
 
-        public void Do(IUndoableOperation operation)
+        public void Do(IUndoableOperation? operation)
         {
+            if (operation is null)
+                return;
+
             // Add and ignore previous undone operations
             if (_currentOffset < _count) {
                 _operations[ActualIndex(_currentOffset)] = operation;

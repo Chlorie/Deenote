@@ -1,6 +1,7 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
+using Deenote.GameStage;
 using Deenote.Localization;
 using Deenote.Project.Models;
 using Deenote.Project.Models.Datas;
@@ -38,7 +39,7 @@ namespace Deenote.UI.Views
         [SerializeField] KVRangeInputProperty _chartRemapVolumeProperty = default!;
 
         [Header("Prefabs")]
-        [SerializeField] ChartListItem _chartListItemPrefab;
+        [SerializeField] ChartListItem _chartListItemPrefab = default!;
         private PooledObjectListView<ChartListItem> _charts;
 
         private static readonly MessageBoxArgs _loadAudioFailedMsgBoxArgs = new(
@@ -97,19 +98,56 @@ namespace Deenote.UI.Views
                 _projectComposerProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectComposer);
                 _projectChartDesignerProperty.InputField.OnEndEdit.AddListener(MainSystem.ProjectManager.EditProjectChartDesigner);
 
-                // TODO: 如果是在加载中第一次打开这个页面，currentproject 是null
+                MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
+                    Project.ProjectManager.NotifyProperty.CurrentProject,
+                    projm =>
+                    {
+                        var proj = projm.CurrentProject;
+                        if (proj is null) {
+                            _noProjectLoadedTextGameObject.SetActive(true);
+                            _projectInfoCollapsable.gameObject.SetActive(false);
+                            _chartInfoCollapsable.gameObject.SetActive(false);
+                        }
+                        else {
+                            _noProjectLoadedTextGameObject.SetActive(false);
+                            _projectInfoCollapsable.gameObject.SetActive(true);
+                            _chartInfoCollapsable.gameObject.SetActive(true);
+                            NotifyAudioFileChanged(proj);
+                            _projectMusicNameProperty.InputField.SetValueWithoutNotify(proj.MusicName);
+                            _projectComposerProperty.InputField.SetValueWithoutNotify(proj.Composer);
+                            _projectChartDesignerProperty.InputField.SetValueWithoutNotify(proj.ChartDesigner);
+                            ReloadChartList(proj);
+                        }
+                    });
+
                 MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.Audio,
-                    proj => NotifyAudioFileChanged(proj.CurrentProject));
+                    projm =>
+                    {
+                        if (projm.CurrentProject is { } proj)
+                            NotifyAudioFileChanged(projm.CurrentProject);
+                    });
                 MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.MusicName,
-                    proj => _projectMusicNameProperty.InputField.SetValueWithoutNotify(proj.CurrentProject.MusicName));
+                    projm =>
+                    {
+                        if (projm.CurrentProject is { } proj)
+                            _projectMusicNameProperty.InputField.SetValueWithoutNotify(proj.MusicName);
+                    });
                 MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.Composer,
-                    proj => _projectComposerProperty.InputField.SetValueWithoutNotify(proj.CurrentProject.Composer));
+                    projm =>
+                    {
+                        if (projm.CurrentProject is { } proj)
+                            _projectComposerProperty.InputField.SetValueWithoutNotify(proj.Composer);
+                    });
                 MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.ChartDesigner,
-                    proj => _projectChartDesignerProperty.InputField.SetValueWithoutNotify(proj.CurrentProject.ChartDesigner));
+                    projm =>
+                    {
+                        if (projm.CurrentProject is { } proj)
+                            _projectChartDesignerProperty.InputField.SetValueWithoutNotify(proj.ChartDesigner);
+                    });
             }
 
             // Project Charts
@@ -152,90 +190,96 @@ namespace Deenote.UI.Views
                 // Notify chart list changed
                 MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
                     Project.ProjectManager.NotifyProperty.ChartList,
-                    projm => ReloadCharts(projm.CurrentProject));
+                    projm =>
+                    {
+                        if (projm.CurrentProject is { } proj)
+                            ReloadChartList(proj);
+                    });
             }
-
-            MainSystem.ProjectManager.RegisterPropertyChangeNotificationAndInvoke(
-                Project.ProjectManager.NotifyProperty.CurrentProject,
-                projm =>
-                {
-                    var proj = projm.CurrentProject;
-                    if (proj is null) {
-                        _noProjectLoadedTextGameObject.SetActive(true);
-                        _projectInfoCollapsable.gameObject.SetActive(false);
-                    }
-                    else {
-                        _noProjectLoadedTextGameObject.SetActive(false);
-                        _projectInfoCollapsable.gameObject.SetActive(true);
-                        NotifyAudioFileChanged(proj);
-                        _projectMusicNameProperty.InputField.SetValueWithoutNotify(proj.MusicName);
-                        _projectComposerProperty.InputField.SetValueWithoutNotify(proj.Composer);
-                        _projectChartDesignerProperty.InputField.SetValueWithoutNotify(proj.ChartDesigner);
-                        ReloadCharts(proj);
-                    }
-                });
 
             // Chart properties
             {
                 _chartNameProperty.InputField.OnEndEdit.AddListener(MainSystem.GameStage.EditChartName);
-                _chartDifficultyProperty.Dropdown.ResetOptions(DifficultyExt.DropdownOptions.AsSpan());
-                _chartDifficultyProperty.Dropdown.OnValueChanged.AddListener(
-                    val => MainSystem.GameStage.EditChartDifficulty(DifficultyExt.FromInt32(val)));
-                _chartLevelProperty.InputField.OnEndEdit.AddListener(MainSystem.GameStage.EditChartLevel);
-                _chartSpeedProperty.InputField.OnEndEdit.AddListener(val =>
-                {
-                    if (float.TryParse(val, out var fval))
-                        MainSystem.GameStage.EditChartSpeed(fval);
-                    else
-                        _chartSpeedProperty.InputField.SetValueWithoutNotify(MainSystem.GameStage.Chart.Data.Speed.ToString("F3"));
-                });
-                _chartRemapVolumeProperty.LowerInputField.OnEndEdit.AddListener(val =>
-                {
-                    if (int.TryParse(val, out var ival))
-                        MainSystem.GameStage.EditChartRemapVMin(ival);
-                    else
-                        _chartRemapVolumeProperty.LowerInputField.SetValueWithoutNotify(MainSystem.GameStage.Chart.Data.RemapMinVelocity.ToString());
-                });
-                _chartRemapVolumeProperty.UpperInputField.OnEndEdit.AddListener(val =>
-                {
-                    if (int.TryParse(val, out var ival))
-                        MainSystem.GameStage.EditChartRemapVMax(ival);
-                    else
-                        _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(MainSystem.GameStage.Chart.Data.RemapMaxVelocity.ToString());
-                });
-
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartName,
                     stage =>
                     {
-                        _chartNameProperty.InputField.SetValueWithoutNotify(stage.Chart.Name ?? "");
-                        RefreshCharts();
+                        if (stage.Chart is { } chart) {
+                            _chartNameProperty.InputField.SetValueWithoutNotify(chart.Name ?? "");
+                            RefreshCharts();
+                        }
                     });
+
+                _chartDifficultyProperty.Dropdown.ResetOptions(DifficultyExt.DropdownOptions.AsSpan());
+                _chartDifficultyProperty.Dropdown.OnValueChanged.AddListener(
+                    val => MainSystem.GameStage.EditChartDifficulty(DifficultyExt.FromInt32(val)));
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartDifficulty,
                     stage =>
                     {
-                        var difficulty = stage.Chart.Difficulty;
-                        _chartDifficultyProperty.Dropdown.SetValueWithoutNotify(difficulty.ToInt32());
-                        _chartNameProperty.InputField.PlaceHolderText = difficulty.ToDisplayString();
-                        RefreshCharts();
+                        if (stage.Chart is { } chart) {
+                            var difficulty = chart.Difficulty;
+                            _chartDifficultyProperty.Dropdown.SetValueWithoutNotify(difficulty.ToInt32());
+                            _chartNameProperty.InputField.PlaceHolderText = difficulty.ToDisplayString();
+                            RefreshCharts();
+                        }
                     });
+
+                _chartLevelProperty.InputField.OnEndEdit.AddListener(MainSystem.GameStage.EditChartLevel);
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartLevel,
                     stage =>
                     {
-                        _chartLevelProperty.InputField.SetValueWithoutNotify(stage.Chart.Level);
-                        RefreshCharts();
+                        if (stage.Chart is { } chart) {
+                            _chartLevelProperty.InputField.SetValueWithoutNotify(stage.Chart.Level);
+                            RefreshCharts();
+                        }
                     });
+
+                _chartSpeedProperty.InputField.OnEndEdit.AddListener(val =>
+                {
+                    if (float.TryParse(val, out var fval))
+                        MainSystem.GameStage.EditChartSpeed(fval);
+                    else if (MainSystem.GameStage.Chart is { } chart)
+                        _chartSpeedProperty.InputField.SetValueWithoutNotify(chart.Data.Speed.ToString("F3"));
+                });
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartSpeed,
-                    stage => _chartSpeedProperty.InputField.SetValueWithoutNotify(stage.Chart.Data.Speed.ToString("F3")));
+                    stage =>
+                    {
+                        if (stage.Chart is { } chart)
+                            _chartSpeedProperty.InputField.SetValueWithoutNotify(stage.Chart.Data.Speed.ToString("F3"));
+                    });
+
+                _chartRemapVolumeProperty.LowerInputField.OnEndEdit.AddListener(val =>
+                {
+                    if (int.TryParse(val, out var ival))
+                        MainSystem.GameStage.EditChartRemapVMin(ival);
+                    else if (MainSystem.GameStage.Chart is { } chart)
+                        _chartRemapVolumeProperty.LowerInputField.SetValueWithoutNotify(chart.Data.RemapMinVelocity.ToString());
+                });
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartRemapMinVolume,
-                    stage => _chartRemapVolumeProperty.LowerInputField.SetValueWithoutNotify(stage.Chart.Data.RemapMinVelocity.ToString()));
+                    stage =>
+                    {
+                        if (stage.Chart is { } chart)
+                            _chartRemapVolumeProperty.LowerInputField.SetValueWithoutNotify(chart.Data.RemapMinVelocity.ToString());
+                    });
+
+                _chartRemapVolumeProperty.UpperInputField.OnEndEdit.AddListener(val =>
+                {
+                    if (int.TryParse(val, out var ival))
+                        MainSystem.GameStage.EditChartRemapVMax(ival);
+                    else if (MainSystem.GameStage.Chart is { } chart)
+                        _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(chart.Data.RemapMaxVelocity.ToString());
+                });
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.ChartRemapMaxVolume,
-                    stage => _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(stage.Chart.Data.RemapMaxVelocity.ToString()));
+                    stage =>
+                    {
+                        if (stage.Chart is { } chart)
+                            _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(chart.Data.RemapMaxVelocity.ToString());
+                    });
 
                 MainSystem.GameStage.RegisterPropertyChangeNotificationAndInvoke(
                     GameStage.GameStageController.NotifyProperty.CurrentChart,
@@ -247,10 +291,11 @@ namespace Deenote.UI.Views
                         else {
                             _chartInfoCollapsable.gameObject.SetActive(true);
                             var chart = stage.Chart;
-                            _chartNameProperty.InputField.PlaceHolderText = chart.Difficulty.ToDisplayString();
                             _chartNameProperty.InputField.SetValueWithoutNotify(chart.Name);
+                            _chartNameProperty.InputField.PlaceHolderText = chart.Difficulty.ToDisplayString();
                             _chartDifficultyProperty.Dropdown.SetValueWithoutNotify(chart.Difficulty.ToInt32());
                             _chartLevelProperty.InputField.SetValueWithoutNotify(chart.Level);
+                            _chartSpeedProperty.InputField.SetValueWithoutNotify(chart.Data.Speed.ToString("F3"));
                             _chartRemapVolumeProperty.LowerInputField.SetValueWithoutNotify(chart.Data.RemapMinVelocity.ToString());
                             _chartRemapVolumeProperty.UpperInputField.SetValueWithoutNotify(chart.Data.RemapMaxVelocity.ToString());
                         }
@@ -259,12 +304,11 @@ namespace Deenote.UI.Views
 
             void NotifyAudioFileChanged(ProjectModel proj)
             {
-                // TODO: proj为null时报错
                 _projectAudioProperty.Button.Text.SetRawText(Path.GetFileName(proj.AudioFileRelativePath));
                 _projectAudioProperty.Button.Text.Text.horizontalAlignment = HorizontalAlignmentOptions.Left;
             }
 
-            void ReloadCharts(ProjectModel proj)
+            void ReloadChartList(ProjectModel proj)
             {
                 using (var resettingCharts = _charts.Resetting(proj.Charts.Count)) {
                     foreach (var chart in proj.Charts) {
@@ -296,7 +340,7 @@ namespace Deenote.UI.Views
             int findIndex = _charts.IndexOf(item);
             Debug.Assert(findIndex >= 0, $"Try to remove a {nameof(ChartListItem)} that is not in the list");
             _charts.RemoveAt(findIndex);
-            Debug.Assert(ReferenceEquals(item.Chart, MainSystem.ProjectManager.CurrentProject.Charts[findIndex]),
+            Debug.Assert(ReferenceEquals(item.Chart, MainSystem.ProjectManager.CurrentProject?.Charts[findIndex]),
                 "Chart in ProjectInfo page and in current project not match");
             MainSystem.ProjectManager.RemoveProjectChartAt(findIndex);
         }
