@@ -116,7 +116,7 @@ namespace Deenote.GameStage
 
         private void Awake()
         {
-            _audioPlayerPool = UnityUtils.CreateObjectPool(_audioPlayerPrefab, _audioPlayerParentTransform, 0);
+            _audioPlayerPool = UnityUtils.CreateObjectPool(_audioPlayerPrefab, _audioPlayerParentTransform, defaultCapacity: 0);
         }
     }
 }

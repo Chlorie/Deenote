@@ -3,6 +3,7 @@
 using Deenote.Settings;
 using Deenote.UI;
 using Deenote.UI.ComponentModel;
+using Deenote.UI.Themes;
 using System;
 using UnityEngine;
 
@@ -13,12 +14,26 @@ namespace Deenote
         [Header("Args")]
         [SerializeField] GameStageViewArgs _gameStageViewArgs = default!;
         [SerializeField] KnownIconsArgs _knownIconsArgs = default!;
-
+        [SerializeField] UIColors _uiColors = default!;
+        [SerializeField] UIPrefabs _uIPrefabs = default!;
         partial class Args
         {
             public static GameStageViewArgs GameStageViewArgs => Instance._gameStageViewArgs;
 
             public static KnownIconsArgs KnownIconsArgs => Instance._knownIconsArgs;
+
+            public static UIColors UIColors
+#if UNITY_EDITOR
+            { get; } = UnityEditor.AssetDatabase.LoadAssetAtPath<UIColors>("Assets/ScriptableObjects/UI/UIColors.asset");
+#else
+                => Instance._uiColors;
+#endif
+            public static UIPrefabs UIPrefabs
+#if UNITY_EDITOR
+            { get; } = UnityEditor.AssetDatabase.LoadAssetAtPath<UIPrefabs>("Assets/ScriptableObjects/UI/UIPrefabs.asset");
+#else
+                => Instance._uiPrefabs;
+#endif
         }
 
         public sealed class Settings : INotifyPropertyChange<Settings, Settings.NotifyProperty>

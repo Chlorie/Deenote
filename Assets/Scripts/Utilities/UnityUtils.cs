@@ -64,8 +64,13 @@ namespace Deenote.Utilities
         }
 
         public static ObjectPool<T> CreateObjectPool<T>(T prefab, Transform? parentTransform = null,
-            int defaultCapacity = 10, int maxSize = 10000) where T : Component
-            => CreateObjectPool(() => UnityEngine.Object.Instantiate(prefab, parentTransform), defaultCapacity,
+            Action<T>? onCreate = null, int defaultCapacity = 10, int maxSize = 10000) where T : Component
+            => CreateObjectPool(() =>
+            {
+                var item = UnityEngine.Object.Instantiate(prefab, parentTransform);
+                onCreate?.Invoke(item);
+                return item;
+            }, defaultCapacity,
                 maxSize);
 
         public static ObjectPool<T> CreateObjectPool<T>(Func<T> createFunc, int defaultCapacity = 10,

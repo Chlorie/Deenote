@@ -9,7 +9,7 @@ namespace Deenote.UI.Themes
     {
         private readonly List<Image> _images = new();
 
-        public UIColorTheme ColorTheme;
+        public UIColors ColorTheme;
 
         public void RegisterMainColorTheme(Image image)
         {

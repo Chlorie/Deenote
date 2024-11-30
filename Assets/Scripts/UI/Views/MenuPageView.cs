@@ -70,7 +70,7 @@ namespace Deenote.UI.Views
             _recentFiles = new PooledObjectListView<RecentFileItem>(
                 UnityUtils.CreateObjectPool(() =>
                 {
-                    var item = Instantiate(_recentFileItemPrefab, _recentFilesCollapsable.Content.transform);
+                    var item = Instantiate(_recentFileItemPrefab, _recentFilesCollapsable.Content);
                     item.Parent = this;
                     return item;
                 }, maxSize: MaxRecentFilesCount));

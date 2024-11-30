@@ -116,7 +116,7 @@ namespace Deenote.Edit
         {
             _placeNoteTemplate = new NoteData { Size = 1f };
             _noteIndicatorList = new PooledObjectListView<NoteIndicatorController>(
-                UnityUtils.CreateObjectPool(_noteIndicatorPrefab, _noteIndicatorParentTransform, 1));
+                UnityUtils.CreateObjectPool(_noteIndicatorPrefab, _noteIndicatorParentTransform, defaultCapacity: 1));
         }
 
         private void Start_NotePlacement()

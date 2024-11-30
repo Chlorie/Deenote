@@ -26,7 +26,7 @@ namespace Deenote.UI.Dialogs.Elements
 
         private void Awake()
         {
-            var parentTransform = _sectionTitle.Content.transform;
+            var parentTransform = _sectionTitle.Content;
             var buttonsBuilder = new Button[_pages.Length];
             foreach (ref var btn in buttonsBuilder.AsSpan()) {
                 btn = Instantiate(_sectionPrefab, parentTransform);
@@ -47,7 +47,7 @@ namespace Deenote.UI.Dialogs.Elements
 
         internal void SetCollapsableState(bool expanded)
         {
-            _sectionTitle.Content.SetActive(expanded);
+            _sectionTitle.IsExpanded = expanded;
         }
 
         [Serializable]
