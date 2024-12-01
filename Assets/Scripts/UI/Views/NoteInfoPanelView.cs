@@ -224,7 +224,7 @@ namespace Deenote.UI.Views
                 _shiftProperty.InputField.IsInteractable = interactable;
                 _speedProperty.InputField.IsInteractable = interactable;
                 _kindProperty.ToggleList.IsInteractable = interactable;
-                _vibrateProperty.CheckBox.UnityToggle.interactable = interactable;
+                _vibrateProperty.CheckBox.IsInteractable = interactable;
                 _warningTypeProperty.InputField.IsInteractable = interactable;
                 _eventIdProperty.InputField.IsInteractable = interactable;
             }

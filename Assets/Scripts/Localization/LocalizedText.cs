@@ -49,9 +49,6 @@ namespace Deenote.Localization
 
         public void SetLocalizedText(string textKey, string arg0)
             => SetText(LocalizableText.Localized(textKey), MemoryMarshal.CreateReadOnlySpan(ref arg0, 1));
-
-        public void SetLocalizedText(string textKey)
-            => SetText(LocalizableText.Localized(textKey), default);
         
         public void SetText(LocalizableText text, ReadOnlySpan<string> args = default)
         {

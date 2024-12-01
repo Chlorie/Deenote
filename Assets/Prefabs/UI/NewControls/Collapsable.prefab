@@ -30,10 +30,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 709964967627108966}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 100, y: -40}
+  m_SizeDelta: {x: 200, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2776814169689217883
 GameObject:
@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 1773147714552599972}
   - component: {fileID: 3840150468775598732}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -170,7 +170,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &879354613354725528
 CanvasRenderer:
@@ -187,7 +187,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3768209316061574607}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -223,8 +223,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 16
-    m_Right: 16
+    m_Left: 0
+    m_Right: 0
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 1
@@ -248,8 +248,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e0d7eec289613949b1bb6b46fc2c152, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _backgroundImage: {fileID: 8896553915943781420}
   _collapseButton: {fileID: 4255690760307679946}
   _content: {fileID: 8235239324077259127}
+  _arrowImage: {fileID: 1773147714552599972}
+  _isExpanded_bf: 0
 --- !u!1 &5653808639896148125
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,12 +442,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c32f77949c9833f4cb651eb2557fe75d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isInteractable_bf: 1
+  _isHovering: 0
+  _isPressed: 0
   _backgroundImage: {fileID: 3155663822685184863}
   _image: {fileID: 920805286618021474}
   _text: {fileID: 223237076053304420}
   _colorSet: 1
-  _isHovering: 0
-  _isPressed: 0
 --- !u!114 &1758852563582665247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,7 +462,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 12
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
@@ -612,7 +616,7 @@ PrefabInstance:
     - target: {fileID: 7257949920264679021, guid: 635c81a2bfb94164eb7f652f1a1aab4b,
         type: 3}
       propertyPath: m_fontSize
-      value: 12
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 7257949920264679021, guid: 635c81a2bfb94164eb7f652f1a1aab4b,
         type: 3}

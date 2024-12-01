@@ -90,12 +90,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7065bbf736968bc4c8fef4c38b438ae1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isInteractable_bf: 1
+  _isHovering: 0
+  _isPressed: 0
   _backgroundImage: {fileID: 3175665010123521628}
   _borderImage: {fileID: 3475089329904980852}
   _handleImage: {fileID: 6498512970892087204}
   _group: {fileID: 0}
-  _isHovering: 0
-  _isPressed: 0
+  isChecked_bf: 0
 --- !u!1 &2985807755775970682
 GameObject:
   m_ObjectHideFlags: 0
@@ -154,7 +156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.84705883, g: 0.6901961, b: 0.78431374, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -206,7 +208,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 16, y: 16}
+  m_SizeDelta: {x: 14, y: 14}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4707736850887706818
 CanvasRenderer:

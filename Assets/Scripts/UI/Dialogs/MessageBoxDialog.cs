@@ -53,7 +53,7 @@ namespace Deenote.UI.Dialogs
             using (var resettingButtons = _buttons.Resetting(data.Buttons.Length)) {
                 foreach (var text in data.Buttons) {
                     resettingButtons.Add(out var button);
-                    button.Text.SetText(text);
+                    button.LocText.SetText(text);
                 }
             }
             _buttons.SetSiblingIndicesInOrder();

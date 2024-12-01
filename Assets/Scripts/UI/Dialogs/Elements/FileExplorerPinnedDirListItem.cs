@@ -26,7 +26,7 @@ namespace Deenote.UI.Dialogs.Elements
 
         private void Awake()
         {
-            _unpinButton.Image.sprite = MainSystem.Args.KnownIconsArgs.FileExplorerUnpinSprite;
+            _unpinButton.Image.sprite = MainSystem.Args.UIIcons.FileExplorerUnpinSprite;
         }
 
         private void Start()
@@ -46,7 +46,7 @@ namespace Deenote.UI.Dialogs.Elements
         internal void Initialize(string directory)
         {
             Directory = directory;
-            _button.Text.SetRawText(Path.GetFileName(directory));
+            _button.LocText.SetRawText(Path.GetFileName(directory));
         }
     }
 }

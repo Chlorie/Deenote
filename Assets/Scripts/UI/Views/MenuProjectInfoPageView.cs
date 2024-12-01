@@ -304,8 +304,8 @@ namespace Deenote.UI.Views
 
             void NotifyAudioFileChanged(ProjectModel proj)
             {
-                _projectAudioProperty.Button.Text.SetRawText(Path.GetFileName(proj.AudioFileRelativePath));
-                _projectAudioProperty.Button.Text.Text.horizontalAlignment = HorizontalAlignmentOptions.Left;
+                _projectAudioProperty.Button.LocText.SetRawText(Path.GetFileName(proj.AudioFileRelativePath));
+                _projectAudioProperty.Button.LocText.Text.horizontalAlignment = HorizontalAlignmentOptions.Left;
             }
 
             void ReloadChartList(ProjectModel proj)

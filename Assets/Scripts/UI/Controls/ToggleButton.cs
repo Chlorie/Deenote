@@ -2,124 +2,79 @@
 
 using Deenote.Utilities;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Controls
 {
-    public sealed partial class ToggleButton : MonoBehaviour
+    public sealed class ToggleButton : UIPressableControlBase, IPointerClickHandler
     {
         [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image? _image;
-        [SerializeField] TextBlock? _text;
+        [SerializeField] Image _image = default!;
+        [SerializeField] TextBlock _text = default!;
 
         [Header("Control")]
         [SerializeField] ToggleButtonGroup? _group;
         public ToggleButtonGroup? Group => _group;
 
         [SerializeField]
-        private bool _isToggleOn_bf;
+        private bool _isChecked_bf;
 
-        public bool IsToggleOn
+        public bool IsChecked => _isChecked_bf;
+
+        public UnityEvent<bool> OnValueChanged { get; } = new();
+
+        internal void SetIsChecked(bool value)
         {
-            get => _isToggleOn_bf;
-            internal set {
-                if (Utils.SetField(ref _isToggleOn_bf, value)) {
-                    TranslateVisual();
+            if (Utils.SetField(ref _isChecked_bf, value)) {
+                TranslateVisual();
+            }
+        }
+
+        void IPointerClickHandler.OnPointerClick(PointerEventData eventData)
+        {
+            if (IsLeftButtonOnInteractableControl(eventData)) {
+                if (Group is null) {
+                    SetIsChecked(!IsChecked);
+                }
+                else {
+                    Group.Toggle(this);
                 }
             }
         }
-    }
 
-    partial class ToggleButton : IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
-    {
-        [Header("Visual")]
-        [SerializeField] bool _isHovering;
-        [SerializeField] bool _isPressed;
-
-        void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
+        protected override void TranslateVisual()
         {
-            _isPressed = true;
-            TranslateVisual();
-        }
+            if (!isActiveAndEnabled)
+                return;
 
-        void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
-        {
-            _isHovering = true;
-            TranslateVisual();
-        }
-
-        void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
-        {
-            _isHovering = false;
-            TranslateVisual();
-        }
-
-        void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
-        {
-            _isPressed = false;
-            TranslateVisual();
-        }
-
-        private void TranslateVisual()
-        {
             var colors = MainSystem.Args.UIColors;
 
-            if (IsToggleOn) {
-                if (_isPressed) {
-                    _backgroundImage.color = colors.AccentDefaultColor;
-                    if (_image != null)
-                        _image.color = colors.AccentTextSecondaryColor;
-                    if (_text != null)
-                        _text.TmpText.color = colors.AccentTextSecondaryColor;
-                    return;
-                }
-
-                if (_isHovering) {
-                    _backgroundImage.color = colors.AccentSecondaryColor;
-                    if (_image != null)
-                        _image.color = colors.AccentTextDefaultColor;
-                    if (_text != null)
-                        _text.TmpText.color = colors.AccentTextDefaultColor;
-                    return;
-                }
-
-                _backgroundImage.color = colors.AccentDefaultColor;
-                if (_image != null)
-                    _image.color = colors.AccentTextDefaultColor;
-                if (_text != null)
-                    _text.TmpText.color = colors.AccentTextDefaultColor;
+            if (IsChecked) {
+                var (bg, txt) = GetPressVisualState() switch {
+                    PressVisualState.Disabled => (colors.ControlAccentDisabledColor, colors.TextAccentDisabledColor),
+                    PressVisualState.Pressed => (colors.ControlAccentTertiaryColor, colors.TextAccentTertiaryColor),
+                    PressVisualState.Hovering => (colors.ControlAccentSecondaryColor, colors.TextAccentSecondaryColor),
+                    PressVisualState.Default or _ => (colors.ControlAccentDefaultColor, colors.TextAccentPrimaryColor),
+                };
+                _backgroundImage.color = bg;
+                _image.color = txt;
+                _text.TmpText.color = txt;
             }
             else {
-                if (_isPressed) {
-                    _backgroundImage.color = colors.ControlTertiaryColor;
-                    if (_image != null)
-                        _image.color = colors.TextSecondaryColor;
-                    if (_text != null)
-                        _text.TmpText.color = colors.TextSecondaryColor;
-                    return;
-                }
-
-                if (_isHovering) {
-                    _backgroundImage.color = colors.ControlSecondaryColor;
-                    if (_image != null)
-                        _image.color = colors.TextDefaultColor;
-                    if (_text != null)
-                        _text.TmpText.color = colors.TextDefaultColor;
-                    return;
-                }
-
-                _backgroundImage.color = colors.ControlDefaultColor;
-                if (_image != null)
-                    _image.color = colors.TextDefaultColor;
-                if (_text != null)
-                    _text.TmpText.color = colors.TextDefaultColor;
+                var (bg, txt) = GetPressVisualState() switch {
+                    PressVisualState.Disabled => (colors.ControlDisabledColor, colors.TextDisabledColor),
+                    PressVisualState.Pressed => (colors.ControlTertiaryColor, colors.TextTertiaryColor),
+                    PressVisualState.Hovering => (colors.ControlSecondaryColor, colors.TextSecondaryColor),
+                    PressVisualState.Default or _ => (colors.ControlDefaultColor, colors.TextPrimaryColor),
+                };
+                _backgroundImage.color = bg;
+                _image.color = txt;
+                _text.TmpText.color = txt;
             }
         }
 
-        private void OnValidate()
-        {
-            TranslateVisual();
-        }
+        public void UpdateVisual() => TranslateVisual();
     }
 }

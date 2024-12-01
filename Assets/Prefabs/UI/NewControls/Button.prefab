@@ -90,12 +90,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c32f77949c9833f4cb651eb2557fe75d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isInteractable_bf: 1
+  _isHovering: 0
+  _isPressed: 0
   _backgroundImage: {fileID: 3744696292738034292}
   _image: {fileID: 8755339107284271634}
   _text: {fileID: 3481282400405276637}
   _colorSet: 0
-  _isHovering: 0
-  _isPressed: 0
 --- !u!1 &4755533114454847053
 GameObject:
   m_ObjectHideFlags: 0

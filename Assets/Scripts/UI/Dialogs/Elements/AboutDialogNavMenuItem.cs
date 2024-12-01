@@ -40,7 +40,7 @@ namespace Deenote.UI.Dialogs.Elements
             for (int i = 0; i < _pages.Length; i++) {
                 var btn = _pageButtons[i];
                 var page = _pages[i];
-                btn.Text.SetText(page.Title);
+                btn.LocText.SetText(page.Title);
                 btn.OnClick.AddListener(() => Parent.LoadPage(page));
             }
         }

@@ -46,8 +46,8 @@ namespace Deenote.UI.Views.Elements
                 _revertButton.IsInteractable = _isDirty;
                 _playButton.IsInteractable = _soundItems.Count > 0;
                 _soundsProperty.Button.Image.sprite = _isDirty
-                    ? MainSystem.Args.KnownIconsArgs.NoteInfoSoundsAcceptSprite
-                    : MainSystem.Args.KnownIconsArgs.NoteInfoSoundsCollapseSprite;
+                    ? MainSystem.Args.UIIcons.NoteInfoSoundsAcceptSprite
+                    : MainSystem.Args.UIIcons.NoteInfoSoundsCollapseSprite;
             }
         }
 
@@ -77,13 +77,13 @@ namespace Deenote.UI.Views.Elements
             {
                 if (_editPanelGameObject.activeSelf) {
                     SaveDataToEditingNotes();
-                    _soundsProperty.Button.Image.sprite = MainSystem.Args.KnownIconsArgs.NoteInfoSoundsEditSprite;
+                    _soundsProperty.Button.Image.sprite = MainSystem.Args.UIIcons.NoteInfoSoundsEditSprite;
                     _editPanelGameObject.SetActive(false);
                 }
                 else {
                     ResetEditingNotesAndLoad(MainSystem.Editor.SelectedNotes);
                     _editPanelGameObject.SetActive(true);
-                    _soundsProperty.Button.Image.sprite = MainSystem.Args.KnownIconsArgs.NoteInfoSoundsCollapseSprite;
+                    _soundsProperty.Button.Image.sprite = MainSystem.Args.UIIcons.NoteInfoSoundsCollapseSprite;
                 }
             });
             _soundsProperty.Button.OnClick.Invoke();
@@ -110,11 +110,11 @@ namespace Deenote.UI.Views.Elements
             {
                 switch (selectedNotes.Length) {
                     case 0:
-                        _soundsProperty.Button.Text.SetRawText("-");
+                        _soundsProperty.Button.LocText.SetRawText("-");
                         break;
                     case 1: {
                         var sounds = selectedNotes[0].Data.Sounds;
-                        _soundsProperty.Button.Text.SetRawText(sounds.Count switch {
+                        _soundsProperty.Button.LocText.SetRawText(sounds.Count switch {
                             0 => "-",
                             1 => sounds[0].ToPitchDisplayString(),
                             _ => sounds.Count.ToString(),
@@ -123,14 +123,14 @@ namespace Deenote.UI.Views.Elements
                     }
                     default: {
                         if (SameForAll(selectedNotes, out var sounds)) {
-                            _soundsProperty.Button.Text.SetRawText(sounds.Count switch {
+                            _soundsProperty.Button.LocText.SetRawText(sounds.Count switch {
                                 0 => "-",
                                 1 => sounds[0].ToPitchDisplayString(),
                                 _ => sounds.Count.ToString(),
                             });
                         }
                         else {
-                            _soundsProperty.Button.Text.SetRawText("-");
+                            _soundsProperty.Button.LocText.SetRawText("-");
                         }
                         break;
                     }

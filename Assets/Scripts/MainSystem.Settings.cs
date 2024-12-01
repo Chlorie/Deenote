@@ -13,24 +13,32 @@ namespace Deenote
     {
         [Header("Args")]
         [SerializeField] GameStageViewArgs _gameStageViewArgs = default!;
-        [SerializeField] KnownIconsArgs _knownIconsArgs = default!;
+        [SerializeField] UIIcons _uiIcons = default!;
         [SerializeField] UIColors _uiColors = default!;
         [SerializeField] UIPrefabs _uIPrefabs = default!;
         partial class Args
         {
             public static GameStageViewArgs GameStageViewArgs => Instance._gameStageViewArgs;
 
-            public static KnownIconsArgs KnownIconsArgs => Instance._knownIconsArgs;
+#if UNITY_EDITOR
+            private static T GetScriptableObject<T>() where T : ScriptableObject => UnityEditor.AssetDatabase.LoadAssetAtPath<T>($"Assets/ScriptableObjects/UI/{typeof(T).Name}.asset");
+#endif
 
+            public static UIIcons UIIcons
+#if UNITY_EDITOR
+                => GetScriptableObject<UIIcons>();
+#else
+                => Instance._uiIcons;
+#endif
             public static UIColors UIColors
 #if UNITY_EDITOR
-            { get; } = UnityEditor.AssetDatabase.LoadAssetAtPath<UIColors>("Assets/ScriptableObjects/UI/UIColors.asset");
+            { get; } = GetScriptableObject<UIColors>();
 #else
                 => Instance._uiColors;
 #endif
             public static UIPrefabs UIPrefabs
 #if UNITY_EDITOR
-            { get; } = UnityEditor.AssetDatabase.LoadAssetAtPath<UIPrefabs>("Assets/ScriptableObjects/UI/UIPrefabs.asset");
+            { get; } = GetScriptableObject<UIPrefabs>();
 #else
                 => Instance._uiPrefabs;
 #endif

@@ -57,9 +57,9 @@ namespace Deenote.UI.Dialogs
 
             _languageProperty.Dropdown.ResetOptions(MainSystem.Localization.Languages);
             _languageProperty.Dropdown.SetValueWithoutNotify(
-                _languageProperty.Dropdown.Options.Find(v => v == MainSystem.Localization.CurrentLanguage));
+                _languageProperty.Dropdown.FindIndex(text => text == MainSystem.Localization.CurrentLanguage));
             _languageProperty.Dropdown.OnValueChanged.AddListener(
-                val => MainSystem.Localization.CurrentLanguage = _languageProperty.Dropdown.Options[val].TextOrKey);
+                val => MainSystem.Localization.CurrentLanguage = _languageProperty.Dropdown.Options[val].Text.TextOrKey);
             MainSystem.Localization.OnLanguageChanged += val =>
             {
                 _languageProperty.Dropdown.SetValueWithoutNotify(

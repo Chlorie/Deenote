@@ -39,10 +39,10 @@ namespace Deenote.UI.Dialogs.Elements
             _isDirectory = isDirectory;
             _path = path;
 
-            _button.Text.SetRawText(displayText ?? System.IO.Path.GetFileName(path));
+            _button.LocText.SetRawText(displayText ?? System.IO.Path.GetFileName(path));
             _button.Image.sprite = isDirectory
-                ? MainSystem.Args.KnownIconsArgs.FileListItemFolderSprite
-                : MainSystem.Args.KnownIconsArgs.FileListItemFileSprite;
+                ? MainSystem.Args.UIIcons.FileListItemFolderSprite
+                : MainSystem.Args.UIIcons.FileListItemFileSprite;
 
             _pinButton.gameObject.SetActive(false);
             _pinnedItem = null;
@@ -54,10 +54,10 @@ namespace Deenote.UI.Dialogs.Elements
                 _pinButton.gameObject.SetActive(true);
                 var pinnedItem = Parent.TryGetPinnedDirItem(Path);
                 if (pinnedItem is null) {
-                    _pinButton.Image.sprite = MainSystem.Args.KnownIconsArgs.FileExplorerPinSprite;
+                    _pinButton.Image.sprite = MainSystem.Args.UIIcons.FileExplorerPinSprite;
                 }
                 else {
-                    _pinButton.Image.sprite = MainSystem.Args.KnownIconsArgs.FileExplorerUnpinSprite;
+                    _pinButton.Image.sprite = MainSystem.Args.UIIcons.FileExplorerUnpinSprite;
                 }
                 _pinnedItem = pinnedItem;
             }

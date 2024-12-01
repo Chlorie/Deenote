@@ -11,7 +11,7 @@ namespace Deenote.UI.Controls
     public sealed class KVNumericSliderProperty : KeyValueProperty
     {
         [SerializeField] TMP_InputField _valueInput = default!;
-        [SerializeField] Slider _slider = default!;
+        [SerializeField] UnityEngine.UI.Slider _slider = default!;
 
         public float Value
         {

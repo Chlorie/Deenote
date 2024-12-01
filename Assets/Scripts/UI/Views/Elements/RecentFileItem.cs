@@ -91,7 +91,7 @@ namespace Deenote.UI.Views.Elements
         public void Initialize(string filePath)
         {
             _filePath = filePath;
-            _button.Text.SetRawText(Path.GetFileName(filePath));
+            _button.LocText.SetRawText(Path.GetFileName(filePath));
         }
     }
 }
