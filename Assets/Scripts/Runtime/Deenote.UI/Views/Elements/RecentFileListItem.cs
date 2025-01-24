@@ -1,0 +1,100 @@
+using Cysharp.Threading.Tasks;
+using Deenote.Localization;
+using Deenote.Library;
+using Deenote.UIFramework.Controls;
+using Deenote.UI.Dialogs.Elements;
+using System.IO;
+using UnityEngine;
+
+namespace Deenote.UI.Views.Elements
+{
+    public sealed class RecentFileListItem : MonoBehaviour
+    {
+        [SerializeField] Button _button = default!;
+
+        public MenuNavigationPageView Parent { get; private set; } = default!;
+
+        public string FilePath { get; private set; }
+
+        private static readonly MessageBoxArgs _openProjOnOpenMsgBoxArgs = new(
+            LocalizableText.Localized("OpenRecentProject_MsgBox_Title"),
+            LocalizableText.Localized("OpenProjectOnOpen_MsgBox_Content"),
+            LocalizableText.Localized("OpenProjectOnOpen_MsgBox_Y"),
+            LocalizableText.Localized("OpenProjectOnOpen_MsgBox_N"));
+
+        private static readonly MessageBoxArgs _loadProjFailedMsgBoxArgs = new(
+            LocalizableText.Localized("OpenRecentProject_MsgBox_Title"),
+            LocalizableText.Localized("LoadProjectFailed_MsgBox_Content"),
+            LocalizableText.Localized("LoadProjectFailed_MsgBox_Y"),
+            LocalizableText.Localized("LoadProjectFailed_MsgBox_N"));
+
+        private static readonly MessageBoxArgs _fileNotFoundMsgBoxArgs = new(
+            LocalizableText.Localized("OpenRecentProject_MsgBox_Title"),
+            LocalizableText.Localized("OpenRecentProjectFileNotFound_MsgBox_Content"),
+            LocalizableText.Localized("OpenRecentProjectFileNotFound_MsgBox_Y"),
+            LocalizableText.Localized("OpenRecentProjectFileNotFound_MsgBox_X"),
+            LocalizableText.Localized("OpenRecentProjectFileNotFound_MsgBox_N"));
+
+        private void Awake()
+        {
+            _button.Clicked += UniTask.Action(async () =>
+            {
+                if (MainSystem.ProjectManager.CurrentProject is not null) {
+                    var res = await MainWindow.MessageBox.OpenAsync(_openProjOnOpenMsgBoxArgs);
+                    if (res != 0)
+                        return;
+                }
+
+                // Load project
+                if (File.Exists(FilePath)) {
+                    bool res = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(FilePath);
+                    if (!res) {
+                        MainWindow.MessageBox.OpenAsync(_loadProjFailedMsgBoxArgs)
+                            .Forget();
+                    }
+                    Parent.TouchRecentFile(this);
+                    return;
+                }
+
+                // File not found
+                var click = await MainWindow.MessageBox.OpenAsync(_fileNotFoundMsgBoxArgs);
+                switch (click) {
+                    case 0: // Remove
+                        Parent.RemoveRecentFile(this);
+                        return;
+                    case 1: { // Reselect
+                        var res = await MainWindow.FileExplorer.OpenSelectFileAsync(
+                            LocalizableText.Localized("OpenProject_FileExplorer_Title"),
+                            MainSystem.Args.SupportLoadProjectFileExtensions,
+                            Path.GetDirectoryName(FilePath));
+                        if (res.IsCancelled)
+                            return;
+                        bool openRes = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(res.Path);
+                        if (!openRes) {
+                            MainWindow.MessageBox.OpenAsync(_loadProjFailedMsgBoxArgs).Forget();
+                            Parent.RemoveRecentFile(this);
+                            return;
+                        }
+                        else {
+                            Initialize(res.Path);
+                            Parent.TouchRecentFile(this);
+                            return;
+                        }
+                    }
+                }
+            });
+
+        }
+
+        internal void OnInstantiate(MenuNavigationPageView parent)
+        {
+            Parent = parent;
+        }
+
+        internal void Initialize(string filePath)
+        {
+            FilePath = filePath;
+            _button.Text.SetRawText(Path.GetFileName(filePath));
+        }
+    }
+}

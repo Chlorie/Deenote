@@ -1,0 +1,17 @@
+{
+    "name": "Deenote.Library",
+    "rootNamespace": "Deenote.Library",
+    "references": [
+        "UniTask",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

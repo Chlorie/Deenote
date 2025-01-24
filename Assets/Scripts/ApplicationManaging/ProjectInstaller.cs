@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Core;
 using Deenote.Localization;
 using Reflex.Core;
 using UnityEngine;

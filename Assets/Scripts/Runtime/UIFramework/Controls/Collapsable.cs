@@ -1,0 +1,50 @@
+#nullable enable
+
+using Deenote.Library;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Deenote.UIFramework.Controls
+{
+    public sealed partial class Collapsable : UIControlBase
+    {
+        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] Button _collapseButton = default!;
+        [SerializeField] Image _arrowImage = default!;
+        [SerializeField] RectTransform _contentRectTransform = default!;
+
+        public RectTransform Content => _contentRectTransform;
+
+        [SerializeField]
+        private bool _isExpanded_bf;
+        public bool IsExpanded
+        {
+            get => _isExpanded_bf;
+            set {
+                if (Utils.SetField(ref _isExpanded_bf, value)) {
+                    _backgroundImage.enabled = value;
+                    _contentRectTransform.gameObject.SetActive(value);
+                    _arrowImage.rectTransform.localScale = _arrowImage.rectTransform.localScale with { y = value ? -1 : 1 };
+                }
+            }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _collapseButton.Clicked += () => IsExpanded = !IsExpanded;
+        }
+
+        protected override void DoVisualTransition()
+        {
+            _backgroundImage.enabled = IsExpanded;
+            _contentRectTransform.gameObject.SetActive(IsExpanded);
+            _arrowImage.rectTransform.localScale = _arrowImage.rectTransform.localScale with { y = IsExpanded ? -1 : 1 };
+        }
+
+        protected override void DoStaticVisualTransition()
+        {
+            _backgroundImage.color = UISystem.ThemeArgs.CardBackgroundDefaultColor;
+        }
+    }
+}

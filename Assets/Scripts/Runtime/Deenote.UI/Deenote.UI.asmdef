@@ -1,0 +1,24 @@
+{
+    "name": "Deenote.UI",
+    "rootNamespace": "",
+    "references": [
+        "Deenote.Core",
+        "Deenote.Entities",
+        "Deenote.UIFramework",
+        "UniTask",
+        "Deenote.Library",
+        "Deenote",
+        "Unity.TextMeshPro",
+        "Reflex",
+        "Deenote.Localization"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

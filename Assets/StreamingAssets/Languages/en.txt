@@ -19,125 +19,137 @@ English
 
 ## Menu
 
-LMenuBar_MenuPage=Menu
-MenuPage_File=File
-MenuPage_File_New=New
-MenuPage_File_Open=Open
-MenuPage_File_Save=Save
-MenuPage_File_SaveAs=Save as
-MenuPage_File_Recent=Recent projects
-MenuPage_Preferences=Preferences
-MenuPage_About=About
-MenuPage_UpdateHistory=Update History
-MenuPage_Tutorials=Tutorials
-MenuPage_CheckUpdates=CheckUpdates
+Nav_Menu=Menu
+NavPanel_NewProject=New
+NavPanel_OpenProject=Open
+NavPanel_SaveProject=Save
+NavPanel_SaveProjectAs=Save as...
+NavPanel_RecentFiles=Recent Files
+NavPanel_Preferences=Preferences
+NavPanel_About=About
+NavPanel_UpdateHistory=Update History
+NavPanel_Tutorials=Tutorials
+NavPanel_CheckUpdate=Check Update
 
-LMenuBar_Project=Project
-MenuProjectPage_NoProject=No Project Loaded.
-MenuProjectPage_ProjectInfo=Project Info
-MenuProjectPage_ProjectInfo_Audio=Audio
-MenuProjectPage_ProjectInfo_Name=Name
-MenuProjectPage_ProjectInfo_Composer=Composer
-MenuProjectPage_ProjectInfo_Charter=Chart Designer
-MenuProjectPage_ProjectInfo_Charts=Charts
-MenuProjectPage_ChartInfo=Chart Info
-MenuProjectPage_ChartInfo_Name=Name
-MenuProjectPage_ChartInfo_Difficulty=Difficulty
-MenuProjectPage_ChartInfo_Level=Level
-MenuProjectPage_ChartInfo_Speed=Speed
-MenuProjectPage_ChartInfo_RemapVolume=Remap Volume
+Nav_Project=Project
+NavPanel_Project_Header=PROJECT
+NavPanel_ProjectAudio_Label=Audio
+NavPanel_ProjectName_Label=Name
+NavPanel_ProjectComposer_Label=Composer
+NavPanel_ProjectChartDesigner_Label=Chart Designer
+NavPanel_ProjectCharts_Label=Charts
+NavPanel_ProjectAddChart=Add
+NavPanel_ProjectLoadChart=Load
+NavPanel_Chart_Header=CHART
+NavPanel_ChartName_Label=Name
+NavPanel_ChartDifficulty_Label=Difficulty
+NavPanel_ChartLevel_Label=Level
+NavPanel_ChartSpeed_Label=Speed
+NavPanel_ChartRemapVolume_Label=Remap Volume
 
-LMenuBar_Toolkit=Toolkit
+Nav_Player=Player
+NavPanel_Player_Header=PLAYER
+NavPanel_View_Label=View
+NavPanel_NoteSpeed_Label=Note Speed
+NavPanel_MusicVolume_Label=Music Volume
+NavPanel_EffectVolume_Label=Effect Volume
+NavPanel_PianoVolume_Label=Piano Volume
+NavPanel_SuddenPlus_Label=Sudden +
+NavPanel_LinksIndicator_Label=Show Links
+NavPanel_PlacementIndicator_Label=Show Placement Indicator
 
-RMenuBar_Note=Note
-MenuNotePanel_Header=Note Info
-MenuNotePanel_Body_Position=Position
-MenuNotePanel_Body_Time=Time
-MenuNotePanel_Body_Size=Size
-MenuNotePanel_Body_Duration=Duration
-MenuNotePanel_Body_Shift=Shift
-MenuNotePanel_Body_Speed=Speed
-MenuNotePanel_Body_Kind=Kind
-MenuNotePanel_Body_Vibrate=Vibrate
-MenuNotePanel_Body_WarningType=Warning Type
-MenuNotePanel_Body_EventId=Event ID
-MenuNotePanel_Body_Sounds=Sounds
-MenuNotePanel_Body_Sounds_Play=Play
-MenuNotePanel_Body_Sounds_Revert=Revert
+Nav_Toolkit=Toolkit
 
-RMenuBar_Player=Player
-MenuPlayerPanel_Header=Player
-MenuPlayerPanel_Body_View=View
-MenuPlayerPanel_Body_NoteSpeed=Note Speed
-MenuPlayerPanel_Body_EffectVolume=Effect Volume
-MenuPlayerPanel_Body_MusicVolume=Music Volume
-MenuPlayerPanel_Body_PianoVolume=Piano Volume
-MenuPlayerPanel_Body_ShowLinks=Show Links
-MenuPlayerPanel_Body_SuddenPlus=Sudden +
+Nav_Editor=Editor
+NavPanel_Note_Header=NOTE
+NavPanel_NotePosition_Label=Position
+NavPanel_NoteTime_Label=Time
+NavPanel_NoteSize_Label=Size
+NavPanel_NoteDuration_Label=Duration
+NavPanel_NoteKindClick_Label=Click
+NavPanel_NoteKindSlide_Label=Slide
+NavPanel_NoteKindSwipe_Label=Swipe
+NavPanel_NoteSpeed_Label=Speed
+NavPanel_NoteSounds_Label=Sounds
+NavPanel_NoteSoundsEdit=Edit
+NavPanel_NotePiano_Play=Play
+NavPanel_NotePiano_Revert=Revert
+NavPanel_NoteShift_Label=Shift
+NavPanel_NoteEventId_Label=Event Id
+NavPanel_NoteWarningType_Label=Warning Type
+NavPanel_NoteVibrate_Label=Vibrate
+NavPanel_NotePropertyMultipleValue_PlaceHolder=Multiple Values
+NavPanel_Editor_Header=EDITOR
+NavPanel_EditorMusicSpeed_Label=MusicSpeed
+NavPanel_EditorGrids_SubHeader=Grids
+NavPanel_EditorGridSnap_Label=Snap
+NavPanel_EditorCurve_SubHeader=Curve
+NavPanel_EditorCurveLinear_Label=Linear
+NavPanel_EditorCurveCubic_Label=Cubic
+NavPanel_EditorCurveGenerate_Label=Generate
+NavPanel_EditorCurveDisable_Label=Disable
+NavPanel_EditorCurveFillAmount_PlaceHolder=Fill Amount
+NavPanel_EditorCurveFill_Label=Fill
+NavPanel_EditorCurveAutoApply_SubHeader=Auto Apply Properties
+NavPanel_EditorCurveAutoApplyApply_Label=Apply
+NavPanel_EditorBpm_SubHeader=BPM
+NavPanel_EditorBpmTime_Label=Time
+NavPanel_EditorBpmTimeStart_PlaceHolder=Start
+NavPanel_EditorBpmTimeEnd_PlaceHolder=End
+NavPanel_EditorBpmBpm_Label=BPM
+NavPanel_EditorBpmFill_Label=Fill
 
-RMenuBar_Editor=Editor
-MenuEditorPanel_Header=Editor
-MenuEditorPanel_Body_MusicSpeed=Music Speed
-MenuEditorPanel_Body_ShowIndicator=Show Indicator
-MenuEditorPanel_Body_Grid_Snap=Snap
-MenuEditorPanel_Body_Curve_Linear=Linear
-MenuEditorPanel_Body_Curve_Cubic=Cubic
-MenuEditorPanel_Body_Curve_Generate=Generate
-MenuEditorPanel_Body_Curve_Disable=Disable
-MenuEditorPanel_Body_Curve_Fill=Fill
-MenuEditorPanel_Body_Curve_ApplyProperties=Apply Properties
-MenuEditorPanel_Body_Curve_ApplyProperties_Apply=Apply
-MenuEditorPanel_Body_Curve_ApplyProperties_Property_Size=Size
-MenuEditorPanel_Body_Curve_ApplyProperties_Property_Speed=Speed
-MenuEditorPanel_Body_Bpm_Time=Time
-MenuEditorPanel_Body_Bpm_TimeStart_Placeholder=Start
-MenuEditorPanel_Body_Bpm_TimeEnd_Placeholder=End
-MenuEditorPanel_Body_Bpm_Bpm=Bpm
-MenuEditorPanel_Body_Bpm_Bpm_PlaceHolder=Bpm
-MenuEditorPanel_Body_Bpm_Fill=Fill
+
+## Status Bar
+StatusBar_Fps=FPS: {0}
+
 
 ## Dialogs
 
-NewProjectDialog_Title=New Project
-NewProjectDialog_ProjectName_Label=Project Name
-NewProjectDialog_ProjectName_PlaceHolder=Enter project name...
+Dialog_About_Title=About
+Dialog_AboutDevelopers_Section=Developers
+Dialog_AboutTutorials_Section=Tutorials
+Dialog_AboutUpdateHistory_Section=Update History
+
+Dialog_FileExplorer_Title=File Explorer
+Dialog_FileExplorerConfirm_Label=Confirm
+Dialog_FileExplorerCancel_Label=Cancel
+
+Dialog_NewProject_Title=New Project
+Dialog_NewProjectName_Label=Project Name
+Dialog_NewProjectName_PlaceHolder=Enter project name...
+Dialog_NewProjectAudioFile_Label=Audio File
+Dialog_NewProjectAudioFile_PlaceHolder=Enter audio file path...
+Dialog_NewProjectDirectory_Label=Directory
+Dialog_NewProjectDirectory_PlaceHolder=Enter directory path...
+Dialog_NewProjectSameDir_Label=Place project file at the directory of audio file
+Dialog_NewProjectResultPath=The project will be created as "{0}".
+Dialog_NewProject_Create_Button=Create
+Dialog_NewProject_Cancel_Button=Cancel
+Dialog_FileExplorer_SelectAudio_Title=Select Audio
+Dialog_FileExplorer_SelectDirectory_Title=Select Directory
+
+Dialog_Preferences_Title=Preferences
+Dialog_PreferencesGameStage_Header=Game Stage
+Dialog_PreferencesGameStageEffect_Label=Stage Effect
+Dialog_PreferencesMouseSensitivity_Label=Mouse Scroll Sensitivity
+Dialog_PreferencesMouseSensitivityInvert_Button=Invert
+Dialog_PreferencesDistinguishPianoNotes_Label=Distinguish Piano Notes
+Dialog_PreferencesSystem_Header=System
+Dialog_PreferencesVSync_Label=VSync
+Dialog_PreferencesLanguage_Label=Language
+Dialog_PreferencesAutoSave_Label=Auto Save
+Dialog_PreferencesAutoSaveOff_Option=Off
+Dialog_PreferencesAutoSaveOn_Option=On
+Dialog_PreferencesAutoSaveOnAndSaveJson_Option=On And Save Json
+Dialog_PreferencesEmbedProjectAudio_Label=Embed Audio Data In Project
+Dialog_PreferencesUI_Header=UI
+Dialog_PreferencesShowFps_Label=Show FPS
+Dialog_PreferencesShowIneffectiveProp_Label=Show Ineffective Properties
+
 NewProjectDialog_ProjectName_Invalid=Invalid project name.
-NewProjectDialog_AudioFile_Label=Audio File
-NewProjectDialog_AudioFile_PlaceHolder=Enter audio file path...
 NewProjectDialog_AudioFile_Invalid=Invalid audio file path.
-NewProjectDialog_Directory_Label=Directory
-NewProjectDialog_Directory_PlaceHolder=Enter directory path...
 NewProjectDialog_Directory_Invalid=Invalid directory name.
-NewProjectDialog_Directory_SameDirCheck=Place project file at the directory of audio file.
-NewProjectDialog_Directory_CreateHint=The project will be created as "{0}"
-NewProjectDialog_ProjectName_Create=Create
-NewProjectDialog_ProjectName_Cancel=Cancel
-
-PreferencesDialog_Title=Preferences
-PreferencesDialog_Body_StageEffect=Stage Effect
-PreferencesDialog_Body_ShowFps=Show FPS
-PreferencesDialog_Body_VSync=VSync
-PreferencesDialog_Body_MouseScrollSensitivity=Mouse Scroll Sensitivity
-PreferencesDialog_Body_MouseScrollSensitivity_Reverse=Reverse
-PreferencesDialog_Body_Language=Language
-PreferencesDialog_Body_AutoSave=Auto Save
-PreferencesDialog_Body_AutoSave_Off=Off
-PreferencesDialog_Body_AutoSave_On=On
-PreferencesDialog_Body_AutoSave_OnAndSaveJson=On & Save Json
-PreferencesDialog_Body_IneffectiveProperties=Ineffective Properties
-PreferencesDialog_Body_DistinguishPianoNotes=Distinguish Piano Notes
-PreferencesDialog_Body_SaveAudioInProject=Save Audio In Project
-
-AboutDialog_Title=About
-AboutDialog_Nav_Developers=Developers
-AboutDialog_Nav_Tutorials=Tutorials
-AboutDialog_Nav_Versions=Update History
-
-FileExplorerDialog_Button_Confirm=Confirm
-FileExplorerDialog_Button_Cancel=Cancel
-
-## StatusBar
-Status_Fps=FPS: {0}
 
 # Dynamic / MessageBox
 
@@ -148,11 +160,18 @@ QuitUnsaved_MsgBox_Content=Project unsaved, are you sure to quit?
 Quit_MsgBox_Y=Quit
 Quit_MsgBox_N=Cancel
 
+Version_NoInternet_Toast=No Internet connection.
+Version_UpToDate_Toast=Deenote is up to date.
 NewVersion_MsgBox_Title=New version detected.
 NewVersion_MsgBox_Content=Current version: {0}<br/>Latest version: {1}
 NewVersion_MsgBox_1=Go to release page
 NewVersion_MsgBox_2=Go to download page
 NewVersion_MsgBox_N=Update later
+
+UnhandledException_Toast="""
+    Unhandled exception detected.
+    Full information has been output to exceptions.log.
+    """
 
 ## Menu
 
@@ -254,8 +273,9 @@ ExportChart_FileExplorer_Title=Export chart to...
 
 ## Developers
 
-AboutDialog_Developers_HCl=HCl
-AboutDialog_Developers_HCl_Content="""
+Dialog_AboutDevelopers_Page_HCl=HCl
+Dialog_AboutDevelopers_Page_HCl_Title=HCl
+Dialog_AboutDevelopers_Page_HCl_Content="""
     Deenote By HCl
 
     *Bad English Alert*
@@ -289,8 +309,9 @@ AboutDialog_Developers_HCl_Content="""
     - 2 Dec 2017
     """
 
-AboutDialog_Developers_NachtgeistW=NachtgeistW
-AboutDialog_Developers_NachtgeistW_Content="""
+Dialog_AboutDevelopers_Page_NachtgeistW=NachtgeistW
+Dialog_AboutDevelopers_Page_NachtgeistW_Title=NachtgeistW
+Dialog_AboutDevelopers_Page_NachtgeistW_Content="""
     *Bad English Alert*
 
         This is NachtgeistW, or you can call me Nightwheel. For some reasons, I forked this project and tried to learn C# while fixing deenote.
@@ -303,18 +324,21 @@ AboutDialog_Developers_NachtgeistW_Content="""
     - 31 Jan 2020
     """
 
-AboutDialog_Developers_Trarizon=Trarizon
-AboutDialog_Developers_Trarizon_Content="""
+Dialog_AboutDevelopers_Page_Trarizon=Trarizon
+Dialog_AboutDevelopers_Page_Trarizon_Title=Trarizon
+Dialog_AboutDevelopers_Page_Trarizon_Content="""
     TODO:
     """
 
 ## Tutorials
 
-AboutDialog_Tutorials_Tutorial=Tutorial
-AboutDialog_Tutorials_Tutorial_Content=<color=#800000ff>Full English tutorial coming soon</color>
+Dialog_AboutTurorials_Page_Tutorial=Tutorial
+Dialog_AboutTurorials_Page_Tutorial_Title=Tutorial
+Dialog_AboutTurorials_Page_Tutorial_Content=<color=#800000ff>Full English tutorial coming soon</color>
 
-AboutDialog_Tutorials_Shortcuts=Shortcuts
-AboutDialog_Tutorials_Shortcuts_Content="""
+Dialog_AboutTurorials_Page_Shortcuts=Shortcuts
+Dialog_AboutTurorials_Page_Shortcuts_Title=Shortcuts
+Dialog_AboutTurorials_Page_Shortcuts_Content="""
     -Project-
 
     [Ctrl+N] Create a new project file
@@ -363,8 +387,9 @@ AboutDialog_Tutorials_Shortcuts_Content="""
     [F] Fill notes on the curve
     """
 
-AboutDialog_Tutorials_UpgradeGuide=Upgrade Guide
-AboutDialog_Tutorials_UpgradeGuide_Content="""
+Dialog_AboutTurorials_Page_UpgradeGuide=Upgrade Guide
+Dialog_AboutTurorials_Page_UpgradeGuide_Title=Upgrade Guide
+Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
     TODO
     """
 

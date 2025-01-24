@@ -1,11 +1,11 @@
 #nullable enable
 
 using Deenote.Audio;
-using Deenote.Inputting;
 using Deenote.Localization;
-using Deenote.Utilities;
 using Reflex.Core;
 using UnityEngine;
+using Deenote.Core.Inputting;
+using Deenote.Utilities;
 
 namespace Deenote.ApplicationManaging
 {
