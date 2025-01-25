@@ -50,19 +50,22 @@ namespace Deenote.GamePlay
             }
         }
 
-        private void UpdateNoteSounds(bool forward,bool manually)
+        private void UpdateNoteSounds(bool forward, bool manually)
         {
-            if (forward) {
-                while (_nextHitNoteIndex < CurrentChart.NoteNodes.Count && CurrentChart.NoteNodes[_nextHitNoteIndex].Time <= MusicPlayer.Time)
-                    _nextHitNoteIndex++;
-                while (_nextHitBackgroundNoteIndex < CurrentChart.BackgroundNotes.Count && CurrentChart.BackgroundNotes[_nextHitBackgroundNoteIndex].Time <= MusicPlayer.Time)
-                    _nextHitBackgroundNoteIndex++;
-            }
-            else {
-                while (_nextHitNoteIndex > 0 && CurrentChart.NoteNodes[_nextHitNoteIndex - 1].Time > MusicPlayer.Time)
-                    _nextHitNoteIndex--;
-                while (_nextHitBackgroundNoteIndex > 0 && CurrentChart.BackgroundNotes[_nextHitBackgroundNoteIndex - 1].Time > MusicPlayer.Time)
-                    _nextHitBackgroundNoteIndex--;
-            }
+            //AssertChartLoaded();
+
+            //if (forward) {
+            //    while (_nextHitNoteIndex < CurrentChart.NoteNodes.Count && CurrentChart.NoteNodes[_nextHitNoteIndex].Time <= MusicPlayer.Time)
+            //        _nextHitNoteIndex++;
+            //    while (_nextHitBackgroundNoteIndex < CurrentChart.BackgroundNotes.Count && CurrentChart.BackgroundNotes[_nextHitBackgroundNoteIndex].Time <= MusicPlayer.Time)
+            //        _nextHitBackgroundNoteIndex++;
+            //}
+            //else {
+            //    while (_nextHitNoteIndex > 0 && CurrentChart.NoteNodes[_nextHitNoteIndex - 1].Time > MusicPlayer.Time)
+            //        _nextHitNoteIndex--;
+            //    while (_nextHitBackgroundNoteIndex > 0 && CurrentChart.BackgroundNotes[_nextHitBackgroundNoteIndex - 1].Time > MusicPlayer.Time)
+            //        _nextHitBackgroundNoteIndex--;
+            //}
+        }
     }
 }
