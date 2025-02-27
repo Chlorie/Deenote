@@ -3,7 +3,6 @@
 using CommunityToolkit.Diagnostics;
 using Deenote.Library.Components;
 using Deenote.Localization;
-using Deenote.UI.Views;
 using Deenote.UIFramework.Controls;
 using System.Collections.Immutable;
 using UnityEngine;
@@ -53,13 +52,13 @@ namespace Deenote.UI.Dialogs
 
             _vSyncToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsVSyncOn = val;
             MainSystem.GlobalSettings.RegisterNotification(
-                MainSystem.Settings.NotificationFlag.VSync,
+                GlobalSettings.NotificationFlag.VSync,
                 settings => _vSyncToggle.IsChecked = settings.IsVSyncOn);
 
-            _languageDropdown.ResetOptions(LocalizationSystem.Languages);
-            _languageDropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(text => text == LocalizationSystem.CurrentLanguage));
-            _languageDropdown.SelectedIndexChanged += val => LocalizationSystem.CurrentLanguage = _languageDropdown.Options[val].Text.TextOrKey;
-            LocalizationSystem.LanguageChanged += val => _languageDropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(text => text == val));
+            _languageDropdown.ResetOptions(LocalizationSystem.Languages, pack => LocalizableText.Raw(pack.LanguageDisplayName));
+            _languageDropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(text => text == LocalizationSystem.CurrentLanguage.LanguageDisplayName));
+            _languageDropdown.SelectedIndexChanged += val => LocalizationSystem.CurrentLanguage = (LanguagePack)_languageDropdown.Options[val].Item!;
+            LocalizationSystem.LanguageChanged += val => _languageDropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(text => text == val.LanguageDisplayName));
 
             _autoSaveDropdown.ResetOptions(_autoSaveDropdownOptions.AsSpan());
             _autoSaveDropdown.SelectedIndexChanged += val => MainSystem.ProjectManager.AutoSave = GetAutoSaveDropdownOption(val);
@@ -73,12 +72,12 @@ namespace Deenote.UI.Dialogs
 
             _showFpsToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsFpsShown = val;
             MainSystem.GlobalSettings.RegisterNotification(
-                MainSystem.Settings.NotificationFlag.FpsShown,
+                GlobalSettings.NotificationFlag.FpsShown,
                 settings => _showFpsToggle.IsChecked = settings.IsFpsShown);
 
             _showIneffectivePropertiesToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsIneffectivePropertiesVisible = val;
             MainSystem.GlobalSettings.RegisterNotification(
-                MainSystem.Settings.NotificationFlag.IneffectivePropertiesVisible,
+                GlobalSettings.NotificationFlag.IneffectivePropertiesVisible,
                 settings => _showIneffectivePropertiesToggle.IsChecked = settings.IsIneffectivePropertiesVisible);
 
             _distinguishPianoNotesToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsPianoNotesDistinguished = val;
@@ -88,6 +87,11 @@ namespace Deenote.UI.Dialogs
         }
 
         public void Open() => OpenSelfModalDialog();
+
+        private void OnValidate()
+        {
+            _dialog ??= GetComponent<Dialog>();
+        }
 
         #region AutoSaveOptions
 

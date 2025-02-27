@@ -21,14 +21,19 @@ namespace Deenote.GamePlay.UI
         [SerializeField] Button _pauseButton = default!;
         [Header("Combo UI")]
         [SerializeField] GameObject _comboGameObject = default!;
-        [SerializeField] TMP_Text _numberText = default!;
-        [SerializeField] TMP_Text _shadowText = default!;
+        [SerializeField] TextMeshProUGUI _numberText = default!;
+        [SerializeField] TextMeshProUGUI _shadowText = default!;
         [SerializeField] Image _shockWaveCircleImage = default!;
         [SerializeField] Image _shockWaveImage = default!;
+        [SerializeField] RectTransform _shockWaveEnterPosTransform = default!;
+        [SerializeField] RectTransform _shockWaveExitPosTransform = default!;
         [SerializeField] Image _charmingImage = default!;
 
         [Header("Resources")]
         [SerializeField] DeemoGameStageUIArgs _args = default!;
+
+        private float _shockWaveEnterPosX;
+        private float _shockWaveExitPosX;
 
         private Difficulty _difficulty_bf;
         private Difficulty Difficulty
@@ -53,6 +58,12 @@ namespace Deenote.GamePlay.UI
             }
         }
 
+        private void Awake()
+        {
+            _shockWaveEnterPosX = _shockWaveEnterPosTransform.anchorMin.x;
+            _shockWaveExitPosX = _shockWaveExitPosTransform.anchorMin.x;
+        }
+
         internal override void OnInstantiate()
         {
             // TODO:这怎么有这个玩意
@@ -64,7 +75,7 @@ namespace Deenote.GamePlay.UI
             _pauseButton.onClick.AddListener(() => MainSystem.GamePlayManager.MusicPlayer.TogglePlayingState());
 
             MainSystem.GamePlayManager.MusicPlayer.ClipChanged += clip => _timeSlider.maxValue = clip.length;
-            MainSystem.GamePlayManager.MusicPlayer.TimeChanged += args => _timeSlider.value = args.NewTime;
+            MainSystem.GamePlayManager.MusicPlayer.TimeChanged += args => _timeSlider.SetValueWithoutNotify(args.NewTime);
             _timeSlider.maxValue = MainSystem.GamePlayManager.MusicPlayer.ClipLength;
             _timeSlider.SetValueWithoutNotify(MainSystem.GamePlayManager.MusicPlayer.Time);
 
@@ -123,7 +134,7 @@ namespace Deenote.GamePlay.UI
 
                     UpdateComboRegistrant(manager);
 
-                    var currentCombo = manager.CurrentCombo;
+                    var currentCombo = manager.NotesManager.CurrentCombo;
                     if (currentCombo <= 0) {
                         _scoreText.text = "0.00 %";
                         return;
@@ -144,7 +155,7 @@ namespace Deenote.GamePlay.UI
 
         private void UpdateComboRegistrant(GamePlayManager stage)
         {
-            int combo = stage.CurrentCombo;
+            int combo = stage.NotesManager.CurrentCombo;
             if (combo < _args.MinDisplayCombo) {
                 _comboGameObject.SetActive(false);
                 return;
@@ -152,7 +163,7 @@ namespace Deenote.GamePlay.UI
 
             // prevHitNoteIndex wont smaller than combo, so here
             // it is asserted a valid index
-            var prevHitNote = stage.GetPreviouseHitComboNode();
+            var prevHitNote = stage.NotesManager.GetPreviousHitComboNode();
             Debug.Assert(prevHitNote?.IsComboNode() ?? false);
 
             _comboGameObject.SetActive(true);
@@ -214,37 +225,47 @@ namespace Deenote.GamePlay.UI
             }
             // Shock Wave Strike
             {
-                float x;
-                float alpha;
+                _shockWaveImage.rectTransform.WithAnchoredMinMaxX(GetStrikePosition(deltaTime));
+                _shockWaveImage.WithColorAlpha(GetStrikeAlpha(deltaTime));
 
-                if (deltaTime <= _args.ComboShockWaveAlphaIncTime) {
-                    float ratio = deltaTime / _args.ComboShockWaveAlphaIncTime;
-                    x = _args.ComboShockWaveStartX;
-                    alpha = ratio;
+                float GetStrikePosition(float deltaTime)
+                {
+                    if (deltaTime <= _args.ComboShockWaveAlphaIncTime) {
+                        return _shockWaveEnterPosX;
+                    }
+                    else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime) {
+                        float ratio = (deltaTime - _args.ComboShockWaveAlphaIncTime) / _args.ComboShockWaveMoveTime;
+                        return Mathf.Lerp(_shockWaveEnterPosX, _shockWaveExitPosX, ratio);
+                    }
+                    else {
+                        return _shockWaveExitPosX;
+                    }
                 }
-                else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime) {
-                    float ratio = (deltaTime - _args.ComboShockWaveAlphaIncTime) / _args.ComboShockWaveMoveTime;
-                    x = Mathf.Lerp(_args.ComboShockWaveStartX, _args.ComboShockWaveEndX, ratio);
-                    alpha = 1f;
+
+                float GetStrikeAlpha(float deltaTime)
+                {
+                    if (deltaTime <= _args.ComboShockWaveAlphaIncTime) {
+                        float ratio = deltaTime / _args.ComboShockWaveAlphaIncTime;
+                        return ratio;
+                    }
+                    else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime) {
+                        float ratio = (deltaTime - _args.ComboShockWaveAlphaIncTime) / _args.ComboShockWaveMoveTime;
+                        return 1f;
+                    }
+                    else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime +
+                    _args.ComboShockWaveAlphaDecTime) {
+                        float ratio = (deltaTime - _args.ComboShockWaveAlphaIncTime - _args.ComboShockWaveMoveTime) /
+                                      _args.ComboShockWaveAlphaDecTime;
+                        return 1 - ratio;
+                    }
+                    else {
+                        return 0;
+                    }
                 }
-                else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime +
-                _args.ComboShockWaveAlphaDecTime) {
-                    float ratio = (deltaTime - _args.ComboShockWaveAlphaIncTime - _args.ComboShockWaveMoveTime) /
-                                  _args.ComboShockWaveAlphaDecTime;
-                    x = _args.ComboShockWaveEndX;
-                    alpha = 1 - ratio;
-                }
-                else {
-                    x = 0;
-                    alpha = 0;
-                }
-                _shockWaveImage.transform.localPosition = new(x, 0f, 0f);
-                _shockWaveImage.color = Color.white with { a = alpha };
             }
             // Charming
             {
                 float scale;
-                float alpha;
                 if (deltaTime <= _args.ComboCharmingGrowTime) {
                     float ratio = deltaTime / _args.ComboCharmingGrowTime;
                     scale = Mathf.Lerp(1f, _args.ComboCharmingMaxScaleY, ratio);
@@ -256,7 +277,9 @@ namespace Deenote.GamePlay.UI
                 else {
                     scale = 0f;
                 }
+                _charmingImage.transform.localScale = new Vector3(1f, scale, 1f);
 
+                float alpha;
                 if (deltaTime <= _args.ComboCharmingAlphaIncTime) {
                     float ratio = deltaTime / _args.ComboCharmingAlphaIncTime;
                     alpha = Mathf.Lerp(0f, 1f, ratio);
@@ -271,7 +294,6 @@ namespace Deenote.GamePlay.UI
                 else {
                     alpha = 0f;
                 }
-                _charmingImage.transform.localScale = new Vector3(1f, scale, 1f);
                 _charmingImage.color = Color.white with { a = alpha };
             }
         }

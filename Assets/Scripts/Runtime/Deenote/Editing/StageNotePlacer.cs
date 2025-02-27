@@ -400,18 +400,18 @@ namespace Deenote.Editing
             void MoveCopied()
             {
                 if (Options.HasFlag(PlacementOptions.PastingRememberPosition)) {
-                    coord.Position = _editor.ClipBoardBaseCoord.Position;
+                    coord.Position = _editor.ClipBoard.BaseCoord.Position;
                     coord = _editor._game.Grids.Quantize(coord, false, SnapToTimeGrid);
                 }
                 else {
                     coord = _editor._game.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
                 }
 
-                Debug.Assert(_indicators.Count == _editor.ClipBoardNotes.Length);
-                var baseCoord = coord - _editor.ClipBoardBaseCoord;
+                Debug.Assert(_indicators.Count == _editor.ClipBoard.Notes.Length);
+                var baseCoord = coord - _editor.ClipBoard.BaseCoord;
                 for (int i = 0; i < _indicators.Count; i++) {
                     var indicator = _indicators[i];
-                    var note = _editor.ClipBoardNotes[i];
+                    var note = _editor.ClipBoard.Notes[i];
                     indicator.MoveTo(NoteCoord.ClampPosition(baseCoord + note.PositionCoord));
                 }
             }
@@ -472,18 +472,18 @@ namespace Deenote.Editing
 
             void PasteNotes()
             {
-                Debug.Assert(!_editor.ClipBoardNotes.IsEmpty);
+                Debug.Assert(!_editor.ClipBoard.Notes.IsEmpty);
 
                 NoteCoord placeCoord;
                 if (Options.HasFlag(PlacementOptions.PastingRememberPosition)) {
-                    placeCoord = coord with { Position = _editor.ClipBoardBaseCoord.Position };
+                    placeCoord = coord with { Position = _editor.ClipBoard.BaseCoord.Position };
                     placeCoord = _editor._game.Grids.Quantize(placeCoord, false, true);
                 }
                 else {
                     placeCoord = _editor._game.Grids.Quantize(coord, SnapToPositionGrid, SnapToTimeGrid);
                 }
 
-                _editor.AddMultipleNotes(placeCoord, _editor.ClipBoardNotes);
+                _editor.AddMultipleNotes(placeCoord, _editor.ClipBoard.Notes);
             }
         }
 
@@ -516,7 +516,7 @@ namespace Deenote.Editing
 
             if (_state is PlacementState.PlacingMultiple) {
                 using var indicators = _indicators.Resetting();
-                foreach (var note in _editor.ClipBoardNotes) {
+                foreach (var note in _editor.ClipBoard.Notes) {
                     indicators.Add(out var indicator);
                     indicator.Initialize(note);
                 }

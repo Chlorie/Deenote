@@ -56,7 +56,7 @@ namespace Deenote.Library.Collections
         #region Search
 
         public static bool IsSameForAll<T, TValue>(this ReadOnlySpan<T> list,
-            Func<T, TValue> valueGetter,out TValue? value, IEqualityComparer<TValue>? comparer = null)
+            Func<T, TValue> valueGetter, out TValue? value, IEqualityComparer<TValue>? comparer = null)
         {
             switch (list) {
                 case { Length: 0 }:
@@ -94,6 +94,12 @@ namespace Deenote.Library.Collections
             return ~span.Length;
         }
 
+        public static int LinearSearch<T, TComparer>(this Span<T> span, T item, TComparer comparer) where TComparer : IComparer<T>
+            => LinearSearch((ReadOnlySpan<T>)span, item, comparer);
+
+        public static int LinearSearch<T, TComparable>(this Span<T> span, TComparable item) where TComparable : IComparable<T>
+            => LinearSearch((ReadOnlySpan<T>)span, item);
+
         public static int LinearSearchFromEnd<T, TComparer>(this ReadOnlySpan<T> span, T item, TComparer comparer) where TComparer : IComparer<T>
            => span.LinearSearchFromEnd(new ComparerComparable<T, TComparer>(item, comparer));
 
@@ -109,6 +115,8 @@ namespace Deenote.Library.Collections
             return ~0;
         }
 
+        public static int LinearSearchFromEnd<T, TComparer>(this Span<T> span, T item, TComparer comparer) where TComparer : IComparer<T>
+            => LinearSearchFromEnd((ReadOnlySpan<T>)span, item, comparer);
         public static int LinearSearchFromEnd<T, TComparable>(this Span<T> span, TComparable item) where TComparable : IComparable<T>
             => LinearSearchFromEnd((ReadOnlySpan<T>)span, item);
 

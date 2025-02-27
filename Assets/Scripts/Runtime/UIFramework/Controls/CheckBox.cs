@@ -11,9 +11,9 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class CheckBox : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image _borderImage = default!;
-        [SerializeField] Image _checkmarkImage = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _borderImage = default!;
+        [SerializeField] UnityEngine.UI.Image _checkmarkImage = default!;
 
 #if UNITY_EDITOR
         [SerializeField]

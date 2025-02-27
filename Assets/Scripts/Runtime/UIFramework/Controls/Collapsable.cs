@@ -1,6 +1,7 @@
 #nullable enable
 
 using Deenote.Library;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,11 +9,12 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed partial class Collapsable : UIControlBase
     {
-        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
         [SerializeField] Button _collapseButton = default!;
-        [SerializeField] Image _arrowImage = default!;
+        [SerializeField] UnityEngine.UI.Image _arrowImage = default!;
         [SerializeField] RectTransform _contentRectTransform = default!;
 
+        public Button Header => _collapseButton;
         public RectTransform Content => _contentRectTransform;
 
         [SerializeField]
@@ -25,9 +27,12 @@ namespace Deenote.UIFramework.Controls
                     _backgroundImage.enabled = value;
                     _contentRectTransform.gameObject.SetActive(value);
                     _arrowImage.rectTransform.localScale = _arrowImage.rectTransform.localScale with { y = value ? -1 : 1 };
+                    IsExpandedChanged?.Invoke(value);
                 }
             }
         }
+
+        public event Action<bool>? IsExpandedChanged;
 
         protected override void Awake()
         {

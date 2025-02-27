@@ -48,6 +48,11 @@ namespace Deenote.UI.Dialogs
             nav.Load();
         }
 
+        private void OnValidate()
+        {
+            _dialog ??= GetComponent<Dialog>();
+        }
+
         public enum Page
         {
             Developers,

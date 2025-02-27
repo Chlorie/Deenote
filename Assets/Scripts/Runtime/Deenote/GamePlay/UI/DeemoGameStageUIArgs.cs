@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using UnityEngine;
 
 namespace Deenote.GamePlay.UI
@@ -27,7 +28,9 @@ namespace Deenote.GamePlay.UI
         public float ComboShockWaveAlphaIncTime;
         public float ComboShockWaveMoveTime;
         public float ComboShockWaveAlphaDecTime;
+        [Obsolete]
         public float ComboShockWaveStartX;
+        [Obsolete]
         public float ComboShockWaveEndX;
         [Header("Combo Charming")]
         public float ComboCharmingGrowTime;

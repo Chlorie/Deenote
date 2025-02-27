@@ -65,7 +65,7 @@ namespace Deenote.UIFramework.Controls
             LocalizationSystem.LanguageChanged -= _LanguageChanged;
         }
 
-        private void _LanguageChanged(string lang) => RefreshDisplayText();
+        private void _LanguageChanged(LanguagePack lang) => RefreshDisplayText();
 
         private void RefreshDisplayText()
         {

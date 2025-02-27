@@ -15,6 +15,7 @@ namespace Deenote.Entities.Models
         internal int _holdCount;
         internal List<IStageNoteNode> _visibleNoteNodes;
         internal List<SoundNoteModel> _backgroundNotes;
+        internal List<SpeedChangeWarningModel> _speedChangeWarnings;
         internal List<SpeedLineValueModel> _speedLines;
 
         /// <summary>
@@ -26,6 +27,8 @@ namespace Deenote.Entities.Models
         public ReadOnlySpan<IStageNoteNode> NoteNodes => _visibleNoteNodes.AsSpan();
 
         public ReadOnlySpan<SoundNoteModel> BackgroundNotes => _backgroundNotes.AsSpan();
+
+        public ReadOnlySpan<SpeedChangeWarningModel> SpeedChangeWarnings => _speedChangeWarnings.AsSpan();
 
         public ReadOnlySpan<SpeedLineValueModel> SpeedLines => _speedLines.AsSpan();
 

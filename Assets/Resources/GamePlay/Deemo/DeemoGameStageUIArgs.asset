@@ -29,7 +29,7 @@ MonoBehaviour:
   ComboShockWaveEndX: -72
   ComboCharmingGrowTime: 0.075
   ComboCharmingFadeTime: 0.225
-  ComboCharmingAlphaIncTime: 0
-  ComboCharmingAlphaDecStartTime: 0.3
+  ComboCharmingAlphaIncTime: 0.05
+  ComboCharmingAlphaDecStartTime: 0.25
   ComboCharmingAlphaDecTime: 0
   ComboCharmingMaxScaleY: 1.25

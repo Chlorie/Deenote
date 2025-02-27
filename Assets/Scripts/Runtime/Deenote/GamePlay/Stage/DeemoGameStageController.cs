@@ -1,6 +1,5 @@
 #nullable enable
 
-using Deenote.Entities.Models;
 using Deenote.Library.Components;
 using Deenote.Project;
 using TMPro;
@@ -49,7 +48,7 @@ namespace Deenote.GamePlay.Stage
             manager.AssertChartLoaded();
 
             // Update judge line hit effect
-            var previousHitNode = GetPreviousHitNote();
+            var previousHitNode = _manager.NotesManager.GetPreviousHitNote();
             if (previousHitNode is null) {
                 _judgeLineHitEffectSpriteRenderer.color = Color.clear;
                 return;
@@ -68,15 +67,6 @@ namespace Deenote.GamePlay.Stage
                 alpha = 0f;
             }
             _judgeLineHitEffectSpriteRenderer.color = Color.white with { a = alpha };
-
-            NoteModel? GetPreviousHitNote()
-            {
-                for (int i = manager.NextHitNoteIndex - 1; i >= 0; i--) {
-                    if (manager.CurrentChart.NoteNodes[i] is NoteModel note)
-                        return note;
-                }
-                return null;
-            }
         }
 
         private void _OnProjectNameChanged(ProjectManager manager)

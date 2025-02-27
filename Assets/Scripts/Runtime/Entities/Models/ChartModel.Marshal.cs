@@ -15,18 +15,23 @@ namespace Deenote.Entities.Models
             /// Return collection will be null if <paramref name="notes"/> is empty, to reduce allocation
             /// </remarks>
             public static void DeserializeNotes(ReadOnlySpan<NoteModel> notes,
-                out int holdCount, out List<IStageNoteNode>? visibleNotes, out List<SoundNoteModel>? backgroundNotes)
+                out int holdCount,
+                out List<IStageNoteNode>? visibleNotes,
+                out List<SoundNoteModel>? backgroundNotes,
+                out List<SpeedChangeWarningModel>? speedChangeWarnings)
             {
                 if (notes.IsEmpty) {
                     holdCount = 0;
                     visibleNotes = null;
                     backgroundNotes = null;
+                    speedChangeWarnings = null;
                     return;
                 }
 
                 holdCount = 0;
                 visibleNotes = new List<IStageNoteNode>();
                 backgroundNotes = new List<SoundNoteModel>();
+                speedChangeWarnings = new List<SpeedChangeWarningModel>();
                 var tailsBuffer = new List<NoteTailNode>();
 
                 foreach (var note in notes) {
@@ -41,6 +46,9 @@ namespace Deenote.Entities.Models
                             tailsBuffer.GetSortedModifier(NoteTimeComparer.Instance)
                                 .Add(new NoteTailNode(note));
                         }
+                    }
+                    else if (note.WarningType is WarningType.SpeedChange) {
+                        speedChangeWarnings.Add(new SpeedChangeWarningModel(note));
                     }
                     else {
                         backgroundNotes.Add(new SoundNoteModel(note));
@@ -59,7 +67,7 @@ namespace Deenote.Entities.Models
 
             public static void ResetNotes(ChartModel chart, ReadOnlySpan<NoteModel> notes)
             {
-                DeserializeNotes(notes, out var holdCount, out var visibleNotes, out var backgroundNotes);
+                DeserializeNotes(notes, out var holdCount, out var visibleNotes, out var backgroundNotes, out var speedChangeWarnings);
                 chart._holdCount = holdCount;
                 if (visibleNotes is null) {
                     if (chart._visibleNoteNodes.Count > 0)
@@ -74,6 +82,14 @@ namespace Deenote.Entities.Models
                 }
                 else {
                     chart._backgroundNotes = backgroundNotes;
+                }
+
+                if (speedChangeWarnings is null) {
+                    if (chart._speedChangeWarnings.Count > 0)
+                        chart._speedChangeWarnings = new();
+                }
+                else {
+                    chart._speedChangeWarnings = speedChangeWarnings;
                 }
             }
         }

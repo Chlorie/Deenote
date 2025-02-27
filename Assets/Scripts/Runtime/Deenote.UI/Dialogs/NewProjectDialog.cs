@@ -185,5 +185,9 @@ namespace Deenote.UI.Dialogs
             _createButton.IsInteractable = false;
         }
 
+        private void OnValidate()
+        {
+            _dialog ??= GetComponent<Dialog>();
+        }
     }
 }

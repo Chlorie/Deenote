@@ -14,7 +14,7 @@ namespace Deenote.UIFramework.Controls
     public sealed class Dropdown : MonoBehaviour, IInteractableControl
     {
         [SerializeField] Button _button = default!;
-        [SerializeField] Image _arrowImage = default!;
+        [SerializeField] UnityEngine.UI.Image _arrowImage = default!;
         [SerializeField] RectTransform _contentRectTransform = default!;
 
         [SerializeField] List<Option> _options = new();
@@ -27,6 +27,7 @@ namespace Deenote.UIFramework.Controls
             get => _isInteractable_bf;
             set {
                 if (Utils.SetField(ref _isInteractable_bf, value)) {
+                    _button.IsInteractable = value;
                 }
             }
         }
@@ -102,7 +103,6 @@ namespace Deenote.UIFramework.Controls
                 IsExpanded = !IsExpanded;
             };
 
-            // TODO:需要仔细研究一下start的时机，还有-1怎么处理
             _selectedIndex_bf = -1;
         }
 
@@ -123,6 +123,7 @@ namespace Deenote.UIFramework.Controls
         {
             public Sprite? Sprite;
             public LocalizableText Text;
+            public object? Item;
         }
 
         public int FindIndex(Predicate<LocalizableText> predicate)
@@ -143,6 +144,22 @@ namespace Deenote.UIFramework.Controls
                     _options.Add(option);
                     resetter.Add(out var item);
                     item.Initialize(i, option);
+                }
+            }
+            _dropdownItems.SetSiblingIndicesInOrder();
+        }
+
+        public void ResetOptions<T>(IReadOnlyCollection<T> items, Func<T, LocalizableText> textSelector)
+        {
+            _options.Clear();
+            using (var resetter = _dropdownItems.Resetting()) {
+                int i = 0;
+                foreach (var item in items) {
+                    var option = new Option { Text = textSelector(item), Item = item };
+                    _options.Add(option);
+                    resetter.Add(out var dropdownItem);
+                    dropdownItem.Initialize(i, option);
+                    i++;
                 }
             }
             _dropdownItems.SetSiblingIndicesInOrder();

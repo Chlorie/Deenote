@@ -118,9 +118,9 @@ namespace Deenote.UI.Views
                 {
                     var res = await VersionManager.CheckUpdateAsync();
                     if (res.Type is VersionManager.UpdateCheckResultType.NoInternet)
-                        _ = MainWindow.StatusBar.ShowLocalizedToastAsync(VersionCheckNoInternetToastKey, 3f);
+                        _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckNoInternetToastKey, 3f);
                     if (res.Type is VersionManager.UpdateCheckResultType.UpToDate)
-                        _ = MainWindow.StatusBar.ShowLocalizedToastAsync(VersionCheckUpdateToDateToastKey, 3f);
+                        _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckUpdateToDateToastKey, 3f);
 
                     var clicked = await MainWindow.MessageBox.OpenAsync(_verUpdMsgBoxArgs, VersionManager.CurrentVersion.ToString(), res.LatestVersion.ToString());
                     switch (clicked) {
@@ -191,9 +191,13 @@ namespace Deenote.UI.Views
         {
             Debug.Assert(MainSystem.ProjectManager.CurrentProject is not null, "Unexpected interactable save button when current project is null");
             var proj = MainSystem.ProjectManager.CurrentProject!;
+            
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
+            
             await MainSystem.ProjectManager.SaveCurrentProjectAsync();
             AddPathToRecentFiles(proj.ProjectFilePath);
+            MainSystem.Configuration.Save();
+
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
 
@@ -218,6 +222,7 @@ namespace Deenote.UI.Views
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectToAsync(feRes.Path);
+            MainSystem.Configuration.Save();
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
 

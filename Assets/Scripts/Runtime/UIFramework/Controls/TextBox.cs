@@ -11,9 +11,9 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class TextBox : UIFocusableControlBase
     {
-        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
         //[SerializeField] Image _borderImage = default!; // 找到的颜色好像不对
-        [SerializeField] Image _elevationImage = default!;
+        [SerializeField] UnityEngine.UI.Image _elevationImage = default!;
         [SerializeField] TMP_InputField _inputField = default!;
         [SerializeField] TextBlock _placeHolderText = default!;
         [SerializeField] TMP_Text _inputText = default!;

@@ -29,6 +29,7 @@ namespace Deenote.UI
         [SerializeField] PreferencesDialog _preferencesDialog = default!;
         [SerializeField] AboutDialog _aboutDialog = default!;
         [SerializeField] StatusBar _statusBar = default!;
+        [SerializeField] ToastManager _toastManager = default!;
         [SerializeField] PerspectiveViewPanelView _perspectiveViewPanelView = default!;
 
         public static UIPianoSoundPlayer PianoSoundPlayer => _instance._pianoSoundPlayer;
@@ -39,6 +40,7 @@ namespace Deenote.UI
         public static PreferencesDialog PreferencesDialog => _instance._preferencesDialog;
         public static AboutDialog AboutDialog => _instance._aboutDialog;
         public static StatusBar StatusBar => _instance._statusBar;
+        public static ToastManager ToastManager => _instance._toastManager;
         public static PerspectiveViewPanelView PerspectiveViewPanelView => _instance._perspectiveViewPanelView;
 
         #endregion
@@ -92,7 +94,7 @@ namespace Deenote.UI
             };
             UnhandledExceptionHandler.UnhandledExceptionOccurred += args =>
             {
-                StatusBar.ShowLocalizedToastAsync(UnhandledExceptionToastKey, 3f);
+                ToastManager.ShowLocalizedToastAsync(UnhandledExceptionToastKey, 3f);
             };
             MainSystem.ProjectManager.ProjectAutoSaving += args =>
             {

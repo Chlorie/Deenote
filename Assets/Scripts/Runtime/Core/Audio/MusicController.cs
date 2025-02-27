@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Deenote.Audio
 {
+    [Obsolete]
     [RequireComponent(typeof(AudioSource))]
     public sealed class MusicController : MonoBehaviour
     {

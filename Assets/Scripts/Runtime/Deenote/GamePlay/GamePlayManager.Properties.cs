@@ -22,6 +22,7 @@ namespace Deenote.GamePlay
         private bool _isPianoNotesDistinguished_bf;
         private float _suddenPlus_bf;
         private bool _isStageEffectOn_bf;
+        private bool _earlyDisplayLowSpeedNotes_bf;
 
         /// <summary>
         /// Range [1, 99], display [0.1, 9.9]
@@ -33,7 +34,7 @@ namespace Deenote.GamePlay
                 value = Mathf.Clamp(value, MinNoteSpeed, MaxNoteSpeed);
                 if (Utils.SetField(ref _noteSpeed_bf, value)) {
                     if (CurrentChart is not null && Stage is not null) {
-                        UpdateActiveNotes();
+                        NotesManager.UpdateTimeState(MusicPlayer.Time, false, true);
                     }
                     NotifyFlag(NotificationFlag.NoteSpeed);
                 }
@@ -47,7 +48,7 @@ namespace Deenote.GamePlay
             get => _showLinkLines_bf;
             set {
                 if (Utils.SetField(ref _showLinkLines_bf, value)) {
-                    RefreshNotesTimeState(); // This updates link line
+                    NotesManager.UpdateLinkVisibility(value);
                     NotifyFlag(NotificationFlag.IsShowLinkLines);
                 }
             }
@@ -58,7 +59,7 @@ namespace Deenote.GamePlay
             get => _isPianoNotesDistinguished_bf;
             set {
                 if (Utils.SetField(ref _isPianoNotesDistinguished_bf, value)) {
-                    RefreshNotesVisual();
+                    NotesManager.RefreshVisual();
                     NotifyFlag(NotificationFlag.DistinguishPianoNotes);
                 }
             }
@@ -87,7 +88,7 @@ namespace Deenote.GamePlay
                 value = Mathf.Clamp(value, 0f, 1f);
                 if (Utils.SetField(ref _suddenPlus_bf, value)) {
                     _cacheVisibleRangePercentage = null;
-                    RefreshNotesTimeState();
+                    NotesManager.UpdateSuddenPlus(value);
                     NotifyFlag(NotificationFlag.SuddenPlus);
                 }
             }
@@ -101,6 +102,17 @@ namespace Deenote.GamePlay
                 this.AssertStageLoaded();
                 _cacheVisibleRangePercentage ??= this.StagePerspectiveCamera.SuddenPlusRangeToVisibleRangePercentage(SuddenPlus);
                 return _cacheVisibleRangePercentage.GetValueOrDefault();
+            }
+        }
+
+        public bool EarlyDisplayLowSpeedNotes
+        {
+            get => _earlyDisplayLowSpeedNotes_bf;
+            set {
+                if (Utils.SetField(ref _earlyDisplayLowSpeedNotes_bf, value)) {
+                    NotesManager.UpdateTimeState(MusicPlayer.Time, false);
+                    NotifyFlag(NotificationFlag.EarlyDisplayLowSpeedNotes);
+                }
             }
         }
 

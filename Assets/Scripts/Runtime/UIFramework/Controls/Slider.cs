@@ -13,8 +13,8 @@ namespace Deenote.UIFramework.Controls
         IDragHandler, IBeginDragHandler, IEndDragHandler
     {
         [SerializeField] internal RectTransform _raycastAreaRectTransform = default!;
-        [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image _fillImage = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _fillImage = default!;
         [SerializeField] SliderHandle _handle = default!;
 
         [SerializeField, Range(0f, 1f)]

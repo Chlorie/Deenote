@@ -88,6 +88,11 @@ namespace Deenote.Entities.Storage
                 WriteSoundNote(writer, note);
             }
 
+            writer.Write(chart.SpeedChangeWarnings.Length);
+            foreach (var note in chart.SpeedChangeWarnings) {
+                WriteSpeedChangeWarning(writer, note);
+            }
+
             writer.Write(chart.SpeedLines.Length);
             foreach (ref readonly var line in chart.SpeedLines) {
                 WriteSpeedLine(writer, line);
@@ -123,6 +128,12 @@ namespace Deenote.Entities.Storage
             chart._backgroundNotes.Capacity = soundCount;
             for (int i = 0; i < soundCount; i++) {
                 chart._backgroundNotes.Add(ReadSoundNote(reader));
+            }
+
+            var speedChangeCount = reader.ReadInt32();
+            chart._speedChangeWarnings.Capacity = speedChangeCount;
+            for (int i = 0; i < speedChangeCount; i++) {
+                chart._speedChangeWarnings.Add(ReadSpeedChangeWarning(reader));
             }
 
             var lineCount = reader.ReadInt32();
@@ -184,21 +195,21 @@ namespace Deenote.Entities.Storage
 
         private static void WriteSoundNote(BinaryWriter writer, SoundNoteModel note)
         {
-            var underlyingNote = note._noteModel;
-            writer.Write(underlyingNote.Time);
-            writer.Write(underlyingNote.Sounds.Length);
-            foreach (var sound in underlyingNote.Sounds) {
+            writer.Write(note.Time);
+            writer.Write(note.Sounds.Length);
+            foreach (var sound in note.Sounds) {
                 WriteSound(writer, sound);
             }
         }
 
-        public static SoundNoteModel ReadSoundNote(BinaryReader reader)
+        private static SoundNoteModel ReadSoundNote(BinaryReader reader)
         {
             var note = new NoteModel() {
                 Position = 12,
             };
             var time = reader.ReadSingle();
             var len = reader.ReadInt32();
+            note.Time = time;
             note._sounds.Capacity = len;
             for (var i = 0; i < len; i++)
                 note._sounds.Add(ReadSound(reader));
@@ -220,6 +231,20 @@ namespace Deenote.Entities.Storage
             var pitch = reader.ReadInt32();
             var velocity = reader.ReadInt32();
             return new PianoSoundValueModel(delay, duration, pitch, velocity);
+        }
+
+        private static void WriteSpeedChangeWarning(BinaryWriter writer, in SpeedChangeWarningModel warning)
+        {
+            writer.Write(warning.Time);
+        }
+
+        private static SpeedChangeWarningModel ReadSpeedChangeWarning(BinaryReader reader)
+        {
+            var time = reader.ReadSingle();
+            return new SpeedChangeWarningModel(new NoteModel() {
+                Position = 4f,
+                Time = time,
+            });
         }
 
         private static void WriteSpeedLine(BinaryWriter writer, in SpeedLineValueModel line)

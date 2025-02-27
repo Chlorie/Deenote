@@ -30,7 +30,7 @@ namespace Deenote.UI.Views
         [SerializeField] NoteInfoPianoSoundEditPanel _soundEditPanel = default!;
         [SerializeField] TextBox _shiftInput = default!;
         [SerializeField] TextBox _eventIdInput = default!;
-        [SerializeField] Dropdown _warningTypeDropdown = default!;
+        //[SerializeField] Dropdown _warningTypeDropdown = default!;
         [SerializeField] CheckBox _vibrateCheckBox = default!;
 
         [SerializeField] GameObject[] _ineffectivePropertyGameObjects = default!;
@@ -40,8 +40,8 @@ namespace Deenote.UI.Views
 
         private const string MultipleValuesPlaceHolderKey = "NavPanel_NotePropertyMultipleValue_PlaceHolder";
 
-
         #endregion
+
         private const string NoSoundButtonText = "-";
 
 
@@ -51,11 +51,11 @@ namespace Deenote.UI.Views
                 _positionInput, _timeInput, _sizeInput, _durationInput,
                 _clickNoteKindToggle, _slideNoteKindToggle, _swipeNoteKindToggle,
                 _speedInput, _shiftInput, _eventIdInput,
-                _warningTypeDropdown, _vibrateCheckBox,
+                _vibrateCheckBox,
             };
 
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
-                MainSystem.Settings.NotificationFlag.IneffectivePropertiesVisible,
+                GlobalSettings.NotificationFlag.IneffectivePropertiesVisible,
                 settings =>
                 {
                     var visible = settings.IsIneffectivePropertiesVisible;
@@ -188,15 +188,15 @@ namespace Deenote.UI.Views
                 StageChartEditor.NotificationFlag.NoteEventId,
                 editor => NotifyMultiEventIdChanged(editor.Selector.SelectedNotes));
 
-            _warningTypeDropdown.ResetOptions(WarningTypeExt.DropdownOptions);
-            _warningTypeDropdown.SelectedIndexChanged += index =>
-            {
-                if (index >= 0)
-                    MainSystem.StageChartEditor.EditSelectedNotesWarningType(WarningTypeExt.FromIndex(index));
-            };
-            MainSystem.StageChartEditor.RegisterNotification(
-                StageChartEditor.NotificationFlag.NoteWarningType,
-                editor => NotifyMultiWarningTypeChanged(editor.Selector.SelectedNotes));
+            //_warningTypeDropdown.ResetOptions(WarningTypeExt.DropdownOptions);
+            //_warningTypeDropdown.SelectedIndexChanged += index =>
+            //{
+            //    if (index >= 0)
+            //        MainSystem.StageChartEditor.EditSelectedNotesWarningType(WarningTypeExt.FromIndex(index));
+            //};
+            //MainSystem.StageChartEditor.RegisterNotification(
+            //    StageChartEditor.NotificationFlag.NoteWarningType,
+            //    editor => NotifyMultiWarningTypeChanged(editor.Selector.SelectedNotes));
 
             _vibrateCheckBox.IsCheckedChanged += check =>
             {
@@ -243,7 +243,7 @@ namespace Deenote.UI.Views
                             NotifyMultiSoundsChanged(notes);
                             SyncFloatInput(_shiftInput, note.Shift);
                             _eventIdInput.SetValueWithoutNotify(note.EventId);
-                            _warningTypeDropdown.SetValueWithoutNotify(note.WarningType.ToIndex());
+                            //_warningTypeDropdown.SetValueWithoutNotify(note.WarningType.ToIndex());
                             _vibrateCheckBox.SetValueWithoutNotify(note.Vibrate);
                             break;
                         default:
@@ -257,7 +257,7 @@ namespace Deenote.UI.Views
                             NotifyMultiSoundsChanged(notes);
                             NotifyMultiFloatValueChanged(_shiftInput, notes, n => n.Shift);
                             NotifyMultiEventIdChanged(notes);
-                            NotifyMultiWarningTypeChanged(notes);
+                            //NotifyMultiWarningTypeChanged(notes);
                             NotifyMultiBoolValueChanged(_vibrateCheckBox, notes, n => n.Vibrate);
                             break;
                     }
@@ -285,7 +285,7 @@ namespace Deenote.UI.Views
 
                         _noteKindToggleGroup.ForceToggleOff();
                         _soundsButton.Text.SetRawText(NoSoundButtonText);
-                        _warningTypeDropdown.SetValueWithoutNotify(-1);
+                        //_warningTypeDropdown.SetValueWithoutNotify(-1);
                         _vibrateCheckBox.SetValueWithoutNotify(null);
 
                         foreach (var ctrl in _interactableControls)
@@ -371,12 +371,12 @@ namespace Deenote.UI.Views
             }
         }
 
-        private void NotifyMultiWarningTypeChanged(ReadOnlySpan<NoteModel> notes)
-        {
-            if (notes.IsSameForAll(n => n.WarningType, out var warningType))
-                _warningTypeDropdown.SetValueWithoutNotify(warningType.ToIndex());
-            else
-                _warningTypeDropdown.SetValueWithoutNotify(-1);
-        }
+        //private void NotifyMultiWarningTypeChanged(ReadOnlySpan<NoteModel> notes)
+        //{
+        //    if (notes.IsSameForAll(n => n.WarningType, out var warningType))
+        //        _warningTypeDropdown.SetValueWithoutNotify(warningType.ToIndex());
+        //    else
+        //        _warningTypeDropdown.SetValueWithoutNotify(-1);
+        //}
     }
 }

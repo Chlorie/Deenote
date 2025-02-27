@@ -23,7 +23,7 @@ namespace Deenote.UIFramework.Controls
             };
         }
 
-        internal void Initialize(int selfIndex, Dropdown.Option option)
+        internal void Initialize(int selfIndex, in Dropdown.Option option)
         {
             _selfIndex = selfIndex;
             if (option.Sprite is null)

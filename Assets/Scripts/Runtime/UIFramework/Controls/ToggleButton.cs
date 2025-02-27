@@ -11,8 +11,8 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class ToggleButton : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image _image = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _image = default!;
         [SerializeField] TextBlock _text = default!;
         [SerializeField] ButtonColorSet _colorSet;
 

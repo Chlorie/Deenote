@@ -58,7 +58,7 @@ namespace Deenote.Entities.Models
             // MaxVolume=oriVMax;
             RemapMinVolume = remapVMin;
             RemapMaxVolume = remapVMax;
-            Marshal.DeserializeNotes(notes.AsSpanOrEmpty(), out _holdCount, out _visibleNoteNodes!, out _backgroundNotes!);
+            Marshal.DeserializeNotes(notes.AsSpanOrEmpty(), out _holdCount, out _visibleNoteNodes!, out _backgroundNotes!, out _speedChangeWarnings!);
             _visibleNoteNodes ??= new();
             _backgroundNotes ??= new();
             DeserializeSpeedLines(lines);
@@ -86,6 +86,8 @@ namespace Deenote.Entities.Models
                 return;
             }
 
+            lines.Sort((x, y) => Comparer<float>.Default.Compare(x.StartTime, y.StartTime));
+
             var speedLines = new List<SpeedLineValueModel>();
             float prevEndTime = 0f;
 
@@ -99,7 +101,11 @@ namespace Deenote.Entities.Models
             speedLines.Add(new(1f, prevEndTime, WarningType.Default));
 
             Debug.Assert(_visibleNoteNodes.OfType<NoteModel>()
-                .All(note => speedLines.Last(l => l.StartTime <= note.Time).Speed == note.Speed));
+                .All(note =>
+                {
+                    var line = speedLines.Last(l => l.StartTime <= note.Time);
+                    return line.Speed == note.Speed;
+                }));
 
             _speedLines = speedLines;
         }

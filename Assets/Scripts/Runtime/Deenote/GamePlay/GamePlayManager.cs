@@ -17,15 +17,18 @@ namespace Deenote.GamePlay
     {
         private PerspectiveViewForegroundBase _perspectiveViewForegroundPrefab = default!;
 
+        private NotesManager _notesManager = default!;
         private GridsManager _gridsManager = default!;
         [SerializeField] GameMusicPlayer _musicPlayer = default!;
         private StagePianoSoundPlayer _pianoSoundPlayer = default!;
         [SerializeField] HitSoundPlayer _hitSoundPlayer = default!;
 
+
         public GameStageControllerBase? Stage { get; private set; }
         public GameStagePerspectiveCamera? StagePerspectiveCamera { get; private set; }
         public PerspectiveLinesRenderer? PerspectiveLinesRenderer { get; private set; }
 
+        public NotesManager NotesManager => _notesManager;
         public GridsManager Grids => _gridsManager;
         public GameMusicPlayer MusicPlayer => _musicPlayer;
         public StagePianoSoundPlayer PianoSoundPlayer => _pianoSoundPlayer;
@@ -48,7 +51,7 @@ namespace Deenote.GamePlay
         {
             if (manualPlaySpeed is { } speed) {
                 if (speed == 0f) {
-                    MusicPlayer.Pitch = MusicSpeed;
+                    MusicPlayer.Pitch = ActualMusicSpeed;
                     MusicPlayer.Stop();
                 }
                 else {
@@ -57,7 +60,7 @@ namespace Deenote.GamePlay
                 _manualPlaySpeedMultiplier = speed;
             }
             else {
-                _musicPlayer.Pitch = MusicSpeed;
+                _musicPlayer.Pitch = ActualMusicSpeed;
                 _manualPlaySpeedMultiplier = null;
             }
         }
@@ -73,6 +76,7 @@ namespace Deenote.GamePlay
         {
             _gridsManager = new GridsManager(this);
             _pianoSoundPlayer = new StagePianoSoundPlayer(MainSystem.PianoSoundSource);
+            _notesManager = new NotesManager(this);
 
             GameStageSceneLoader.StageLoaded += loader =>
             {
@@ -84,12 +88,13 @@ namespace Deenote.GamePlay
                 StagePerspectiveCamera.OnInstantiate(this, Stage);
                 PerspectiveLinesRenderer = loader.PerspectiveLinesRenderer;
                 PerspectiveLinesRenderer.OnInstantiate(this);
+                NotesManager.Initialize(
+                    loader.StageController.Args.GamePlayNotePrefab,
+                    loader.StageController);
                 OnStageLoaded_Properties(loader);
-                OnStageLoaded_Notes(loader);
 
-                if (CurrentChart is not null) {
-                    UpdateActiveNotes();
-                    RefreshNotesVisual();
+                if (IsChartLoaded()) {
+                    UpdateNotes(true, true);
                 }
 
                 NotifyFlag(NotificationFlag.GameStageLoaded);
@@ -98,8 +103,8 @@ namespace Deenote.GamePlay
             MusicPlayer.TimeChanged += args =>
             {
                 var forward = args.NewTime > args.OldTime;
-                UpdateActiveNotesRelatively(forward);
-                UpdateNoteSounds(forward, _manualPlaySpeedMultiplier is not null || args.IsByJump);
+                NotesManager.UpdateTimeState(args.NewTime, !args.IsByJump && _manualPlaySpeedMultiplier is null);
+                NotifyFlag(NotificationFlag.ActiveNoteUpdated);
                 // In previous version, note time was controlled by StageNoteController.Update,
                 // so we have to manually call update when manually change music time.
                 // In current version, note time is controlled by GamePlayManager.UpdateActiveNotes,
@@ -116,7 +121,7 @@ namespace Deenote.GamePlay
                         UnloadChart();
                         return;
                     }
-
+                    
                     // TODO: try out streaming clip provider
                     _musicPlayer.ReplaceClip(new DecodedClipProvider(proj.AudioClip));
 
@@ -137,7 +142,7 @@ namespace Deenote.GamePlay
 
             MainSystem.StageChartEditor.Selector.RegisterNotification(
                 Editing.StageNoteSelector.NotificationFlag.SelectedNotesChanged,
-                selector => RefreshNotesVisual());
+                selector => NotesManager.RefreshVisual());
         }
 
         private void OnDestroy()
@@ -170,6 +175,27 @@ namespace Deenote.GamePlay
             }
         }
 
+        public void UpdateNotes(bool noteCollectionChangedOrNoteTimeRelatedPropertyChanged, bool notesVisualDataChanged)
+        {
+            AssertChartLoaded();
+            AssertStageLoaded();
+
+            switch (noteCollectionChangedOrNoteTimeRelatedPropertyChanged, notesVisualDataChanged) {
+                case (true, false):
+                    NotesManager.UpdateTimeState(MusicPlayer.Time, false, true);
+                    break;
+                case (false, true):
+                    NotesManager.RefreshVisual();
+                    break;
+                case (true, true):
+                    NotesManager.UpdateTimeState(MusicPlayer.Time, false, true);
+                    break;
+                default:
+                    return;
+            }
+            NotifyFlag(NotificationFlag.ActiveNoteUpdated);
+        }
+
         public void LoadChartInCurrentProject(ChartModel chart)
         {
             Debug.Assert(MainSystem.ProjectManager.CurrentProject?.Charts.Contains(chart) is true);
@@ -177,12 +203,10 @@ namespace Deenote.GamePlay
             MusicPlayer.Stop();
             MusicPlayer.Time = 0f;
             CurrentChart = chart;
-            _noteManager.ResetIndices();
 
             CheckCollision();
-            if (Stage is not null) {
-                UpdateActiveNotes();
-                RefreshNotesVisual();
+            if (IsStageLoaded()) {
+                UpdateNotes(true, true);
             }
             NotifyFlag(NotificationFlag.CurrentChart);
 
@@ -227,21 +251,25 @@ namespace Deenote.GamePlay
                 throw new System.InvalidOperationException("Chart not loaded.");
         }
 
+#pragma warning disable CS8774
         /// <summary>
         /// The method do <c>UnityEngine.Debug.Assert()</c>, and could make IDE
         /// provide a better nullable diagnostic in context
         /// </summary>
         [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
         [MemberNotNull(nameof(CurrentChart))]
-#pragma warning disable CS8774
         public void AssertChartLoaded() => Debug.Assert(CurrentChart is not null, "Chart not loaded");
-#pragma warning restore CS8774
 
         [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
         [MemberNotNull(nameof(Stage), nameof(StagePerspectiveCamera), nameof(PerspectiveLinesRenderer))]
-#pragma warning disable CS8774
         public void AssertStageLoaded() => Debug.Assert(Stage is not null, "Stage not loaded");
 #pragma warning restore CS8774
+
+        [MemberNotNullWhen(true, nameof(Stage), nameof(StagePerspectiveCamera), nameof(PerspectiveLinesRenderer))]
+        public bool IsStageLoaded() => Stage is not null;
+
+        [MemberNotNullWhen(true, nameof(CurrentChart))]
+        public bool IsChartLoaded() => CurrentChart is not null;
 
         #endregion
 
@@ -258,6 +286,7 @@ namespace Deenote.GamePlay
             SuddenPlus,
             StageEffectOn,
             DistinguishPianoNotes,
+            EarlyDisplayLowSpeedNotes,
             ActiveNoteUpdated,
 
             CurrentChart,

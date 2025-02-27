@@ -13,13 +13,13 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class Button : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image _image = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _image = default!;
         [SerializeField] TextBlock _text = default!;
 
         [SerializeField] ButtonColorSet _colorSet;
 
-        public Image Image => _image;
+        public UnityEngine.UI.Image Image => _image;
 
         public TextBlock Text => _text;
 
@@ -34,6 +34,12 @@ namespace Deenote.UIFramework.Controls
         }
 
         public event Action? Clicked;
+
+        private void OnDisable()
+        {
+            _isHovering = false;
+            _isPressed = false;
+        }
 
         public async UniTask OnClickAsync(CancellationToken cancellationToken)
         {

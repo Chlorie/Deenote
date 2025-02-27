@@ -1,9 +1,8 @@
 #nullable enable
 
-using Cysharp.Threading.Tasks;
-using Deenote.Localization;
 using Deenote.Library;
 using Deenote.Library.Components;
+using Deenote.Localization;
 using Deenote.UIFramework.Controls;
 using System;
 using UnityEngine;
@@ -31,19 +30,10 @@ namespace Deenote.UI.Views
         public void SetLocalizedStatusMessage(string key, ReadOnlySpan<string> args = default)
             => SetStatusMessage(LocalizableText.Localized(key), args);
 
-        public UniTaskVoid ShowToastAsync(LocalizableText message, float duration_s)
-        {
-            // TODO: impl
-            return default!;
-        }
-
-        public UniTaskVoid ShowLocalizedToastAsync(string key, float duration_s)
-            => ShowToastAsync(LocalizableText.Localized(key), duration_s);
-
         private void Awake()
         {
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
-                MainSystem.Settings.NotificationFlag.FpsShown,
+                GlobalSettings.NotificationFlag.FpsShown,
                 settings => _fpsText.gameObject.SetActive(_isFpsUpdate = settings.IsFpsShown));
         }
 

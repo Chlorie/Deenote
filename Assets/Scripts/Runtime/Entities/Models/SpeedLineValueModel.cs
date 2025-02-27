@@ -6,6 +6,10 @@ using System.Diagnostics;
 
 namespace Deenote.Entities.Models
 {
+    // Official json file has "lines" array, which represents a interval in which all notes has same speed,
+    // but the array is actually duplicated for chart, as all note has its own speed property.
+    // I dont know which property DEEMO II use to parse when game playing, I use note's property, and the
+    // SpeedLine is just for serialization
     public struct SpeedLineValueModel
     {
         public float Speed;

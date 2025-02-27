@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,13 @@ using UnityEngine;
 
 namespace Deenote.Entities.Comparisons
 {
-    public sealed class NoteTimeComparer : IComparer<IStageTimeNode>
+    public sealed class NoteTimeComparer : IComparer<IStageTimeNode>, IComparer<SpeedLineValueModel>
     {
         public static readonly NoteTimeComparer Instance = new();
 
         public int Compare(IStageTimeNode x, IStageTimeNode y) => Comparer<float>.Default.Compare(x.Time, y.Time);
+
+        public int Compare(SpeedLineValueModel x, SpeedLineValueModel y) => Comparer<float>.Default.Compare(x.StartTime, y.StartTime);
 
         [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
         public static void AssertInOrder(IEnumerable<IStageTimeNode> notes, string? additionMessage = null)

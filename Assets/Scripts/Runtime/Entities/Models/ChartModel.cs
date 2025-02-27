@@ -1,13 +1,9 @@
 #nullable enable
 
 using Deenote.Entities.Comparisons;
-using Deenote.Library.Collections;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Deenote.Entities.Models
 {
@@ -77,36 +73,6 @@ namespace Deenote.Entities.Models
         public string ToJsonString()
         {
             return JsonConvert.SerializeObject(this);
-        }
-
-        public readonly partial struct NoteModelListProxy : IReadOnlyList<IStageNoteNode>
-        {
-            private readonly ChartModel _chartModel;
-
-            public NoteModelListProxy(ChartModel chart) => _chartModel = chart;
-
-            public IStageNoteNode this[int index] => _chartModel._visibleNoteNodes[index];
-
-            /// <summary>
-            /// Count of all <see cref="IStageNoteNode"/>, including <see cref="NoteModel"/>
-            /// and <see cref="NoteTailNode"/>
-            /// </summary>
-            public int Count => _chartModel._visibleNoteNodes.Count;
-
-            /// <summary>
-            /// Count of <see cref="NoteModel"/>, also the total combo in game
-            /// </summary>
-            public int NoteCount => Count - _chartModel._holdCount;
-
-            public ReadOnlySpan<IStageNoteNode> AsSpan() => _chartModel._visibleNoteNodes.AsSpan();
-
-            public List<IStageNoteNode>.Enumerator GetEnumerator() => _chartModel._visibleNoteNodes.GetEnumerator();
-
-            public CollectionUtils.SpanOfTypeIterator<IStageNoteNode, NoteModel> EnumerateSelectableModels()
-                => AsSpan().OfType<IStageNoteNode, NoteModel>();
-
-            IEnumerator<IStageNoteNode> IEnumerable<IStageNoteNode>.GetEnumerator() => GetEnumerator();
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }

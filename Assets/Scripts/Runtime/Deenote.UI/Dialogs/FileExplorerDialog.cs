@@ -213,6 +213,11 @@ namespace Deenote.UI.Dialogs
             FilterByExtensions,
         }
 
+        private void OnValidate()
+        {
+            _dialog ??= GetComponent<Dialog>();
+        }
+
         private readonly struct PathFilter
         {
             private readonly ImmutableArray<string> _filters;

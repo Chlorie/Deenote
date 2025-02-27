@@ -12,8 +12,8 @@ namespace Deenote.UIFramework.Controls
         IDragHandler, IBeginDragHandler, IEndDragHandler
     {
         [SerializeField] Slider _slider = default!;
-        [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image _circleImage = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _circleImage = default!;
         [SerializeField] RectTransform _rectTransform = default!;
         // 似乎有1像素的border，颜色ControlElevationBorderBrush，但是完全看不出来，算了
 

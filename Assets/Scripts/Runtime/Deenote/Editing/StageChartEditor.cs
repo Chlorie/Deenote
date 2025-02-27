@@ -13,6 +13,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Deenote.Editing
 {
@@ -60,9 +61,16 @@ namespace Deenote.Editing
 
         #region Add Remove
 
+        private void OnNoteCollectionChanged()
+        {
+            _game.AssertChartLoaded();
+            NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
+            _game.UpdateNotes(true, false);
+        }
+
         public void AddNote(NoteCoord noteCoord, NoteModel notePrototype)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
 
             var note = notePrototype.Clone();
@@ -71,15 +79,15 @@ namespace Deenote.Editing
                 .OnRedone(note =>
                 {
                     _selector.Clear();
-                    _game.ForceUpdateNotes(true, false);
+                    OnNoteCollectionChanged();
                     NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
                 })
-                .OnUndone(note => _game.ForceUpdateNotes(true, false)));
+                .OnUndone(note => OnNoteCollectionChanged()));
         }
 
         public void AddMultipleNotes(NoteCoord baseCoord, ReadOnlySpan<NoteModel> notePrototypes)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (notePrototypes.IsEmpty)
                 return;
@@ -102,21 +110,20 @@ namespace Deenote.Editing
             _operations.Do(_game.CurrentChart.AddMultipleNotes(ImmutableCollectionsMarshal.AsImmutableArray(notes))
                 .OnRedone(nodes =>
                 {
-                    _selector.Reselect(notes.OfType<NoteModel>());
-                    _game.ForceUpdateNotes(true, false);
-                    NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
+                    _selector.Reselect(nodes.OfType<NoteModel>());
+                    OnNoteCollectionChanged();
                 })
                 .OnUndone(nodes =>
                 {
-                    _selector.DeselectMultiple(notes.OfType<NoteModel>());
-                        
+                    _selector.DeselectMultiple(nodes.OfType<NoteModel>());
+
                     NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
                 }));
         }
 
         public void RemoveNotes(ReadOnlySpan<NoteModel> notes)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (notes.IsEmpty)
                 return;
@@ -125,14 +132,12 @@ namespace Deenote.Editing
                 .OnRedone(nodes =>
                 {
                     _selector.Clear();
-                    _game.ForceUpdateNotes(true, false); // TODO:为什么这里原本的noteDataChangedExceptTime是true？
-                    NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
+                    OnNoteCollectionChanged();
                 })
                 .OnUndone(nodes =>
                 {
                     _selector.AddSelectMultiple(nodes.OfType<NoteModel>());
-                    _game.ForceUpdateNotes(true, false);
-                    NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
+                    OnNoteCollectionChanged();
                 }));
         }
 
@@ -140,7 +145,7 @@ namespace Deenote.Editing
 
         public void AddNotesSnappingToCurve(int count, ReadOnlySpan<GridsManager.CurveApplyProperty> applyProperties = default)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_game.Grids.CurveTimeInterval is not (var start, var end))
                 return;

@@ -62,11 +62,16 @@ namespace Deenote.GamePlay.Audio
 
         private void SetTime(float value, bool isByJump)
         {
-            if (Utils.SetField(ref _time, value, out var oldValue)) {
-                if (isByJump)
-                    _source.time = value;
-                TimeChanged?.Invoke(new TimeChangedEventArgs(oldValue, value, isByJump));
+            if (Mathf.Approximately(value, _time)) {
+                _time = value;
+                return;
             }
+
+            var oldValue = _time;
+            _time = value;
+            if (isByJump)
+                _source.time = value;
+            TimeChanged?.Invoke(new TimeChangedEventArgs(oldValue, value, isByJump));
         }
 
         /// <summary>

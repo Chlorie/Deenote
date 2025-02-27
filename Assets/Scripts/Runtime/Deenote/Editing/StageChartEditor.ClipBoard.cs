@@ -10,32 +10,21 @@ namespace Deenote.Editing
 {
     partial class StageChartEditor
     {
-        private PooledObjectListView<NoteModel> _clipBoard;
-
-        public ReadOnlySpan<NoteModel> ClipBoardNotes => _clipBoard.AsSpan();
-
-        public NoteCoord ClipBoardBaseCoord => _clipBoard.Count > 0 ? _clipBoard[0].PositionCoord : new(0f, 0f);
+        private NotesClipBoard _noteClipBoard_bf = default!;
+        public NotesClipBoard ClipBoard => _noteClipBoard_bf;
 
         private void Awake_ClipBoard()
         {
-            _clipBoard = new(new ObjectPool<NoteModel>(() => new NoteModel()));
+            _noteClipBoard_bf = new();
         }
 
         public void CopySelectedNotes()
         {
-            if (ClipBoardNotes.IsEmpty)
+            if (_selector.SelectedNotes.IsEmpty)
                 return;
 
             _placer.CancelPlaceNote();
-            _clipBoard.Clear();
-
-            var notes = _selector.SelectedNotes;
-
-            foreach (var note in notes) {
-                _clipBoard.Add(out var clipNote);
-                note.CloneDataTo(clipNote);
-            }
-            NoteModel.CloneLinkDatas(notes, _clipBoard.AsSpan());
+            ClipBoard.SetNotes(_selector.SelectedNotes);
         }
 
         public void CutSelectedNotes()
@@ -46,7 +35,7 @@ namespace Deenote.Editing
 
         public void PasteNotes()
         {
-            if (ClipBoardNotes.IsEmpty)
+            if (ClipBoard.Notes.IsEmpty)
                 return;
 
             _placer.PreparePasteClipBoard();

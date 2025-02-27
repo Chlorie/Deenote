@@ -11,9 +11,9 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class ToggleSwitch : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image _borderImage = default!;
-        [SerializeField] Image _knobImage = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _borderImage = default!;
+        [SerializeField] UnityEngine.UI.Image _knobImage = default!;
 
         [SerializeField]
         private bool _isChecked_bf;

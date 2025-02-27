@@ -25,10 +25,16 @@ namespace Deenote.Library
         public static void WithLocalScaleXY(this Transform transform, float x, float y)
             => transform.localScale = transform.localScale with { x = x, y = y };
 
+        public static void WithAnchoredMinMaxX(this RectTransform transform, float x)
+        {
+            transform.anchorMin = transform.anchorMin with { x = x };
+            transform.anchorMax = transform.anchorMax with { x = x };
+        }
+
         public static void WithColorAlpha(this SpriteRenderer spriteRenderer, float alpha)
             => spriteRenderer.color = spriteRenderer.color with { a = alpha };
 
-        public static void WithColorRGB(this SpriteRenderer spriteRenderer, Color color)
+        public static void WithColorSolid(this SpriteRenderer spriteRenderer, Color color)
             => spriteRenderer.color = color with { a = spriteRenderer.color.a };
 
         public static void WithColorAlpha(this Graphic graphic, float alpha)

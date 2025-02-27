@@ -11,9 +11,9 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class RadioButton : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image _borderImage = default!;
-        [SerializeField] Image _handleImage = default!;
+        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
+        [SerializeField] UnityEngine.UI.Image _borderImage = default!;
+        [SerializeField] UnityEngine.UI.Image _handleImage = default!;
 
         [SerializeField] RadioButtonGroup _group = default!;
         public RadioButtonGroup Group => _group;

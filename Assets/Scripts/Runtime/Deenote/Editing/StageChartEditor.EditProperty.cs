@@ -18,17 +18,17 @@ namespace Deenote.Editing
         private static readonly PianoSoundValueModel[] _defaultNoteSounds
             = new[] { new PianoSoundValueModel(0f, 0f, 72, 0) };
 
-        private void OnNotePropertyEdited(bool notesTimeChanged, bool notesVisualDataChanged, NotificationFlag flag)
+        private void OnNotePropertyEdited(bool notesVerticalPositionChanged, bool notesVisualDataChanged, NotificationFlag flag)
         {
             _game.AssertChartLoaded();
             NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
             NotifyFlag(flag);
-            _game.ForceUpdateNotes(notesTimeChanged, notesVisualDataChanged);
+            _game.UpdateNotes(notesVerticalPositionChanged, notesVisualDataChanged);
         }
 
         public void EditSelectedNotesPositionCoord(Func<NoteCoord, NoteCoord> valueSelector)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -41,7 +41,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesTime(Func<float, float> valueSelector)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -54,7 +54,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesTime(float newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -67,7 +67,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesPosition(Func<float, float> valueSelector)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -79,7 +79,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesPosition(float newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -91,7 +91,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesSize(Func<float, float> valueSelector)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -104,7 +104,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesSize(float newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -117,7 +117,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesShift(float newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -130,7 +130,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesSpeed(Func<float, float> valueSelector)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -138,12 +138,12 @@ namespace Deenote.Editing
             _operations.Do(_game.CurrentChart
                 .EditNotes(_selector.SelectedNotes, v => EntityArgs.ClampNoteSpeed(valueSelector(v)),
                     n => n.Speed, (n, v) => n.Speed = v)
-                .OnDone(notes => OnNotePropertyEdited(false, false, NotificationFlag.NoteSpeed)));
+                .OnDone(notes => OnNotePropertyEdited(true, false, NotificationFlag.NoteSpeed)));
         }
 
         public void EditSelectedNotesSpeed(float newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -156,7 +156,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesDuration(float newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -168,7 +168,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesVibrate(bool newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -181,7 +181,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesKind(NoteModel.NoteKind newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -193,7 +193,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesWarningType(WarningType newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -206,7 +206,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNotesEventId(string newValue)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -219,7 +219,7 @@ namespace Deenote.Editing
 
         public void EditSelectedNoteSounds(ReadOnlySpan<PianoSoundValueModel> values)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;
@@ -235,7 +235,7 @@ namespace Deenote.Editing
         /// </summary>
         public void EditSelectedNoteSounds(bool hasSound)
         {
-            if (_game.CurrentChart is null)
+            if (!_game.IsChartLoaded())
                 return;
             if (_selector.SelectedNotes.IsEmpty)
                 return;

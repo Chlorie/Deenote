@@ -94,14 +94,14 @@ namespace Deenote.GamePlay.Stage
         public float ConvertNoteCoordPositionToWorldX(float position)
             => position * (Args.NotePanelWidth / EntityArgs.StageMaxPositionWidth);
 
-        public float ConvertNoteCoordTimeToWorldZ(float time)
-            => _manager.ActualNoteSpeed * ConvertNoteCoordTimeToWorldZBase(time);
+        public float ConvertNoteCoordTimeToWorldZ(float time, float noteSpeed = 1f)
+            => _manager.ActualNoteSpeed * noteSpeed * ConvertNoteCoordTimeToWorldZBase(time);
 
         private float ConvertNoteCoordTimeToWorldZBase(float time)
             => time * Args.NoteTimeToZBaseMultiplier;
 
-        public float ConvertNoteCoordTimeToHoldScaleY(float time)
-            => _manager.ActualNoteSpeed * ConvertNoteCoordTimeToWorldZBase(time) / Args.HoldSpritePrefab.Sprite.bounds.size.y;
+        public float ConvertNoteCoordTimeToHoldScaleY(float time, float noteSpeed = 1f)
+            => _manager.ActualNoteSpeed * noteSpeed * ConvertNoteCoordTimeToWorldZBase(time) / Args.HoldSpritePrefab.Sprite.bounds.size.y;
 
         public (float X, float Z) ConvertNoteCoordToWorldPosition(NoteCoord coord)
             => (ConvertNoteCoordPositionToWorldX(coord.Position), ConvertNoteCoordTimeToWorldZ(coord.Time));

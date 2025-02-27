@@ -5,6 +5,7 @@ using Deenote.Entities.Models;
 using Deenote.GamePlay.Audio;
 using Deenote.Library;
 using System.Timers;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Deenote.GamePlay.Stage
@@ -50,21 +51,6 @@ namespace Deenote.GamePlay.Stage
             }
         }
 
-        public void PlayHitSosund()
-        {
-            if (NoteModel.IsSlide)
-                _game.HitSoundPlayer.PlaySlideSound();
-            else
-                _game.HitSoundPlayer.PlayClickSound();
-        }
-
-        public void PlayPianoSound()
-        {
-            if (NoteModel.HasSounds) {
-                _game.PianoSoundPlayer.PlaySounds(NoteModel.Sounds);
-            }
-        }
-
         /// <summary>
         /// Called when music time updated
         /// </summary>
@@ -92,21 +78,22 @@ namespace Deenote.GamePlay.Stage
             {
                 var stage = _game.Stage;
                 float noteAppearTime = stage.NoteAppearAheadTime;
-                if (timeDelta > noteAppearTime) {
+
+
+                if (timeDelta * NoteModel.Speed >= noteAppearTime) {
                     _noteSpriteRenderer.WithColorAlpha(0f);
                     SetHoldBodyDisplayLength(0);
                     return;
                 }
 
-                float noteFadeInTime = noteAppearTime * stage.Args.NoteFadeInRangePercent;
-                float alpha = Mathf.Clamp01((noteAppearTime - timeDelta) / noteFadeInTime);
-
-                _noteSpriteRenderer.WithColorAlpha(alpha);
-
                 // Position
 
-                float z = stage.ConvertNoteCoordTimeToWorldZ(timeDelta);
+                float z = stage.ConvertNoteCoordTimeToWorldZ(timeDelta, NoteModel.Speed);
                 this.transform.WithLocalPositionZ(z);
+
+                // Alpha
+
+                SetFallingNoteSpriteAlpha();
 
                 // Link lines
 
@@ -263,30 +250,36 @@ namespace Deenote.GamePlay.Stage
             _game.AssertStageLoaded();
 
             if (NoteModel.IsSelected)
-                _noteSpriteRenderer.WithColorRGB(_game.Stage.Args.NoteSelectedColor);
+                _noteSpriteRenderer.WithColorSolid(_game.Stage.Args.NoteSelectedColor);
             else if (NoteModel.IsCollided)
-                _noteSpriteRenderer.WithColorRGB(_game.Stage.Args.NoteCollidedColor);
+                _noteSpriteRenderer.WithColorSolid(_game.Stage.Args.NoteCollidedColor);
             else
-                _noteSpriteRenderer.WithColorRGB(Color.white);
+                _noteSpriteRenderer.WithColorSolid(Color.white);
         }
 
         #region Setters
+
+        private void SetFallingNoteSpriteAlpha()
+        {
+            _game.AssertStageLoaded();
+            var stage = _game.Stage;
+            var noteTime = NoteModel.Time - _game.MusicPlayer.Time;
+            var noteAppearTime = stage.NoteAppearAheadTime / NoteModel.Speed;
+
+            var noteFadeInTime = noteAppearTime * stage.Args.NoteFadeInRangePercent;
+            var alpha = MathUtils.MapTo(noteTime, noteAppearTime, noteAppearTime - noteFadeInTime, 0f, 1f);
+            _noteSpriteRenderer.WithColorAlpha(alpha);
+        }
 
         private void SetHoldBodyDisplayLength(float time)
         {
             _game.AssertStageLoaded();
 
-            var scaleY = _game.Stage.ConvertNoteCoordTimeToHoldScaleY(time);
+            var scaleY = _game.Stage.ConvertNoteCoordTimeToHoldScaleY(time, NoteModel.Speed);
             _holdBodySpriteRenderer.transform.WithLocalScaleY(scaleY);
         }
 
         #endregion
-
-        private void OnDrawGizmosSelected()
-        {
-            var b = _holdBodySpriteRenderer.bounds;
-            Gizmos.DrawWireCube(b.center, b.size);
-        }
 
         public enum NoteDisplayState
         {
