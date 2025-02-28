@@ -1,13 +1,13 @@
 #nullable enable
 
 using CommunityToolkit.HighPerformance.Buffers;
+using Deenote.CoreApp.Project;
 using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Entities.Operations;
 using Deenote.GamePlay;
 using Deenote.Library.Components;
-using Deenote.Project;
 using System;
 using System.Collections.Immutable;
 using System.Linq;

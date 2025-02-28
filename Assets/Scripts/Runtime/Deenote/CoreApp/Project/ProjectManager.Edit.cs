@@ -4,7 +4,7 @@ using Deenote.Entities.Models;
 using System.IO;
 using UnityEngine;
 
-namespace Deenote.Project
+namespace Deenote.CoreApp.Project
 {
     partial class ProjectManager
     {

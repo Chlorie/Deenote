@@ -1,9 +1,9 @@
 #nullable enable
 
+using Deenote.CoreApp.Project;
 using Deenote.Entities;
 using Deenote.GamePlay.Audio;
 using Deenote.Library.Components;
-using Deenote.Project;
 
 namespace Deenote.GamePlay
 {
@@ -15,7 +15,7 @@ namespace Deenote.GamePlay
         {
             _game = manager;
             MainSystem.ProjectManager.RegisterNotification(
-                Project.ProjectManager.NotificationFlag.ProjectTempos,
+                ProjectManager.NotificationFlag.ProjectTempos,
                 _OnTemposChanged);
             _game.RegisterNotification(
                 GamePlayManager.NotificationFlag.SuddenPlus,

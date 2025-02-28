@@ -8,13 +8,13 @@ using Deenote.GamePlay;
 using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
-using Deenote.Project;
 using Deenote.UIFramework.Controls;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Deenote.CoreApp.Project;
 
 namespace Deenote.UI.Views
 {

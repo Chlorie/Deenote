@@ -1,13 +1,13 @@
 #nullable enable
 
 using Deenote.Audio;
+using Deenote.CoreApp.Project;
 using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.GamePlay.Audio;
 using Deenote.GamePlay.Stage;
 using Deenote.GamePlay.UI;
 using Deenote.Library.Components;
-using Deenote.Project;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 

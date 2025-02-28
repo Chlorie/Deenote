@@ -1,6 +1,7 @@
 #nullable enable
 
 using CommunityToolkit.Diagnostics;
+using Deenote.CoreApp.Project;
 using Deenote.Library.Components;
 using Deenote.Localization;
 using Deenote.UIFramework.Controls;
@@ -63,7 +64,7 @@ namespace Deenote.UI.Dialogs
             _autoSaveDropdown.ResetOptions(_autoSaveDropdownOptions.AsSpan());
             _autoSaveDropdown.SelectedIndexChanged += val => MainSystem.ProjectManager.AutoSave = GetAutoSaveDropdownOption(val);
             MainSystem.ProjectManager.RegisterNotificationAndInvoke(
-                Project.ProjectManager.NotificationFlag.AutoSave,
+                ProjectManager.NotificationFlag.AutoSave,
                 manager => _autoSaveDropdown.SetValueWithoutNotify(GetAutoSaveDropdownIndex(manager.AutoSave)));
 
             //_embedAudioDataToggle.IsCheckedChanged+=MainSystem.ProjectManager.

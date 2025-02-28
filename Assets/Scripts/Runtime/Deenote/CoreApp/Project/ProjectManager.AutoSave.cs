@@ -6,16 +6,13 @@ using Deenote.Library;
 using System;
 using System.IO;
 using System.Threading;
-using UnityEngine;
 
-namespace Deenote.Project
+namespace Deenote.CoreApp.Project
 {
     partial class ProjectManager
     {
-        private const float AutoSaveIntervalTime_s = 5f * 60f;
         private const string AutoSaveJsonDirName = "$Deenote_AutoSave";
 
-        private float _lastAutoSaveTime;
         private CancellationTokenSource? _autoSaveCts;
 
         private ProjectAutoSaveOption _autoSave_bf;
@@ -24,8 +21,6 @@ namespace Deenote.Project
             get => _autoSave_bf;
             set {
                 if (Utils.SetField(ref _autoSave_bf, value)) {
-                    if (value is ProjectAutoSaveOption.Off)
-                        _lastAutoSaveTime = 0f;
                     NotifyFlag(NotificationFlag.AutoSave);
                 }
             }
@@ -34,31 +29,27 @@ namespace Deenote.Project
         public event Action<ProjectAutoSaveEventArgs>? ProjectAutoSaving;
         public event Action<ProjectAutoSaveEventArgs>? ProjectAutoSaved;
 
-
-        private void Update_AutoSave()
+        private void AutoSaveHandler()
         {
             switch (AutoSave) {
-                case ProjectAutoSaveOption.Off:
-                    break;
                 case ProjectAutoSaveOption.On:
-                    if (CurrentProject is null)
-                        return;
-                    if (_lastAutoSaveTime.IncAndTryWrap(Time.unscaledDeltaTime, AutoSaveIntervalTime_s)) {
+                    if (IsProjectLoaded()) {
                         _ = SaveProjectAsync();
                     }
                     break;
                 case ProjectAutoSaveOption.OnAndSaveJson:
-                    if (CurrentProject is null)
-                        return;
-                    if (_lastAutoSaveTime.IncAndTryWrap(Time.deltaTime, AutoSaveIntervalTime_s)) {
+                    if (IsProjectLoaded()) {
                         _ = SaveProjectAndJsonAsync();
                     }
+                    break;
+                default:
                     break;
             }
 
             async UniTaskVoid SaveProjectAsync()
             {
                 _autoSaveCts?.Cancel();
+                _autoSaveCts?.Dispose();
                 var cts = new CancellationTokenSource();
                 _autoSaveCts = cts;
                 try {
@@ -75,6 +66,7 @@ namespace Deenote.Project
             async UniTaskVoid SaveProjectAndJsonAsync()
             {
                 _autoSaveCts?.Cancel();
+                _autoSaveCts?.Dispose();
                 var cts = new CancellationTokenSource();
                 _autoSaveCts = cts;
                 try {

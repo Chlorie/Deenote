@@ -1,7 +1,7 @@
 #nullable enable
 
+using Deenote.CoreApp.Project;
 using Deenote.Library.Components;
-using Deenote.Project;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

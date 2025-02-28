@@ -6,13 +6,13 @@ using Deenote.Localization;
 using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
-using Deenote.Project;
 using Deenote.UI.Dialogs;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
 using Deenote.UIFramework.Controls;
 using System.IO;
 using UnityEngine;
+using Deenote.CoreApp.Project;
 
 namespace Deenote.UI.Views
 {
@@ -196,7 +196,7 @@ namespace Deenote.UI.Views
             
             await MainSystem.ProjectManager.SaveCurrentProjectAsync();
             AddPathToRecentFiles(proj.ProjectFilePath);
-            MainSystem.Configuration.Save();
+            MainSystem.SaveSystem.SaveConfigurations();
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
@@ -222,7 +222,7 @@ namespace Deenote.UI.Views
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectToAsync(feRes.Path);
-            MainSystem.Configuration.Save();
+            MainSystem.SaveSystem.SaveConfigurations();
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
 

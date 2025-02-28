@@ -11,7 +11,7 @@ using System.IO;
 using System.Threading;
 using UnityEngine;
 
-namespace Deenote.Project
+namespace Deenote.CoreApp.Project
 {
     public sealed partial class ProjectManager : FlagNotifiableMonoBehaviour<ProjectManager, ProjectManager.NotificationFlag>
     {
@@ -26,15 +26,21 @@ namespace Deenote.Project
             }
         }
 
-        private void Start()
+        private void Awake()
         {
-            // TODO: Fake
-            CurrentProject = Fake.GetProject();
+            MainSystem.SaveSystem.AutoSaving += AutoSaveHandler;
         }
 
-        private void Update()
+        private void OnDestroy()
         {
-            Update_AutoSave();
+            MainSystem.SaveSystem.AutoSaving -= AutoSaveHandler;
+        }
+
+        private void Start()
+        {
+
+            // TODO: Fake
+            CurrentProject = Fake.GetProject();
         }
 
         public async UniTask<bool> OpenLoadProjectFileAsync(string filePath)
@@ -84,7 +90,7 @@ namespace Deenote.Project
         private void ValidateProject()
         {
             if (CurrentProject is null)
-                throw new System.InvalidOperationException("No project loaded.");
+                throw new InvalidOperationException("No project loaded.");
         }
 
         /// <summary>
@@ -97,6 +103,9 @@ namespace Deenote.Project
 #pragma warning disable CS8774
             => Debug.Assert(CurrentProject is not null, "Project not loaded");
 #pragma warning restore CS8774
+
+        [MemberNotNullWhen(true, nameof(CurrentProject))]
+        public bool IsProjectLoaded() => CurrentProject is not null;
 
         #endregion
 

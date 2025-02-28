@@ -3,11 +3,12 @@
 using Deenote.Audio;
 using Deenote.Core.Configurations;
 using Deenote.Core.Inputting;
+using Deenote.CoreApp.Project;
 using Deenote.Editing;
 using Deenote.GamePlay;
 using Deenote.GamePlay.Stage;
 using Deenote.Library.Components;
-using Deenote.Project;
+using Deenote.Systems;
 using System;
 using System.Collections.Immutable;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace Deenote
     public sealed partial class MainSystem : SingletonBehaviour<MainSystem>
     {
         [Header("System")]
+        [SerializeField] SaveSystem _saveSystem = default!;
         [SerializeField] PianoSoundSource _pianoSoundSource = default!;
         [Header("Manager")]
         [SerializeField] ProjectManager _projectManager = default!;
@@ -24,7 +26,7 @@ namespace Deenote
         [SerializeField] StageChartEditor _stageChartEditor = default!;
         [SerializeField] KeyBindingManager _keyBindingManager = default!;
 
-        public static ConfigSerializer Configuration { get; private set; }=default!;
+        public static SaveSystem SaveSystem => Instance._saveSystem;
         public static GlobalSettings GlobalSettings { get; private set; } = default!;
 
         public static PianoSoundSource PianoSoundSource => Instance._pianoSoundSource;
@@ -38,7 +40,6 @@ namespace Deenote
         {
             base.Awake();
 
-            Configuration = new(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "config.json");
             GlobalSettings = new();
 
             StageChartEditor.OnInstantiate(ProjectManager, GamePlayManager);
@@ -46,7 +47,7 @@ namespace Deenote
 
         private void Start()
         {
-            Configuration.Load();
+            SaveSystem.LoadConfigurations();
             _ = GameStageSceneLoader.LoadAsync("DeemoStage");
         }
 

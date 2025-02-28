@@ -16,14 +16,14 @@ namespace Deenote
         {
             _keyBindings = new();
 
-            MainSystem.Configuration.Saving += configs =>
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
                 configs.Add("vsync", IsVSyncOn);
                 configs.Add("ineffective_prop_visible", IsIneffectivePropertiesVisible);
                 configs.Add("fps_shown", IsFpsShown);
                 configs.AddDictionary("key_bindings", _keyBindings);
             };
-            MainSystem.Configuration.Loaded += configs =>
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
                 IsVSyncOn = configs.GetBoolean("vsync");
                 IsIneffectivePropertiesVisible = configs.GetBoolean("ineffective_prop_visible");
