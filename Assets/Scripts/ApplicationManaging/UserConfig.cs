@@ -1,6 +1,6 @@
 #nullable enable
 
-using Deenote.Core.Inputting;
+using Deenote.Systems.Inputting;
 using System.Collections.Generic;
 using UnityEngine;
 

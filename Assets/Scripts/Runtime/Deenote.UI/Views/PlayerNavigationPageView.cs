@@ -1,6 +1,7 @@
 #nullable enable
 
-using Deenote.Editing;
+using Deenote.Core.Editing;
+using Deenote.Core.GamePlay;
 using Deenote.GamePlay;
 using Deenote.Library.Components;
 using Deenote.UIFramework.Controls;

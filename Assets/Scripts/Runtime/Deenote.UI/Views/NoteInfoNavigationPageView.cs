@@ -2,7 +2,6 @@
 
 using CommunityToolkit.Diagnostics;
 using Deenote.Localization;
-using Deenote.Editing;
 using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.Library.Collections;
@@ -12,6 +11,7 @@ using Deenote.UI.Views.Panels;
 using System;
 using System.Linq;
 using UnityEngine;
+using Deenote.Core.Editing;
 
 namespace Deenote.UI.Views
 {

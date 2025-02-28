@@ -1,7 +1,6 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
-using Deenote.Core;
 using Deenote.Localization;
 using Deenote.Library;
 using Deenote.Library.Collections;
@@ -12,7 +11,8 @@ using Deenote.UI.Views.Elements;
 using Deenote.UIFramework.Controls;
 using System.IO;
 using UnityEngine;
-using Deenote.CoreApp.Project;
+using Deenote.Core.Project;
+using Deenote.Core;
 
 namespace Deenote.UI.Views
 {

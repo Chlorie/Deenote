@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
-using Deenote.Core;
 using Deenote.Localization;
 using Deenote.UI.Dialogs.Elements;
+using Deenote.Core;
 
 namespace Deenote.UI
 {

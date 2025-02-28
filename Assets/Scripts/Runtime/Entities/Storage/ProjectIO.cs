@@ -1,7 +1,6 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
-using Deenote.Core;
 using Deenote.Entities.Models;
 using System.IO;
 using System.Threading;
@@ -10,6 +9,9 @@ namespace Deenote.Entities.Storage
 {
     public static partial class ProjectIO
     {
+        public const ushort DeenoteProjectFileHeader = 0xDEE0;
+        public const byte DeenoteProjectFileVersionMark = 1;
+
         public static UniTask<ProjectModel?> LoadAsync(string projectFilePath, CancellationToken cancellationToken = default)
             => UniTask.RunOnThreadPool(() => Load(projectFilePath), configureAwait: false, cancellationToken);
 
@@ -31,11 +33,11 @@ namespace Deenote.Entities.Storage
             using var br = new BinaryReader(fs);
 
             var header = br.ReadUInt16();
-            if (header != VersionManager.DeenoteProjectFileHeader)
+            if (header != DeenoteProjectFileHeader)
                 return null;
 
             var version = br.ReadByte();
-            if (version != VersionManager.DeenoteProjectFileVersionMark)
+            if (version != DeenoteProjectFileVersionMark)
                 return null;
 
             var proj = ReadProject(br, projectFilePath);
@@ -46,8 +48,8 @@ namespace Deenote.Entities.Storage
         {
             using var fs = File.OpenWrite(saveFilePath);
             using var bw = new BinaryWriter(fs);
-            bw.Write(VersionManager.DeenoteProjectFileHeader);
-            bw.Write(VersionManager.DeenoteProjectFileVersionMark);
+            bw.Write(DeenoteProjectFileHeader);
+            bw.Write(DeenoteProjectFileVersionMark);
             WriteProject(bw, project);
             project.ProjectFilePath = saveFilePath;
         }

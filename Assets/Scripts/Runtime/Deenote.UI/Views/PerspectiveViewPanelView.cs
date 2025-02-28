@@ -1,12 +1,10 @@
 #nullable enable
 
 using Deenote.Core;
-using Deenote.GamePlay;
-using Deenote.GamePlay.Stage;
+using Deenote.Core.GamePlay;
 using Deenote.GamePlay.UI;
 using Deenote.Library;
 using Deenote.Library.Components;
-using Deenote.UI.Views.Panels;
 using System;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -74,7 +72,7 @@ namespace Deenote.UI.Views
                 manager =>
                 {
                     manager.AssertStageLoaded();
-                    manager.StagePerspectiveCamera.ApplyToRenderTexture(_viewRenderTexture);
+                    manager.Stage.PerspectiveCamera.ApplyToRenderTexture(_viewRenderTexture);
                     StageForeground = manager.InstantiatePerspectiveViewForeground(_contentTransform);
                     _OnStageLoaded_Input(manager);
                 });

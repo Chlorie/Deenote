@@ -330,6 +330,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43df871793f322647a15b0c7d2d646ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _perspectiveCamera: {fileID: 1372557760}
   _holdBodyCullMaterial: {fileID: 2100000, guid: 919dd3b629e4fb64c9774a646b1a058e,
     type: 2}
   <NotePanelTransform>k__BackingField: {fileID: 1535761542}
@@ -1267,7 +1268,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <StageController>k__BackingField: {fileID: 384983969}
-  <GameStagePerspectiveCamera>k__BackingField: {fileID: 1372557760}
   <PerspectiveLinesRenderer>k__BackingField: {fileID: 900070399}
   <PerspectiveViewForeground>k__BackingField: {fileID: 3109862978520466737, guid: 4c1d716edf4dce74f8cef56eb87b30a3,
     type: 3}

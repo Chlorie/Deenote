@@ -1,6 +1,6 @@
 #nullable enable
 
-using Deenote.Editing;
+using Deenote.Core.Editing;
 using Deenote.Entities.Models;
 using Deenote.Library;
 using Deenote.Library.Components;

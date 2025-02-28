@@ -1,7 +1,8 @@
 #nullable enable
 
 using CommunityToolkit.Diagnostics;
-using Deenote.CoreApp.Project;
+using Deenote.Core.GamePlay;
+using Deenote.Core.Project;
 using Deenote.Library.Components;
 using Deenote.Localization;
 using Deenote.UIFramework.Controls;
@@ -35,7 +36,7 @@ namespace Deenote.UI.Dialogs
 
             _stageEffectToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsStageEffectOn = val;
             MainSystem.GamePlayManager.RegisterNotification(
-                GamePlay.GamePlayManager.NotificationFlag.StageEffectOn,
+                GamePlayManager.NotificationFlag.StageEffectOn,
                 manager => _stageEffectToggle.SetIsCheckedWithoutNotify(manager.IsStageEffectOn));
 
             _mouseSensitivityInput.EditSubmitted += val =>
@@ -83,7 +84,7 @@ namespace Deenote.UI.Dialogs
 
             _distinguishPianoNotesToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsPianoNotesDistinguished = val;
             MainSystem.GamePlayManager.RegisterNotification(
-                GamePlay.GamePlayManager.NotificationFlag.DistinguishPianoNotes,
+                GamePlayManager.NotificationFlag.DistinguishPianoNotes,
                 manager => _distinguishPianoNotesToggle.IsChecked = manager.IsPianoNotesDistinguished);
         }
 

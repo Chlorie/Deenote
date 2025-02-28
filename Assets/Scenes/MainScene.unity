@@ -15163,6 +15163,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5edf4a797c7347241827744ca91c60c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1058332189 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2460163384876621137, guid: 0863a797753b6814c9c567063d664ab3,
+    type: 3}
+  m_PrefabInstance: {fileID: 4334773112346427407}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 656d40cdc356c9b419549df8fc913894, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1061038412
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15726,6 +15738,7 @@ GameObject:
   - component: {fileID: 1074414939}
   - component: {fileID: 1074414938}
   - component: {fileID: 1074414937}
+  - component: {fileID: 1074414942}
   m_Layer: 0
   m_Name: MainSystem
   m_TagString: Untagged
@@ -15783,6 +15796,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cee3aa9904c75d9499a5750884e5febe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saveSystem: {fileID: 1074414942}
   _pianoSoundSource: {fileID: 295354312}
   _projectManager: {fileID: 1074414939}
   _gamePlayManager: {fileID: 1074414938}
@@ -15807,6 +15821,18 @@ Transform:
   - {fileID: 1649527660}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1074414942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074414936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60fb3f5d2a99af841a9b1f7c1e3cabb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1092427013
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32548,6 +32574,16 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -20
       objectReference: {fileID: 0}
+    - target: {fileID: 1364213962606655444, guid: 0863a797753b6814c9c567063d664ab3,
+        type: 3}
+      propertyPath: _navMenuItems.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1364213962606655444, guid: 0863a797753b6814c9c567063d664ab3,
+        type: 3}
+      propertyPath: _navMenuItems.Array.data[6]
+      value: 
+      objectReference: {fileID: 1058332189}
     - target: {fileID: 1721283400968376476, guid: 0863a797753b6814c9c567063d664ab3,
         type: 3}
       propertyPath: m_AnchorMax.y

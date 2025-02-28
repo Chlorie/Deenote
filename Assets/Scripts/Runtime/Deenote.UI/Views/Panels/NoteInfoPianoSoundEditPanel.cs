@@ -1,12 +1,12 @@
 #nullable enable
 
-using Deenote.Editing;
+using Deenote.Core.Editing;
 using Deenote.Entities.Models;
 using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
-using Deenote.UIFramework.Controls;
 using Deenote.UI.Views.Elements;
+using Deenote.UIFramework.Controls;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

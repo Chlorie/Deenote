@@ -4,8 +4,8 @@ using Deenote.Audio;
 using Deenote.Localization;
 using Reflex.Core;
 using UnityEngine;
-using Deenote.Core.Inputting;
 using Deenote.Utilities;
+using Deenote.Systems.Inputting;
 
 namespace Deenote.ApplicationManaging
 {

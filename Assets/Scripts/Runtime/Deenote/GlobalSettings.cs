@@ -1,5 +1,5 @@
-using Deenote.Core.Inputting;
 using Deenote.Library.Components;
+using Deenote.Systems.Inputting;
 using System.Collections.Generic;
 using UnityEngine;
 

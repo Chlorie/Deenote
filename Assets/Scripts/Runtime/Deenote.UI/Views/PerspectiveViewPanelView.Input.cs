@@ -1,9 +1,9 @@
 #nullable enable
 
-using Deenote.Core.Inputting;
+using Deenote.Core.GamePlay;
 using Deenote.Entities;
-using Deenote.GamePlay;
 using Deenote.Library;
+using Deenote.Systems.Inputting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -133,7 +133,7 @@ namespace Deenote.UI.Views
                 localPoint.x / tsfmrect.width,
                 localPoint.y / tsfmrect.height);
 
-            return MainSystem.GamePlayManager.StagePerspectiveCamera.TryConvertViewportPointToNoteCoord(viewPoint, out coord);
+            return MainSystem.GamePlayManager.Stage.TryConvertViewportPointToNoteCoord(viewPoint, out coord);
         }
     }
 }

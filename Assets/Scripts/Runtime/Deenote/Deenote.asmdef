@@ -6,7 +6,8 @@
         "UniTask",
         "Deenote.Entities",
         "Deenote.Library",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Deenote.Localization"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
