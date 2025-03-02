@@ -124,9 +124,11 @@ namespace Deenote.Core.Editing
                 GamePlayManager.NotificationFlag.IsShowLinkLines,
                 manager =>
                 {
-                    bool show = manager.IsShowLinkLines;
-                    foreach (var note in _indicators)
-                        note.UpdateLinkLineVisibility(show);
+                    if (manager.IsStageLoaded() && manager.IsChartLoaded()) {
+                        bool show = manager.IsShowLinkLines;
+                        foreach (var note in _indicators)
+                            note.UpdateLinkLineVisibility(show);
+                    }
                 });
             _editor._game.RegisterNotification(
                 GamePlayManager.NotificationFlag.CurrentChart,

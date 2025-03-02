@@ -108,7 +108,7 @@ namespace Deenote.UI.Views
                 void ResizeTargetTexture(Vector2 old, Vector2 size)
                 {
                     _viewRenderTexture.Resize(MathUtils.RoundToInt(size));
-                    MainSystem.GamePlayManager.StagePerspectiveCamera?.ApplyToRenderTexture(_viewRenderTexture);
+                    MainSystem.GamePlayManager.Stage?.PerspectiveCamera.ApplyToRenderTexture(_viewRenderTexture);
                 }
             }
         }

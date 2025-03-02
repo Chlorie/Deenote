@@ -1,3 +1,5 @@
+#nullable enable
+
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
 using Deenote.Library;
@@ -14,7 +16,7 @@ namespace Deenote.UI.Views.Elements
 
         public MenuNavigationPageView Parent { get; private set; } = default!;
 
-        public string FilePath { get; private set; }
+        public string FilePath { get; private set; } = default!;
 
         private static readonly MessageBoxArgs _openProjOnOpenMsgBoxArgs = new(
             LocalizableText.Localized("OpenRecentProject_MsgBox_Title"),

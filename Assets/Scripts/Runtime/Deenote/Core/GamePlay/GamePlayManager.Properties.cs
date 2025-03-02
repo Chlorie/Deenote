@@ -15,6 +15,40 @@ namespace Deenote.Core.GamePlay
             loader.StageController.VisibleRangePercentage = VisibleRangePercentage;
         }
 
+        private void RegisterConfigurations()
+        {
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
+            {
+                configs.Add("stage/note_speed", NoteFallSpeed);
+                configs.Add("stage/show_link_lines", IsShowLinkLines);
+                configs.Add("stage/piano_note_distinguish", IsPianoNotesDistinguished);
+                configs.Add("stage/effect", IsStageEffectOn);
+                configs.Add("stage/sudden_plus", SuddenPlus);
+                configs.Add("stage/early_display_slow_notes", EarlyDisplaySlowNotes);
+                configs.Add("stage/ignore_note_speed_property", IgnoreNoteSpeed);
+
+                configs.Add("stage/music_speed", MusicSpeed);
+                configs.Add("stage/hitsound_volume", HitSoundVolume);
+                configs.Add("stage/music_volume", MusicVolume);
+                configs.Add("stage/piano_volume", PianoVolume);
+            };
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
+            {
+                NoteFallSpeed = configs.GetInt32("stage/note_speed", 50);
+                IsShowLinkLines = configs.GetBoolean("stage/show_link_lines", true);
+                IsPianoNotesDistinguished = configs.GetBoolean("stage/piano_note_distinguish", true);
+                IsStageEffectOn = configs.GetBoolean("stage/sudden_plus", true);
+                SuddenPlus = configs.GetSingle("stage/sudden_plus", 0f);
+                EarlyDisplaySlowNotes = configs.GetBoolean("stage/early_display_slow_notes", false);
+                IgnoreNoteSpeed = configs.GetBoolean("stage/ignore_note_speed_property", false);
+
+                MusicSpeed = configs.GetInt32("stage/music_speed", 10);
+                HitSoundVolume = configs.GetSingle("stage/hitsound_volume", 0f);
+                MusicVolume = configs.GetSingle("stage/music_volume", 100f);
+                PianoVolume = configs.GetSingle("stage/piano_volume", 0f);
+            };
+        }
+
         #region Stage
 
         private int _noteSpeed_bf;
@@ -23,32 +57,37 @@ namespace Deenote.Core.GamePlay
         private float _suddenPlus_bf;
         private bool _isStageEffectOn_bf;
         private bool _earlyDisplayLowSpeedNotes_bf;
+        private bool _ignoreNoteSpeed_bf;
 
         /// <summary>
         /// Range [1, 99], display [0.1, 9.9]
         /// </summary>
-        public int NoteSpeed
+        public int NoteFallSpeed
         {
             get => _noteSpeed_bf;
             set {
                 value = Mathf.Clamp(value, MinNoteSpeed, MaxNoteSpeed);
                 if (Utils.SetField(ref _noteSpeed_bf, value)) {
-                    if (CurrentChart is not null && Stage is not null) {
-                        NotesManager.UpdateTimeState(MusicPlayer.Time, false, true);
+                    if (IsStageLoaded() && IsChartLoaded()) {
+                        NotesManager.RefreshStageActiveNotes();
                     }
                     NotifyFlag(NotificationFlag.NoteSpeed);
                 }
             }
         }
 
-        public float ActualNoteSpeed => ConvertToActualNoteSpeed(NoteSpeed);
+        public float ActualNoteFallSpeed => ConvertToActualNoteSpeed(NoteFallSpeed);
 
         public bool IsShowLinkLines
         {
             get => _showLinkLines_bf;
             set {
                 if (Utils.SetField(ref _showLinkLines_bf, value)) {
-                    NotesManager.UpdateLinkVisibility(value);
+                    if (IsStageLoaded() && IsChartLoaded()) {
+                        foreach (var note in NotesManager.StageActiveNotes) {
+                            note.RefreshLinkLine();
+                        }
+                    }
                     NotifyFlag(NotificationFlag.IsShowLinkLines);
                 }
             }
@@ -59,7 +98,11 @@ namespace Deenote.Core.GamePlay
             get => _isPianoNotesDistinguished_bf;
             set {
                 if (Utils.SetField(ref _isPianoNotesDistinguished_bf, value)) {
-                    NotesManager.RefreshVisual();
+                    if (IsStageLoaded() && IsChartLoaded()) {
+                        foreach (var note in NotesManager.StageActiveNotes) {
+                            note.RefreshVisual();
+                        }
+                    }
                     NotifyFlag(NotificationFlag.DistinguishPianoNotes);
                 }
             }
@@ -88,7 +131,11 @@ namespace Deenote.Core.GamePlay
                 value = Mathf.Clamp(value, 0f, 1f);
                 if (Utils.SetField(ref _suddenPlus_bf, value)) {
                     _cacheVisibleRangePercentage = null;
-                    NotesManager.UpdateSuddenPlus(value);
+                    if (IsStageLoaded() && IsChartLoaded()) {
+                        foreach (var note in NotesManager.StageActiveNotes) {
+                            note.RefreshNoteSpriteAlpha();
+                        }
+                    }
                     NotifyFlag(NotificationFlag.SuddenPlus);
                 }
             }
@@ -105,13 +152,36 @@ namespace Deenote.Core.GamePlay
             }
         }
 
-        public bool EarlyDisplayLowSpeedNotes
+        /// <remarks>
+        /// In DEEMO II, if a low-speed notes is following a high-speed note, 
+        /// the slow note will appear only when the fast one appeared.
+        /// That means, the slow note will appear from the center of note panel.
+        /// <br/>
+        /// 
+        /// </remarks>
+        public bool EarlyDisplaySlowNotes
         {
             get => _earlyDisplayLowSpeedNotes_bf;
             set {
                 if (Utils.SetField(ref _earlyDisplayLowSpeedNotes_bf, value)) {
-                    NotesManager.UpdateTimeState(MusicPlayer.Time, false);
-                    NotifyFlag(NotificationFlag.EarlyDisplayLowSpeedNotes);
+                    if (IsStageLoaded() && IsChartLoaded()) {
+                        foreach (var note in NotesManager.StageActiveNotes) {
+                            note.RefreshNoteSpriteAlpha();
+                        }
+                    }
+                    NotifyFlag(NotificationFlag.EarlyDisplaySlowNotes);
+                }
+            }
+        }
+
+        public bool IgnoreNoteSpeed
+        {
+            get => _ignoreNoteSpeed_bf;
+            set {
+                if(Utils.SetField(ref _ignoreNoteSpeed_bf, value)) {
+                    if(IsStageLoaded() && IsChartLoaded()) {
+                        NotesManager.RefreshStageActiveNotes();
+                    }
                 }
             }
         }

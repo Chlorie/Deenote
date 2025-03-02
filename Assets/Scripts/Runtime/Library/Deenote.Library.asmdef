@@ -3,7 +3,8 @@
     "rootNamespace": "Deenote.Library",
     "references": [
         "UniTask",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Trarizon.Library"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

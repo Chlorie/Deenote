@@ -1,10 +1,8 @@
 #nullable enable
 
-using Deenote;
-using Deenote.Library.Collections;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Library.Components

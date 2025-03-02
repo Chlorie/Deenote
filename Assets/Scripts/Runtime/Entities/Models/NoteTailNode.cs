@@ -18,6 +18,10 @@ namespace Deenote.Entities.Models
 
         public float Position => HeadModel.Position;
 
+        public float Speed => HeadModel.Speed;
+
+        bool IStageNoteNode.IsComboNode => true;
+
         public NoteTailNode(NoteModel headModel) => HeadModel = headModel;
     }
 

@@ -7,7 +7,8 @@
         "Deenote.Entities",
         "Deenote.Library",
         "Unity.TextMeshPro",
-        "Deenote.Localization"
+        "Deenote.Localization",
+        "Trarizon.Library"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

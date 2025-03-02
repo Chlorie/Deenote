@@ -62,9 +62,9 @@ namespace Deenote.Entities
             if (time <= currentTime)
                 return time;
             else if (time < currentTime + StageNoteAheadTime)
-                return (time - currentTime) * noteSpeed;
+                return currentTime + (time - currentTime) * noteSpeed;
             else
-                return (time - currentTime) - StageNoteAheadTime / noteSpeed;
+                return currentTime + (time - currentTime) - StageNoteAheadTime / noteSpeed;
         }
 
         #endregion

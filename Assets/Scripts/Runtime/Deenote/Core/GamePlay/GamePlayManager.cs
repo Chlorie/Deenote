@@ -8,6 +8,7 @@ using Deenote.Core.Project;
 using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.GamePlay.UI;
+using Deenote.Library;
 using Deenote.Library.Components;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
@@ -26,7 +27,6 @@ namespace Deenote.Core.GamePlay
 
 
         public GameStageController? Stage { get; private set; }
-        public GameStagePerspectiveCamera? StagePerspectiveCamera { get; private set; }
         public PerspectiveLinesRenderer? PerspectiveLinesRenderer { get; private set; }
 
         public NotesManager NotesManager => _notesManager;
@@ -79,6 +79,8 @@ namespace Deenote.Core.GamePlay
             _pianoSoundPlayer = new StagePianoSoundPlayer(MainSystem.PianoSoundSource);
             _notesManager = new NotesManager(this);
 
+            RegisterConfigurations();
+
             GameStageSceneLoader.StageLoaded += loader =>
             {
                 _perspectiveViewForegroundPrefab = loader.PerspectiveViewForeground;
@@ -88,8 +90,10 @@ namespace Deenote.Core.GamePlay
                 PerspectiveLinesRenderer = loader.PerspectiveLinesRenderer;
                 PerspectiveLinesRenderer.OnInstantiate(this);
                 NotesManager.Initialize(
-                    loader.StageController.Args.GamePlayNotePrefab,
-                    loader.StageController);
+                    UnityUtils.CreateObjectPool(
+                        Stage.Args.GamePlayNotePrefab, 
+                        Stage.NotePanelTransform, 
+                        item => item.OnInstantiate(this)));
                 OnStageLoaded_Properties(loader);
 
                 if (IsChartLoaded()) {
@@ -102,7 +106,7 @@ namespace Deenote.Core.GamePlay
             MusicPlayer.TimeChanged += args =>
             {
                 var forward = args.NewTime > args.OldTime;
-                NotesManager.UpdateTimeState(args.NewTime, !args.IsByJump && _manualPlaySpeedMultiplier is null);
+                NotesManager.ShiftStageActiveNotes(!args.IsByJump && _manualPlaySpeedMultiplier is null);
                 NotifyFlag(NotificationFlag.ActiveNoteUpdated);
                 // In previous version, note time was controlled by StageNoteController.Update,
                 // so we have to manually call update when manually change music time.
@@ -120,7 +124,7 @@ namespace Deenote.Core.GamePlay
                         UnloadChart();
                         return;
                     }
-                    
+
                     // TODO: try out streaming clip provider
                     _musicPlayer.ReplaceClip(new DecodedClipProvider(proj.AudioClip));
 
@@ -141,7 +145,12 @@ namespace Deenote.Core.GamePlay
 
             MainSystem.StageChartEditor.Selector.RegisterNotification(
                 StageNoteSelector.NotificationFlag.SelectedNotesChanged,
-                selector => NotesManager.RefreshVisual());
+                selector =>
+                {
+                    foreach (var note in NotesManager.StageActiveNotes) {
+                        note.RefreshColoring();
+                    }
+                });
         }
 
         private void OnDestroy()
@@ -152,7 +161,7 @@ namespace Deenote.Core.GamePlay
         private void Start()
         {
             // TODO: Fake
-            NoteSpeed = 10;
+            NoteFallSpeed = 10;
             IsPianoNotesDistinguished = true;
             IsStageEffectOn = true;
 
@@ -181,13 +190,15 @@ namespace Deenote.Core.GamePlay
 
             switch (noteCollectionChangedOrNoteTimeRelatedPropertyChanged, notesVisualDataChanged) {
                 case (true, false):
-                    NotesManager.UpdateTimeState(MusicPlayer.Time, false, true);
+                    NotesManager.RefreshStageActiveNotes();
                     break;
                 case (false, true):
-                    NotesManager.RefreshVisual();
+                    foreach (var note in NotesManager.StageActiveNotes) {
+                        note.RefreshVisual();
+                    }
                     break;
                 case (true, true):
-                    NotesManager.UpdateTimeState(MusicPlayer.Time, false, true);
+                    NotesManager.RefreshStageActiveNotes();
                     break;
                 default:
                     return;
@@ -260,11 +271,11 @@ namespace Deenote.Core.GamePlay
         public void AssertChartLoaded() => Debug.Assert(CurrentChart is not null, "Chart not loaded");
 
         [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
-        [MemberNotNull(nameof(Stage), nameof(StagePerspectiveCamera), nameof(PerspectiveLinesRenderer))]
+        [MemberNotNull(nameof(Stage), nameof(PerspectiveLinesRenderer))]
         public void AssertStageLoaded() => Debug.Assert(Stage is not null, "Stage not loaded");
 #pragma warning restore CS8774
 
-        [MemberNotNullWhen(true, nameof(Stage), nameof(StagePerspectiveCamera), nameof(PerspectiveLinesRenderer))]
+        [MemberNotNullWhen(true, nameof(Stage), nameof(PerspectiveLinesRenderer))]
         public bool IsStageLoaded() => Stage is not null;
 
         [MemberNotNullWhen(true, nameof(CurrentChart))]
@@ -285,7 +296,7 @@ namespace Deenote.Core.GamePlay
             SuddenPlus,
             StageEffectOn,
             DistinguishPianoNotes,
-            EarlyDisplayLowSpeedNotes,
+            EarlyDisplaySlowNotes,
             ActiveNoteUpdated,
 
             CurrentChart,

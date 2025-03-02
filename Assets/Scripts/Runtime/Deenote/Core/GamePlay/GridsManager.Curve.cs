@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Core.GamePlay

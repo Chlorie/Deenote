@@ -4,11 +4,12 @@ using Deenote.Core.GamePlay;
 using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
-using Deenote.Library;
-using Deenote.Library.Collections;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trarizon.Library.Collections;
+using Trarizon.Library.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -27,28 +28,16 @@ namespace Deenote.Core.GameStage
         private readonly GamePlayManager _game;
         private float _time;
 
-        private ObjectPool<GameStageNoteController> _pool = default!;
-        private readonly List<GameStageNoteController> _activeNotes = default!;
-        /// <summary>
-        /// Notes whose start time is earlier than NoteDisappearTime,
-        /// but end time later than that,
-        /// </summary>
-        /// <remarks>
-        /// Normally, this list contains very few notes, so actually we
-        /// just using a List&lt;> as Dictionary&lt;,> 
-        /// </remarks>
-        private readonly List<GameStageNoteController> _pendingNotes = default!;
-
         /// <summary>
         /// Index of the note that will disappear next when
         /// player is playing forward
         /// </summary>
-        public int NextInactiveNoteIndex { get; private set; }
+        private int _nextInactiveNoteIndex;
         /// <summary>
         /// Index of the note that will next touch the 
         /// judgeline when player is playing forward.
         /// </summary>
-        public int NextHitNoteIndex { get; private set; }
+        private int _nextHitNoteIndex;
         /// <summary>
         /// Current combo
         /// </summary>
@@ -61,51 +50,73 @@ namespace Deenote.Core.GameStage
         /// Index of the note that will next appear when
         /// player is playing forward.
         /// </summary>
-        public int NextActiveNoteIndex { get; private set; }
+        private int _nextActiveNoteIndex;
+        private int _nextActiveNoteIndexInAppearOrder;
 
-        internal ReadOnlySpan<GameStageNoteController> ActiveNotes => _activeNotes.AsSpan();
-        internal ReadOnlySpan<GameStageNoteController> PendingNotes => _pendingNotes.AsSpan();
+        private SortedList<IStageNoteNode> _stageNoteNodesInAppearOrder = default!;
 
         internal NotesManager(GamePlayManager game)
         {
             _game = game;
-            _activeNotes = new();
-            _pendingNotes = new();
+            _trackingNotesInTimeOrder = new(Comparer<GameStageNoteController>.Create(
+                (l, r) => Comparer<float>.Default.Compare(l.NoteModel.Time, r.NoteModel.Time)));
+            _trackingNotesAppearTimeOrder = new(Comparer<GameStageNoteController>.Create(
+                (l, r) =>
+                {
+                    _game.AssertStageLoaded();
+                    var ltime = _game.Stage.GetNoteAppearTime(l.NoteModel);
+                    var rtime = _game.Stage.GetNoteAppearTime(r.NoteModel);
+                    return Comparer<float>.Default.Compare(ltime, rtime);
+                }));
         }
 
-        internal void Initialize(GameStageNoteController notePrefab, GameStageController stage)
+        internal void Initialize(ObjectPool<GameStageNoteController> gameStageNotePool)
         {
             if (_pool is not null) {
-                ClearAll();
+                ClearTrackNotes();
                 _pool.Dispose();
             }
-            else {
-                Debug.Assert(_activeNotes.Count == 0);
-                Debug.Assert(_pendingNotes.Count == 0);
-            }
 
-            _pool = UnityUtils.CreateObjectPool(notePrefab, stage.NotePanelTransform, item => item.OnInstantiate(_game));
-            NextInactiveNoteIndex = 0;
-            NextHitNoteIndex = 0;
+            _pool = gameStageNotePool;
+            _nextInactiveNoteIndex = 0;
+            _nextHitNoteIndex = 0;
             CurrentCombo = 0;
-            NextActiveNoteIndex = 0;
+            _nextActiveNoteIndex = 0;
         }
 
-        #region Public Methods
+        internal void UpdateNotesAppearOrder()
+        {
+            if (_stageNoteNodesInAppearOrder is null) {
+                _stageNoteNodesInAppearOrder = new SortedList<IStageNoteNode>(Comparer<IStageNoteNode>.Create((l, r) =>
+                {
+                    _game.AssertStageLoaded();
+                    var ltime = _game.Stage.GetNoteAppearTime(l);
+                    var rtime = _game.Stage.GetNoteAppearTime(r);
+                    return Comparer<float>.Default.Compare(ltime, rtime);
+                }));
+            }
+            else {
+                _stageNoteNodesInAppearOrder.Clear();
+            }
+
+            foreach (var node in _game.CurrentChart!.NoteNodes) {
+                _stageNoteNodesInAppearOrder.AddFromEnd(node);
+            }
+        }
+
+        #region Get
 
         /// <returns>
         /// ComboNode that just reached judge line,
         /// <see langword="null"/> if current combo is 0
-        /// <br/>
-        /// See <see cref="StageNoteNodeExt.IsComboNode(IStageNoteNode)"/> for what is a ComboNode
         /// </returns>
         public IStageNoteNode? GetPreviousHitComboNode()
         {
             _game.AssertChartLoaded();
 
-            for (int i = NextHitNoteIndex - 1; i >= 0; i--) {
+            for (int i = _nextHitNoteIndex - 1; i >= 0; i--) {
                 var note = _game.CurrentChart.NoteNodes[i];
-                if (note.IsComboNode())
+                if (note.IsComboNode)
                     return note;
             }
             return null;
@@ -115,147 +126,123 @@ namespace Deenote.Core.GameStage
         {
             _game.AssertChartLoaded();
 
-            for (int i = NextHitNoteIndex - 1; i >= 0; i--) {
+            for (int i = _nextHitNoteIndex - 1; i >= 0; i--) {
                 if (_game.CurrentChart.NoteNodes[i] is NoteModel note)
                     return note;
             }
             return null;
         }
 
-        /// <summary>
-        /// If stage music player time changed, call this method
-        /// NOTE THAT this method wont notify
-        /// </summary>
-        /// <param name="newTime"></param>
-        /// <param name="forceReselectNotes">Force reselect active notes in chart, 
-        /// if notes added/removed or note time changed, set this to <see langword="true"/>
-        /// </param>
-        internal void UpdateTimeState(float newTime, bool playSound, bool forceReselectNotes = false)
+        public IStageNoteNode? GetNextActiveNodeInNonEarlyDisplayMode()
         {
-            if (forceReselectNotes) {
-                ReselectActiveVisibleNotes();
-            }
-            else {
-                ShiftActiveVisibleNotes(newTime >= _time);
-            }
-            UpdateNoteSoundsRelatively(newTime >= _time, playSound);
-            _time = newTime;
+            _game.AssertChartLoaded();
+
+            var nodes = _game.CurrentChart.NoteNodes;
+            if (_nextActiveNoteIndex >= nodes.Length)
+                return null;
+            else
+                return nodes[_nextActiveNoteIndex];
         }
 
-        /// <summary>
-        /// Refresh visual data of notes, that is properties that wont affect note's vertical position
-        /// </summary>
-        internal void RefreshVisual()
-        {
-            if (!_game.IsStageLoaded())
-                return;
-
-            foreach (var note in ActiveNotes) {
-                note.RefreshVisual();
-            }
-            foreach (var note in PendingNotes) {
-                note.RefreshVisual();
-            }
-        }
-
-        internal void UpdateLinkVisibility(bool visible)
-        {
-            if (!_game.IsStageLoaded())
-                return;
-
-            foreach (var note in ActiveNotes) {
-                note.RefreshTimeState();
-            }
-            foreach (var note in PendingNotes) {
-                note.RefreshTimeState();
-            }
-        }
-
-        // FIXME:这个在StageNoteController里改一下，把sprite透明度调整的部分提取出来
-        internal void UpdateSuddenPlus(float percent)
-        {
-            if (!_game.IsStageLoaded())
-                return;
-
-            foreach (var note in ActiveNotes) {
-                note.RefreshTimeState();
-            }
-            foreach (var note in PendingNotes) {
-                note.RefreshTimeState();
-            }
-        }
+        #endregion
 
         private void ReselectActiveVisibleNotes()
         {
+            UpdateNotesAppearOrder();
+
             _game.AssertStageLoaded();
             _game.AssertChartLoaded();
 
-            ClearAll();
-            var musicPlayer = _game.MusicPlayer;
+            ClearTrackNotes();
             var stage = _game.Stage;
             var chart = _game.CurrentChart;
 
-            var activateTime = musicPlayer.Time + stage.NoteActiveAheadTime;
-            var deactivateTime = musicPlayer.Time - stage.Args.HitEffectSpritePrefabs.HitEffectTime;
+            var currentTime = _game.MusicPlayer.Time;
+            var deactiveDeltaTime = stage.Args.HitEffectSpritePrefabs.HitEffectTime;
+            var deactiveNoteTime = currentTime - deactiveDeltaTime;
+            var activateDeltaTime = stage.NoteActiveAheadTime;
+            var activateNoteTime = currentTime + activateDeltaTime;
 
             int index = 0, combo = 0;
 
             // Iterate nodes before current stage
             for (; index < chart.NoteNodes.Length; index++) {
                 var node = chart.NoteNodes[index];
-                if (node.Time > deactivateTime)
+                if (node.Time > deactiveNoteTime)
                     break;
-                AdjustCombo(node);
+                IncrementCombo(node);
+                TrackNote(node);
             }
-            NextInactiveNoteIndex = index;
+            _nextInactiveNoteIndex = index;
 
             // Iterate nodes in hiteffect time
             for (; index < chart.NoteNodes.Length; index++) {
                 var node = chart.NoteNodes[index];
-                if (node.Time > musicPlayer.Time)
+                if (node.Time > currentTime)
                     break;
-                AdjustCombo(node);
+                IncrementCombo(node);
                 TrackNote(node);
             }
-            NextHitNoteIndex = index;
+            _nextHitNoteIndex = index;
             CurrentCombo = combo;
 
-            // iterate nodes in falling time
+            // Iterate nodes in falling time to find _nextActiveNoteIndex
+            // Notes may have different speed, we do not track note here
             for (; index < chart.NoteNodes.Length; index++) {
                 var node = chart.NoteNodes[index];
-                //if (ToPseudoTime(node.Time, node.Speed) > activateTime)
-                if (node.Time > activateTime)
+                if (node is NoteModel && ToPseudoTime(node.Time, node.Speed) > activateNoteTime)
                     break;
-                TrackNote(node);
             }
-            NextActiveNoteIndex = index;
+            _nextActiveNoteIndex = index;
 
-            RefreshNotesTimeState();
-            //NotifyFlag(NotificationFlag.ActiveNoteUpdated);
+            // Iterate node in falling time, by appear time order
+            var indexInAppearOrder = _stageNoteNodesInAppearOrder.AsSpan()
+                .FindLowerBoundIndex(new AppearTimeComparable(currentTime, this));
 
-            void AdjustCombo(IStageNoteNode note)
+            for (int i = indexInAppearOrder - 1; i >= 0; i--) {
+                var node = _stageNoteNodesInAppearOrder[i];
+                if (node is NoteModel note) {
+                    if (note.Time > currentTime)
+                        AddTrackNote(note, _game.Stage.NoteAppearAheadTime);
+                }
+            }
+            _nextActiveNoteIndexInAppearOrder = indexInAppearOrder;
+
+            // Chain stage notes
+            GameStageNoteController? prevStageNote = null;
+            foreach (var note in _trackingNotesInTimeOrder) {
+                note.PostInitialize(prevStageNote);
+                prevStageNote = note;
+            }
+
+            void IncrementCombo(IStageNoteNode node)
             {
-                if (note.IsComboNode())
+                if (node.IsComboNode)
                     combo++;
             }
 
-            void TrackNote(IStageNoteNode note)
+            void TrackNote(IStageNoteNode node)
             {
-                if (note is NoteTailNode tail) {
-                    var head = tail.HeadModel;
-                    if (head.Time <= deactivateTime) {
-                        AddPendingNote(head);
-                    }
-                    // Handled in another branch
-                    else {
-                        return;
-                    }
-                }
-                else {
-                    Debug.Assert(note is NoteModel);
-                    AddActiveNote((NoteModel)note);
+                if (node is not NoteModel note)
+                    return;
+                if (note.EndTime > deactiveNoteTime) {
+                    AddTrackNote(note, _game.Stage.NoteAppearAheadTime);
                 }
             }
+
+            float ToPseudoTime(float time, float noteSpeed)
+            {
+                var currentTime = _game.MusicPlayer.Time;
+                return currentTime + (time - currentTime) * noteSpeed;
+            }
+        }
+
+        private void ResetIndices()
+        {
+            _nextInactiveNoteIndex = 0;
+            _nextHitNoteIndex = 0;
+            CurrentCombo = 0;
+            _nextActiveNoteIndex = 0;
         }
 
         /// <remarks>
@@ -276,7 +263,7 @@ namespace Deenote.Core.GameStage
             if (forward) OnPlayForward();
             else OnPlayBackward();
 
-            RefreshNotesTimeState();
+            // RefreshNotesTimeState();
 
             void OnPlayForward()
             {
@@ -492,163 +479,35 @@ namespace Deenote.Core.GameStage
 #endif
         }
 
-        private void RefreshNotesTimeState()
+        internal void RefreshStageActiveNotes()
         {
-            if (!_game.IsStageLoaded())
-                return;
-
-            foreach (var note in ActiveNotes) {
-                note.RefreshTimeState();
-            }
-            foreach (var note in PendingNotes) {
-                note.RefreshTimeState();
-            }
+            var currentTime = _game.MusicPlayer.Time;
+            ReselectActiveVisibleNotes();
+            UpdateNoteSoundsRelatively(currentTime >= _time, false);
+            _time = currentTime;
         }
 
-        #endregion Public Methods
-
-        private void ResetIndices()
+        internal void ShiftStageActiveNotes(bool playSound)
         {
-            NextInactiveNoteIndex = 0;
-            NextHitNoteIndex = 0;
-            CurrentCombo = 0;
-            NextActiveNoteIndex = 0;
+            var currentTime = _game.MusicPlayer.Time;
+            ShiftActiveVisibleNotes(currentTime >= _time);
+            UpdateNoteSoundsRelatively(currentTime >= _time, playSound);
+            _time = currentTime;
         }
 
-        private void ClearAll()
+        private readonly struct AppearTimeComparable : IComparable<IStageNoteNode>
         {
-            foreach (var item in _activeNotes) {
-                _pool.Release(item);
-            }
-            foreach (var item in _pendingNotes) {
-                _pool.Release(item);
-            }
-            _activeNotes.Clear();
-            _pendingNotes.Clear();
-        }
+            private readonly float _time;
+            private readonly NotesManager _manager;
 
-        /// <summary>
-        /// Move a note in active list to pending list, NOTE that this
-        /// method does not remove the item in active list
-        /// </summary>
-        private void MoveToPending_NonRemove(int indexInActiveNotes)
-        {
-            _pendingNotes.Add(_activeNotes[indexInActiveNotes]);
-        }
-
-        private void RemoveActiveNotes(Range range, bool checkPending)
-        {
-            foreach (var note in _activeNotes.AsSpan()[range]) {
-                _pool.Release(note);
-            }
-            _activeNotes.RemoveRange(range);
-        }
-
-        /// <summary>
-        /// Remove range in active list, if note is in pending list,
-        /// the note will not be released.
-        /// </summary>
-        private void RemoveActiveNotesWithPendingCheck(Range range)
-        {
-            foreach (var note in _activeNotes.AsSpan()[range]) {
-                if (IndexOfPendingNote(note.NoteModel) < 0)
-                    _pool.Release(note);
-            }
-            _activeNotes.RemoveRange(range);
-        }
-
-        private void RemovePendingNote(NoteModel note)
-        {
-            int index = IndexOfPendingNote(note);
-            Debug.Assert(index >= 0, "Cannot find note in pending list");
-
-            _pool.Release(_pendingNotes[index]);
-            _pendingNotes.RemoveAt(index);
-        }
-
-        private void RemoveAllPendingNotes(Predicate<GameStageNoteController> predicate)
-        {
-            var pool = _pool;
-            _pendingNotes.RemoveAll(note =>
+            public AppearTimeComparable(float time, NotesManager manager)
             {
-                if (predicate(note)) {
-                    pool.Release(note);
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            });
-        }
-
-        private GameStageNoteController AddActiveNote(NoteModel note)
-        {
-            var item = _pool.Get();
-            item.Initialize(note);
-            _activeNotes.Add(item);
-            return item;
-        }
-
-        private GameStageNoteController AddPendingNote(NoteModel note)
-        {
-            // We try to predict whether _trackingNotes contains this
-            // in GameStageController.SearchForNotesOnStage(),
-            // to reduce some cost on repeat-check
-            Debug.Assert(IndexOfPendingNote(note) == -1);
-
-            var gameNote = _pool.Get();
-            gameNote.Initialize(note);
-            _pendingNotes.Add(gameNote);
-            return gameNote;
-        }
-
-        private int IndexOfPendingNote(NoteModel note)
-        {
-            for (int i = 0; i < _pendingNotes.Count; i++) {
-                if (_pendingNotes[i].NoteModel == note)
-                    return i;
-            }
-            return -1;
-        }
-
-        private void PrependOnStageNotes(ReadOnlySpan<NoteModel> notes)
-        {
-            PreserveSpaceFromStart(_activeNotes, notes.Length);
-
-            var span = _activeNotes.AsSpan();
-            for (int i = 0; i < notes.Length; i++) {
-                // To keep active notes in order
-                NoteModel note = notes[i];
-                ref var gameNote = ref span[notes.Length - i - 1];
-                int indexInPending = IndexOfPendingNote(note);
-                if (indexInPending >= 0) {
-                    // If the note is in pending list, move from pending list
-                    gameNote = _pendingNotes[indexInPending];
-                    _pendingNotes.RemoveAt(indexInPending);
-                }
-                else {
-                    // Create new
-                    var item = _pool.Get();
-                    item.Initialize(note);
-                    gameNote = item;
-                }
+                _time = time;
+                _manager = manager;
             }
 
-            static void PreserveSpaceFromStart(List<GameStageNoteController> list, int count)
-            {
-                var oldCount = list.Count;
-                for (int i = 0; i < count; i++) {
-                    list.Add(default!);
-                }
-                var span = list.AsSpan();
-                span[..oldCount].CopyTo(span[count..]);
-            }
-        }
-
-        [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
-        private void AssertOnStageNotesInOrder(string? additionalMessage = null)
-        {
-            NoteTimeComparer.AssertInOrder(_activeNotes.Select(n => n.NoteModel), additionalMessage);
+            public int CompareTo(IStageNoteNode other)
+                => Comparer<float>.Default.Compare(_time, _manager._game.Stage!.GetNoteAppearTime(other));
         }
     }
 }

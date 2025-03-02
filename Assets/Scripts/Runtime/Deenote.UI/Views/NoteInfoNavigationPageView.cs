@@ -17,6 +17,7 @@ namespace Deenote.UI.Views
 {
     public sealed class NoteInfoNavigationPageView : MonoBehaviour
     {
+        [SerializeField] TextBlock _noteHeaderText = default!;
         [SerializeField] TextBox _positionInput = default!;
         [SerializeField] TextBox _timeInput = default!;
         [SerializeField] TextBox _sizeInput = default!;
@@ -38,6 +39,8 @@ namespace Deenote.UI.Views
 
         #region Localization Keys
 
+        private const string NoteNonSelectedHeader = "NavPanel_Note_Header";
+        private const string NoteSelectedHeader = "NavPanel_NoteSelected_Header";
         private const string MultipleValuesPlaceHolderKey = "NavPanel_NotePropertyMultipleValue_PlaceHolder";
 
         #endregion
@@ -53,6 +56,8 @@ namespace Deenote.UI.Views
                 _speedInput, _shiftInput, _eventIdInput,
                 _vibrateCheckBox,
             };
+
+            
 
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
                 GlobalSettings.NotificationFlag.IneffectivePropertiesVisible,
@@ -217,9 +222,11 @@ namespace Deenote.UI.Views
                     var notes = selector.SelectedNotes;
                     switch (notes.Length) {
                         case 0:
+                            _noteHeaderText.SetLocalizedText(NoteNonSelectedHeader);
                             SetControlsActive(false);
                             break;
                         case 1:
+                            _noteHeaderText.SetLocalizedText(NoteSelectedHeader, "1");
                             SetControlsActive(true);
                             var note = notes[0];
                             SyncFloatInput(_positionInput, note.Position);
@@ -247,6 +254,7 @@ namespace Deenote.UI.Views
                             _vibrateCheckBox.SetValueWithoutNotify(note.Vibrate);
                             break;
                         default:
+                            _noteHeaderText.SetLocalizedText(NoteSelectedHeader, notes.Length.ToString());
                             SetControlsActive(true);
                             NotifyMultiFloatValueChanged(_positionInput, notes, n => n.Position);
                             NotifyMultiFloatValueChanged(_timeInput, notes, n => n.Time);

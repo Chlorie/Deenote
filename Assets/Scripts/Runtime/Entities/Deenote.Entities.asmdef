@@ -4,7 +4,8 @@
     "references": [
         "Deenote.Library",
         "UniTask",
-        "Deenote.Core"
+        "Deenote.Core",
+        "Trarizon.Library"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

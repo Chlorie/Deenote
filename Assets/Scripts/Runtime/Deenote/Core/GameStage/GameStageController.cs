@@ -38,12 +38,20 @@ namespace Deenote.Core.GameStage
         /// visibility according to <see cref="NoteAppearAheadTime"/>, this is for tracking
         /// notes in different speed easier.
         /// </remarks>
-        public float NoteActiveAheadTime => Args.NotePanelBaseLengthTime / _manager.ActualNoteSpeed;
+        public float NoteActiveAheadTime => Args.NotePanelBaseLengthTime / _manager.ActualNoteFallSpeed;
+
+        public float GetNoteActiveAheadTime(float noteSpeed) => NoteActiveAheadTime / noteSpeed;
+
+        public float GetNoteActiveTime(IStageNoteNode node) => node.Time - GetNoteActiveAheadTime(node.Speed);
 
         /// <summary>
-        /// The time offset from current time when notes become visible
+        /// The time offset from current time when notes(speed==1) become visible
         /// </summary>
         public float NoteAppearAheadTime => NoteActiveAheadTime * _manager.VisibleRangePercentage;
+
+        public float GetNoteAppearAheadTime(float noteSpeed) => NoteAppearAheadTime / noteSpeed;
+
+        public float GetNoteAppearTime(IStageNoteNode node) => node.Time - GetNoteAppearAheadTime(node.Speed);
 
         protected GamePlayManager _manager = default!;
 
@@ -94,22 +102,22 @@ namespace Deenote.Core.GameStage
             => x / (Args.NotePanelWidth / EntityArgs.StageMaxPositionWidth);
 
         public float ConvertWorldZToNoteCoordTime(float z)
-            => z / Args.NoteTimeToZBaseMultiplier / _manager.ActualNoteSpeed;
+            => z / Args.NoteTimeToZBaseMultiplier / _manager.ActualNoteFallSpeed;
 
         public float ConvertNoteCoordPositionToWorldX(float position)
             => position * (Args.NotePanelWidth / EntityArgs.StageMaxPositionWidth);
 
         public float ConvertNoteCoordTimeToWorldZ(float time, float noteSpeed = 1f)
-            => _manager.ActualNoteSpeed * noteSpeed * ConvertNoteCoordTimeToWorldZBase(time);
+            => _manager.ActualNoteFallSpeed * noteSpeed * ConvertNoteCoordTimeToWorldZBase(time);
 
         private float ConvertNoteCoordTimeToWorldZBase(float time)
             => time * Args.NoteTimeToZBaseMultiplier;
 
         public float ConvertNoteCoordTimeToHoldScaleY(float time, float noteSpeed = 1f)
-            => _manager.ActualNoteSpeed * noteSpeed * ConvertNoteCoordTimeToWorldZBase(time) / Args.HoldSpritePrefab.Sprite.bounds.size.y;
+            => _manager.ActualNoteFallSpeed * noteSpeed * ConvertNoteCoordTimeToWorldZBase(time) / Args.HoldSpritePrefab.Sprite.bounds.size.y;
 
-        public (float X, float Z) ConvertNoteCoordToWorldPosition(NoteCoord coord)
-            => (ConvertNoteCoordPositionToWorldX(coord.Position), ConvertNoteCoordTimeToWorldZ(coord.Time));
+        public (float X, float Z) ConvertNoteCoordToWorldPosition(NoteCoord coord, float noteSpeed = 1f)
+            => (ConvertNoteCoordPositionToWorldX(coord.Position), ConvertNoteCoordTimeToWorldZ(coord.Time, noteSpeed));
 
         public bool TryConvertViewportPointToNoteCoord(Vector2 perspectiveViewPanelViewportPoint, out NoteCoord coord)
         {

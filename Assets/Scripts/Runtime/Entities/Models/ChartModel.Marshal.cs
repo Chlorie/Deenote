@@ -4,6 +4,7 @@ using Deenote.Entities.Comparisons;
 using Deenote.Library.Collections;
 using System;
 using System.Collections.Generic;
+using Trarizon.Library.Collections;
 
 namespace Deenote.Entities.Models
 {

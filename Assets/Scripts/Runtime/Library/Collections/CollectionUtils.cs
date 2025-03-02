@@ -11,25 +11,6 @@ namespace Deenote.Library.Collections
     {
         #region Modifiers
 
-        public static void MoveTo<T>(this Span<T> span, int fromIndex, int toIndex)
-        {
-            if (fromIndex == toIndex)
-                return;
-
-            var val = span[fromIndex];
-
-            if (fromIndex > toIndex) {
-                var len = fromIndex - toIndex;
-                span.Slice(toIndex, len).CopyTo(span.Slice(toIndex + 1, len));
-            }
-            else {
-                var len = toIndex - fromIndex;
-                span.Slice(fromIndex + 1, len).CopyTo(span.Slice(fromIndex, len));
-            }
-
-            span[toIndex] = val;
-        }
-
         /// <summary>
         /// Get a value from a dictionary or add it if it doesn't exist.
         /// </summary>
@@ -79,47 +60,6 @@ namespace Deenote.Library.Collections
             return true;
         }
 
-        public static int LinearSearch<T, TComparer>(this ReadOnlySpan<T> span, T item, TComparer comparer) where TComparer : IComparer<T>
-            => span.LinearSearch(new ComparerComparable<T, TComparer>(item, comparer));
-
-        public static int LinearSearch<T, TComparable>(this ReadOnlySpan<T> span, TComparable item) where TComparable : IComparable<T>
-        {
-            for (int i = 0; i < span.Length; i++) {
-                var res = item.CompareTo(span[i]);
-                if (res < 0)
-                    return ~i;
-                if (res == 0)
-                    return i;
-            }
-            return ~span.Length;
-        }
-
-        public static int LinearSearch<T, TComparer>(this Span<T> span, T item, TComparer comparer) where TComparer : IComparer<T>
-            => LinearSearch((ReadOnlySpan<T>)span, item, comparer);
-
-        public static int LinearSearch<T, TComparable>(this Span<T> span, TComparable item) where TComparable : IComparable<T>
-            => LinearSearch((ReadOnlySpan<T>)span, item);
-
-        public static int LinearSearchFromEnd<T, TComparer>(this ReadOnlySpan<T> span, T item, TComparer comparer) where TComparer : IComparer<T>
-           => span.LinearSearchFromEnd(new ComparerComparable<T, TComparer>(item, comparer));
-
-        public static int LinearSearchFromEnd<T, TComparable>(this ReadOnlySpan<T> span, TComparable item) where TComparable : IComparable<T>
-        {
-            for (int i = span.Length - 1; i >= 0; i--) {
-                var res = item.CompareTo(span[i]);
-                if (res > 0)
-                    return ~(i + 1);
-                if (res == 0)
-                    return i;
-            }
-            return ~0;
-        }
-
-        public static int LinearSearchFromEnd<T, TComparer>(this Span<T> span, T item, TComparer comparer) where TComparer : IComparer<T>
-            => LinearSearchFromEnd((ReadOnlySpan<T>)span, item, comparer);
-        public static int LinearSearchFromEnd<T, TComparable>(this Span<T> span, TComparable item) where TComparable : IComparable<T>
-            => LinearSearchFromEnd((ReadOnlySpan<T>)span, item);
-
         #endregion
 
 
@@ -158,20 +98,6 @@ namespace Deenote.Library.Collections
                 _index = index;
                 return false;
             }
-        }
-
-        private readonly struct ComparerComparable<T, TComparer> : IComparable<T> where TComparer : IComparer<T>
-        {
-            private readonly T _value;
-            private readonly TComparer _comparer;
-
-            public ComparerComparable(T value, TComparer comparer)
-            {
-                _value = value;
-                _comparer = comparer;
-            }
-
-            public int CompareTo(T? other) => _comparer.Compare(_value, other!);
         }
     }
 }

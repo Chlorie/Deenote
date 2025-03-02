@@ -5,6 +5,7 @@ using Deenote.Entities.Operations;
 using Deenote.Library.Collections;
 using System;
 using System.Collections.Immutable;
+using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Entities.Models

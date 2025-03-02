@@ -8,7 +8,7 @@ namespace Deenote.Core.GameStage
     partial class NotesManager
     {
         private int _nextHitBackgroundNoteIndex;
-        private int _nextHitNoteIndex;
+        private int _nextHitSoundNoteIndex;
 
         // TODO:NExt在gpmanager调用，顺便需要在发生变动时更新上面两个变量
 
@@ -16,21 +16,21 @@ namespace Deenote.Core.GameStage
         {
             _game.AssertChartLoaded();
 
-            int prevHitNoteIndex = _nextHitNoteIndex;
+            int prevHitNoteIndex = _nextHitSoundNoteIndex;
             int prevHitBackgroundNoteIndex = _nextHitBackgroundNoteIndex;
 
             var chart = _game.CurrentChart;
             var musicPlayer = _game.MusicPlayer;
 
             if (forward) {
-                while (_nextHitNoteIndex < chart.NoteNodes.Length && chart.NoteNodes[_nextHitNoteIndex].Time <= musicPlayer.Time)
-                    _nextHitNoteIndex++;
+                while (_nextHitSoundNoteIndex < chart.NoteNodes.Length && chart.NoteNodes[_nextHitSoundNoteIndex].Time <= musicPlayer.Time)
+                    _nextHitSoundNoteIndex++;
                 while (_nextHitBackgroundNoteIndex < chart.BackgroundNotes.Length && chart.BackgroundNotes[_nextHitBackgroundNoteIndex].Time <= musicPlayer.Time)
                     _nextHitBackgroundNoteIndex++;
             }
             else {
-                while (_nextHitNoteIndex > 0 && chart.NoteNodes[_nextHitNoteIndex - 1].Time > musicPlayer.Time)
-                    _nextHitNoteIndex--;
+                while (_nextHitSoundNoteIndex > 0 && chart.NoteNodes[_nextHitSoundNoteIndex - 1].Time > musicPlayer.Time)
+                    _nextHitSoundNoteIndex--;
                 while (_nextHitBackgroundNoteIndex > 0 && chart.BackgroundNotes[_nextHitBackgroundNoteIndex - 1].Time > musicPlayer.Time)
                     _nextHitBackgroundNoteIndex--;
             }
@@ -46,7 +46,7 @@ namespace Deenote.Core.GameStage
             if (!forward)
                 return;
 
-            for (int i = prevHitNoteIndex; i < _nextHitNoteIndex; i++) {
+            for (int i = prevHitNoteIndex; i < _nextHitSoundNoteIndex; i++) {
                 if (chart.NoteNodes[i] is NoteModel note) {
                     _game.HitSoundPlayer.PlaySound(note.Kind);
                     _game.PianoSoundPlayer.PlaySounds(note.Sounds);
@@ -60,13 +60,13 @@ namespace Deenote.Core.GameStage
         private void UpdateNoteSoundsIndices()
         {
             _game.AssertChartLoaded();
-            _nextHitNoteIndex = 0;
+            _nextHitSoundNoteIndex = 0;
             _nextHitBackgroundNoteIndex = 0;
             var chart = _game.CurrentChart;
             var musicPlayer = _game.MusicPlayer;
 
-            while (_nextHitNoteIndex < chart.NoteNodes.Length && chart.NoteNodes[_nextHitNoteIndex].Time <= musicPlayer.Time)
-                _nextHitNoteIndex++;
+            while (_nextHitSoundNoteIndex < chart.NoteNodes.Length && chart.NoteNodes[_nextHitSoundNoteIndex].Time <= musicPlayer.Time)
+                _nextHitSoundNoteIndex++;
             while (_nextHitBackgroundNoteIndex < chart.BackgroundNotes.Length && chart.BackgroundNotes[_nextHitBackgroundNoteIndex].Time <= musicPlayer.Time)
                 _nextHitBackgroundNoteIndex++;
         }

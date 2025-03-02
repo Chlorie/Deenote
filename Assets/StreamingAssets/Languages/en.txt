@@ -57,11 +57,13 @@ NavPanel_PianoVolume_Label=Piano Volume
 NavPanel_SuddenPlus_Label=Sudden +
 NavPanel_LinksIndicator_Label=Show Links
 NavPanel_PlacementIndicator_Label=Show Placement Indicator
+NavPanel_EarlyShowSlowNotes=Early Display Slow Notes
 
 Nav_Toolkit=Toolkit
 
 Nav_Editor=Editor
 NavPanel_Note_Header=NOTE
+NavPanel_NoteSelected_Header=NOTE ({0} Selected)
 NavPanel_NotePosition_Label=Position
 NavPanel_NoteTime_Label=Time
 NavPanel_NoteSize_Label=Size

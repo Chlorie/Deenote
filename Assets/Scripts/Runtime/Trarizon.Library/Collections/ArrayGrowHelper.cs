@@ -1,20 +1,26 @@
+#nullable enable
+
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Deenote.Library.Collections;
+namespace Trarizon.Library.Collections;
 internal static class ArrayGrowHelper
 {
     public static void FreeManaged<T>(T[] array)
     {
+#if !NETSTANDARD2_0
         if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+#endif
             Array.Clear(array, 0, array.Length);
     }
 
     public static void FreeManaged<T>(T[] array, Range range)
     {
+#if !NETSTANDARD2_0
         if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
             return;
+#endif
 
         var (off, len) = range.GetOffsetAndLength(array.Length);
         Array.Clear(array, off, len);
@@ -22,8 +28,10 @@ internal static class ArrayGrowHelper
 
     public static void FreeManaged<T>(T[] array, int index, int length)
     {
+#if !NETSTANDARD2_0
         if (!RuntimeHelpers.IsReferenceOrContainsReferences<T>())
             return;
+#endif
 
         Array.Clear(array, index, length);
     }
@@ -40,7 +48,6 @@ internal static class ArrayGrowHelper
 
     public static void GrowNonMove<T>(ref T[] array, int expectedLength)
         => GrowNonMove(ref array, expectedLength, 2146435071);
-
     public static void GrowNonMove<T>(ref T[] array, int expectedLength, int maxLength)
     {
         Debug.Assert(expectedLength > array.Length);

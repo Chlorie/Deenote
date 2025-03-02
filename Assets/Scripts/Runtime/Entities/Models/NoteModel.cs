@@ -39,6 +39,8 @@ namespace Deenote.Entities.Models
 
         public bool IsCollided => CollisionCount > 0;
 
+        bool IStageNoteNode.IsComboNode => !IsHold;
+
         public NoteModel()
         {
             _sounds = new();

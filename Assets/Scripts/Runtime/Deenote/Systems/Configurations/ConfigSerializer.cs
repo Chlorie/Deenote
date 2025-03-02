@@ -58,6 +58,9 @@ namespace Deenote.Systems.Configurations
             public int GetInt32(string key, int defaultValue = default)
                 => GetToken(key, JTokenType.Integer) is { } token ? (int)token : defaultValue;
 
+            public float GetSingle(string key, float defaultValue = default)
+                => GetToken(key, JTokenType.Float) is { } token ? (float)token : defaultValue;
+
             public bool GetBoolean(string key, bool defaultValue = default)
                 => GetToken(key, JTokenType.Boolean) is { } token ? (bool)token : defaultValue;
 
@@ -92,6 +95,7 @@ namespace Deenote.Systems.Configurations
             internal IDictionary<string, object> Configs => _configs ??= new();
 
             public void Add(string key, int value) => AddInternal(key, value);
+            public void Add(string key, float value) => AddInternal(key, value);
             public void Add(string key, bool value) => AddInternal(key, value);
             public void AddDictionary<TValue>(string key, IReadOnlyDictionary<string, TValue> dictionary) => AddInternal(key, dictionary);
             public void AddObject(string key, object obj) => AddInternal(key, obj);

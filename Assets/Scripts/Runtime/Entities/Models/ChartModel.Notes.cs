@@ -4,6 +4,7 @@ using Deenote.Entities.Comparisons;
 using Deenote.Library.Collections;
 using System;
 using System.Collections.Generic;
+using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Entities.Models
@@ -14,6 +15,7 @@ namespace Deenote.Entities.Models
         // and `_holdCount` is ensured to be equal to count of `NoteTailNode` in `_visibleNotes`
         internal int _holdCount;
         internal List<IStageNoteNode> _visibleNoteNodes;
+        internal List<IStageNoteNode> _visibleNotesInAppearOrder;
         internal List<SoundNoteModel> _backgroundNotes;
         internal List<SpeedChangeWarningModel> _speedChangeWarnings;
         internal List<SpeedLineValueModel> _speedLines;

@@ -110,9 +110,9 @@ namespace Deenote.Inputting
             if (UnityUtils.IsKeyDown(KeyCode.End))
                 game.MusicPlayer.Time = game.MusicPlayer.ClipLength;
             if (UnityUtils.IsKeyDown(KeyCode.UpArrow, ctrl: true))
-                game.NoteSpeed += 5;
+                game.NoteFallSpeed += 5;
             if (UnityUtils.IsKeyDown(KeyCode.DownArrow, ctrl: true))
-                game.NoteSpeed -= 5;
+                game.NoteFallSpeed -= 5;
             if (UnityUtils.IsKeyDown(KeyCode.UpArrow, alt: true))
                 game.MusicSpeed += 1;
             if (UnityUtils.IsKeyDown(KeyCode.DownArrow, alt: true))

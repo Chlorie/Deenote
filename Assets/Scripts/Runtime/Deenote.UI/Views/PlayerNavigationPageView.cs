@@ -25,6 +25,7 @@ namespace Deenote.UI.Views
         [SerializeField] TextBox _suddenPlusInput = default!;
         [SerializeField] ToggleSwitch _linksIndicatorToggle = default!;
         [SerializeField] ToggleSwitch _placementIndicatorToggle = default!;
+        [SerializeField] ToggleSwitch _earlyDisplaySlowNotesToggle = default!;
 
         private static readonly string[] PredefinedAspectTexts = { "16:9", "4:3" };
         private static readonly float[] PredefinedAspectValues = { 16f / 9f, 4f / 3f };
@@ -59,7 +60,7 @@ namespace Deenote.UI.Views
 
             _noteSpeedNumericStepper.SetInputParser(static input => float.TryParse(input, out var val) ? Mathf.RoundToInt(val * 10f) : null);
             _noteSpeedNumericStepper.SetDisplayerTextSelector(static ival => $"{ival / 10}.{ival % 10}");
-            _noteSpeedNumericStepper.ValueChanged += val => MainSystem.GamePlayManager.NoteSpeed = val;
+            _noteSpeedNumericStepper.ValueChanged += val => MainSystem.GamePlayManager.NoteFallSpeed = val;
             _musicVolumeSlider.ValueChanged += val => MainSystem.GamePlayManager.MusicVolume = val;
             _musicVolumeInput.EditSubmitted += input =>
             {
@@ -93,14 +94,9 @@ namespace Deenote.UI.Views
                     Sync01Range(_suddenPlusInput, _suddenPlusSlider, MainSystem.GamePlayManager.SuddenPlus);
             };
 
-            #endregion
-
-            _linksIndicatorToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsShowLinkLines = val;
-            _placementIndicatorToggle.IsCheckedChanged += val => MainSystem.StageChartEditor.Placer.IsIndicatorOn = val;
-
             MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.NoteSpeed,
-                manager => _noteSpeedNumericStepper.Value = manager.NoteSpeed);
+                manager => _noteSpeedNumericStepper.Value = manager.NoteFallSpeed);
             MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.MusicVolume,
                 manager => Sync01Range(_musicVolumeInput, _musicVolumeSlider, manager.MusicVolume));
@@ -113,12 +109,22 @@ namespace Deenote.UI.Views
             MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.SuddenPlus,
                 manager => Sync01Range(_suddenPlusInput, _suddenPlusSlider, manager.SuddenPlus));
+
+            #endregion
+
+            _linksIndicatorToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsShowLinkLines = val;
+            _placementIndicatorToggle.IsCheckedChanged += val => MainSystem.StageChartEditor.Placer.IsIndicatorOn = val;
+            _earlyDisplaySlowNotesToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.EarlyDisplaySlowNotes = val;
+
             MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.IsShowLinkLines,
-                manager => _linksIndicatorToggle.IsChecked = manager.IsShowLinkLines);
+                manager => _linksIndicatorToggle.SetIsCheckedWithoutNotify(manager.IsShowLinkLines));
             MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
                 StageNotePlacer.NotificationFlag.IsIndicatorOn,
-                placer => _placementIndicatorToggle.IsChecked = placer.IsIndicatorOn);
+                placer => _placementIndicatorToggle.SetIsCheckedWithoutNotify(placer.IsIndicatorOn));
+            MainSystem.GamePlayManager.RegisterNotification(
+                GamePlayManager.NotificationFlag.EarlyDisplaySlowNotes,
+                manager => _earlyDisplaySlowNotesToggle.SetIsCheckedWithoutNotify(manager.EarlyDisplaySlowNotes));
         }
     }
 }

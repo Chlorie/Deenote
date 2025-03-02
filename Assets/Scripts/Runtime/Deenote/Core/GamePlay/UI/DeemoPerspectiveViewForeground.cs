@@ -165,7 +165,7 @@ namespace Deenote.GamePlay.UI
             // prevHitNoteIndex wont smaller than combo, so here
             // it is asserted a valid index
             var prevHitNote = stage.NotesManager.GetPreviousHitComboNode();
-            Debug.Assert(prevHitNote?.IsComboNode() ?? false);
+            Debug.Assert(prevHitNote?.IsComboNode ?? false);
 
             _comboGameObject.SetActive(true);
             var deltaTime = stage.MusicPlayer.Time - prevHitNote!.Time;
@@ -250,7 +250,6 @@ namespace Deenote.GamePlay.UI
                         return ratio;
                     }
                     else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime) {
-                        float ratio = (deltaTime - _args.ComboShockWaveAlphaIncTime) / _args.ComboShockWaveMoveTime;
                         return 1f;
                     }
                     else if (deltaTime < _args.ComboShockWaveAlphaIncTime + _args.ComboShockWaveMoveTime +

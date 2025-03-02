@@ -4,9 +4,9 @@
     "references": [
         "Deenote.Library",
         "UniTask",
-        "Deenote.Core",
         "Unity.TextMeshPro",
-        "Deenote.Localization"
+        "Deenote.Localization",
+        "Trarizon.Library"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,17 +1,19 @@
+#nullable enable
+
 using CommunityToolkit.Diagnostics;
-using Deenote.Library.Collections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Trarizon.Library.Numerics;
 
-namespace Deenote.Library.Collections.Generic;
+namespace Trarizon.Library.Collections.Generic;
 public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
 {
     private T[] _array;
     private int _count;
     private int _version;
-    private readonly IComparer<T> _comparer;
+    private IComparer<T> _comparer;
 
     public T this[int index]
     {
@@ -28,7 +30,6 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
 
     public int Count => _count;
 
-
     public int Capacity
     {
         get => _array.Length;
@@ -44,7 +45,14 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         }
     }
 
-    public IComparer<T> Comparer => _comparer;
+    public IComparer<T> Comparer
+    {
+        get => _comparer;
+        set {
+            _comparer = value;
+            Array.Sort(_array, 0, _count, _comparer);
+        }
+    }
 
     public SortedList(IComparer<T> comparer)
     {
@@ -62,10 +70,7 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
 
     public ReadOnlySpan<T> AsSpan(int start, int length)
     {
-        Guard.IsGreaterThanOrEqualTo(start, 0);
-        Guard.IsGreaterThanOrEqualTo(length, 0);
-        Guard.IsLessThanOrEqualTo(start + length, _count);
-
+        TraNumber.ValidateSliceArgs(start, length, _count);
         return _array.AsSpan(start, length);
     }
 
@@ -77,35 +82,35 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
 
     public int BinarySearch(T item) => AsSpan().BinarySearch(item, _comparer);
 
-    /// <remarks>
-    /// Its caller's responsibility to ensure <paramref name="item"/> has the same comparison logic with Comparer of the list
-    /// </remarks>
-    public int BinarySearch<TComparable>(TComparable item) where TComparable : IComparable<T> => AsSpan().BinarySearch(item);
+    public int BinarySearch<TComparable>(TComparable comparable) where TComparable : IComparable<T>
+        => AsSpan().BinarySearch(comparable);
 
     public int LinearSearch(T item) => AsSpan().LinearSearch(item, _comparer);
 
     public int LinearSearchFromEnd(T item) => AsSpan().LinearSearchFromEnd(item, _comparer);
 
+    /// <summary>
+    /// Binary search the index and insert with keeping the list in order
+    /// </summary>
     public int Add(T item)
     {
         var index = BinarySearch(item);
-        MathUtils.FlipNegative(ref index);
+        TraNumber.FlipNegative(ref index);
         InsertAt(index, item);
-        _count++;
         return index;
     }
 
     public void AddFromEnd(T item)
     {
-        var index = AsSpan().LinearSearchFromEnd(item, _comparer);
-        MathUtils.FlipNegative(ref index);
+        var index = BinarySearch(item);
+        TraNumber.FlipNegative(ref index);
         InsertAt(index, item);
     }
 
     public void AddFromStart(T item)
     {
-        var index = AsSpan().LinearSearch(item, _comparer);
-        MathUtils.FlipNegative(ref index);
+        var index = BinarySearch(item);
+        TraNumber.FlipNegative(ref index);
         InsertAt(index, item);
     }
 
@@ -120,12 +125,12 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         else {
             if (_comparer.Compare(item, this[searchStartIndex]) < 0) {
                 var index = _array.AsSpan(..searchStartIndex).LinearSearchFromEnd(item, _comparer);
-                MathUtils.FlipNegative(ref index);
+                TraNumber.FlipNegative(ref index);
                 InsertAt(index, item);
             }
             else {
                 var index = _array.AsSpan(searchStartIndex.._count).LinearSearch(item, _comparer);
-                MathUtils.FlipNegative(ref index);
+                TraNumber.FlipNegative(ref index);
                 InsertAt(searchStartIndex + index, item);
             }
         }
@@ -138,21 +143,6 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
             RemoveAt(index);
         }
         return index;
-    }
-
-    public int RemoveIn(T item, Range searchRange)
-    {
-        var (ofs, len) = searchRange.GetOffsetAndLength(_count);
-        var span = AsSpan(ofs, len);
-        var index = span.BinarySearch(item, _comparer);
-        if (index >= 0) {
-            var rmvIndex = index + ofs;
-            RemoveAt(rmvIndex);
-            return rmvIndex;
-        }
-        else {
-            return index - ofs;
-        }
     }
 
     public int RemoveFrom(T item, int searchStartIndex)
@@ -234,7 +224,7 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         Debug.Assert((uint)from < (uint)_count);
         Debug.Assert((uint)to < (uint)_count);
 
-        _array.AsSpan(.._count).MoveTo(from, to);
+        _array.AsSpan().MoveTo(from, to);
     }
 
     private void NotifyEditedAt(int index)
@@ -244,12 +234,12 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         var editItem = _array[index];
         if (index >= 1 && _comparer.Compare(_array[index - 1], editItem) > 0) {
             var destIndex = _array.AsSpan(0, index).BinarySearch(editItem, _comparer);
-            MathUtils.FlipNegative(ref destIndex);
+            TraNumber.FlipNegative(ref destIndex);
             MoveTo(index, destIndex);
         }
         else if (index < _count - 1 && _comparer.Compare(editItem, _array[index + 1]) > 0) {
             var destIndex = _array.AsSpan(index, _count - 1 - index).BinarySearch(editItem, _comparer);
-            MathUtils.FlipNegative(ref destIndex);
+            TraNumber.FlipNegative(ref destIndex);
             MoveTo(index, destIndex - 1);
         }
         else {
@@ -259,9 +249,7 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
 
     public void CopyTo(T[] array, int arrayIndex)
     {
-        Guard.IsGreaterThanOrEqualTo(arrayIndex, 0);
-        Guard.IsLessThanOrEqualTo(arrayIndex + _count, array.Length);
-
+        TraNumber.ValidateSliceArgs(arrayIndex, _count, array.Length);
         AsSpan().CopyTo(array.AsSpan(arrayIndex, _count));
     }
 
@@ -298,6 +286,8 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
 
         public bool MoveNext()
         {
+            CheckVersion();
+
             if (_index < 0)
                 return false;
 
@@ -313,7 +303,18 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
             }
         }
 
-        public void Reset() => _index = 0;
-        public void Dispose() { }
+        public void Reset()
+        {
+            CheckVersion();
+            _index = 0;
+        }
+
+        public readonly void Dispose() { }
+
+        private readonly void CheckVersion()
+        {
+            if (_version != _list._version)
+                throw new InvalidOperationException("Collection modified after enumerator created");
+        }
     }
 }

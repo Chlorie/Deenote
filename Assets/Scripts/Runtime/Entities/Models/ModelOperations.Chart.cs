@@ -10,6 +10,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Entities.Models
@@ -184,7 +185,7 @@ namespace Deenote.Entities.Models
                         if (note.IsHold)
                             modifier.Add(new NoteTailNode(note));
                     }
-                    insertNotes = ListUtils.GetUnderlyingArray(insertNoteList);
+                    insertNotes = insertNoteList.ToArray();
                 }
 
                 ReadOnlySpan<IStageNoteNode> visibleNotes = chart._visibleNoteNodes.AsSpan();

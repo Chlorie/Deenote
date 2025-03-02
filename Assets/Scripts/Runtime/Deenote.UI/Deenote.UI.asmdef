@@ -2,7 +2,6 @@
     "name": "Deenote.UI",
     "rootNamespace": "",
     "references": [
-        "Deenote.Core",
         "Deenote.Entities",
         "Deenote.UIFramework",
         "UniTask",
@@ -10,7 +9,8 @@
         "Deenote",
         "Unity.TextMeshPro",
         "Reflex",
-        "Deenote.Localization"
+        "Deenote.Localization",
+        "Trarizon.Library"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

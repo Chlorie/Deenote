@@ -10,6 +10,7 @@ using Deenote.Library.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Core.Editing

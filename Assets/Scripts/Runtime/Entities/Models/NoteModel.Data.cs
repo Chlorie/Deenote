@@ -1,9 +1,9 @@
 #nullable enable
 
 using CommunityToolkit.Diagnostics;
-using Deenote.Library.Collections;
 using System;
 using System.Diagnostics;
+using Trarizon.Library.Collections;
 using UnityEngine.Pool;
 
 namespace Deenote.Entities.Models
