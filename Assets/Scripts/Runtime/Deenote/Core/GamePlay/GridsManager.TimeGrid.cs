@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Core.GameStage;
 using Deenote.Entities;
 using Deenote.Library;
 using System.Collections.Generic;
@@ -34,13 +35,12 @@ namespace Deenote.Core.GamePlay
             }
         }
 
-        private void SubmitTimeGridRender()
+        private void SubmitTimeGridRender(PerspectiveLinesRenderer.LineCollector collector)
         {
             _game.AssertStageLoaded();
 
-            var renderer = _game.PerspectiveLinesRenderer;
-            float minx = _game.Stage.ConvertNoteCoordPositionToWorldX(-EntityArgs.StageMaxPosition);
-            float maxx = _game.Stage.ConvertNoteCoordPositionToWorldX(EntityArgs.StageMaxPosition);
+            float minx = _game.ConvertNoteCoordPositionToWorldX(-EntityArgs.StageMaxPosition);
+            float maxx = _game.ConvertNoteCoordPositionToWorldX(EntityArgs.StageMaxPosition);
 
             var args = _game.Stage.GridLineArgs;
             foreach (var (time, kind) in _timeGridLines) {
@@ -50,8 +50,8 @@ namespace Deenote.Core.GamePlay
                     TimeGridLineKind.TempoLine => args.TempoLineColor,
                     _ => throw new System.NotImplementedException(),
                 };
-                var z = _game.Stage.ConvertNoteCoordTimeToWorldZ(time);
-                renderer.AddLine(new Vector2(minx, z), new Vector2(maxx, z), color, args.TimeGridWidth);
+                var z = _game.ConvertNoteCoordTimeToWorldZ(time);
+                collector.AddLine(new Vector2(minx, z), new Vector2(maxx, z), color, args.TimeGridWidth);
             }
         }
 
@@ -62,7 +62,7 @@ namespace Deenote.Core.GamePlay
             var projManager = MainSystem.ProjectManager;
             if (projManager.CurrentProject is null)
                 return;
-            if (_game.Stage is null)
+            if (!_game.IsStageLoaded())
                 return;
 
             _timeGridLines.Clear();
@@ -72,7 +72,7 @@ namespace Deenote.Core.GamePlay
             var tempoIndex = project.GetTempoIndex(currentTime);
             if (tempoIndex < 0)
                 tempoIndex = 0;
-            float appearTime = currentTime + _game.Stage.NoteAppearAheadTime;
+            float appearTime = currentTime + _game.StageNoteAppearAheadTime;
             float minSubBeatInterval = Tempo.MinBeatLineInterval / TimeGridSubBeatCount;
 
             for (; tempoIndex < project.Tempos.Length; tempoIndex++) {

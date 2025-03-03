@@ -37,6 +37,7 @@ namespace Deenote.Core.GameStage.Args
         public NoteHitEffectSpritePrefabs HitEffectSpritePrefabs;
         public Color NoteSelectedColor = new(85f / 255f, 192f / 255f, 1f);
         public Color NoteCollidedColor = new(1f, 85f / 255f, 85f / 255f);
+        [Range(0f, 1f)] public float NoteDownplayAlpha = 0.5f;
 
         [Serializable]
         public struct NoteSpritePrefab

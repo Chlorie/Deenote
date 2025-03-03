@@ -74,3 +74,4 @@ MonoBehaviour:
     GlowFadeTime: 0.6666667
   NoteSelectedColor: {r: 0.33333334, g: 0.7529412, b: 1, a: 1}
   NoteCollidedColor: {r: 1, g: 0.33333334, b: 0.33333334, a: 1}
+  NoteDownplayAlpha: 0.25

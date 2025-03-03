@@ -151,7 +151,7 @@ namespace Deenote.Core.Editing
             _operations.Do(_game.CurrentChart
                 .EditNotes(_selector.SelectedNotes, EntityArgs.ClampNoteSpeed(newValue),
                     n => n.Speed, (n, v) => n.Speed = v)
-                .OnDone(notes => OnNotePropertyEdited(false, false, NotificationFlag.NoteSpeed)));
+                .OnDone(notes => OnNotePropertyEdited(true, false, NotificationFlag.NoteSpeed)));
         }
 
         public void EditSelectedNotesDuration(float newValue)

@@ -10,6 +10,7 @@ using Deenote.Entities.Models;
 using Deenote.GamePlay.UI;
 using Deenote.Library;
 using Deenote.Library.Components;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
@@ -27,13 +28,14 @@ namespace Deenote.Core.GamePlay
 
 
         public GameStageController? Stage { get; private set; }
-        public PerspectiveLinesRenderer? PerspectiveLinesRenderer { get; private set; }
 
         public NotesManager NotesManager => _notesManager;
         public GridsManager Grids => _gridsManager;
         public GameMusicPlayer MusicPlayer => _musicPlayer;
         public StagePianoSoundPlayer PianoSoundPlayer => _pianoSoundPlayer;
         public HitSoundPlayer HitSoundPlayer => _hitSoundPlayer;
+
+        public event Action<StageLoadedEventArgs>? StageLoaded;
 
 
         public ChartModel? CurrentChart { get; private set; }
@@ -66,13 +68,6 @@ namespace Deenote.Core.GamePlay
             }
         }
 
-        public PerspectiveViewForegroundBase InstantiatePerspectiveViewForeground(RectTransform parentTransform)
-        {
-            var obj = Instantiate(_perspectiveViewForegroundPrefab, parentTransform);
-            obj.OnInstantiate();
-            return obj;
-        }
-
         private void Awake()
         {
             _gridsManager = new GridsManager(this);
@@ -87,12 +82,10 @@ namespace Deenote.Core.GamePlay
 
                 Stage = loader.StageController;
                 Stage.OnInstantiate(this);
-                PerspectiveLinesRenderer = loader.PerspectiveLinesRenderer;
-                PerspectiveLinesRenderer.OnInstantiate(this);
                 NotesManager.Initialize(
                     UnityUtils.CreateObjectPool(
-                        Stage.Args.GamePlayNotePrefab, 
-                        Stage.NotePanelTransform, 
+                        Stage.Args.GamePlayNotePrefab,
+                        Stage.NotePanelTransform,
                         item => item.OnInstantiate(this)));
                 OnStageLoaded_Properties(loader);
 
@@ -100,7 +93,7 @@ namespace Deenote.Core.GamePlay
                     UpdateNotes(true, true);
                 }
 
-                NotifyFlag(NotificationFlag.GameStageLoaded);
+                StageLoaded?.Invoke(new StageLoadedEventArgs(Stage, loader.PerspectiveViewForeground));
             };
 
             MusicPlayer.TimeChanged += args =>
@@ -142,20 +135,11 @@ namespace Deenote.Core.GamePlay
                     manager.AssertProjectLoaded();
                     _musicPlayer.ReplaceClip(new DecodedClipProvider(manager.CurrentProject.AudioClip));
                 });
-
-            MainSystem.StageChartEditor.Selector.RegisterNotification(
-                StageNoteSelector.NotificationFlag.SelectedNotesChanged,
-                selector =>
-                {
-                    foreach (var note in NotesManager.StageActiveNotes) {
-                        note.RefreshColoring();
-                    }
-                });
         }
 
         private void OnDestroy()
         {
-            _gridsManager.Destroy();
+            _gridsManager.Dispose();
         }
 
         private void Start()
@@ -177,10 +161,6 @@ namespace Deenote.Core.GamePlay
                 return;
             if (!MusicPlayer.IsPlaying && _manualPlaySpeedMultiplier is { } manuallPlaySpeed)
                 MusicPlayer.Nudge(Time.deltaTime * manuallPlaySpeed);
-
-            if (Stage is not null) {
-                Grids.SubmitLinesRender();
-            }
         }
 
         public void UpdateNotes(bool noteCollectionChangedOrNoteTimeRelatedPropertyChanged, bool notesVisualDataChanged)
@@ -193,7 +173,7 @@ namespace Deenote.Core.GamePlay
                     NotesManager.RefreshStageActiveNotes();
                     break;
                 case (false, true):
-                    foreach (var note in NotesManager.StageActiveNotes) {
+                    foreach (var note in NotesManager.OnStageNotes) {
                         note.RefreshVisual();
                     }
                     break;
@@ -271,11 +251,11 @@ namespace Deenote.Core.GamePlay
         public void AssertChartLoaded() => Debug.Assert(CurrentChart is not null, "Chart not loaded");
 
         [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
-        [MemberNotNull(nameof(Stage), nameof(PerspectiveLinesRenderer))]
+        [MemberNotNull(nameof(Stage))]
         public void AssertStageLoaded() => Debug.Assert(Stage is not null, "Stage not loaded");
 #pragma warning restore CS8774
 
-        [MemberNotNullWhen(true, nameof(Stage), nameof(PerspectiveLinesRenderer))]
+        [MemberNotNullWhen(true, nameof(Stage))]
         public bool IsStageLoaded() => Stage is not null;
 
         [MemberNotNullWhen(true, nameof(CurrentChart))]
@@ -285,7 +265,8 @@ namespace Deenote.Core.GamePlay
 
         public enum NotificationFlag
         {
-            GameStageLoaded,
+            HighlightedNoteSpeed,
+            IsFilterNoteSpeed,
 
             NoteSpeed,
             MusicSpeed,
@@ -307,5 +288,9 @@ namespace Deenote.Core.GamePlay
             ChartRemapMinVolume,
             ChartRemapMaxVolume,
         }
+
+        public readonly record struct StageLoadedEventArgs(
+            GameStageController Stage,
+            PerspectiveViewForegroundBase PerspectiveViewForegroundPrefab);
     }
 }

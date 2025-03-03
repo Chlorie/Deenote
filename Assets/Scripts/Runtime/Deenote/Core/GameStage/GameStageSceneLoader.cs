@@ -19,9 +19,6 @@ namespace Deenote.Core.GameStage
         public GameStageController StageController { get; private set; } = default!;
 
         [field: SerializeField]
-        public PerspectiveLinesRenderer PerspectiveLinesRenderer { get; private set; } = default!;
-
-        [field: SerializeField]
         public PerspectiveViewForegroundBase PerspectiveViewForeground { get; private set; } = default!;
 
         private void Awake()

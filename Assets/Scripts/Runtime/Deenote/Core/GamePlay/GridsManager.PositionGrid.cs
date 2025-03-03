@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Core.GameStage;
 using Deenote.Entities;
 using Deenote.Library;
 using System.Collections.Generic;
@@ -117,29 +118,27 @@ namespace Deenote.Core.GamePlay
 
         #endregion
 
-        private void SubmitPositionGridsRender()
+        private void SubmitPositionGridsRender(PerspectiveLinesRenderer.LineCollector collector)
         {
             _game.AssertStageLoaded();
 
-            var renderer = _game.PerspectiveLinesRenderer;
-            var stage = _game.Stage;
-            float minZ = stage.ConvertNoteCoordTimeToWorldZ(0f);
-            float maxZ = stage.ConvertNoteCoordTimeToWorldZ(stage.NoteAppearAheadTime);
-            var args = stage.GridLineArgs;
+            float minZ = _game.ConvertNoteCoordTimeToWorldZ(0f);
+            float maxZ = _game.ConvertNoteCoordTimeToWorldZ(_game.StageNoteAppearAheadTime);
+            var args = _game.Stage.GridLineArgs;
             foreach (var (pos, kind) in _positionGridLines) {
-                var x = stage.ConvertNoteCoordPositionToWorldX(pos);
-                renderer.AddLine(new Vector2(x, minZ), new Vector2(x, maxZ),
+                var x = _game.ConvertNoteCoordPositionToWorldX(pos);
+                collector.AddLine(new Vector2(x, minZ), new Vector2(x, maxZ),
                     args.PositionGridLineColor,
                     width: kind is PositionGridKind.Border ? args.PositionGridBorderWidth : args.PositionGridLineWidth);
             }
 
             // Legacy system
             if (PositionGridGeneration is PositionGridGenerationKind.ByCountAndOffset && IsPositionGridBorderVisible_Legacy) {
-                float minx = stage.ConvertNoteCoordPositionToWorldX(-EntityArgs.StageMaxPosition);
-                float maxx = stage.ConvertNoteCoordPositionToWorldX(EntityArgs.StageMaxPosition);
-                renderer.AddLine(new Vector2(minx, minZ), new Vector2(minx, maxZ),
+                float minx = _game.ConvertNoteCoordPositionToWorldX(-EntityArgs.StageMaxPosition);
+                float maxx = _game.ConvertNoteCoordPositionToWorldX(EntityArgs.StageMaxPosition);
+                collector.AddLine(new Vector2(minx, minZ), new Vector2(minx, maxZ),
                     args.PositionGridLineColor, args.PositionGridBorderWidth);
-                renderer.AddLine(new Vector2(maxx, minZ), new Vector2(maxx, maxZ),
+                collector.AddLine(new Vector2(maxx, minZ), new Vector2(maxx, maxZ),
                     args.PositionGridLineColor, args.PositionGridBorderWidth);
             }
         }

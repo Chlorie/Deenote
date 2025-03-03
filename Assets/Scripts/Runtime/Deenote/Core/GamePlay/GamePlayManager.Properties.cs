@@ -1,6 +1,7 @@
 #nullable enable
 
 using Deenote.Core.GameStage;
+using Deenote.Entities.Models;
 using Deenote.Library;
 using UnityEngine;
 
@@ -19,6 +20,9 @@ namespace Deenote.Core.GamePlay
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
+                configs.Add("stage/highlight_note_speed", HighlightedNoteSpeed);
+                configs.Add("stage/filter_note_speed", IsFilterNoteSpeed);
+
                 configs.Add("stage/note_speed", NoteFallSpeed);
                 configs.Add("stage/show_link_lines", IsShowLinkLines);
                 configs.Add("stage/piano_note_distinguish", IsPianoNotesDistinguished);
@@ -34,6 +38,9 @@ namespace Deenote.Core.GamePlay
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
+                HighlightedNoteSpeed = configs.GetSingle("stage/highlight_note_speed", 1f);
+                IsFilterNoteSpeed = configs.GetBoolean("stage/filter_note_speed", false);
+
                 NoteFallSpeed = configs.GetInt32("stage/note_speed", 50);
                 IsShowLinkLines = configs.GetBoolean("stage/show_link_lines", true);
                 IsPianoNotesDistinguished = configs.GetBoolean("stage/piano_note_distinguish", true);
@@ -49,7 +56,54 @@ namespace Deenote.Core.GamePlay
             };
         }
 
+        private float _highlightedNoteSpeed_bf;
+        private bool _filterNoteSpeed_bf;
+
+        /// <summary>
+        /// If <see cref="IsFilterNoteSpeed"/> is <see langword="true"/>,
+        /// a downplayed note will not be selectable on stage.
+        /// <br/>
+        /// The value is also the default value when place note by editor
+        /// </summary>
+        public float HighlightedNoteSpeed
+        {
+            get => _highlightedNoteSpeed_bf;
+            set {
+                if (Utils.SetField(ref _highlightedNoteSpeed_bf, value)) {
+                    if (IsChartLoaded() && IsStageLoaded()) {
+                        foreach (var note in NotesManager.OnStageNotes) {
+                            note.RefreshColorAlpha();
+                        }
+                    }
+                    NotifyFlag(NotificationFlag.HighlightedNoteSpeed);
+                }
+            }
+        }
+
+        public bool IsFilterNoteSpeed
+        {
+            get => _filterNoteSpeed_bf;
+            set {
+                if (Utils.SetField(ref _filterNoteSpeed_bf, value)) {
+                    if (IsChartLoaded() && IsStageLoaded()) {
+                        foreach (var note in NotesManager.OnStageNotes) {
+                            note.RefreshColorAlpha();
+                        }
+                    }
+                    NotifyFlag(NotificationFlag.IsFilterNoteSpeed);
+                }
+            }
+        }
+
+        public bool IsNoteHighlighted(NoteModel note)
+        {
+            return !IsFilterNoteSpeed || Mathf.Approximately(note.Speed, HighlightedNoteSpeed);
+        }
+
         #region Stage
+
+        public const int MinNoteSpeed = 5;
+        public const int MaxNoteSpeed = 95;
 
         private int _noteSpeed_bf;
         private bool _showLinkLines_bf;
@@ -60,7 +114,7 @@ namespace Deenote.Core.GamePlay
         private bool _ignoreNoteSpeed_bf;
 
         /// <summary>
-        /// Range [1, 99], display [0.1, 9.9]
+        /// Range [5, 95], display [0.5, 9.5]
         /// </summary>
         public int NoteFallSpeed
         {
@@ -84,7 +138,7 @@ namespace Deenote.Core.GamePlay
             set {
                 if (Utils.SetField(ref _showLinkLines_bf, value)) {
                     if (IsStageLoaded() && IsChartLoaded()) {
-                        foreach (var note in NotesManager.StageActiveNotes) {
+                        foreach (var note in NotesManager.OnStageNotes) {
                             note.RefreshLinkLine();
                         }
                     }
@@ -99,7 +153,7 @@ namespace Deenote.Core.GamePlay
             set {
                 if (Utils.SetField(ref _isPianoNotesDistinguished_bf, value)) {
                     if (IsStageLoaded() && IsChartLoaded()) {
-                        foreach (var note in NotesManager.StageActiveNotes) {
+                        foreach (var note in NotesManager.OnStageNotes) {
                             note.RefreshVisual();
                         }
                     }
@@ -113,7 +167,7 @@ namespace Deenote.Core.GamePlay
             get => _isStageEffectOn_bf;
             set {
                 if (Utils.SetField(ref _isStageEffectOn_bf, value)) {
-                    if (Stage is not null) {
+                    if (IsStageLoaded()) {
                         Stage.IsStageEffectOn = value;
                     }
                     NotifyFlag(NotificationFlag.StageEffectOn);
@@ -132,8 +186,8 @@ namespace Deenote.Core.GamePlay
                 if (Utils.SetField(ref _suddenPlus_bf, value)) {
                     _cacheVisibleRangePercentage = null;
                     if (IsStageLoaded() && IsChartLoaded()) {
-                        foreach (var note in NotesManager.StageActiveNotes) {
-                            note.RefreshNoteSpriteAlpha();
+                        foreach (var note in NotesManager.OnStageNotes) {
+                            note.RefreshColorAlpha();
                         }
                     }
                     NotifyFlag(NotificationFlag.SuddenPlus);
@@ -147,7 +201,22 @@ namespace Deenote.Core.GamePlay
         {
             get {
                 this.AssertStageLoaded();
-                _cacheVisibleRangePercentage ??= this.Stage.ConvertSuddenPlusRangToVisibleRangePercentage(SuddenPlus);
+                if (_cacheVisibleRangePercentage is null) {
+                    var x = ConvertNoteCoordPositionToWorldX(0f);
+                    var maxZ = ConvertNoteCoordTimeToWorldZ(StageNoteActiveAheadTime);
+                    var minZ = ConvertNoteCoordTimeToWorldZ(0f);
+
+                    bool try0, try1;
+                    try0 = Stage.TryConvertNotePanelPositionToPerspectiveCameraViewportPoint((x, minZ), out var minVp);
+                    try1 = Stage.TryConvertNotePanelPositionToPerspectiveCameraViewportPoint((x, maxZ), out var maxVp);
+                    Debug.Assert(try0 && try1);
+
+                    var vp = new Vector2(maxVp.x, Mathf.Lerp(maxVp.y, minVp.y, SuddenPlus));
+                    try0 = Stage.TryConvertPerspectiveCameraViewportPointToNotePanelPosition(vp, out var pos);
+                    Debug.Assert(try0);
+
+                    _cacheVisibleRangePercentage = Mathf.InverseLerp(minZ, maxZ, pos.Z);
+                }
                 return _cacheVisibleRangePercentage.GetValueOrDefault();
             }
         }
@@ -165,8 +234,8 @@ namespace Deenote.Core.GamePlay
             set {
                 if (Utils.SetField(ref _earlyDisplayLowSpeedNotes_bf, value)) {
                     if (IsStageLoaded() && IsChartLoaded()) {
-                        foreach (var note in NotesManager.StageActiveNotes) {
-                            note.RefreshNoteSpriteAlpha();
+                        foreach (var note in NotesManager.OnStageNotes) {
+                            note.RefreshColorAlpha();
                         }
                     }
                     NotifyFlag(NotificationFlag.EarlyDisplaySlowNotes);
@@ -178,8 +247,8 @@ namespace Deenote.Core.GamePlay
         {
             get => _ignoreNoteSpeed_bf;
             set {
-                if(Utils.SetField(ref _ignoreNoteSpeed_bf, value)) {
-                    if(IsStageLoaded() && IsChartLoaded()) {
+                if (Utils.SetField(ref _ignoreNoteSpeed_bf, value)) {
+                    if (IsStageLoaded() && IsChartLoaded()) {
                         NotesManager.RefreshStageActiveNotes();
                     }
                 }
@@ -189,6 +258,9 @@ namespace Deenote.Core.GamePlay
         #endregion
 
         #region Audio
+
+        public const int MinMusicSpeed = 1;
+        public const int MaxMusicSpeed = 30;
 
         // The field is required as we may restore it when manual-play mode off
         private int _musicSpeed_bf;
@@ -258,5 +330,8 @@ namespace Deenote.Core.GamePlay
         }
 
         #endregion
+
+        private static float ConvertToActualNoteSpeed(int noteSpeed) => noteSpeed / 10f;
+        private static float ConvertToActualMusicSpeed(int musicSpeed) => musicSpeed / 10f;
     }
 }

@@ -67,15 +67,7 @@ namespace Deenote.UI.Views
             InitAspectRatioController();
             RegisterKeyBindings();
 
-            MainSystem.GamePlayManager.RegisterNotification(
-                GamePlayManager.NotificationFlag.GameStageLoaded,
-                manager =>
-                {
-                    manager.AssertStageLoaded();
-                    manager.Stage.PerspectiveCamera.ApplyToRenderTexture(_viewRenderTexture);
-                    StageForeground = manager.InstantiatePerspectiveViewForeground(_contentTransform);
-                    _OnStageLoaded_Input(manager);
-                });
+            MainSystem.GamePlayManager.StageLoaded += _OnStageLoaded;
 
             MainSystem.GamePlayManager.MusicPlayer.TimeChanged += args =>
             {
@@ -113,5 +105,17 @@ namespace Deenote.UI.Views
             }
         }
 
+        private void _OnStageLoaded(GamePlayManager.StageLoadedEventArgs args)
+        {
+            args.Stage.PerspectiveCamera.ApplyToRenderTexture(_viewRenderTexture);
+
+            var foreground = Instantiate(args.PerspectiveViewForegroundPrefab, _contentTransform);
+            if (StageForeground != null) {
+                Destroy(StageForeground.gameObject);
+            }
+            StageForeground = foreground;
+
+            _OnStageLoaded_Input();
+        }
     }
 }

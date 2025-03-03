@@ -38,6 +38,8 @@ namespace Deenote.Core.GameStage
 
         private GamePlayManager _game = default!;
 
+        public event Action<LineCollector>? LineCollecting;
+
         private void Awake()
         {
             _meshRenderer.sortingLayerName = "Lines";
@@ -72,6 +74,8 @@ namespace Deenote.Core.GameStage
 
         private void LateUpdate()
         {
+            var collector = new LineCollector(this);
+            LineCollecting?.Invoke(collector);
             _meshFilter.mesh = GenerateMesh();
         }
 
@@ -114,25 +118,6 @@ namespace Deenote.Core.GameStage
             return mesh;
         }
 
-        public void AddLineStrip(ReadOnlySpan<Vector2> points, Color color, float width)
-        {
-            Vector2 prev = points[0];
-            foreach (var point in points) {
-                _vertices.Add(new VertexData {
-                    Positions = new Vector4(point.x, point.y, prev.x, prev.y),
-                    Color = color,
-                    Width = width
-                });
-                prev = point;
-            }
-        }
-
-        public void AddLine(Vector2 p1, Vector2 p2, Color color, float width)
-        {
-            ReadOnlySpan<Vector2> points = stackalloc Vector2[] { p1, p2 };
-            AddLineStrip(points, color, width);
-        }
-
         private void OnValidate()
         {
             _meshFilter ??= GetComponent<MeshFilter>();
@@ -154,6 +139,35 @@ namespace Deenote.Core.GameStage
             /// Width in screen space px.
             /// </summary>
             public float Width;
+        }
+
+        public struct LineCollector
+        {
+            private PerspectiveLinesRenderer _renderer;
+
+            public LineCollector(PerspectiveLinesRenderer renderer)
+            {
+                _renderer = renderer;
+            }
+
+            public void AddLine(Vector2 p1, Vector2 p2, Color color, float width)
+            {
+                ReadOnlySpan<Vector2> points = stackalloc Vector2[] { p1, p2 };
+                AddLineStrip(points, color, width);
+            }
+
+            public void AddLineStrip(ReadOnlySpan<Vector2> points, Color color, float width)
+            {
+                Vector2 prev = points[0];
+                foreach (var point in points) {
+                    _renderer._vertices.Add(new VertexData {
+                        Positions = new Vector4(point.x, point.y, prev.x, prev.y),
+                        Color = color,
+                        Width = width
+                    });
+                    prev = point;
+                }
+            }
         }
     }
 }

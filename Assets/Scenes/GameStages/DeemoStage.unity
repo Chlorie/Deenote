@@ -331,11 +331,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _perspectiveCamera: {fileID: 1372557760}
+  _perspectiveLineRenderer: {fileID: 900070399}
+  _notePanelTransform: {fileID: 1535761542}
+  _noteIndicatorPanelTransform: {fileID: 1583514218}
+  _noteDragSelectionPanelTransform: {fileID: 43574881}
   _holdBodyCullMaterial: {fileID: 2100000, guid: 919dd3b629e4fb64c9774a646b1a058e,
     type: 2}
-  <NotePanelTransform>k__BackingField: {fileID: 1535761542}
-  <NoteIndicatorPanelTransform>k__BackingField: {fileID: 1583514218}
-  <NoteDragSelectionPanelTransform>k__BackingField: {fileID: 43574881}
   <Args>k__BackingField: {fileID: 11400000, guid: c5ef0acc7035d894ebff6fef35d31d34,
     type: 2}
   <GridLineArgs>k__BackingField: {fileID: 11400000, guid: 9b6012c3663b01a4e85e046c1a6e9c46,

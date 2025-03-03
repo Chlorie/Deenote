@@ -59,14 +59,11 @@ namespace Deenote.GamePlay.UI
             }
         }
 
-        private void Awake()
+        protected override void Awake()
         {
             _shockWaveEnterPosX = _shockWaveEnterPosTransform.anchorMin.x;
             _shockWaveExitPosX = _shockWaveExitPosTransform.anchorMin.x;
-        }
 
-        internal override void OnInstantiate()
-        {
             // TODO:这怎么有这个玩意
             //MainSystem.GameStage.PerspectiveView.RegisterPropertyChangeNotificationAndInvoke(
             //    GameStage.PerspectiveViewController.NotifyProperty.AspectRatio,

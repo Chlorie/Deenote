@@ -14,7 +14,7 @@ namespace Deenote.Core.GameStage
         private readonly SortedList<GameStageNoteController> _trackingNotesInTimeOrder;
         private readonly SortedList<GameStageNoteController> _trackingNotesAppearTimeOrder;
 
-        internal ReadOnlySpan<GameStageNoteController> StageActiveNotes => _trackingNotesInTimeOrder.AsSpan();
+        internal ReadOnlySpan<GameStageNoteController> OnStageNotes => _trackingNotesInTimeOrder.AsSpan();
 
 
         #region Collection Modification

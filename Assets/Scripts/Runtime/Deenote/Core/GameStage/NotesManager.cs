@@ -64,8 +64,8 @@ namespace Deenote.Core.GameStage
                 (l, r) =>
                 {
                     _game.AssertStageLoaded();
-                    var ltime = _game.Stage.GetNoteAppearTime(l.NoteModel);
-                    var rtime = _game.Stage.GetNoteAppearTime(r.NoteModel);
+                    var ltime = _game.GetStageNoteAppearTime(l.NoteModel);
+                    var rtime = _game.GetStageNoteAppearTime(r.NoteModel);
                     return Comparer<float>.Default.Compare(ltime, rtime);
                 }));
         }
@@ -90,8 +90,8 @@ namespace Deenote.Core.GameStage
                 _stageNoteNodesInAppearOrder = new SortedList<IStageNoteNode>(Comparer<IStageNoteNode>.Create((l, r) =>
                 {
                     _game.AssertStageLoaded();
-                    var ltime = _game.Stage.GetNoteAppearTime(l);
-                    var rtime = _game.Stage.GetNoteAppearTime(r);
+                    var ltime = _game.GetStageNoteAppearTime(l);
+                    var rtime = _game.GetStageNoteAppearTime(r);
                     return Comparer<float>.Default.Compare(ltime, rtime);
                 }));
             }
@@ -133,7 +133,7 @@ namespace Deenote.Core.GameStage
             return null;
         }
 
-        public IStageNoteNode? GetNextActiveNodeInNonEarlyDisplayMode()
+        public IStageNoteNode? GetNextActiveNodeInTimeOrderDisplayMode()
         {
             _game.AssertChartLoaded();
 
@@ -160,7 +160,7 @@ namespace Deenote.Core.GameStage
             var currentTime = _game.MusicPlayer.Time;
             var deactiveDeltaTime = stage.Args.HitEffectSpritePrefabs.HitEffectTime;
             var deactiveNoteTime = currentTime - deactiveDeltaTime;
-            var activateDeltaTime = stage.NoteActiveAheadTime;
+            var activateDeltaTime = _game.StageNoteActiveAheadTime;
             var activateNoteTime = currentTime + activateDeltaTime;
 
             int index = 0, combo = 0;
@@ -203,7 +203,7 @@ namespace Deenote.Core.GameStage
                 var node = _stageNoteNodesInAppearOrder[i];
                 if (node is NoteModel note) {
                     if (note.Time > currentTime)
-                        AddTrackNote(note, _game.Stage.NoteAppearAheadTime);
+                        AddTrackNote(note, _game.StageNoteAppearAheadTime);
                 }
             }
             _nextActiveNoteIndexInAppearOrder = indexInAppearOrder;
@@ -226,7 +226,7 @@ namespace Deenote.Core.GameStage
                 if (node is not NoteModel note)
                     return;
                 if (note.EndTime > deactiveNoteTime) {
-                    AddTrackNote(note, _game.Stage.NoteAppearAheadTime);
+                    AddTrackNote(note, _game.StageNoteAppearAheadTime);
                 }
             }
 
@@ -507,7 +507,7 @@ namespace Deenote.Core.GameStage
             }
 
             public int CompareTo(IStageNoteNode other)
-                => Comparer<float>.Default.Compare(_time, _manager._game.Stage!.GetNoteAppearTime(other));
+                => Comparer<float>.Default.Compare(_time, _manager._game.GetStageNoteAppearTime(other));
         }
     }
 }

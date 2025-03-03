@@ -12,7 +12,7 @@ namespace Deenote.GamePlay.UI
         [field: SerializeField]
         public GameStageUIArgs Args { get; private set; } = default!;
 
-        internal abstract void OnInstantiate();
+        protected abstract void Awake();
 
         protected virtual void OnValidate()
         {

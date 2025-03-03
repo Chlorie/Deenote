@@ -81,12 +81,8 @@ namespace Deenote.UI.Views.Panels
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteSounds,
                 editor => ResetEditingNotesAndLoad(editor.Selector.SelectedNotes));
-            MainSystem.StageChartEditor.Selector.RegisterNotificationAndInvoke(
-                StageNoteSelector.NotificationFlag.SelectedNotesChanging,
-                selector => SaveDataToEditingNotes());
-            MainSystem.StageChartEditor.Selector.RegisterNotificationAndInvoke(
-                StageNoteSelector.NotificationFlag.SelectedNotesChanged,
-                selector => ResetEditingNotesAndLoad(selector.SelectedNotes));
+            MainSystem.StageChartEditor.Selector.SelectedNotesChanging += _ => SaveDataToEditingNotes();
+            MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector => ResetEditingNotesAndLoad(selector.SelectedNotes);
         }
 
         internal void RemoveSoundItem(NoteInfoPianoSoundEditListItem item)

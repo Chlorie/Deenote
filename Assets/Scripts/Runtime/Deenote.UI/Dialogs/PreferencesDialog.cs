@@ -28,10 +28,8 @@ namespace Deenote.UI.Dialogs
         [SerializeField] ToggleSwitch _showIneffectivePropertiesToggle = default!;
         [SerializeField] ToggleSwitch _distinguishPianoNotesToggle = default!;
 
-        protected override void Awake()
+        private void Start()
         {
-            base.Awake();
-
             _dialog.CloseButton.Clicked += base.CloseSelfModalDialog;
 
             _stageEffectToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsStageEffectOn = val;

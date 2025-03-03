@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Core.GameStage;
 using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.Library;
@@ -16,7 +17,6 @@ namespace Deenote.Core.Editing
         private StageNotePlacer _placer = default!;
 
         private (Vector2 Start, Vector2 Offset)? _linkLine;
-        private bool _shouldDrawLinkLine;
         private NoteModel _notePrototype = default!;
 
         public NoteModel NotePrototype => _notePrototype;
@@ -24,6 +24,10 @@ namespace Deenote.Core.Editing
         internal void OnInstantiate(StageNotePlacer placer)
         {
             _placer = placer;
+
+            var game = _placer._editor._game;
+            game.AssertStageLoaded();
+            game.Stage.PerspectiveLinesRenderer.LineCollecting += _OnPerspectiveLineCollecting;
         }
 
         internal void Initialize(NoteModel note)
@@ -32,6 +36,7 @@ namespace Deenote.Core.Editing
 
             _placer._editor._game.AssertStageLoaded();
 
+            var game = _placer._editor._game;
             var stage = _placer._editor._game.Stage;
             var args = stage.Args;
             var prefab = note switch {
@@ -47,7 +52,7 @@ namespace Deenote.Core.Editing
             _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(note.Size, 1f, 1f) * prefab.Scale;
 
             if (note.NextLink is not null) {
-                var (tox, toz) = stage.ConvertNoteCoordToWorldPosition(note.NextLink.PositionCoord - note.PositionCoord);
+                var (tox, toz) = game.ConvertNoteCoordToWorldPosition(note.NextLink.PositionCoord - note.PositionCoord);
                 _linkLine = (Vector2.zero, new Vector2(tox, toz));
             }
             else {
@@ -59,35 +64,44 @@ namespace Deenote.Core.Editing
                 _holdBodySpriteRender.gameObject.SetActive(true);
                 _holdBodySpriteRender.transform.WithLocalScaleXY(
                     note.Size * holdprefab.ScaleX,
-                    stage.ConvertNoteCoordTimeToHoldScaleY(note.Duration));
+                    game.ConvertNoteCoordTimeToHoldScaleY(note.Duration));
             }
             else {
                 _holdBodySpriteRender.gameObject.SetActive(false);
             }
         }
 
+        private void OnDestroy()
+        {
+            var game = _placer._editor._game;
+            if (game.IsStageLoaded())
+                game.Stage.PerspectiveLinesRenderer.LineCollecting -= _OnPerspectiveLineCollecting;
+        }
+
+        private void OnDisable()
+        {
+            _linkLine = null;
+        }
+
+        private void _OnPerspectiveLineCollecting(PerspectiveLinesRenderer.LineCollector collector)
+        {
+            var showLinkLine = _placer._editor._game.IsShowLinkLines;
+            if (showLinkLine && _linkLine is var (start, offset)) {
+                _placer._editor._game.AssertStageLoaded();
+
+                var args = _placer._editor._game.Stage.GridLineArgs;
+                collector.AddLine(start, start + offset,
+                    args.LinkLineColor with { a = NoteAlpha },
+                    args.LinkLineWidth);
+            }
+        }
         public void MoveTo(NoteCoord coord)
         {
             _placer._editor._game.AssertStageLoaded();
 
             var localCoord = coord - new NoteCoord(position: 0, time: _placer._editor._game.MusicPlayer.Time);
-            var (x, z) = _placer._editor._game.Stage.ConvertNoteCoordToWorldPosition(localCoord);
+            var (x, z) = _placer._editor._game.ConvertNoteCoordToWorldPosition(localCoord);
             transform.WithLocalPositionXZ(x, z);
-        }
-
-        internal void UpdateLinkLineVisibility(bool showLinkLines)
-            => _shouldDrawLinkLine = showLinkLines;
-
-        private void Update()
-        {
-            if (_shouldDrawLinkLine && _linkLine is var (start, offset)) {
-                _placer._editor._game.AssertStageLoaded();
-
-                var args = _placer._editor._game.Stage.GridLineArgs;
-                _placer._editor._game.PerspectiveLinesRenderer.AddLine(start, start + offset,
-                    args.LinkLineColor with { a = NoteAlpha },
-                    args.LinkLineWidth);
-            }
         }
     }
 }

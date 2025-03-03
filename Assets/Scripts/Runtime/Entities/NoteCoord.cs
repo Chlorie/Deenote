@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Diagnostics;
 using UnityEngine;
 
@@ -41,6 +42,11 @@ namespace Deenote.Entities
         public static NoteCoord operator +(NoteCoord left, NoteCoord right) =>
             new(left.Position + right.Position, left.Time + right.Time);
 
+        public readonly bool Equals(NoteCoord other) => Position == other.Position && Time == other.Time;
+        public static bool operator ==(NoteCoord left, NoteCoord right) => left.Equals(right);
+        public static bool operator !=(NoteCoord left, NoteCoord right) => !left.Equals(right);
         public override readonly string ToString() => $"{{ Pos:{Position}, Time:{Time} }}";
+        public override readonly bool Equals(object? obj) => obj is NoteCoord coord && Equals(coord);
+        public override readonly int GetHashCode() => HashCode.Combine(Position, Time);
     }
 }

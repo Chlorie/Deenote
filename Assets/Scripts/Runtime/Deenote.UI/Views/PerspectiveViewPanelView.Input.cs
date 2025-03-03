@@ -16,7 +16,7 @@ namespace Deenote.UI.Views
     {
         [SerializeField] GraphicRaycaster _raycaster = default!;
 
-        private void _OnStageLoaded_Input(GamePlayManager manager)
+        private void _OnStageLoaded_Input()
         {
             _raycaster.enabled = true;
         }
@@ -33,7 +33,7 @@ namespace Deenote.UI.Views
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
-            if (MainSystem.GamePlayManager.CurrentChart is null)
+            if (!MainSystem.GamePlayManager.IsChartLoaded())
                 return;
 
             var editor = MainSystem.StageChartEditor;
@@ -65,7 +65,7 @@ namespace Deenote.UI.Views
 
         void IPointerMoveHandler.OnPointerMove(PointerEventData eventData)
         {
-            if (MainSystem.GamePlayManager.CurrentChart is null)
+            if (!MainSystem.GamePlayManager.IsChartLoaded())
                 return;
 
             var editor = MainSystem.StageChartEditor;
@@ -87,7 +87,7 @@ namespace Deenote.UI.Views
 
         void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
         {
-            if (MainSystem.GamePlayManager.CurrentChart is null)
+            if (!MainSystem.GamePlayManager.IsChartLoaded())
                 return;
 
             var editor = MainSystem.StageChartEditor;
@@ -108,7 +108,7 @@ namespace Deenote.UI.Views
 
         void IScrollHandler.OnScroll(PointerEventData eventData)
         {
-            if (MainSystem.GamePlayManager.CurrentChart is null)
+            if (!MainSystem.GamePlayManager.IsChartLoaded())
                 return;
 
             float scroll = eventData.scrollDelta.y;
@@ -133,7 +133,7 @@ namespace Deenote.UI.Views
                 localPoint.x / tsfmrect.width,
                 localPoint.y / tsfmrect.height);
 
-            return MainSystem.GamePlayManager.Stage.TryConvertViewportPointToNoteCoord(viewPoint, out coord);
+            return MainSystem.GamePlayManager.TryConvertPerspectiveViewportPointToNoteCoord(viewPoint, out coord);
         }
     }
 }

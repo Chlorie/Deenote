@@ -119,39 +119,25 @@ namespace Deenote.Core.Editing
         {
             _placeNotePrototype = new NoteModel();
             _editor = editor;
-
-            _editor._game.RegisterNotification(
-                GamePlayManager.NotificationFlag.IsShowLinkLines,
-                manager =>
-                {
-                    if (manager.IsStageLoaded() && manager.IsChartLoaded()) {
-                        bool show = manager.IsShowLinkLines;
-                        foreach (var note in _indicators)
-                            note.UpdateLinkLineVisibility(show);
-                    }
-                });
+            
             _editor._game.RegisterNotification(
                 GamePlayManager.NotificationFlag.CurrentChart,
                 manager =>
                 {
                     CancelPlaceNote();
                 });
-            _editor._game.RegisterNotification(
-                GamePlayManager.NotificationFlag.GameStageLoaded,
-                manager =>
-                {
-                    manager.AssertStageLoaded();
-
-                    _indicatorPanelTransform = manager.Stage.NoteIndicatorPanelTransform;
-                    _indicators = new(UnityUtils.CreateObjectPool(manager.Stage.Args.PlacementNoteIndicatorPrefab,
+            _editor._game.StageLoaded += args =>
+            {
+                    _indicatorPanelTransform = args.Stage.NoteIndicatorPanelTransform;
+                    _indicators = new(UnityUtils.CreateObjectPool(args.Stage.Args.PlacementNoteIndicatorPrefab,
                         _indicatorPanelTransform,
                         item =>
                         {
                             item.OnInstantiate(this);
-                            item.UpdateLinkLineVisibility(manager.IsShowLinkLines);
                         }));
                     RefreshIndicators();
-                });
+
+            };
             _editor._game.MusicPlayer.TimeChanged += args =>
             {
                 var delta = args.NewTime - args.OldTime;
@@ -512,7 +498,7 @@ namespace Deenote.Core.Editing
             if (!IsIndicatorOn)
                 return;
 
-            if (_editor._game.Stage is null)
+            if (!_editor._game.IsStageLoaded())
                 return;
 
             if (_state is PlacementState.PlacingMultiple) {
@@ -552,7 +538,7 @@ namespace Deenote.Core.Editing
 
             if (coord.Position is > PlacementAreaMaxPosition or < -PlacementAreaMaxPosition)
                 return false;
-            if (coord.Time > game.MusicPlayer.Time + game.Stage.NoteAppearAheadTime)
+            if (coord.Time > game.MusicPlayer.Time + game.StageNoteAppearAheadTime)
                 return false;
 
             return true;

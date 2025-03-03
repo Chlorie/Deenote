@@ -2,13 +2,15 @@
 
 using Deenote;
 using Deenote.Core.GamePlay.Audio;
+using Deenote.Core.GameStage;
 using Deenote.Core.Project;
 using Deenote.Entities;
 using Deenote.Library.Components;
+using System;
 
 namespace Deenote.Core.GamePlay
 {
-    public sealed partial class GridsManager : FlagNotifiable<GridsManager, GridsManager.NotificationFlag>
+    public sealed partial class GridsManager : FlagNotifiable<GridsManager, GridsManager.NotificationFlag>, IDisposable
     {
         private readonly GamePlayManager _game;
 
@@ -22,9 +24,13 @@ namespace Deenote.Core.GamePlay
                 GamePlayManager.NotificationFlag.SuddenPlus,
                 _OnSuddenPlusChanged);
             _game.MusicPlayer.TimeChanged += _OnStageTimeChanged;
+            _game.StageLoaded += args =>
+            {
+                args.Stage.PerspectiveLinesRenderer.LineCollecting += _OnPerspectiveLineCollecting;
+            };
         }
 
-        public void Destroy()
+        public void Dispose()
         {
             MainSystem.ProjectManager.UnregisterNotification(
                 ProjectManager.NotificationFlag.ProjectTempos,
@@ -33,6 +39,9 @@ namespace Deenote.Core.GamePlay
                 GamePlayManager.NotificationFlag.SuddenPlus,
                 _OnSuddenPlusChanged);
             _game.MusicPlayer.TimeChanged -= _OnStageTimeChanged;
+
+            if (_game.IsStageLoaded())
+                _game.Stage.PerspectiveLinesRenderer.LineCollecting -= _OnPerspectiveLineCollecting;
         }
 
         #region Registrations
@@ -44,7 +53,13 @@ namespace Deenote.Core.GamePlay
             UpdateTimeGrids();
             UpdateCurveLine();
         }
-
+        private void _OnPerspectiveLineCollecting(PerspectiveLinesRenderer.LineCollector collector)
+        {
+            SubmitTimeGridRender(collector);
+            SubmitPositionGridsRender(collector);
+            SubmitCurveRender(collector);
+        }
+        
         #endregion
 
         public NoteCoord Quantize(NoteCoord coord, bool snapPosition, bool snapTime)
@@ -54,16 +69,6 @@ namespace Deenote.Core.GamePlay
                 ? GetCurveTransformedPosition(snappedTime) ?? GetNearestPositionGridPosition(coord.Position)
                 ?? coord.Position : coord.Position;
             return NoteCoord.ClampPosition(snappedPosition, snappedTime);
-        }
-
-        /// <summary>
-        /// Call every update
-        /// </summary>
-        internal void SubmitLinesRender()
-        {
-            SubmitTimeGridRender();
-            SubmitPositionGridsRender();
-            SubmitCurveRender();
         }
 
         public enum NotificationFlag

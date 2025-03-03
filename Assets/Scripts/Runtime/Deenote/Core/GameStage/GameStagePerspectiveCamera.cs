@@ -23,6 +23,7 @@ namespace Deenote.Core.GameStage
             _camera.rect = new Rect(0f, 0f, 1f, h);
 
             _backgroundCamera.targetTexture = renderTexture;
+            _backgroundCamera.Render();
         }
 
         private void OnValidate()

@@ -1,6 +1,7 @@
 #nullable enable
 
 using CommunityToolkit.HighPerformance.Buffers;
+using Deenote.Core.GameStage;
 using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
@@ -102,7 +103,7 @@ namespace Deenote.Core.GamePlay
 
         public void HideCurve() => IsCurveOn = false;
 
-        private void SubmitCurveRender()
+        private void SubmitCurveRender(PerspectiveLinesRenderer.LineCollector collector)
         {
             if (IsCurveOn && _shouldRenderCurve) {
                 _game.AssertStageLoaded();
@@ -110,10 +111,10 @@ namespace Deenote.Core.GamePlay
                 var args = _game.Stage.GridLineArgs;
                 var strip = (stackalloc Vector2[_curveRenderPositions.Length]);
                 for (int i = 0; i < strip.Length; i++) {
-                    var (x, z) = _game.Stage.ConvertNoteCoordToWorldPosition(_curveRenderPositions[i]);
+                    var (x, z) = _game.ConvertNoteCoordToWorldPosition(_curveRenderPositions[i]);
                     strip[i] = new Vector2(x, z);
                 }
-                _game.PerspectiveLinesRenderer.AddLineStrip(strip, args.CurveLineColor, args.CurveLineWidth);
+                collector.AddLineStrip(strip, args.CurveLineColor, args.CurveLineWidth);
             }
         }
 
@@ -121,11 +122,11 @@ namespace Deenote.Core.GamePlay
         {
             if (!IsCurveOn)
                 return;
-            if (_game.Stage is null)
+            if (!_game.IsStageLoaded())
                 return;
 
             var currentTime = _game.MusicPlayer.Time;
-            var stageMaxTime = _game.Stage.NoteAppearAheadTime;
+            var stageMaxTime = _game.StageNoteAppearAheadTime;
 
             using var coords_so = _positionCurveData.GetRenderValues(currentTime, stageMaxTime);
             var coords = coords_so.Span;

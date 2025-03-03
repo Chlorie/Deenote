@@ -12,6 +12,9 @@ namespace Deenote.UI.Views
 {
     public sealed class EditorNavigationPageView : MonoBehaviour
     {
+        [SerializeField] TextBox _highlightNoteSpeedInput = default!;
+        [SerializeField] ToggleButton _filterNoteSpeedToggle = default!;
+
         [SerializeField] NumericStepper _musicSpeedNumericStepper = default!;
         [SerializeField] TextBox _horizontalGridCountInput = default!;
         [SerializeField] TextBox _verticalGridCountInput = default!;
@@ -60,6 +63,21 @@ namespace Deenote.UI.Views
         {
             // Stage
             {
+                _highlightNoteSpeedInput.EditSubmitted += text =>
+                {
+                    if (float.TryParse(text, out var value))
+                        MainSystem.GamePlayManager.HighlightedNoteSpeed = value;
+                    else
+                        _highlightNoteSpeedInput.SetValueWithoutNotify(MainSystem.GamePlayManager.HighlightedNoteSpeed.ToString("F2"));
+                };
+                MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                    GamePlayManager.NotificationFlag.HighlightedNoteSpeed,
+                    manager => _highlightNoteSpeedInput.SetValueWithoutNotify(MainSystem.GamePlayManager.HighlightedNoteSpeed.ToString("F2")));
+                _filterNoteSpeedToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsFilterNoteSpeed = val;
+                MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                    GamePlayManager.NotificationFlag.IsFilterNoteSpeed,
+                    manager => _filterNoteSpeedToggle.SetIsCheckedWithoutNotify(manager.IsFilterNoteSpeed));
+
                 _musicSpeedNumericStepper.Initialize(GamePlayManager.MinMusicSpeed, GamePlayManager.MaxMusicSpeed);
                 _musicSpeedNumericStepper.SetInputParser(static input => float.TryParse(input, out var val) ? Mathf.RoundToInt(val * 10f) : null);
                 _musicSpeedNumericStepper.SetDisplayerTextSelector(static ival => $"{ival / 10}.{ival % 10}");
@@ -145,15 +163,13 @@ namespace Deenote.UI.Views
                 _curveApplySizeButton.Clicked += () => MainSystem.StageChartEditor.ApplySelectedNotesWithCurveTranform(GridsManager.CurveApplyProperty.Size);
                 _curveApplySpeedButton.Clicked += () => MainSystem.StageChartEditor.ApplySelectedNotesWithCurveTranform(GridsManager.CurveApplyProperty.Speed);
 
-                MainSystem.StageChartEditor.Selector.RegisterNotificationAndInvoke(
-                    StageNoteSelector.NotificationFlag.SelectedNotesChanged,
-                    selector =>
-                    {
-                        bool val = selector.SelectedNotes.Length > 1;
-                        _fillCurveButton.IsInteractable = val;
-                        _curveApplySizeButton.IsInteractable = val;
-                        _curveApplySpeedButton.IsInteractable = val;
-                    });
+                MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector =>
+                {
+                    bool val = selector.SelectedNotes.Length > 1;
+                    _fillCurveButton.IsInteractable = val;
+                    _curveApplySizeButton.IsInteractable = val;
+                    _curveApplySpeedButton.IsInteractable = val;
+                };
             }
 
             // BPM
@@ -180,30 +196,28 @@ namespace Deenote.UI.Views
                 };
                 _bpmFillButton.Clicked += () => MainSystem.StageChartEditor.InsertTempo(new Entities.TempoRange(_bpmValue, _bpmStartTime, _bpmEndTime));
 
-                MainSystem.StageChartEditor.Selector.RegisterNotificationAndInvoke(
-                    StageNoteSelector.NotificationFlag.SelectedNotesChanged,
-                    selector =>
-                    {
-                        var selectedNotes = selector.SelectedNotes;
-                        if (selectedNotes.IsEmpty)
-                            return;
+                MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector =>
+                {
+                    var selectedNotes = selector.SelectedNotes;
+                    if (selectedNotes.IsEmpty)
+                        return;
 
-                        float start = selectedNotes[0].Time;
-                        float end = selectedNotes[^1].Time;
-                        _bpmStartTime = start;
-                        _bpmEndTime = end;
-                        SyncFloatInput(_bpmStartTimeInput, _bpmStartTime);
-                        SyncFloatInput(_bpmEndTimeInput, _bpmEndTime);
+                    float start = selectedNotes[0].Time;
+                    float end = selectedNotes[^1].Time;
+                    _bpmStartTime = start;
+                    _bpmEndTime = end;
+                    SyncFloatInput(_bpmStartTimeInput, _bpmStartTime);
+                    SyncFloatInput(_bpmEndTimeInput, _bpmEndTime);
 
-                        if (selectedNotes.Length == 1)
-                            return;
+                    if (selectedNotes.Length == 1)
+                        return;
 
-                        float interval = end - start;
-                        if (interval < Tempo.MinBeatLineInterval)
-                            return;
-                        _bpmValue = 60f / interval;
-                        SyncFloatInput(_bpmValueInput, _bpmValue);
-                    });
+                    float interval = end - start;
+                    if (interval < Tempo.MinBeatLineInterval)
+                        return;
+                    _bpmValue = 60f / interval;
+                    SyncFloatInput(_bpmValueInput, _bpmValue);
+                };
             }
         }
     }
