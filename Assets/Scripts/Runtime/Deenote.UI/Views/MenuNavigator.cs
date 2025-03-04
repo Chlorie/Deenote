@@ -19,7 +19,7 @@ namespace Deenote.UI.Views
         [SerializeField] GameObject _menuPage = default!;
         [SerializeField] GameObject _projectPage = default!;
         [SerializeField] GameObject _playerPage = default!;
-        //[SerializeField] GameObject _toolkitPage=default!;
+        [SerializeField] GameObject _toolkitPage = default!;
 
         private void Awake()
         {
@@ -28,6 +28,7 @@ namespace Deenote.UI.Views
             _menuButton.IsCheckedChanged += _menuPage.SetActive;
             _projectButton.IsCheckedChanged += _projectPage.SetActive;
             _playerButton.IsCheckedChanged += _playerPage.SetActive;
+            _toolkitButton.IsCheckedChanged += _toolkitPage.SetActive;
         }
 
         private void UpdateLayoutPadding(bool pageOn)
@@ -40,7 +41,7 @@ namespace Deenote.UI.Views
 
         private void OnValidate()
         {
-            UpdateLayoutPadding(_menuPage.activeSelf || _projectPage.activeSelf || _playerPage.activeSelf);
+            UpdateLayoutPadding(_menuPage.activeSelf || _projectPage.activeSelf || _playerPage.activeSelf || _toolkitPage.activeSelf);
         }
     }
 }

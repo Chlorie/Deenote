@@ -33,7 +33,7 @@ namespace Deenote.UI.Dialogs
             _dialog.CloseButton.Clicked += base.CloseSelfModalDialog;
 
             _stageEffectToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsStageEffectOn = val;
-            MainSystem.GamePlayManager.RegisterNotification(
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.StageEffectOn,
                 manager => _stageEffectToggle.SetIsCheckedWithoutNotify(manager.IsStageEffectOn));
 
@@ -44,14 +44,14 @@ namespace Deenote.UI.Dialogs
                 _mouseSensitivityInput.SetValueWithoutNotify(fval.ToString("F1"));
             };
             _mouseSensitivityInvertButton.Clicked += () => MainWindow.Settings.GameViewScrollSensitivity = -MainWindow.Settings.GameViewScrollSensitivity;
-            MainWindow.Settings.RegisterNotification(
+            MainWindow.Settings.RegisterNotificationAndInvoke(
                 MainWindow.SettingsData.NotificationFlag.GameViewScrollSensitivity,
                 settings => _mouseSensitivityInput.SetValueWithoutNotify(settings.GameViewScrollSensitivity.ToString("F1")));
 
             // System
 
             _vSyncToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsVSyncOn = val;
-            MainSystem.GlobalSettings.RegisterNotification(
+            MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
                 GlobalSettings.NotificationFlag.VSync,
                 settings => _vSyncToggle.IsChecked = settings.IsVSyncOn);
 
@@ -59,6 +59,7 @@ namespace Deenote.UI.Dialogs
             _languageDropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(text => text == LocalizationSystem.CurrentLanguage.LanguageDisplayName));
             _languageDropdown.SelectedIndexChanged += val => LocalizationSystem.CurrentLanguage = (LanguagePack)_languageDropdown.Options[val].Item!;
             LocalizationSystem.LanguageChanged += val => _languageDropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(text => text == val.LanguageDisplayName));
+            _languageDropdown.SetValueWithoutNotify(_languageDropdown.FindIndex(text => text == LocalizationSystem.CurrentLanguage.LanguageDisplayName));
 
             _autoSaveDropdown.ResetOptions(_autoSaveDropdownOptions.AsSpan());
             _autoSaveDropdown.SelectedIndexChanged += val => MainSystem.ProjectManager.AutoSave = GetAutoSaveDropdownOption(val);
@@ -71,17 +72,17 @@ namespace Deenote.UI.Dialogs
             // Display
 
             _showFpsToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsFpsShown = val;
-            MainSystem.GlobalSettings.RegisterNotification(
+            MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
                 GlobalSettings.NotificationFlag.FpsShown,
                 settings => _showFpsToggle.IsChecked = settings.IsFpsShown);
 
             _showIneffectivePropertiesToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsIneffectivePropertiesVisible = val;
-            MainSystem.GlobalSettings.RegisterNotification(
+            MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
                 GlobalSettings.NotificationFlag.IneffectivePropertiesVisible,
                 settings => _showIneffectivePropertiesToggle.IsChecked = settings.IsIneffectivePropertiesVisible);
 
             _distinguishPianoNotesToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsPianoNotesDistinguished = val;
-            MainSystem.GamePlayManager.RegisterNotification(
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.DistinguishPianoNotes,
                 manager => _distinguishPianoNotesToggle.IsChecked = manager.IsPianoNotesDistinguished);
         }

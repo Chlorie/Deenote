@@ -1,13 +1,10 @@
 {
-    "name": "Deenote.Plugins",
-    "rootNamespace": "",
+    "name": "Deenote.Plugin",
+    "rootNamespace": "Deenote.Plugin",
     "references": [
         "Deenote",
-        "Deenote.Plugin",
-        "UniTask",
-        "Deenote.Localization",
-        "Deenote.Library",
-        "Deenote.Entities"
+        "Deenote.UI",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

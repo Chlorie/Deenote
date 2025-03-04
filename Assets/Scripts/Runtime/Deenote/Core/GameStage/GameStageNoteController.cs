@@ -74,14 +74,14 @@ namespace Deenote.Core.GameStage
 
         private void OnDestroy()
         {
-            if(_game.IsStageLoaded())
-            _game.Stage.PerspectiveLinesRenderer.LineCollecting -= _OnPerspectiveLineCollecting;
+            if (_game.IsStageLoaded())
+                _game.Stage.PerspectiveLinesRenderer.LineCollecting -= _OnPerspectiveLineCollecting;
         }
 
         private void OnDisable()
         {
             _state = NoteDisplayState.Inactive;
-            SetLinkLine(false);
+            SetLinkLine();
         }
 
         private void _OnPerspectiveLineCollecting(PerspectiveLinesRenderer.LineCollector collector)
@@ -104,12 +104,12 @@ namespace Deenote.Core.GameStage
             SetState();
             switch (_state) {
                 case NoteDisplayState.Invisible:
-                    SetLinkLine(false);
+                    SetLinkLine();
                     break;
                 case NoteDisplayState.Fall:
                     SetNotePositionZ(_stageDeltaTime);
                     SetNoteSpriteAlpha();
-                    SetLinkLine(true);
+                    SetLinkLine();
                     SetHoldBodyDisplayLength(NoteModel.GetActualDuration());
                     break;
                 case NoteDisplayState.Holding:
@@ -123,7 +123,7 @@ namespace Deenote.Core.GameStage
             void OnHolding()
             {
                 SetNotePositionZ(0f);
-                SetLinkLine(false);
+                SetLinkLine();
                 SetHoldBodyDisplayLength(_stageDeltaTime + NoteModel.GetActualDuration());
 
                 _game.AssertStageLoaded();
@@ -140,7 +140,7 @@ namespace Deenote.Core.GameStage
             void OnHitEffect()
             {
                 SetNotePositionZ(0f);
-                SetLinkLine(false);
+                SetLinkLine();
                 SetHoldBodyDisplayLength(0f);
 
                 _game.AssertStageLoaded();
@@ -225,7 +225,7 @@ namespace Deenote.Core.GameStage
 
         public void RefreshLinkLine()
         {
-            SetLinkLine(_state is NoteDisplayState.Fall);
+            SetLinkLine();
         }
 
         /// <summary>
@@ -235,31 +235,10 @@ namespace Deenote.Core.GameStage
         {
             _game.AssertStageLoaded();
 
-            gameObject.transform.WithLocalPositionX(_game.ConvertNoteCoordPositionToWorldX(NoteModel.Position));
-            var prefab = NoteModel switch {
-                { Kind: NoteModel.NoteKind.Swipe } => _game.Stage.Args.SwipeNoteSpritePrefab,
-                { Kind: NoteModel.NoteKind.Slide } => _game.Stage.Args.SlideNoteSpritePrefab,
-                { HasSounds: true } => _game.Stage.Args.BlackNoteSpritePrefab,
-                _ when _game.IsPianoNotesDistinguished => _game.Stage.Args.NoSoundNoteSpritePrefab,
-                _ => _game.Stage.Args.BlackNoteSpritePrefab,
-            };
-            _noteSpriteRenderer.sprite = prefab.Sprite;
-            _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(NoteModel.Size, 1f, 1f) * prefab.Scale;
-
-            if (NoteModel.IsHold) {
-                ref readonly var holdPrefab = ref _game.Stage.Args.HoldSpritePrefab;
-                _holdBodySpriteRenderer.gameObject.SetActive(true);
-                _holdBodySpriteRenderer.transform.WithLocalScaleX(NoteModel.Size * holdPrefab.ScaleX);
-                // Scale.y is set when time changed
-            }
-            else {
-                _holdBodySpriteRenderer.gameObject.SetActive(false);
-            }
-
+            SetNotePositionX();
+            SetNoteSprite();
             RefreshColoring();
-
-            _linkLine = null;
-            _waveColor = prefab.WaveColor;
+            SetLinkLine();
         }
 
         public void RefreshColorAlpha()
@@ -267,7 +246,7 @@ namespace Deenote.Core.GameStage
             if (_state is NoteDisplayState.Invisible or NoteDisplayState.Fall) {
                 SetState();
                 if (_state is NoteDisplayState.Invisible)
-                    SetLinkLine(false);
+                    SetLinkLine();
                 if (_state is NoteDisplayState.Fall)
                     SetNoteSpriteAlpha();
             }
@@ -283,6 +262,37 @@ namespace Deenote.Core.GameStage
         #endregion
 
         #region Setters
+
+        private void SetNotePositionX()
+        {
+            transform.WithLocalPositionX(_game.ConvertNoteCoordPositionToWorldX(NoteModel.Position));
+        }
+
+        private void SetNoteSprite()
+        {
+            _game.AssertStageLoaded();
+
+            var prefab = NoteModel switch {
+                { Kind: NoteModel.NoteKind.Swipe } => _game.Stage.Args.SwipeNoteSpritePrefab,
+                { Kind: NoteModel.NoteKind.Slide } => _game.Stage.Args.SlideNoteSpritePrefab,
+                { HasSounds: true } => _game.Stage.Args.BlackNoteSpritePrefab,
+                _ when _game.IsPianoNotesDistinguished => _game.Stage.Args.NoSoundNoteSpritePrefab,
+                _ => _game.Stage.Args.BlackNoteSpritePrefab,
+            };
+            _noteSpriteRenderer.sprite = prefab.Sprite;
+            _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(NoteModel.Size, 1f, 1f) * prefab.Scale;
+            _waveColor = prefab.WaveColor;
+
+            if (NoteModel.IsHold) {
+                ref readonly var holdPrefab = ref _game.Stage.Args.HoldSpritePrefab;
+                _holdBodySpriteRenderer.gameObject.SetActive(true);
+                _holdBodySpriteRenderer.transform.WithLocalScaleX(NoteModel.Size * holdPrefab.ScaleX);
+                // Scale.y is set when time changed
+            }
+            else {
+                _holdBodySpriteRenderer.gameObject.SetActive(false);
+            }
+        }
 
         private void SetNotePositionZ(float time)
         {
@@ -308,11 +318,11 @@ namespace Deenote.Core.GameStage
             _noteSpriteRenderer.WithColorAlpha(_noteColorAlpha);
         }
 
-        private void SetLinkLine(bool show)
+        private void SetLinkLine()
         {
             _game.AssertStageLoaded();
 
-            if (show && _game.IsShowLinkLines) {
+            if (_state is NoteDisplayState.Fall && _game.IsShowLinkLines) {
                 var currentTime = _game.MusicPlayer.Time;
 
                 var to = NoteModel.NextLink;

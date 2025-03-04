@@ -26,24 +26,18 @@ namespace Deenote.UI.Views.Panels
 
         private PooledObjectListView<NoteInfoPianoSoundEditListItem> _soundItems;
 
-        private List<NoteModel> _editingNotes = new();
+        private readonly List<NoteModel> _editingNotes = new();
 
         private bool _isDirty_bf;
-        private bool _isActive_bf;
+        private bool _isPanelActive_bf;
         private bool IsDirty => _isDirty_bf;
 
-        public bool IsActive
+        public bool IsPanelActive
         {
-            get => _isActive_bf;
+            get => _isPanelActive_bf;
             set {
-                if (Utils.SetField(ref _isActive_bf, value)) {
+                if (Utils.SetField(ref _isPanelActive_bf, value)) {
                     this.gameObject.SetActive(value);
-                    if (value) {
-                        ResetEditingNotesAndLoad(MainSystem.StageChartEditor.Selector.SelectedNotes);
-                    }
-                    else {
-                        SaveDataToEditingNotes();
-                    }
                 }
             }
         }
@@ -62,7 +56,10 @@ namespace Deenote.UI.Views.Panels
         {
             _soundItems = new(UnityUtils.CreateObjectPool(_soundItemPrefab, _soundListContentTransform,
                 item => item.OnInstantiate(this), defaultCapacity: 0));
+        }
 
+        private void Start()
+        {
             _playSoundButton.Clicked += () =>
             {
                 foreach (var item in _soundItems) {
@@ -72,18 +69,61 @@ namespace Deenote.UI.Views.Panels
             _revertButton.Clicked += LoadEditingNotesSoundDatas;
             _pianoKeysPanel.KeyClicked += pitch =>
             {
+                if (_editingNotes.Count == 0)
+                    return;
                 _soundItems.Add(out var item);
                 item.Initialize(new PianoSoundValueModel(0f, 0f, pitch, 0));
                 item.transform.SetAsLastSibling();
                 SetDirty();
             };
-
-            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
-                StageChartEditor.NotificationFlag.NoteSounds,
-                editor => ResetEditingNotesAndLoad(editor.Selector.SelectedNotes));
-            MainSystem.StageChartEditor.Selector.SelectedNotesChanging += _ => SaveDataToEditingNotes();
-            MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector => ResetEditingNotesAndLoad(selector.SelectedNotes);
         }
+
+        private void OnEnable()
+        {
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
+                StageChartEditor.NotificationFlag.NoteSounds, _OnSelectedNotesSoundsChanged);
+            MainSystem.StageChartEditor.Selector.SelectedNotesChanging += _OnSelectedNotesChanging;
+            MainSystem.StageChartEditor.Selector.SelectedNotesChanged += _OnSelectedNotesChanged;
+            
+            _OnSelectedNotesChanged(MainSystem.StageChartEditor.Selector);
+        }
+
+        private void OnDisable()
+        {
+            MainSystem.StageChartEditor.UnregisterNotification(
+                StageChartEditor.NotificationFlag.NoteSounds, _OnSelectedNotesSoundsChanged);
+            MainSystem.StageChartEditor.Selector.SelectedNotesChanging -= _OnSelectedNotesChanging;
+            MainSystem.StageChartEditor.Selector.SelectedNotesChanged -= _OnSelectedNotesChanged;
+
+            SaveSoundDatas();
+        }
+
+        #region Event Handlers
+
+        private void _OnSelectedNotesChanging(StageNoteSelector selector)
+        {
+            SaveSoundDatas();
+        }
+
+        private void _OnSelectedNotesSoundsChanged(StageChartEditor editor)
+        {
+            ResetEditingNotesAndLoad(editor.Selector.SelectedNotes);
+        }
+
+        private void _OnSelectedNotesChanged(StageNoteSelector selector)
+        {
+            ResetEditingNotesAndLoad(selector.SelectedNotes);
+            if (selector.SelectedNotes.IsEmpty) {
+                _playSoundButton.IsInteractable = false;
+                _revertButton.IsInteractable = false;
+            }
+            else {
+                _playSoundButton.IsInteractable = true;
+                _revertButton.IsInteractable = true;
+            }
+        }
+
+        #endregion
 
         internal void RemoveSoundItem(NoteInfoPianoSoundEditListItem item)
         {
@@ -91,9 +131,12 @@ namespace Deenote.UI.Views.Panels
             SetDirty();
         }
 
-        private void SaveDataToEditingNotes()
+        private void SaveSoundDatas()
         {
             if (!IsDirty)
+                return;
+
+            if (_editingNotes.Count == 0)
                 return;
 
             var sounds = _soundItems.Count > 512
@@ -109,7 +152,7 @@ namespace Deenote.UI.Views.Panels
 
         private void ResetEditingNotesAndLoad(ReadOnlySpan<NoteModel> notes)
         {
-            if (IsActive) {
+            if (IsPanelActive) {
                 _editingNotes.Clear();
                 foreach (var note in notes) {
                     _editingNotes.Add(note);
@@ -125,7 +168,7 @@ namespace Deenote.UI.Views.Panels
                 return;
             }
 
-            if (!HasSameSounds(_editingNotes.AsSpan())) {
+            if (!NoteModel.HasSameSounds(_editingNotes.AsSpan())) {
                 _soundItems.Clear();
                 return;
             }
@@ -139,23 +182,6 @@ namespace Deenote.UI.Views.Panels
             }
 
             SetDirty(false);
-        }
-
-        internal static bool HasSameSounds(ReadOnlySpan<NoteModel> notes)
-        {
-            var first = notes[0].Sounds;
-
-            for (int i = 1; i < notes.Length; i++) {
-                var sounds = notes[i].Sounds;
-                if (first.Length != sounds.Length)
-                    return false;
-
-                for (int j = 0; j < sounds.Length; j++) {
-                    if (first[j] != sounds[j])
-                        return false;
-                }
-            }
-            return true;
         }
     }
 }

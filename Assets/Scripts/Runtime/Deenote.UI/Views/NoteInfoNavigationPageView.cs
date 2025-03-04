@@ -153,8 +153,8 @@ namespace Deenote.UI.Views
 
             _soundsButton.Clicked += () =>
             {
-                _soundEditPanel.IsActive = !_soundEditPanel.IsActive;
-                _soundsButton.Image.sprite = _soundEditPanel.IsActive
+                _soundEditPanel.IsPanelActive = !_soundEditPanel.IsPanelActive;
+                _soundsButton.Image.sprite = _soundEditPanel.IsPanelActive
                     ? MainWindow.Args.UIIcons.NoteInfoSoundsCollapseSprite
                     : MainWindow.Args.UIIcons.NoteInfoSoundsEditSprite;
             };
@@ -339,12 +339,12 @@ namespace Deenote.UI.Views
                     break;
                 case 1: {
                     var sounds = notes[0].Sounds;
-                    _soundsButton.Text.SetRawText(GetDisplayText(sounds));
+                    _soundsButton.Text.SetRawText(GetSoundsDisplayText(sounds));
                     break;
                 }
                 default: {
-                    if (NoteInfoPianoSoundEditPanel.HasSameSounds(notes)) {
-                        _soundsButton.Text.SetRawText(GetDisplayText(notes[0].Sounds));
+                    if (NoteModel.HasSameSounds(notes)) {
+                        _soundsButton.Text.SetRawText(GetSoundsDisplayText(notes[0].Sounds));
                     }
                     else {
                         _soundsButton.Text.SetRawText(NoSoundButtonText);
@@ -353,11 +353,12 @@ namespace Deenote.UI.Views
                 }
             }
 
-            static string GetDisplayText(ReadOnlySpan<PianoSoundValueModel> sounds)
+            static string GetSoundsDisplayText(ReadOnlySpan<PianoSoundValueModel> sounds)
             {
                 return sounds.Length switch {
                     0 => NoSoundButtonText,
                     1 => sounds[0].ToPitchDisplayString(),
+                    2 => $"{sounds[0].ToPitchDisplayString()}, {sounds[1].ToPitchDisplayString()}",
                     _ => sounds.Length.ToString(),
                 };
             }

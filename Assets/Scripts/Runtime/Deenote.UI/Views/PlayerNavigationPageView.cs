@@ -30,7 +30,7 @@ namespace Deenote.UI.Views
         private static readonly string[] PredefinedAspectTexts = { "16:9", "4:3" };
         private static readonly float[] PredefinedAspectValues = { 16f / 9f, 4f / 3f };
 
-        private void Awake()
+        private void Start()
         {
             #region View Screen
 

@@ -159,5 +159,22 @@ namespace Deenote.Entities.Models
                 }
             }
         }
+
+        public static bool HasSameSounds(ReadOnlySpan<NoteModel> notes)
+        {
+            var first = notes[0].Sounds;
+
+            for (int i = 1; i < notes.Length; i++) {
+                var sounds = notes[i].Sounds;
+                if (first.Length != sounds.Length)
+                    return false;
+
+                for (int j = 0; j < sounds.Length; j++) {
+                    if (first[j] != sounds[j])
+                        return false;
+                }
+            }
+            return true;
+        }
     }
 }

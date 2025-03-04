@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using Trarizon.Library.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Deenote.UIFramework.Controls
 {

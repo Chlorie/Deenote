@@ -3,6 +3,7 @@
 using CommunityToolkit.Diagnostics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnityEngine;
 
@@ -60,5 +61,21 @@ namespace Deenote.Localization
                 : _currentLanguagePack.GetTranslationOrDefault(text.TextOrKey) ??
                   _defaultLanguagePack.GetTranslationOrDefault(text.TextOrKey) ??
                   text.TextOrKey;
+
+        public static bool TrySetLanguage([AllowNull] string languageCode)
+        {
+            if (languageCode is null)
+                return false;
+            if (_languageDict.TryGetValue(languageCode, out var pack)) {
+                _currentLanguagePack = pack;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryGetLanguagePack(string languageCode, out LanguagePack languagePack)
+        {
+            return _languageDict.TryGetValue(languageCode, out languagePack);
+        }
     }
 }
