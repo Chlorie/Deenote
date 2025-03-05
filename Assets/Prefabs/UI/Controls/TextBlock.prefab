@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2661187060828075065}
   - component: {fileID: 5450569810259530023}
   - component: {fileID: 7257949920264679021}
-  - component: {fileID: 4937799627099257712}
   - component: {fileID: 7948763125655131179}
   m_Layer: 5
   m_Name: TextBlock
@@ -77,8 +76,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 3825205248
+  m_fontColor: {r: 0, g: 0, b: 0, a: 0.89411765}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -137,21 +136,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &4937799627099257712
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 455320220280653878}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 640ea59369277cb4694b66e63b77e474, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _text:
-    _isLocalized: 0
-    _textOrKey: 
 --- !u!114 &7948763125655131179
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,4 +149,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tmpText: {fileID: 7257949920264679021}
-  _localizableTextProvider: {fileID: 4937799627099257712}
+  _localizableText:
+    _isLocalized: 0
+    _textOrKey: 

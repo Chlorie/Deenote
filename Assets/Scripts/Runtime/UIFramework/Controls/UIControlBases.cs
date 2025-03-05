@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace Deenote.UIFramework.Controls
 {
-    public abstract class UIControlBase : MonoBehaviour, IInteractableControl,
+    public abstract class UIVisualTransitionControl : UIThemedControl, IInteractableControl,
         IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] bool _isInteractable_bf = true;
@@ -17,7 +17,7 @@ namespace Deenote.UIFramework.Controls
             get => _isInteractable_bf;
             set {
                 if (Utils.SetField(ref _isInteractable_bf, value)) {
-                    DoVisualTransition();
+                    DoVisualTransition(UISystem.ColorArgs);
                 }
             }
         }
@@ -29,43 +29,45 @@ namespace Deenote.UIFramework.Controls
                 && IsInteractable;
         }
 
-        protected abstract void DoVisualTransition();
+        protected abstract void DoVisualTransition(UIThemeColorArgs args);
+
+        protected override void OnThemeChanged(UIThemeColorArgs args) { }
 
         /// <summary>
         /// Invoke when awake or Theme changed
         /// </summary>
-        protected virtual void DoStaticVisualTransition() { }
 
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
         {
             _isHovering = true;
-            DoVisualTransition();
+            DoVisualTransition(UISystem.ColorArgs);
         }
 
         void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
         {
             _isHovering = false;
-            DoVisualTransition();
+            DoVisualTransition(UISystem.ColorArgs);
         }
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
-            DoStaticVisualTransition();
-            DoVisualTransition();
+            base.Awake();
+            DoVisualTransition(UISystem.ColorArgs);
         }
 
         protected virtual void OnEnable()
         {
-            DoVisualTransition();
+            DoVisualTransition(UISystem.ColorArgs);
         }
 
-        protected virtual void OnValidate()
+        protected override void OnValidate()
         {
-            DoVisualTransition();
+            base.OnValidate();
+            DoVisualTransition(UISystem.ColorArgs);
         }
     }
 
-    public abstract class UIPressableControlBase : UIControlBase,
+    public abstract class UIPressableControlBase : UIVisualTransitionControl,
         IPointerDownHandler, IPointerUpHandler
     {
         [SerializeField] protected bool _isPressed;
@@ -82,6 +84,38 @@ namespace Deenote.UIFramework.Controls
                 return PressVisualState.Default;
         }
 
+        protected override sealed void DoVisualTransition(UIThemeColorArgs args)
+        {
+            if (!isActiveAndEnabled)
+                return;
+            DoVisualTransition(args, GetPressVisualState());
+        }
+
+        protected abstract void DoVisualTransition(UIThemeColorArgs args, PressVisualState state);
+
+        void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
+            => OnPointerDown(eventData);
+
+        protected virtual void OnPointerDown(PointerEventData eventData)
+        {
+            if (eventData.button is not PointerEventData.InputButton.Left)
+                return;
+            _isPressed = true;
+            DoVisualTransition(UISystem.ColorArgs);
+        }
+
+        void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
+            => OnPointerUp(eventData);
+
+        protected virtual void OnPointerUp(PointerEventData eventData)
+        {
+            if (eventData.button is not PointerEventData.InputButton.Left)
+                return;
+
+            _isPressed = false;
+            DoVisualTransition(UISystem.ColorArgs);
+        }
+
         protected enum PressVisualState
         {
             Disabled,
@@ -89,32 +123,9 @@ namespace Deenote.UIFramework.Controls
             Hovering,
             Default,
         }
-
-        void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
-            => OnPointerDownImpl(eventData);
-
-        protected virtual void OnPointerDownImpl(PointerEventData eventData)
-        {
-            if (eventData.button is not PointerEventData.InputButton.Left)
-                return;
-            _isPressed = true;
-            DoVisualTransition();
-        }
-
-        void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
-            => OnPointerUpImpl(eventData);
-
-        protected virtual void OnPointerUpImpl(PointerEventData eventData)
-        {
-            if (eventData.button is not PointerEventData.InputButton.Left)
-                return;
-
-            _isPressed = false;
-            DoVisualTransition();
-        }
     }
 
-    public abstract class UIFocusableControlBase : UIControlBase, IPointerDownHandler
+    public abstract class UIFocusableControlBase : UIVisualTransitionControl, IPointerDownHandler
     {
         [SerializeField] protected bool _isFocused;
 
@@ -132,19 +143,20 @@ namespace Deenote.UIFramework.Controls
                 return FocusVisualState.Default;
         }
 
-        protected enum FocusVisualState
+        protected override sealed void DoVisualTransition(UIThemeColorArgs args)
         {
-            Disabled,
-            Focused,
-            Hovering,
-            Default,
+            if (!isActiveAndEnabled)
+                return;
+            DoVisualTransition(args, GetFocusVisualState());
         }
+
+        protected abstract void DoVisualTransition(UIThemeColorArgs args, FocusVisualState state);
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
             _isFocused = true;
             _pointerDownFrame = Time.frameCount;
-            DoVisualTransition();
+            DoVisualTransition(UISystem.ColorArgs);
         }
 
         protected override void Awake()
@@ -161,7 +173,15 @@ namespace Deenote.UIFramework.Controls
         protected void Unfocus()
         {
             _isFocused = false;
-            DoVisualTransition();
+            DoVisualTransition(UISystem.ColorArgs);
+        }
+
+        protected enum FocusVisualState
+        {
+            Disabled,
+            Focused,
+            Hovering,
+            Default,
         }
     }
 }

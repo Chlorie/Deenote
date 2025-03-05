@@ -13,10 +13,12 @@ using Trarizon.Library.Collections;
 
 namespace Deenote.UIFramework.Controls
 {
+    [RequireComponent(typeof(TextMeshProUGUI))]
     public sealed class TextBlock : MonoBehaviour
     {
-        [SerializeField] TMP_Text _tmpText = default!;
-        [SerializeField] LocalizableTextProvider _localizableTextProvider = default!;
+        [SerializeField] TextMeshProUGUI _tmpText = default!;
+        [SerializeField] LocalizableText _localizableText;
+
         private List<string>? _localizationArgs;
 
         public TMP_Text TmpText => _tmpText;
@@ -26,8 +28,8 @@ namespace Deenote.UIFramework.Controls
         public void SetText(LocalizableText text, ReadOnlySpan<string> args = default)
         {
             bool valueChanged = false;
-            if (_localizableTextProvider.Text != text) {
-                _localizableTextProvider.Text = text;
+            if (_localizableText != text) {
+                _localizableText = text;
                 valueChanged = true;
             }
             var oldArgs = _localizationArgs is null ? ReadOnlySpan<string>.Empty : _localizationArgs.AsSpan();
@@ -71,7 +73,7 @@ namespace Deenote.UIFramework.Controls
 
         private void RefreshDisplayText()
         {
-            string text = LocalizationSystem.GetText(_localizableTextProvider.Text);
+            string text = LocalizationSystem.GetText(_localizableText);
             if (_localizationArgs?.Count > 0) {
                 var sb = new StringBuilder(text);
                 for (int i = 0; i < _localizationArgs.Count; i++) {
@@ -82,6 +84,11 @@ namespace Deenote.UIFramework.Controls
             else {
                 _tmpText.text = text;
             }
+        }
+
+        private void OnValidate()
+        {
+            _tmpText ??= GetComponent<TextMeshProUGUI>();
         }
     }
 }

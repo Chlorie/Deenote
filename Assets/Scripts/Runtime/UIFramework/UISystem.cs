@@ -14,6 +14,13 @@ namespace Deenote.UIFramework
             get => _darkThemeResources ??= Resources.Load<UIThemeResources>($"UIThemes/Dark");
         }
 
+        private static UIThemeColorArgs? _colorArgs;
+
+        public static UIThemeColorArgs ColorArgs
+        {
+            get => _colorArgs ??= Resources.Load<UIThemeColorArgs>("UIThemes/DarkColorArgs");
+        }
+
         public static event Action<MouseButton, Vector2> MouseFocusChanged
         {
             add => UIFocusManager.Instance.FocusChanged += value;

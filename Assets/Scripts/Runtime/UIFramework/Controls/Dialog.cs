@@ -11,7 +11,7 @@ namespace Deenote.UIFramework.Controls
         [SerializeField] TextBlock _titleText = default!;
         [SerializeField] Button _closeButton = default!;
 
-        public event Action<Dialog, bool>? ActiveChanged;
+        //public event Action<Dialog, bool>? ActiveChanged;
 
         public Button CloseButton => _closeButton;
 

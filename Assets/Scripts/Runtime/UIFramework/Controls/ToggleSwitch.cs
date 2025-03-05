@@ -1,19 +1,18 @@
 #nullable enable
 
-using UnityEngine.UI;
+using Deenote.Library;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Deenote.Library;
-using UnityEngine.Events;
-using System;
+using UnityEngine.UI;
 
 namespace Deenote.UIFramework.Controls
 {
     public sealed class ToggleSwitch : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
-        [SerializeField] UnityEngine.UI.Image _borderImage = default!;
-        [SerializeField] UnityEngine.UI.Image _knobImage = default!;
+        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] Image _borderImage = default!;
+        [SerializeField] Image _knobImage = default!;
 
         [SerializeField]
         private bool _isChecked_bf;
@@ -22,7 +21,7 @@ namespace Deenote.UIFramework.Controls
             get => _isChecked_bf;
             set {
                 if (Utils.SetField(ref _isChecked_bf, value)) {
-                    DoVisualTransition();
+                    DoVisualTransition(UISystem.ColorArgs);
                     IsCheckedChanged?.Invoke(value);
                 }
             }
@@ -33,7 +32,7 @@ namespace Deenote.UIFramework.Controls
         public void SetIsCheckedWithoutNotify(bool value)
         {
             _isChecked_bf = value;
-            DoVisualTransition();
+            DoVisualTransition(UISystem.ColorArgs);
         }
 
         void IPointerClickHandler.OnPointerClick(PointerEventData eventData)
@@ -43,47 +42,50 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoVisualTransition()
+        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
         {
-            if (!isActiveAndEnabled)
-                return;
-
-            var colors = UISystem.ThemeArgs;
-
             const float HoverScale = 18f / 14f;
 
+            Color bg, bdr, knb;
+            float pos;
             if (IsChecked) {
-                var state = GetPressVisualState();
-                var (bg, knbscale) = state switch {
-                    PressVisualState.Disabled => (colors.ControlAccentDisabledColor, 1f),
-                    PressVisualState.Pressed => (colors.ControlAccentTertiaryColor, HoverScale),
-                    PressVisualState.Hovering => (colors.ControlAccentSecondaryColor, HoverScale),
-                    PressVisualState.Default or _ => (colors.ControlAccentDefaultColor, 1f),
+                bg = state switch {
+                    PressVisualState.Disabled => args.ControlAccentDisabledColor,
+                    PressVisualState.Pressed => args.ControlAccentTertiaryColor,
+                    PressVisualState.Hovering => args.ControlAccentSecondaryColor,
+                    PressVisualState.Default or _ => args.ControlAccentDefaultColor,
                 };
+                knb = state is PressVisualState.Disabled
+                    ? args.TextAccentDisabledColor
+                    : args.TextAccentPrimaryColor;
+                pos = 1f;
+
                 _backgroundImage.color = bg;
                 _borderImage.color = bg;
-                _knobImage.color = state is PressVisualState.Disabled ? colors.TextAccentDisabledColor : colors.TextAccentPrimaryColor;
-                var knobTsfm = _knobImage.rectTransform;
-                knobTsfm.localScale = new Vector3(knbscale, knbscale, knbscale);
-                knobTsfm.anchorMax = knobTsfm.anchorMax with { x = 1f };
-                knobTsfm.anchorMin = knobTsfm.anchorMin with { x = 1f };
+                _knobImage.color = knb;
             }
             else {
-                var state = GetPressVisualState();
-                var (bg, knbscale) = state switch {
-                    PressVisualState.Disabled => (colors.ControlAltDisabledColor, 1f),
-                    PressVisualState.Pressed => (colors.ControlAltQuarternaryColor, HoverScale),
-                    PressVisualState.Hovering => (colors.ControlAltTertiaryColor, HoverScale),
-                    PressVisualState.Default or _ => (colors.ControlAltSecondaryColor, 1f),
+                bg = state switch {
+                    PressVisualState.Disabled => args.ControlAltDisabledColor,
+                    PressVisualState.Pressed => args.ControlAltQuarternaryColor,
+                    PressVisualState.Hovering => args.ControlAltTertiaryColor,
+                    PressVisualState.Default or _ => args.ControlAltSecondaryColor,
                 };
+                (bdr, knb) = state is PressVisualState.Disabled
+                    ? (args.ControlStrongStrokeDisabledColor, args.TextDisabledColor)
+                    : (args.ControlStrongStrokeDefaultColor, args.TextSecondaryColor);
+                pos = 0f;
+
                 _backgroundImage.color = bg;
-                _borderImage.color = state is PressVisualState.Disabled ? colors.ControlStrongStrokeDisabledColor : colors.ControlStrongStrokeDefaultColor;
-                _knobImage.color = state is PressVisualState.Disabled ? colors.TextDisabledColor : colors.TextSecondaryColor;
-                var knobTsfm = _knobImage.rectTransform;
-                knobTsfm.localScale = new Vector3(knbscale, knbscale, knbscale);
-                knobTsfm.anchorMax = knobTsfm.anchorMax with { x = 0f };
-                knobTsfm.anchorMin = knobTsfm.anchorMin with { x = 0f };
+                _borderImage.color = bdr;
             }
+            var knbscale = state is PressVisualState.Pressed or PressVisualState.Hovering
+                ? HoverScale : 1f;
+
+            var knobTsfm = _knobImage.rectTransform;
+            knobTsfm.localScale = new Vector3(knbscale, knbscale, knbscale);
+            knobTsfm.anchorMax = knobTsfm.anchorMax with { x = pos };
+            knobTsfm.anchorMin = knobTsfm.anchorMin with { x = pos };
         }
     }
 }

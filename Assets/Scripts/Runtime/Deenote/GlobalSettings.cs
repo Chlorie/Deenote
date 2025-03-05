@@ -28,7 +28,7 @@ namespace Deenote
                 IsVSyncOn = configs.GetBoolean("vsync");
                 IsIneffectivePropertiesVisible = configs.GetBoolean("ineffective_prop_visible");
                 IsFpsShown = configs.GetBoolean("fps_shown");
-                _keyBindings = configs.GetObject("key_bindings", _keyBindings);
+                _keyBindings = configs.GetObject("key_bindings", _keyBindings) ?? new();
             };
         }
 

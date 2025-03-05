@@ -23,6 +23,7 @@ namespace Deenote.Entities.Models
             _holdCount = 0;
             _visibleNoteNodes = new List<IStageNoteNode>();
             _backgroundNotes = new List<SoundNoteModel>();
+            _speedChangeWarnings = new List<SpeedChangeWarningModel>();
             _speedLines = new List<SpeedLineValueModel>() { new(1f, 0f, WarningType.Default) };
         }
 

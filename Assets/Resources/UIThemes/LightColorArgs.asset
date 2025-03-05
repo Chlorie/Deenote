@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71e9cc384dcaedc4d96406efedadbcf8, type: 3}
+  m_Name: LightColorArgs
+  m_EditorClassIdentifier: 
+  TextPrimaryColor: {r: 0, g: 0, b: 0, a: 0.89411765}
+  TextSecondaryColor: {r: 0, g: 0, b: 0, a: 0.61960787}
+  TextTertiaryColor: {r: 0, g: 0, b: 0, a: 0.44705883}
+  TextDisabledColor: {r: 0, g: 0, b: 0, a: 0.36078432}
+  TextAccentSelectedTextColor: {r: 1, g: 1, b: 0.99607843, a: 1}
+  TextAccentPrimaryColor: {r: 1, g: 1, b: 1, a: 1}
+  TextAccentSecondaryColor: {r: 1, g: 1, b: 1, a: 0.7019608}
+  TextAccentDisabledColor: {r: 1, g: 1, b: 1, a: 1}
+  ControlDefaultColor: {r: 1, g: 1, b: 1, a: 0.7019608}
+  ControlSecondaryColor: {r: 0.9764706, g: 0.9764706, b: 0.9764706, a: 0.5019608}
+  ControlTertiaryColor: {r: 0.9764706, g: 0.9764706, b: 0.9764706, a: 0.3019608}
+  ControlDisabledColor: {r: 0.9764706, g: 0.9764706, b: 0.9764706, a: 0.3019608}
+  ControlTransparentColor: {r: 1, g: 1, b: 1, a: 0}
+  ControlInputActiveColor: {r: 1, g: 1, b: 1, a: 1}
+  ControlStrongDefaultColor: {r: 0, g: 0, b: 0, a: 0.44705883}
+  ControlStrongDisabledColor: {r: 0, g: 0, b: 0, a: 0.31764707}
+  ControlSolidDefaultColor: {r: 1, g: 1, b: 1, a: 1}
+  ControlAltTransparentColor: {r: 1, g: 1, b: 1, a: 0}
+  ControlAltSecondaryColor: {r: 0, g: 0, b: 0, a: 0.023529412}
+  ControlAltTertiaryColor: {r: 0, g: 0, b: 0, a: 0.05882353}
+  ControlAltQuarternaryColor: {r: 0, g: 0, b: 0, a: 0.09411765}
+  ControlAltDisabledColor: {r: 1, g: 1, b: 1, a: 0}
+  ControlAccentDefaultColor: {r: 0.53333336, g: 0.29411766, b: 0.39215687, a: 1}
+  ControlAccentSecondaryColor: {r: 0.53333336, g: 0.29411766, b: 0.3921569, a: 0.9019608}
+  ControlAccentTertiaryColor: {r: 0.53333336, g: 0.29411766, b: 0.3921569, a: 0.8}
+  ControlAccentDisabledColor: {r: 0, g: 0, b: 0, a: 0.21568628}
+  ControlAccentSelectedTextColor: {r: 0.6392157, g: 0.3764706, b: 0.49019608, a: 1}
+  ControlStrokeDefaultColor: {r: 0, g: 0, b: 0, a: 0.05882353}
+  ControlStrokeSecondaryColor: {r: 0, g: 0, b: 0, a: 0.16078432}
+  ControlAccentStrokeDefaultColor: {r: 1, g: 1, b: 1, a: 0.078431375}
+  ControlAccentStrokeSecondaryColor: {r: 0, g: 0, b: 0, a: 0.4}
+  ControlStrongStrokeDefaultColor: {r: 0, g: 0, b: 0, a: 0.44705883}
+  ControlStrongStrokeDisabledColor: {r: 0, g: 0, b: 0, a: 0.21568628}
+  SurfaceStrokeDefaultColor: {r: 0.45882353, g: 0.45882353, b: 0.45882353, a: 0.4}
+  SurfaceStrokeFlyoutColor: {r: 0, g: 0, b: 0, a: 0.05882353}
+  CardBackgroundDefaultColor: {r: 1, g: 1, b: 1, a: 0.7019608}
+  CardBackgroundSecondaryColor: {r: 0.9647059, g: 0.9647059, b: 0.9647059, a: 0.5019608}
+  LayerDefaultColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+  LayerAltColor: {r: 1, g: 1, b: 1, a: 1}
+  SolidBackgroundFillBaseColor: {r: 0.9529412, g: 0.9529412, b: 0.9529412, a: 1}
+  SolidBackgroundSecondaryColor: {r: 0.93333334, g: 0.93333334, b: 0.93333334, a: 1}
+  SolidBackgroundTertiaryColor: {r: 0.9764706, g: 0.9764706, b: 0.9764706, a: 1}
+  SolidBackgroundQuarternaryColor: {r: 1, g: 1, b: 1, a: 1}
+  SolidBackgroundTransparentColor: {r: 0.9529412, g: 0.9529412, b: 0.9529412, a: 0}
+  SolidBackgroundBaseAltColor: {r: 0.85490197, g: 0.85490197, b: 0.85490197, a: 1}
+  SystemBackgroundCautionColor: {r: 1, g: 0.95686275, b: 0.80784315, a: 1}
+  CautionButtonBackgroundPressed: {r: 0.9098039, g: 0.06666667, b: 0.13725491, a: 1}
+  CautionButtonBackgroundHovered: {r: 0.94509804, g: 0.4392157, b: 0.47843137, a: 1}
+  _textControlElevationFocusedBorderColor: {r: 0.84705883, g: 0.6901961, b: 0.78431374,
+    a: 1}

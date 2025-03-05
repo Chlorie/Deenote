@@ -93,7 +93,8 @@ namespace Deenote.UI.Dialogs
             _openInSystemExplorerButton.Clicked += () =>
             {
                 // We locate to the file only if selected file is in current displaying directory
-                if (Path.GetDirectoryName(CurrentSelectedFilePath.AsSpan()).SequenceEqual(CurrentDirectory)) {
+                if (CurrentSelectedFilePath is not null
+                    && Path.GetDirectoryName(CurrentSelectedFilePath.AsSpan()).SequenceEqual(CurrentDirectory)) {
                     //                                                             Ensure path seperator charater is valid
                     System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{Path.GetFullPath(CurrentSelectedFilePath)}""");
                 }

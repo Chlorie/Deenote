@@ -1,6 +1,5 @@
 #nullable enable
 
-using CommunityToolkit.Diagnostics;
 using Deenote.Library;
 using System;
 using UnityEngine;
@@ -11,8 +10,9 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class ToggleButton : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
-        [SerializeField] UnityEngine.UI.Image _image = default!;
+        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] Image _borderImage = default!;
+        [SerializeField] Image _image = default!;
         [SerializeField] TextBlock _text = default!;
         [SerializeField] ButtonColorSet _colorSet;
 
@@ -49,7 +49,7 @@ namespace Deenote.UIFramework.Controls
         {
             if (Group is null) {
                 if (Utils.SetField(ref _isChecked_bf, value)) {
-                    DoVisualTransition();
+                    DoVisualTransition(UISystem.ColorArgs);
                 }
             }
             else {
@@ -61,7 +61,7 @@ namespace Deenote.UIFramework.Controls
         internal void SetIsCheckedInternal(bool value)
         {
             if (Utils.SetField(ref _isChecked_bf, value)) {
-                DoVisualTransition();
+                DoVisualTransition(UISystem.ColorArgs);
                 IsCheckedChanged?.Invoke(value);
             }
         }
@@ -76,39 +76,45 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoVisualTransition()
+        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
         {
-            if (!isActiveAndEnabled)
-                return;
-
-            var colors = UISystem.ThemeArgs;
-
+            Color bg, fg, bdr;
             if (IsChecked) {
-                var (bg, txt) = GetPressVisualState() switch {
-                    PressVisualState.Disabled => (colors.ControlAccentDisabledColor, colors.TextAccentDisabledColor),
-                    PressVisualState.Pressed => (colors.ControlAccentTertiaryColor, colors.TextAccentTertiaryColor),
-                    PressVisualState.Hovering => (colors.ControlAccentSecondaryColor, colors.TextAccentSecondaryColor),
-                    PressVisualState.Default or _ => (colors.ControlAccentDefaultColor, colors.TextAccentPrimaryColor),
+                (bg, fg, bdr) = state switch {
+                    PressVisualState.Disabled => (args.ControlAccentDisabledColor, args.TextAccentDisabledColor, args.ControlTransparentColor),
+                    PressVisualState.Pressed => (args.ControlAccentTertiaryColor, args.TextAccentSecondaryColor, args.ControlTransparentColor),
+                    PressVisualState.Hovering => (args.ControlAccentSecondaryColor, args.TextAccentPrimaryColor, args.ControlAccentElevationBorderColor),
+                    PressVisualState.Default or _ => (args.ControlAccentDefaultColor, args.TextAccentPrimaryColor, args.ControlAccentElevationBorderColor),
                 };
-                _backgroundImage.color = bg;
-                _image.color = txt;
-                _text.TmpText.color = txt;
             }
             else {
-                var (bg, txt) = GetPressVisualState() switch {
-                    PressVisualState.Disabled => (colors.ControlDisabledColor, colors.TextDisabledColor),
-                    PressVisualState.Pressed => (colors.ControlTertiaryColor, colors.TextTertiaryColor),
-                    PressVisualState.Hovering => (colors.ControlSecondaryColor, colors.TextSecondaryColor),
-                    PressVisualState.Default or _ => (_colorSet is ButtonColorSet.Transparent
-                        ? colors.ControlTransparentColor : colors.ControlDefaultColor, colors.TextPrimaryColor),
-                };
-                _backgroundImage.color = bg;
-                _image.color = txt;
-                _text.TmpText.color = txt;
+                switch (_colorSet) {
+                    case ButtonColorSet.Transparent:
+                        (bg, fg, bdr) = state switch {
+                            PressVisualState.Disabled => (args.ControlDisabledColor, args.TextDisabledColor, args.ControlTransparentColor),
+                            PressVisualState.Pressed => (args.ControlTertiaryColor, args.TextTertiaryColor, args.ControlStrokeDefaultColor),
+                            PressVisualState.Hovering => (args.ControlSecondaryColor, args.TextSecondaryColor, args.ControlElevationBorderColor),
+                            PressVisualState.Default or _ => (args.ControlTransparentColor, args.TextPrimaryColor, args.ControlTransparentColor),
+                        };
+                        break;
+                    case ButtonColorSet.Default:
+                    default:
+                        (bg, fg, bdr) = state switch {
+                            PressVisualState.Disabled => (args.ControlDisabledColor, args.TextDisabledColor, args.ControlStrokeDefaultColor),
+                            PressVisualState.Pressed => (args.ControlTertiaryColor, args.TextTertiaryColor, args.ControlStrokeDefaultColor),
+                            PressVisualState.Hovering => (args.ControlSecondaryColor, args.TextSecondaryColor, args.ControlElevationBorderColor),
+                            PressVisualState.Default or _ => (args.ControlDefaultColor, args.TextPrimaryColor, args.ControlElevationBorderColor),
+                        };
+                        break;
+                }
             }
+
+            _backgroundImage.color = bg;
+            _text.TmpText.color = _image.color = fg;
+            _borderImage.color = bdr;
         }
 
-        public void UpdateVisual() => DoVisualTransition();
+        public void UpdateVisual() => DoVisualTransition(UISystem.ColorArgs);
 
         private enum ButtonColorSet
         {

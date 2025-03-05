@@ -8,14 +8,14 @@ namespace Deenote.UIFramework.Controls
 {
     [RequireComponent(typeof(RectTransform))]
     internal sealed class SliderHandle : UIPressableControlBase,
-        IPointerMoveHandler, 
+        IPointerMoveHandler,
         IDragHandler, IBeginDragHandler, IEndDragHandler
     {
         [SerializeField] Slider _slider = default!;
-        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
-        [SerializeField] UnityEngine.UI.Image _circleImage = default!;
+        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] Image _borderImage = default!;
+        [SerializeField] Image _circleImage = default!;
         [SerializeField] RectTransform _rectTransform = default!;
-        // 似乎有1像素的border，颜色ControlElevationBorderBrush，但是完全看不出来，算了
 
         public RectTransform RectTransform => _rectTransform;
 
@@ -26,9 +26,9 @@ namespace Deenote.UIFramework.Controls
         // we dont want to change the global setting, so we use
         // PointerDown and PointerMove to manually implement drag event
 
-        protected override void OnPointerDownImpl(PointerEventData eventData)
+        protected override void OnPointerDown(PointerEventData eventData)
         {
-            base.OnPointerDownImpl(eventData);
+            base.OnPointerDown(eventData);
 
             if (!IsLeftButtonOnInteractableControl(eventData))
                 return;
@@ -69,32 +69,30 @@ namespace Deenote.UIFramework.Controls
         void IBeginDragHandler.OnBeginDrag(PointerEventData eventData) => _isDragging = true;
         void IEndDragHandler.OnEndDrag(PointerEventData eventData) => _isDragging = false;
 
-        protected override void DoVisualTransition()
+        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
         {
-            if (!isActiveAndEnabled)
-                return;
-
             const float HoverScale = 20f / 14f;
             const float PressScale = 12f / 14f;
 
-            var colors = UISystem.ThemeArgs;
-
-            var state = GetPressVisualState();
-
-            var (circle, scale) = state switch {
-                PressVisualState.Disabled => (colors.ControlAccentDisabledColor, 1f),
-                PressVisualState.Pressed => (colors.ControlAccentTertiaryColor, _slider._isDraggingSliderTrackerBar ? 1f : PressScale),
-                PressVisualState.Hovering => (colors.ControlAccentSecondaryColor, _slider._isDraggingSliderTrackerBar ? 1f : HoverScale),
-                PressVisualState.Default or _ => (colors.ControlAccentDefaultColor, 1f),
+            var (circle, bdr) = state switch {
+                PressVisualState.Disabled => (args.ControlAccentDisabledColor, args.ControlStrokeDefaultColor),
+                PressVisualState.Pressed => (args.ControlAccentTertiaryColor, args.ControlStrokeDefaultColor),
+                PressVisualState.Hovering => (args.ControlAccentSecondaryColor, args.ControlElevationBorderColor),
+                PressVisualState.Default or _ => (args.ControlAccentDefaultColor, args.ControlElevationBorderColor),
+            };
+            var scale = (state, _slider._isDraggingSliderTrackerBar) switch {
+                (PressVisualState.Pressed, false) => PressScale,
+                (PressVisualState.Hovering, false) => HoverScale,
+                _ => 1f,
             };
             _circleImage.color = circle;
+            _borderImage.color = bdr;
             _circleImage.rectTransform.localScale = new Vector3(scale, scale, scale);
         }
 
-        protected override void DoStaticVisualTransition()
+        protected override void OnThemeChanged(UIThemeColorArgs args)
         {
-            var colors = UISystem.ThemeArgs;
-            _backgroundImage.color = colors.ControlSolidDefaultColor;
+            _backgroundImage.color = args.ControlSolidDefaultColor;
         }
     }
 }

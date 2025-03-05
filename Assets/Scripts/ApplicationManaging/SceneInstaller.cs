@@ -13,10 +13,8 @@ namespace Deenote.ApplicationManaging
     {
         public void InstallBindings(ContainerBuilder builder) => builder
             .AddSingleton(_fontSetter)
-            .AddSingleton(_musicController)
             .AddSingletonComponent<KeyBindingManager>(gameObject);
 
         [SerializeField] private SystemFontFallbackSetter _fontSetter = null!;
-        [SerializeField] private MusicController _musicController = null!;
     }
 }

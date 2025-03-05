@@ -7,11 +7,12 @@ using UnityEngine.UI;
 
 namespace Deenote.UIFramework.Controls
 {
-    public sealed partial class Collapsable : UIControlBase
+    public sealed partial class Collapsable : UIVisualTransitionControl
     {
-        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
+        [SerializeField] Image _backgroundImage = default!;
         [SerializeField] Button _collapseButton = default!;
-        [SerializeField] UnityEngine.UI.Image _arrowImage = default!;
+        [SerializeField] Image _lineImage = default!;
+        [SerializeField] Image _arrowImage = default!;
         [SerializeField] RectTransform _contentRectTransform = default!;
 
         public Button Header => _collapseButton;
@@ -40,16 +41,18 @@ namespace Deenote.UIFramework.Controls
             _collapseButton.Clicked += () => IsExpanded = !IsExpanded;
         }
 
-        protected override void DoVisualTransition()
+        protected override void DoVisualTransition(UIThemeColorArgs args)
         {
             _backgroundImage.enabled = IsExpanded;
             _contentRectTransform.gameObject.SetActive(IsExpanded);
             _arrowImage.rectTransform.localScale = _arrowImage.rectTransform.localScale with { y = IsExpanded ? -1 : 1 };
         }
 
-        protected override void DoStaticVisualTransition()
+        protected override void OnThemeChanged(UIThemeColorArgs args)
         {
-            _backgroundImage.color = UISystem.ThemeArgs.CardBackgroundDefaultColor;
+            _backgroundImage.color = args.CardBackgroundDefaultColor;
+            _lineImage.color = args.TextDisabledColor;
+            _arrowImage.color = args.TextPrimaryColor;
         }
     }
 }

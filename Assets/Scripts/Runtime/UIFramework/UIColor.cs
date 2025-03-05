@@ -4,8 +4,10 @@ namespace Deenote.UIFramework
     {
         None,
 
-        SolidBottomBackground,
-        SolidBottomAlterBackground,
+        SolidBackgroundBase,
+        SolidBackgroundSecondary,
+        SolidBackgroundTertiary,
+        SolidBackgroundAlterBase,
         SolidContentBackground,
 
         ControlDefault,
@@ -39,6 +41,7 @@ namespace Deenote.UIFramework
         ControlStrongStrokeDisabled,
 
         SurfaceStrokeDefault,
+        SurfaceStrokeFlyout,
 
         CardBackgroundDefault,
         LayerDefault,

@@ -9,12 +9,12 @@ using UnityEngine.UI;
 namespace Deenote.UIFramework.Controls
 {
     public sealed class Slider : UIPressableControlBase,
-        IPointerMoveHandler, 
+        IPointerMoveHandler,
         IDragHandler, IBeginDragHandler, IEndDragHandler
     {
         [SerializeField] internal RectTransform _raycastAreaRectTransform = default!;
-        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
-        [SerializeField] UnityEngine.UI.Image _fillImage = default!;
+        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] Image _fillImage = default!;
         [SerializeField] SliderHandle _handle = default!;
 
         [SerializeField, Range(0f, 1f)]
@@ -61,16 +61,16 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void OnPointerDownImpl(PointerEventData eventData)
+        protected override void OnPointerDown(PointerEventData eventData)
         {
-            base.OnPointerDownImpl(eventData);
+            base.OnPointerDown(eventData);
             _isDraggingSliderTrackerBar = true;
             ((IPointerMoveHandler)this).OnPointerMove(eventData);
         }
 
-        protected override void OnPointerUpImpl(PointerEventData eventData)
+        protected override void OnPointerUp(PointerEventData eventData)
         {
-            base.OnPointerUpImpl(eventData);
+            base.OnPointerUp(eventData);
             _isDraggingSliderTrackerBar = false;
         }
 
@@ -90,24 +90,20 @@ namespace Deenote.UIFramework.Controls
         void IBeginDragHandler.OnBeginDrag(PointerEventData eventData) => _isDragging = true;
         void IEndDragHandler.OnEndDrag(PointerEventData eventData) => _isDragging = false;
 
-        protected override void DoVisualTransition()
+        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
         {
-            if (!isActiveAndEnabled)
-                return;
-
-            var colors = UISystem.ThemeArgs;
-
-            var state = GetPressVisualState();
+            var bg = state is PressVisualState.Disabled
+                ? args.ControlStrongDisabledColor
+                : args.ControlStrongDefaultColor;
             var fill = state switch {
-                PressVisualState.Disabled => colors.ControlAccentDisabledColor,
-                PressVisualState.Pressed => colors.ControlAccentTertiaryColor,
-                PressVisualState.Hovering => colors.ControlAccentSecondaryColor,
-                PressVisualState.Default or _ => colors.ControlAccentDefaultColor,
+                PressVisualState.Disabled => args.ControlAccentDisabledColor,
+                PressVisualState.Pressed => args.ControlAccentTertiaryColor,
+                PressVisualState.Hovering => args.ControlAccentSecondaryColor,
+                PressVisualState.Default or _ => args.ControlAccentDefaultColor,
             };
+
             _fillImage.color = fill;
-            _backgroundImage.color = state is PressVisualState.Disabled
-                ? colors.ControlStrongDisabledColor
-                : colors.ControlStrongDefaultColor;
+            _backgroundImage.color = bg;
         }
 
         private void TranslateValueVisual()

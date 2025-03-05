@@ -3,7 +3,6 @@
 using Deenote.Library;
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -11,9 +10,9 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class RadioButton : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
-        [SerializeField] UnityEngine.UI.Image _borderImage = default!;
-        [SerializeField] UnityEngine.UI.Image _handleImage = default!;
+        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] Image _borderImage = default!;
+        [SerializeField] Image _handleImage = default!;
 
         [SerializeField] RadioButtonGroup _group = default!;
         public RadioButtonGroup Group => _group;
@@ -38,7 +37,7 @@ namespace Deenote.UIFramework.Controls
         internal void SetIsCheckedInternal(bool value, bool notify)
         {
             if (Utils.SetField(ref _isChecked_bf, value)) {
-                DoVisualTransition();
+                DoVisualTransition(UISystem.ColorArgs);
                 if (value is true && notify)
                     Checked?.Invoke();
             }
@@ -60,36 +59,33 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoVisualTransition()
+        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
         {
-            if (!isActiveAndEnabled)
-                return;
-
-            var colors = UISystem.ThemeArgs;
-
             const float HoverScale = 18f / 14f;
 
             if (IsChecked) {
-                var state = GetPressVisualState();
-                var (bg, scl) = state switch {
-                    PressVisualState.Disabled => (colors.ControlAccentDisabledColor, 1f),
-                    PressVisualState.Pressed => (colors.ControlAccentTertiaryColor, 1f),
-                    PressVisualState.Hovering => (colors.ControlAccentSecondaryColor, HoverScale),
-                    PressVisualState.Default or _ => (colors.ControlAccentDefaultColor, 1f),
+                var bg = state switch {
+                    PressVisualState.Disabled => args.ControlAccentDisabledColor,
+                    PressVisualState.Pressed => args.ControlAccentTertiaryColor,
+                    PressVisualState.Hovering => args.ControlAccentSecondaryColor,
+                    PressVisualState.Default or _ => args.ControlAccentDefaultColor,
                 };
+                var scl = state is PressVisualState.Hovering ? HoverScale : 1f;
                 _backgroundImage.color = bg;
-                _borderImage.color = colors.ControlTransparentColor;
+                _borderImage.color = args.ControlTransparentColor;
                 _handleImage.gameObject.SetActive(true);
-                _handleImage.color = state is PressVisualState.Disabled ? colors.TextAccentDisabledColor : colors.TextAccentPrimaryColor;
+                _handleImage.color = state is PressVisualState.Disabled
+                    ? args.TextAccentDisabledColor
+                    : args.TextAccentPrimaryColor;
+
                 _handleImage.rectTransform.localScale = new Vector3(scl, scl, scl);
             }
             else {
-                var state = GetPressVisualState();
                 var (bg, bdr) = state switch {
-                    PressVisualState.Disabled => (colors.ControlAltDisabledColor, colors.TextDisabledColor),
-                    PressVisualState.Pressed => (colors.ControlAltQuarternaryColor, colors.TextTertiaryColor),
-                    PressVisualState.Hovering => (colors.ControlAltTertiaryColor, colors.TextSecondaryColor),
-                    PressVisualState.Default or _ => (colors.ControlAltSecondaryColor, colors.TextPrimaryColor),
+                    PressVisualState.Disabled => (args.ControlAltDisabledColor, args.TextDisabledColor),
+                    PressVisualState.Pressed => (args.ControlAltQuarternaryColor, args.TextTertiaryColor),
+                    PressVisualState.Hovering => (args.ControlAltTertiaryColor, args.TextSecondaryColor),
+                    PressVisualState.Default or _ => (args.ControlAltSecondaryColor, args.TextPrimaryColor),
                 };
                 _backgroundImage.color = bg;
                 _borderImage.color = bdr;
@@ -103,6 +99,6 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        internal void UpdateVisual() => DoVisualTransition();
+        internal void UpdateVisual() => DoVisualTransition(UISystem.ColorArgs);
     }
 }

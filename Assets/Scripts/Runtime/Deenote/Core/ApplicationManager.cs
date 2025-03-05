@@ -12,7 +12,6 @@ namespace Deenote.Core
 
         public static event Action<CancelEventArgs>? Quitting;
 
-#if !UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod]
         private static void _RegisterQuitting()
         {
@@ -23,7 +22,6 @@ namespace Deenote.Core
                 return !args.Cancel;
             };
         }
-#endif
 
         public static void Quit()
         {

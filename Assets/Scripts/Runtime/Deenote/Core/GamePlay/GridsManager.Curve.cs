@@ -58,7 +58,7 @@ namespace Deenote.Core.GamePlay
                 _curveGenerationContext.InterpolationNotes.AddRange(interpolationNotes);
                 _positionCurveData = kind switch {
                     CurveKind.Cubic => CurveLineData.Cubic(interpolationNotes, n => n.Position),
-                    CurveKind.Linear => CurveLineData.Cubic(interpolationNotes, n => n.Position),
+                    CurveKind.Linear => CurveLineData.Linear(interpolationNotes, n => n.Position),
                     _ => throw new InvalidOperationException("Unknown curve kind"),
                 };
                 IsCurveOn = true;
@@ -111,7 +111,9 @@ namespace Deenote.Core.GamePlay
                 var args = _game.Stage.GridLineArgs;
                 var strip = (stackalloc Vector2[_curveRenderPositions.Length]);
                 for (int i = 0; i < strip.Length; i++) {
-                    var (x, z) = _game.ConvertNoteCoordToWorldPosition(_curveRenderPositions[i]);
+                    var pos = _curveRenderPositions[i];
+                    var x = _game.ConvertNoteCoordPositionToWorldX(pos.Position);
+                    var z = _game.ConvertNoteCoordTimeToWorldZ(pos.Time - _game.MusicPlayer.Time);
                     strip[i] = new Vector2(x, z);
                 }
                 collector.AddLineStrip(strip, args.CurveLineColor, args.CurveLineWidth);
@@ -189,12 +191,17 @@ namespace Deenote.Core.GamePlay
             {
                 var curve = new CurveLineData(interpolationNotes.Length);
 
+                var x = curve.x.AsSpan();
+                var a = curve.a.AsSpan();
+                var b = curve.b.AsSpan();
+                var c = curve.c.AsSpan();
+                var d = curve.d.AsSpan();
+
                 int count = interpolationNotes.Length;
-                int n = count - 1;
 
                 for (int i = 0; i < count; i++) {
-                    curve.x[i] = interpolationNotes[i].Time;
-                    curve.a[i] = valueSelector.Invoke(interpolationNotes[i]);
+                    x[i] = interpolationNotes[i].Time;
+                    a[i] = valueSelector.Invoke(interpolationNotes[i]);
                 }
 
                 var alpha = (stackalloc double[count - 1]);
@@ -204,28 +211,28 @@ namespace Deenote.Core.GamePlay
                 var z = (stackalloc double[count]);
 
                 for (int i = 0; i < count - 1; i++) {
-                    h[i] = i + 1 - curve.x[i + 1] - curve.x[i];
+                    h[i] = x[i + 1] - x[i];
                 }
                 for (int i = 1; i < count - 1; i++) {
-                    alpha[i] = 3 * (curve.a[i + 1] - curve.a[i]) / h[i] - 3 * (curve.a[i] - curve.a[i - 1]) / h[i - 1];
+                    alpha[i] = 3 * (a[i + 1] - a[i]) / h[i] - 3 * (a[i] - a[i - 1]) / h[i - 1];
                 }
 
                 l[0] = 1d;
                 mu[0] = 0d;
                 z[0] = 0d;
-                for (int i = 1; i < n; i++) {
-                    l[i] = 2 * (curve.x[i + 1] - curve.x[i - 1]) - h[i - 1] * mu[i - 1];
+                for (int i = 1; i < count - 1; i++) {
+                    l[i] = 2 * (x[i + 1] - x[i - 1]) - h[i - 1] * mu[i - 1];
                     mu[i] = h[i] / l[i];
                     z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
                 }
-                l[n] = 1d;
-                z[n] = 0d;
-                curve.c[n] = 0d;
+                l[^1] = 1d;
+                z[^1] = 0d;
+                c[^1] = 0d;
 
-                for (int i = n - 1; i >= 0; i--) {
-                    curve.c[i] = z[i] - mu[i] * curve.c[i + 1];
-                    curve.b[i] = (curve.a[i + 1] - curve.a[i]) / h[i] - h[i] * (curve.c[i + 1] + 2 * curve.c[i]) / 3;
-                    curve.d[i] = (curve.c[i + 1] - curve.c[i]) / (3 * h[i]);
+                for (int i = count - 2; i >= 0; i--) {
+                    c[i] = z[i] - mu[i] * c[i + 1];
+                    b[i] = (a[i + 1] - a[i]) / h[i] - h[i] * (c[i + 1] + 2 * c[i]) / 3;
+                    d[i] = (c[i + 1] - c[i]) / (3 * h[i]);
                 }
 
                 return curve;

@@ -11,9 +11,9 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class TextBox : UIFocusableControlBase
     {
-        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
-        //[SerializeField] Image _borderImage = default!; // 找到的颜色好像不对
-        [SerializeField] UnityEngine.UI.Image _elevationImage = default!;
+        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] Image _borderImage = default!;
+        [SerializeField] Image _elevationImage = default!;
         [SerializeField] TMP_InputField _inputField = default!;
         [SerializeField] TextBlock _placeHolderText = default!;
         [SerializeField] TMP_Text _inputText = default!;
@@ -55,33 +55,36 @@ namespace Deenote.UIFramework.Controls
             _inputField.onValueChanged.AddListener(val => ValueChanged?.Invoke(val));
         }
 
-        protected override void DoVisualTransition()
+        protected override void DoVisualTransition(UIThemeColorArgs args, FocusVisualState state)
         {
-            if (!isActiveAndEnabled)
-                return;
+            Color el, bg, bdr;
 
-            var colors = UISystem.ThemeArgs;
-
-            var state = GetFocusVisualState();
-            var (elh, el, bg) = state switch {
-                FocusVisualState.Disabled => (1, colors.ControlStrokeDefaultColor, colors.ControlDisabledColor),
-                FocusVisualState.Focused => (2, colors.TextControlElevationFocusedColor, colors.ControlInputActiveColor),
-                FocusVisualState.Hovering => (1, colors.TextControlElevationColor, colors.ControlSecondaryColor),
-                FocusVisualState.Default or _ => (1, colors.TextControlElevationColor, colors.ControlDefaultColor),
+            (el, bg, bdr) = state switch {
+                FocusVisualState.Disabled => (args.ControlStrokeDefaultColor, args.ControlDisabledColor, args.ControlStrokeDefaultColor),
+                FocusVisualState.Focused => (args.TextControlElevationFocusedBorderColor, args.ControlInputActiveColor, args.ControlStrokeDefaultColor),
+                FocusVisualState.Hovering => (args.TextControlElevationBorderColor, args.ControlSecondaryColor, args.ControlElevationBorderColor),
+                FocusVisualState.Default or _ => (args.TextControlElevationBorderColor, args.ControlDefaultColor, args.ControlElevationBorderColor),
             };
-            _elevationImage.rectTransform.sizeDelta = _elevationImage.rectTransform.sizeDelta with { y = elh };
+            _elevationImage.rectTransform.sizeDelta = _elevationImage.rectTransform.sizeDelta with {
+                y = state is FocusVisualState.Focused ? 2f : 1f,
+            };
             _elevationImage.color = el;
             _backgroundImage.color = bg;
+            _borderImage.color = bdr;
 
-            _placeHolderText.TmpText.color = state is FocusVisualState.Disabled ? colors.TextDisabledColor : colors.TextSecondaryColor;
-            _inputText.color = state is FocusVisualState.Disabled ? colors.TextDisabledColor : colors.TextPrimaryColor;
+            if (state is FocusVisualState.Disabled) {
+                _placeHolderText.TmpText.color = args.TextDisabledColor;
+                _inputText.color = args.TextDisabledColor;
+            }
+            else {
+                _placeHolderText.TmpText.color = args.TextSecondaryColor;
+                _inputText.color = args.TextPrimaryColor;
+            }
         }
 
-        protected override void DoStaticVisualTransition()
+        protected override void OnThemeChanged(UIThemeColorArgs args)
         {
-            var colors = UISystem.ThemeArgs;
-            _inputField.selectionColor = colors.ControlAccentSelectedTextColor;
-            //_borderImage.color = colors.ControlStrokeDefaultColor;
+            _inputField.selectionColor = args.ControlAccentSelectedTextColor;
         }
     }
 }

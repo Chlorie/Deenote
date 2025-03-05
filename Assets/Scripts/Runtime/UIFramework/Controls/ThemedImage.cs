@@ -6,16 +6,21 @@ using UnityEngine.UI;
 namespace Deenote.UIFramework.Controls
 {
     [RequireComponent(typeof(Image))]
-    public sealed class ThemedImage : MonoBehaviour
+    public sealed class ThemedImage : UIThemedControl
     {
         [SerializeField] Image _image = default!;
-        [SerializeField] UIColor _color;
+        [SerializeField] UIThemeColor _color;
 
-        private void OnValidate()
+        protected override void OnThemeChanged(UIThemeColorArgs args)
+        {
+            if (_color is not UIThemeColor.None)
+                _image.color = UISystem.ColorArgs.GetColor(_color);
+        }
+
+        protected override void OnValidate()
         {
             _image ??= GetComponent<Image>();
-            if (UISystem.ThemeArgs.GetColor(_color) is Color color)
-                _image.color = color;
+            base.OnValidate();
         }
     }
 }

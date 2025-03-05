@@ -3,7 +3,6 @@
 using Deenote.Library;
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -11,9 +10,9 @@ namespace Deenote.UIFramework.Controls
 {
     public sealed class CheckBox : UIPressableControlBase, IPointerClickHandler
     {
-        [SerializeField] UnityEngine.UI.Image _backgroundImage = default!;
-        [SerializeField] UnityEngine.UI.Image _borderImage = default!;
-        [SerializeField] UnityEngine.UI.Image _checkmarkImage = default!;
+        [SerializeField] Image _backgroundImage = default!;
+        [SerializeField] Image _borderImage = default!;
+        [SerializeField] Image _checkmarkImage = default!;
 
 #if UNITY_EDITOR
         [SerializeField]
@@ -38,7 +37,7 @@ namespace Deenote.UIFramework.Controls
                 };
 
                 if (Utils.SetField(ref _isChecked_bf, val)) {
-                    DoVisualTransition();
+                    DoVisualTransition(UISystem.ColorArgs);
                     IsCheckedChanged?.Invoke(value);
                 }
             }
@@ -64,7 +63,7 @@ namespace Deenote.UIFramework.Controls
             };
 
             if (Utils.SetField(ref _isChecked_bf, val)) {
-                DoVisualTransition();
+                DoVisualTransition(UISystem.ColorArgs);
                 switch (value) {
                     case true:
                         _checkmarkImage.gameObject.SetActive(true);
@@ -88,38 +87,30 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoStaticVisualTransition()
+        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
         {
-            _checkmarkImage.color = UISystem.ThemeArgs.TextAccentPrimaryColor;
-        }
-
-        protected override void DoVisualTransition()
-        {
-            if (!isActiveAndEnabled)
-                return;
-
-            var theme = UISystem.ThemeArgs;
-
-            if (IsChecked ?? true) {
-                var (bg, bdr) = GetPressVisualState() switch {
-                    PressVisualState.Disabled => (theme.ControlAccentDisabledColor, theme.TextAccentDisabledColor),
-                    PressVisualState.Pressed => (theme.ControlAccentTertiaryColor, theme.TextAccentTertiaryColor),
-                    PressVisualState.Hovering => (theme.ControlAccentSecondaryColor, theme.TextAccentSecondaryColor),
-                    PressVisualState.Default or _ => (theme.ControlAccentDefaultColor, theme.ControlTransparentColor),
+            Color bg, fg, bdr;
+            if (IsChecked == false) {
+                (bg, fg, bdr) = state switch {
+                    PressVisualState.Disabled => (args.ControlDisabledColor, args.TextDisabledColor, args.ControlStrongStrokeDisabledColor),
+                    PressVisualState.Pressed => (args.ControlTertiaryColor, args.TextPrimaryColor, args.ControlStrongStrokeDisabledColor),
+                    PressVisualState.Hovering => (args.ControlSecondaryColor, args.TextPrimaryColor, args.ControlStrongStrokeDefaultColor),
+                    PressVisualState.Default or _ => (args.ControlDefaultColor, args.TextPrimaryColor, args.ControlStrongStrokeDefaultColor),
                 };
-                _backgroundImage.color = bg;
-                _borderImage.color = bdr;
             }
             else {
-                var (bg, bdr) = GetPressVisualState() switch {
-                    PressVisualState.Disabled => (theme.ControlDisabledColor, theme.TextDisabledColor),
-                    PressVisualState.Pressed => (theme.ControlTertiaryColor, theme.TextTertiaryColor),
-                    PressVisualState.Hovering => (theme.ControlSecondaryColor, theme.TextSecondaryColor),
-                    PressVisualState.Default or _ => (theme.ControlDefaultColor, theme.TextPrimaryColor),
+                (bg, fg, bdr) = state switch {
+                    PressVisualState.Disabled => (args.ControlAccentDisabledColor, args.TextAccentDisabledColor, args.ControlStrongStrokeDisabledColor),
+                    PressVisualState.Pressed => (args.ControlAccentTertiaryColor, args.TextAccentSecondaryColor, args.ControlAccentTertiaryColor),
+                    PressVisualState.Hovering => (args.ControlAccentSecondaryColor, args.TextAccentPrimaryColor, args.ControlSecondaryColor),
+                    PressVisualState.Default or _ => (args.ControlAccentDefaultColor, args.TextAccentPrimaryColor, args.ControlAccentDefaultColor),
                 };
-                _backgroundImage.color = bg;
-                _borderImage.color = bdr;
             }
+            _backgroundImage.color = bg;
+            _borderImage.color = bdr;
+            _checkmarkImage.color = fg;
+
+            var theme = UISystem.ThemeArgs;
 
             switch (IsChecked) {
                 case true:
@@ -134,7 +125,6 @@ namespace Deenote.UIFramework.Controls
                     _checkmarkImage.gameObject.SetActive(false);
                     break;
             }
-
         }
 
 #if UNITY_EDITOR
