@@ -1,17 +1,12 @@
 #nullable enable
 
-using Deenote.UI.Dialogs;
-using Deenote.UI.Theme;
-using Deenote.UI.Views;
-using Deenote.Library;
-using NUnit.Framework;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using UnityEngine;
-using Deenote.Localization;
-using Deenote.UI.Dialogs.Elements;
 using Deenote.Core;
+using Deenote.Localization;
+using Deenote.UI.Dialogs;
+using Deenote.UI.Dialogs.Elements;
+using Deenote.UI.Views;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Deenote.UI
 {
@@ -23,22 +18,14 @@ namespace Deenote.UI
 
         private UIPianoSoundPlayer _pianoSoundPlayer = default!;
 
-        [SerializeField] MessageBox _messageBox = default!;
-        [SerializeField] FileExplorerDialog _fileExplorerDialog = default!;
-        [SerializeField] NewProjectDialog _newProjectDialog = default!;
-        [SerializeField] PreferencesDialog _preferencesDialog = default!;
-        [SerializeField] AboutDialog _aboutDialog = default!;
+        [SerializeField] DialogManager _dialogManager = default!;
         [SerializeField] StatusBar _statusBar = default!;
         [SerializeField] ToastManager _toastManager = default!;
         [SerializeField] PerspectiveViewPanelView _perspectiveViewPanelView = default!;
 
         public static UIPianoSoundPlayer PianoSoundPlayer => _instance._pianoSoundPlayer;
 
-        public static MessageBox MessageBox => _instance._messageBox;
-        public static FileExplorerDialog FileExplorer => _instance._fileExplorerDialog;
-        public static NewProjectDialog NewProjectDialog => _instance._newProjectDialog;
-        public static PreferencesDialog PreferencesDialog => _instance._preferencesDialog;
-        public static AboutDialog AboutDialog => _instance._aboutDialog;
+        public static DialogManager DialogManager => _instance._dialogManager;
         public static StatusBar StatusBar => _instance._statusBar;
         public static ToastManager ToastManager => _instance._toastManager;
         public static PerspectiveViewPanelView PerspectiveViewPanelView => _instance._perspectiveViewPanelView;
@@ -82,6 +69,7 @@ namespace Deenote.UI
 #else
             _instance = instance;
 #endif
+            _settings = new();
             _pianoSoundPlayer = new(MainSystem.PianoSoundSource);
 
             ApplicationManager.Quitting += args =>
@@ -89,7 +77,7 @@ namespace Deenote.UI
                 if (!MainSystem.StageChartEditor.HasUnsavedChange) {
                     return;
                 }
-                var res = MessageBox.OpenAsync(_quitUnsavedMsgBoxArgs).GetAwaiter().GetResult();
+                var res = DialogManager.OpenMessageBoxAsync(_quitUnsavedMsgBoxArgs).GetAwaiter().GetResult();
                 args.Cancel = res != 0;
             };
             UnhandledExceptionHandler.UnhandledExceptionOccurred += args =>
@@ -132,23 +120,7 @@ namespace Deenote.UI
 
         public static class Args
         {
-#if UNITY_EDITOR
-            private static T GetScriptableObject<T>() where T : ScriptableObject => UnityEditor.AssetDatabase.LoadAssetAtPath<T>($"Assets/ScriptableObjects/UI/{typeof(T).Name}.asset");
-#endif
-
-            public static UIIcons UIIcons
-#if UNITY_EDITOR
-                => GetScriptableObject<UIIcons>();
-#else
-                => Instance._uiIcons;
-#endif
-
-            public static UIPrefabs UIPrefabs
-#if UNITY_EDITOR
-            { get; } = GetScriptableObject<UIPrefabs>();
-#else
-                => Instance._uiPrefabs;
-#endif
+            public static UIIcons UIIcons => Resources.Load<UIIcons>("UI/UIIcons");
         }
     }
 }

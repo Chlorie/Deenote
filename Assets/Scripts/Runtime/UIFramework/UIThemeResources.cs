@@ -10,7 +10,6 @@ namespace Deenote.UIFramework
       menuName = $"Deenote.UIFramework/{nameof(UIThemeResources)}")]
     public sealed class UIThemeResources : ScriptableObject
     {
-        [Header("Icons")]
         [Header("CheckBox")]
         public Sprite CheckBoxCheckedIcon = default!;
         public Sprite CheckBoxIndeterminateIcon = default!;

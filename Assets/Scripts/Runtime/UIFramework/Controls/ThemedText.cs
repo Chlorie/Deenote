@@ -11,10 +11,10 @@ namespace Deenote.UIFramework.Controls
         [SerializeField] TextMeshProUGUI _text = default!;
         [SerializeField] UIThemeColor _color = UIThemeColor.TextPrimaryColor;
 
-        protected override void OnThemeChanged(UIThemeColorArgs args)
+        protected override void OnThemeChanged(UIThemeArgs args)
         {
             if (_color is not UIThemeColor.None)
-                _text.color = UISystem.ColorArgs.GetColor(_color);
+                _text.color = UISystem.CurrentTheme.GetColor(_color);
 
         }
 

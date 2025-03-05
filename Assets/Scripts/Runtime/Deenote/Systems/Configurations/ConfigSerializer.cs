@@ -27,7 +27,7 @@ namespace Deenote.Systems.Configurations
             var configs = new ConfigRegistration();
             Saving?.Invoke(configs);
 
-            var json = JsonConvert.SerializeObject(configs, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(configs.Configs, Formatting.Indented);
             File.WriteAllText(_configTempFilePath, json);
             if (File.Exists(_configFilePath))
                 File.Delete(_configFilePath);

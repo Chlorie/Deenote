@@ -69,7 +69,7 @@ namespace Deenote.UIFramework.Controls
         void IBeginDragHandler.OnBeginDrag(PointerEventData eventData) => _isDragging = true;
         void IEndDragHandler.OnEndDrag(PointerEventData eventData) => _isDragging = false;
 
-        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
+        protected override void DoVisualTransition(UIThemeArgs args, PressVisualState state)
         {
             const float HoverScale = 20f / 14f;
             const float PressScale = 12f / 14f;
@@ -90,7 +90,7 @@ namespace Deenote.UIFramework.Controls
             _circleImage.rectTransform.localScale = new Vector3(scale, scale, scale);
         }
 
-        protected override void OnThemeChanged(UIThemeColorArgs args)
+        protected override void OnThemeChanged(UIThemeArgs args)
         {
             _backgroundImage.color = args.ControlSolidDefaultColor;
         }

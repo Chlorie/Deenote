@@ -106,7 +106,7 @@ namespace Deenote.UI.Dialogs
             };
             _audioFileExploreButton.Clicked += UniTask.Action(async UniTaskVoid () =>
             {
-                var res = await MainWindow.FileExplorer.OpenSelectFileAsync(
+                var res = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
                     LocalizableText.Localized(SelectAudioFileExplorerTitleKey),
                     MainSystem.Args.SupportLoadAudioFileExtensions);
                 if (res.IsCancelled)
@@ -118,7 +118,7 @@ namespace Deenote.UI.Dialogs
             _directoryInput.ValueChanged += OnDirectoryValueChanged;
             _directoryExploreButton.Clicked += UniTask.Action(async UniTaskVoid () =>
             {
-                var res = await MainWindow.FileExplorer.OpenSelectDirectoryAsync(
+                var res = await MainWindow.DialogManager.OpenFileExplorerSelectDirectoryAsync(
                     LocalizableText.Localized(SelectDirectoryExplorerTitleKey));
                 if (res.IsCancelled)
                     return;

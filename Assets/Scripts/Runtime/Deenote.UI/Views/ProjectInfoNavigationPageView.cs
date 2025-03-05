@@ -77,7 +77,7 @@ namespace Deenote.UI.Views
                     AssertProjectLoaded();
 
                     while (true) {
-                        var res = await MainWindow.FileExplorer.OpenSelectFileAsync(
+                        var res = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
                             LocalizableText.Localized(SelectAudioFileExplorerTitleKey),
                             MainSystem.Args.SupportLoadAudioFileExtensions);
                         if (res.IsCancelled)
@@ -86,7 +86,7 @@ namespace Deenote.UI.Views
                         using var fs = File.OpenRead(res.Path);
                         var clip = await AudioUtils.TryLoadAsync(fs, Path.GetExtension(res.Path));
                         if (clip is null) {
-                            var btn = await MainWindow.MessageBox.OpenAsync(_loadAudioFailedMsgBoxArgs);
+                            var btn = await MainWindow.DialogManager.OpenMessageBoxAsync(_loadAudioFailedMsgBoxArgs);
                             if (btn != 0)
                                 return;
                             continue; // Re-select file
@@ -114,14 +114,14 @@ namespace Deenote.UI.Views
                 };
                 _loadChartButton.Clicked += UniTask.Action(async () =>
                 {
-                    var res = await MainWindow.FileExplorer.OpenSelectFileAsync(
+                    var res = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
                         LocalizableText.Localized(SelectChartFileExplorerTitleKey),
                         MainSystem.Args.SupportLoadChartFileExtensions);
                     if (res.IsCancelled)
                         return;
 
                     if (!ChartModel.TryParse(await File.ReadAllTextAsync(res.Path), out var chart)) {
-                        await MainWindow.MessageBox.OpenAsync(_loadChartFailedMsgBoxArgs);
+                        await MainWindow.DialogManager.OpenMessageBoxAsync(_loadChartFailedMsgBoxArgs);
                         return;
                     }
 

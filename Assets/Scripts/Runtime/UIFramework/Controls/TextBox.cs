@@ -55,7 +55,7 @@ namespace Deenote.UIFramework.Controls
             _inputField.onValueChanged.AddListener(val => ValueChanged?.Invoke(val));
         }
 
-        protected override void DoVisualTransition(UIThemeColorArgs args, FocusVisualState state)
+        protected override void DoVisualTransition(UIThemeArgs args, FocusVisualState state)
         {
             Color el, bg, bdr;
 
@@ -82,7 +82,7 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void OnThemeChanged(UIThemeColorArgs args)
+        protected override void OnThemeChanged(UIThemeArgs args)
         {
             _inputField.selectionColor = args.ControlAccentSelectedTextColor;
         }

@@ -29,7 +29,7 @@ namespace Deenote.UIFramework.Controls
             get => _colorSet;
             set {
                 if (Utils.SetField(ref _colorSet, value)) {
-                    DoVisualTransition(UISystem.ColorArgs);
+                    DoVisualTransition();
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
+        protected override void DoVisualTransition(UIThemeArgs args, PressVisualState state)
         {
             Color bg, fg, bdr;
             switch (_colorSet) {

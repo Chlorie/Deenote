@@ -28,12 +28,12 @@ namespace Deenote.Core.Project
 
         private void Awake()
         {
-            MainSystem.SaveSystem.AutoSaving += AutoSaveHandler;
+            MainSystem.Instance.AutoSaveTrigger.AutoSaving += AutoSaveHandler;
         }
 
         private void OnDestroy()
         {
-            MainSystem.SaveSystem.AutoSaving -= AutoSaveHandler;
+            MainSystem.Instance.AutoSaveTrigger.AutoSaving -= AutoSaveHandler;
         }
 
         private void Start()

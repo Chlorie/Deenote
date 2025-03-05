@@ -106,13 +106,13 @@ namespace Deenote.UI.Views
                 _openButton.Clicked += UniTask.Action(OpenProjectListener);
                 _saveButton.Clicked += UniTask.Action(SaveProjectListener);
                 _saveAsButton.Clicked += UniTask.Action(SaveAsProjectListener);
-                _preferenceButton.Clicked += () => MainWindow.PreferencesDialog.Open();
+                _preferenceButton.Clicked += () => MainWindow.DialogManager.PreferencesDialog.Open();
 
                 // Abouts
 
-                _aboutDevelopersButton.Clicked += () => MainWindow.AboutDialog.Open(AboutDialog.Page.Developers);
-                _turorialsButton.Clicked += () => MainWindow.AboutDialog.Open(AboutDialog.Page.Tutorials);
-                _updateHistoryButton.Clicked += () => MainWindow.AboutDialog.Open(AboutDialog.Page.UpdateHistory);
+                _aboutDevelopersButton.Clicked += () => MainWindow.DialogManager.AboutDialog.Open(AboutDialog.Page.Developers);
+                _turorialsButton.Clicked += () => MainWindow.DialogManager.AboutDialog.Open(AboutDialog.Page.Tutorials);
+                _updateHistoryButton.Clicked += () => MainWindow.DialogManager.AboutDialog.Open(AboutDialog.Page.UpdateHistory);
 
                 _checkUpdateButton.Clicked += UniTask.Action(async () =>
                 {
@@ -122,7 +122,7 @@ namespace Deenote.UI.Views
                     if (res.Type is VersionManager.UpdateCheckResultType.UpToDate)
                         _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckUpdateToDateToastKey, 3f);
 
-                    var clicked = await MainWindow.MessageBox.OpenAsync(_verUpdMsgBoxArgs, VersionManager.CurrentVersion.ToString(), res.LatestVersion.ToString());
+                    var clicked = await MainWindow.DialogManager.OpenMessageBoxAsync(_verUpdMsgBoxArgs, VersionManager.CurrentVersion.ToString(), res.LatestVersion.ToString());
                     switch (clicked) {
                         case 0: VersionManager.OpenReleasePage(); break;
                         case 1: VersionManager.OpenDownloadPage(res.LatestVersion); break;
@@ -145,11 +145,11 @@ namespace Deenote.UI.Views
         private async UniTaskVoid NewProjectListener()
         {
             if (MainSystem.ProjectManager.CurrentProject is not null) {
-                var res = await MainWindow.MessageBox.OpenAsync(_newProjectOnOpenMsgBoxArgs);
+                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_newProjectOnOpenMsgBoxArgs);
                 if (res != 0)
                     return;
             }
-            var result = await MainWindow.NewProjectDialog.OpenCreateNewAsync();
+            var result = await MainWindow.DialogManager.NewProjectDialog.OpenCreateNewAsync();
             if (result is not null) {
                 MainSystem.ProjectManager.CurrentProject = result;
                 MainWindow.StatusBar.SetLocalizedStatusMessage(NewProjectCreatedStatusKey);
@@ -159,12 +159,12 @@ namespace Deenote.UI.Views
         private async UniTaskVoid OpenProjectListener()
         {
             if (MainSystem.ProjectManager.CurrentProject is not null) {
-                var res = await MainWindow.MessageBox.OpenAsync(_openProjOnOpenMsgBoxArgs);
+                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_openProjOnOpenMsgBoxArgs);
                 if (res != 0) return;
             }
 
         SelectFile:
-            var feRes = await MainWindow.FileExplorer.OpenSelectFileAsync(
+            var feRes = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
                 LocalizableText.Localized(OpenProjectFileExplorerTitleKey),
                 MainSystem.Args.SupportLoadProjectFileExtensions);
             if (feRes.IsCancelled)
@@ -179,7 +179,7 @@ namespace Deenote.UI.Views
             }
             else {
                 MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectFailedStatusKey);
-                var res = await MainWindow.MessageBox.OpenAsync(_loadProjFailedMsgBoxArgs);
+                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_loadProjFailedMsgBoxArgs);
                 if (res == 0)
                     goto SelectFile;
                 else
@@ -205,18 +205,18 @@ namespace Deenote.UI.Views
         {
             Debug.Assert(MainSystem.ProjectManager.CurrentProject is not null, "Unexpected interactable save button when current project is null");
         SelectFile:
-            var feRes = await MainWindow.FileExplorer.OpenInputFileAsync(
+            var feRes = await MainWindow.DialogManager.OpenFileExplorerInputFileAsync(
                 LocalizableText.Localized(SaveAsFileExplorerTitleKey),
                 MainSystem.Args.DeenotePreferFileExtension);
             if (feRes.IsCancelled)
                 return;
 
             if (Directory.Exists(feRes.Path)) {
-                await MainWindow.MessageBox.OpenAsync(_saveProjDirExistsMsgBoxArgs);
+                await MainWindow.DialogManager.OpenMessageBoxAsync(_saveProjDirExistsMsgBoxArgs);
                 goto SelectFile;
             }
             if (File.Exists(feRes.Path)) {
-                var res = await MainWindow.MessageBox.OpenAsync(_saveProjFileExistsMsgBoxArgs);
+                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_saveProjFileExistsMsgBoxArgs);
                 if (res != 0) return;
             }
 

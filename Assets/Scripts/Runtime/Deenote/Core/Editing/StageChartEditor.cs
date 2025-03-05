@@ -22,23 +22,29 @@ namespace Deenote.Core.Editing
         private ProjectManager _project = default!;
         internal GamePlayManager _game = default!;
 
-        [SerializeField] StageNotePlacer _placer = default!;
-        [SerializeField] StageNoteSelector _selector = default!;
         private UndoableOperationHistory _operations = default!;
 
-        public StageNotePlacer Placer => _placer;
-        public StageNoteSelector Selector => _selector;
+        public StageNotePlacer Placer { get; private set; } = default!;
+        public StageNoteSelector Selector { get; private set; } = default!;
 
         private void Awake()
         {
             _operations = new(MaxOperationUndoCount);
 
             Awake_ClipBoard();
-        }
 
-        private void Start()
-        {
-            _placer.Unity_Start();
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
+            {
+                configs.Add("editor/indicator", Placer.IsIndicatorOn);
+                configs.Add("editor/snap_pos", Placer.SnapToPositionGrid);
+                configs.Add("editor/snap_time", Placer.SnapToTimeGrid);
+            };
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
+            {
+                Placer.IsIndicatorOn = configs.GetBoolean("editor/indicator", true);
+                Placer.SnapToPositionGrid = configs.GetBoolean("editor/snap_pos", true);
+                Placer.SnapToTimeGrid = configs.GetBoolean("editor/snap_time", true);
+            };
         }
 
         internal void OnInstantiate(ProjectManager project, GamePlayManager game)
@@ -46,8 +52,8 @@ namespace Deenote.Core.Editing
             _project = project;
             _game = game;
 
-            _placer = new StageNotePlacer(this);
-            _selector = new StageNoteSelector(game);
+            Placer = new StageNotePlacer(this);
+            Selector = new StageNoteSelector(game);
 
             _game.RegisterNotification(
                 GamePlayManager.NotificationFlag.CurrentChart,
@@ -74,12 +80,12 @@ namespace Deenote.Core.Editing
             var note = notePrototype.Clone();
             note.PositionCoord = noteCoord;
             _operations.Do(_game.CurrentChart.AddNote(note)
-                .OnRedone(note =>
+                .OnRedone((Action<NoteModel>)(note =>
                 {
-                    _selector.Clear();
+                    this.Selector.Clear();
                     OnNoteCollectionChanged();
                     NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
-                })
+                }))
                 .OnUndone(note => OnNoteCollectionChanged()));
         }
 
@@ -106,17 +112,17 @@ namespace Deenote.Core.Editing
             NoteModel.CloneLinkDatas(notePrototypes, notes);
 
             _operations.Do(_game.CurrentChart.AddMultipleNotes(ImmutableCollectionsMarshal.AsImmutableArray(notes))
-                .OnRedone(nodes =>
+                .OnRedone((Action<ImmutableArray<IStageNoteNode>>)(nodes =>
                 {
-                    _selector.Reselect(nodes.OfType<NoteModel>());
+                    this.Selector.Reselect(nodes.OfType<NoteModel>());
                     OnNoteCollectionChanged();
-                })
-                .OnUndone(nodes =>
+                }))
+                .OnUndone((Action<ImmutableArray<IStageNoteNode>>)(nodes =>
                 {
-                    _selector.DeselectMultiple(nodes.OfType<NoteModel>());
+                    this.Selector.DeselectMultiple(nodes.OfType<NoteModel>());
 
                     NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
-                }));
+                })));
         }
 
         public void RemoveNotes(ReadOnlySpan<NoteModel> notes)
@@ -127,19 +133,19 @@ namespace Deenote.Core.Editing
                 return;
 
             _operations.Do(_game.CurrentChart.RemoveOrderedNotes(notes.ToImmutableArray())
-                .OnRedone(nodes =>
+                .OnRedone((Action<ImmutableArray<IStageNoteNode>>)(nodes =>
                 {
-                    _selector.Clear();
+                    this.Selector.Clear();
                     OnNoteCollectionChanged();
-                })
-                .OnUndone(nodes =>
+                }))
+                .OnUndone((Action<ImmutableArray<IStageNoteNode>>)(nodes =>
                 {
-                    _selector.AddSelectMultiple(nodes.OfType<NoteModel>());
+                    this.Selector.AddSelectMultiple(nodes.OfType<NoteModel>());
                     OnNoteCollectionChanged();
-                }));
+                })));
         }
 
-        public void RemoveSelectedNotes() => RemoveNotes(_selector.SelectedNotes);
+        public void RemoveSelectedNotes() => RemoveNotes(Selector.SelectedNotes);
 
         public void AddNotesSnappingToCurve(int count, ReadOnlySpan<GridsManager.CurveApplyProperty> applyProperties = default)
         {
@@ -148,17 +154,27 @@ namespace Deenote.Core.Editing
             if (_game.Grids.CurveTimeInterval is not (var start, var end))
                 return;
 
+            bool applySize = false, applySpeed = false;
+            foreach (var apply in applyProperties) {
+                if (apply is GridsManager.CurveApplyProperty.Size)
+                    applySize = true;
+                if (apply is GridsManager.CurveApplyProperty.Speed)
+                    applySpeed = true;
+            }
+
             using var so_notes = SpanOwner<NoteModel>.Allocate(count);
             var notes = so_notes.Span;
             for (int i = 0; i < count; i++) {
                 var time = Mathf.Lerp(start, end, (float)(i + 1) / (count + 1));
                 var pos = _game.Grids.GetCurveTransformedPosition(time)!.Value; // Wont be null as CurveTimeInterval is not null
-                var note = notes[i] = _placer.ClonePlaceNotePrototype();
+                var note = notes[i] = Placer.ClonePlaceNotePrototype();
                 note.PositionCoord = new(pos, time);
+                if (applySize)
+                    note.Size = _game.Grids.GetCurveTransformedValue(time, GridsManager.CurveApplyProperty.Size)!.Value;
+                if (applySpeed)
+                    note.Speed = _game.Grids.GetCurveTransformedValue(time, GridsManager.CurveApplyProperty.Speed)!.Value;
             }
             AddMultipleNotes(new NoteCoord(0f, start), notes);
-
-            // TODO: Apply applyproperties
         }
 
         #endregion

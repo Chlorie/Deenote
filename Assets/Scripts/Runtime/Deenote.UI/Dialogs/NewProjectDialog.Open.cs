@@ -33,15 +33,15 @@ namespace Deenote.UI.Dialogs
 
                 string audioFilePath = _audioFileInput.Value;
                 if (File.Exists(audioFilePath)) {
-                    await MainWindow.MessageBox.OpenAsync(_audioNotExistsMsgBoxArgs);
+                    await MainWindow.DialogManager.OpenMessageBoxAsync(_audioNotExistsMsgBoxArgs);
                     goto ReAwaitButtonClick;
                 }
                 if (Directory.Exists(_projectResultPath)) {
-                    await MainWindow.MessageBox.OpenAsync(_dirExistsMsgBoxArgs);
+                    await MainWindow.DialogManager.OpenMessageBoxAsync(_dirExistsMsgBoxArgs);
                     goto ReAwaitButtonClick;
                 }
                 if (File.Exists(_projectResultPath)) {
-                    var res = await MainWindow.MessageBox.OpenAsync(_fileExistsMsgBoxArgs);
+                    var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_fileExistsMsgBoxArgs);
                     if (res != 0)
                         goto ReAwaitButtonClick;
                 }
@@ -56,7 +56,7 @@ namespace Deenote.UI.Dialogs
                     _contentRaycastBlocker.SetActive(true);
                     clip = await AudioUtils.TryLoadAsync(audioFs, Path.GetExtension(audioFilePath), cts.Token);
                     if (clip is null) {
-                        await MainWindow.MessageBox.OpenAsync(_audioLoadFailedMsgBoxArgs);
+                        await MainWindow.DialogManager.OpenMessageBoxAsync(_audioLoadFailedMsgBoxArgs);
                         goto ReAwaitButtonClick;
                     }
 

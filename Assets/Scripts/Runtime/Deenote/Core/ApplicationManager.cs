@@ -25,7 +25,6 @@ namespace Deenote.Core
 
         public static void Quit()
         {
-            // TODO: SaveConfig
             MainSystem.SaveSystem.SaveConfigurations();
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;

@@ -17,7 +17,7 @@ namespace Deenote.UIFramework.Controls
             get => _isInteractable_bf;
             set {
                 if (Utils.SetField(ref _isInteractable_bf, value)) {
-                    DoVisualTransition(UISystem.ColorArgs);
+                    DoVisualTransition();
                 }
             }
         }
@@ -29,9 +29,11 @@ namespace Deenote.UIFramework.Controls
                 && IsInteractable;
         }
 
-        protected abstract void DoVisualTransition(UIThemeColorArgs args);
+        protected void DoVisualTransition() => DoVisualTransition();
 
-        protected override void OnThemeChanged(UIThemeColorArgs args) { }
+        protected abstract void DoVisualTransition(UIThemeArgs args);
+
+        protected override void OnThemeChanged(UIThemeArgs args) { }
 
         /// <summary>
         /// Invoke when awake or Theme changed
@@ -40,30 +42,30 @@ namespace Deenote.UIFramework.Controls
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
         {
             _isHovering = true;
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
         {
             _isHovering = false;
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         protected override void Awake()
         {
             base.Awake();
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         protected virtual void OnEnable()
         {
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         protected override void OnValidate()
         {
             base.OnValidate();
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
     }
 
@@ -84,14 +86,14 @@ namespace Deenote.UIFramework.Controls
                 return PressVisualState.Default;
         }
 
-        protected override sealed void DoVisualTransition(UIThemeColorArgs args)
+        protected override sealed void DoVisualTransition(UIThemeArgs args)
         {
             if (!isActiveAndEnabled)
                 return;
             DoVisualTransition(args, GetPressVisualState());
         }
 
-        protected abstract void DoVisualTransition(UIThemeColorArgs args, PressVisualState state);
+        protected abstract void DoVisualTransition(UIThemeArgs args, PressVisualState state);
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
             => OnPointerDown(eventData);
@@ -101,7 +103,7 @@ namespace Deenote.UIFramework.Controls
             if (eventData.button is not PointerEventData.InputButton.Left)
                 return;
             _isPressed = true;
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
@@ -113,7 +115,7 @@ namespace Deenote.UIFramework.Controls
                 return;
 
             _isPressed = false;
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         protected enum PressVisualState
@@ -143,20 +145,20 @@ namespace Deenote.UIFramework.Controls
                 return FocusVisualState.Default;
         }
 
-        protected override sealed void DoVisualTransition(UIThemeColorArgs args)
+        protected override sealed void DoVisualTransition(UIThemeArgs args)
         {
             if (!isActiveAndEnabled)
                 return;
             DoVisualTransition(args, GetFocusVisualState());
         }
 
-        protected abstract void DoVisualTransition(UIThemeColorArgs args, FocusVisualState state);
+        protected abstract void DoVisualTransition(UIThemeArgs args, FocusVisualState state);
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
             _isFocused = true;
             _pointerDownFrame = Time.frameCount;
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         protected override void Awake()
@@ -173,7 +175,7 @@ namespace Deenote.UIFramework.Controls
         protected void Unfocus()
         {
             _isFocused = false;
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         protected enum FocusVisualState

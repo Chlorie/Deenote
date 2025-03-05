@@ -17,6 +17,9 @@ English
 
 # Static
 
+UITheme_Dark=Dark
+UITheme_Light=Light
+
 ## Menu
 
 Nav_Menu=Menu

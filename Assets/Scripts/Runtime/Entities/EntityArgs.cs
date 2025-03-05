@@ -43,30 +43,5 @@ namespace Deenote.Entities
 
         public static bool IsVisibleOnStage(this NoteModel note)
             => note.Position is >= -StageMaxPosition and <= StageMaxPosition;
-
-        #region Speed属性的一些备用工具
-
-        // NOTE: This change is for speed property of note, currently has no use
-
-        const float CurrentMusicTime = 0f, StageNoteAheadTime = 0f;
-
-        // TODO：NoteModel基于这个值排序，
-        public static float NoteActualAppearTime(float time, float noteSpeed) => time - StageNoteAheadTime / noteSpeed;
-
-        // 这个时间主要用于显示
-        // 形象地说，Note在出现之前以1速下落，出现之后以NoteSpeed速度下落，在判定线以下以1速下落
-        // 基于这个PseudoTime排列，Note能够以其在界面上的位置排序
-        public static float NoteTimeToPseudoTime(float time, float noteSpeed)
-        {
-            var currentTime = CurrentMusicTime;
-            if (time <= currentTime)
-                return time;
-            else if (time < currentTime + StageNoteAheadTime)
-                return currentTime + (time - currentTime) * noteSpeed;
-            else
-                return currentTime + (time - currentTime) - StageNoteAheadTime / noteSpeed;
-        }
-
-        #endregion
     }
 }

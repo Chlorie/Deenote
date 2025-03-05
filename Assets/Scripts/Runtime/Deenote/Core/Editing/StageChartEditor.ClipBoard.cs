@@ -14,17 +14,17 @@ namespace Deenote.Core.Editing
 
         public void CopySelectedNotes()
         {
-            if (_selector.SelectedNotes.IsEmpty)
+            if (Selector.SelectedNotes.IsEmpty)
                 return;
 
-            _placer.CancelPlaceNote();
-            ClipBoard.SetNotes(_selector.SelectedNotes);
+            Placer.CancelPlaceNote();
+            ClipBoard.SetNotes(Selector.SelectedNotes);
         }
 
         public void CutSelectedNotes()
         {
             CopySelectedNotes();
-            RemoveNotes(_selector.SelectedNotes);
+            RemoveNotes(Selector.SelectedNotes);
         }
 
         public void PasteNotes()
@@ -32,7 +32,7 @@ namespace Deenote.Core.Editing
             if (ClipBoard.Notes.IsEmpty)
                 return;
 
-            _placer.PreparePasteClipBoard();
+            Placer.PreparePasteClipBoard();
         }
     }
 }

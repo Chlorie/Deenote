@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71e9cc384dcaedc4d96406efedadbcf8, type: 3}
-  m_Name: DarkColorArgs
+  m_Script: {fileID: 11500000, guid: 9fbaba924affb6149a0186bf5674c3b4, type: 3}
+  m_Name: Dark
   m_EditorClassIdentifier: 
+  ThemeName: Dark
   TextPrimaryColor: {r: 1, g: 1, b: 1, a: 1}
   TextSecondaryColor: {r: 1, g: 1, b: 1, a: 0.77254903}
   TextTertiaryColor: {r: 1, g: 1, b: 1, a: 0.5294118}

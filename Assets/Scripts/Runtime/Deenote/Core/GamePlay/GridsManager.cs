@@ -1,6 +1,5 @@
 #nullable enable
 
-using Deenote;
 using Deenote.Core.GamePlay.Audio;
 using Deenote.Core.GameStage;
 using Deenote.Core.Project;
@@ -27,6 +26,18 @@ namespace Deenote.Core.GamePlay
             _game.StageLoaded += args =>
             {
                 args.Stage.PerspectiveLinesRenderer.LineCollecting += _OnPerspectiveLineCollecting;
+            };
+
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
+            {
+                configs.Add("stage/grids/pos_grid_count", PositionGridCount);
+                configs.Add("stage/grids/time_grid_count", TimeGridSubBeatCount);
+            };
+
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
+            {
+                PositionGridCount = configs.GetInt32("stage/grids/pos_grid_count");
+                TimeGridSubBeatCount = configs.GetInt32("stage/grids/time_grid_count");
             };
         }
 

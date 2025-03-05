@@ -3,6 +3,7 @@
 using Deenote.Core.Editing;
 using Deenote.Core.GamePlay;
 using Deenote.Core.Project;
+using Deenote.UI;
 
 namespace Deenote.Plugin
 {
@@ -14,6 +15,8 @@ namespace Deenote.Plugin
         public GamePlayManager GameManager { get; }
         public StageChartEditor Editor { get; }
         public GlobalSettings GlobalSettings { get; }
+
+        public MainWindow MainWindow { get; }
 
         private DeenotePluginContext()
         {

@@ -90,7 +90,7 @@ namespace Deenote.UIFramework.Controls
         void IBeginDragHandler.OnBeginDrag(PointerEventData eventData) => _isDragging = true;
         void IEndDragHandler.OnEndDrag(PointerEventData eventData) => _isDragging = false;
 
-        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
+        protected override void DoVisualTransition(UIThemeArgs args, PressVisualState state)
         {
             var bg = state is PressVisualState.Disabled
                 ? args.ControlStrongDisabledColor

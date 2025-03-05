@@ -11,10 +11,10 @@ namespace Deenote.UIFramework.Controls
         [SerializeField] Image _image = default!;
         [SerializeField] UIThemeColor _color;
 
-        protected override void OnThemeChanged(UIThemeColorArgs args)
+        protected override void OnThemeChanged(UIThemeArgs args)
         {
             if (_color is not UIThemeColor.None)
-                _image.color = UISystem.ColorArgs.GetColor(_color);
+                _image.color = UISystem.CurrentTheme.GetColor(_color);
         }
 
         protected override void OnValidate()

@@ -49,7 +49,7 @@ namespace Deenote.UIFramework.Controls
         {
             if (Group is null) {
                 if (Utils.SetField(ref _isChecked_bf, value)) {
-                    DoVisualTransition(UISystem.ColorArgs);
+                    DoVisualTransition();
                 }
             }
             else {
@@ -61,7 +61,7 @@ namespace Deenote.UIFramework.Controls
         internal void SetIsCheckedInternal(bool value)
         {
             if (Utils.SetField(ref _isChecked_bf, value)) {
-                DoVisualTransition(UISystem.ColorArgs);
+                DoVisualTransition();
                 IsCheckedChanged?.Invoke(value);
             }
         }
@@ -76,7 +76,7 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
+        protected override void DoVisualTransition(UIThemeArgs args, PressVisualState state)
         {
             Color bg, fg, bdr;
             if (IsChecked) {
@@ -114,7 +114,7 @@ namespace Deenote.UIFramework.Controls
             _borderImage.color = bdr;
         }
 
-        public void UpdateVisual() => DoVisualTransition(UISystem.ColorArgs);
+        public void UpdateVisual() => DoVisualTransition();
 
         private enum ButtonColorSet
         {

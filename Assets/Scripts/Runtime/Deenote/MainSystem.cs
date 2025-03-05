@@ -1,6 +1,7 @@
 #nullable enable
 
 using Deenote.Audio;
+using Deenote.Components;
 using Deenote.Core;
 using Deenote.Core.Editing;
 using Deenote.Core.GamePlay;
@@ -16,7 +17,6 @@ namespace Deenote
     public sealed partial class MainSystem : SingletonBehaviour<MainSystem>
     {
         [Header("System")]
-        [SerializeField] SaveSystem _saveSystem = default!;
         [SerializeField] PianoSoundSource _pianoSoundSource = default!;
         [Header("Manager")]
         [SerializeField] ProjectManager _projectManager = default!;
@@ -24,7 +24,7 @@ namespace Deenote
         [SerializeField] StageChartEditor _stageChartEditor = default!;
         [SerializeField] KeyBindingManager _keyBindingManager = default!;
 
-        public static SaveSystem SaveSystem => Instance._saveSystem;
+        public static SaveSystem SaveSystem { get; private set; } = default!;
         public static GlobalSettings GlobalSettings { get; private set; } = default!;
 
         public static PianoSoundSource PianoSoundSource => Instance._pianoSoundSource;
@@ -34,9 +34,16 @@ namespace Deenote
         public static StageChartEditor StageChartEditor => Instance._stageChartEditor;
         public static KeyBindingManager KeyBindingManager => Instance._keyBindingManager;
 
+        internal AutoSaveTrigger AutoSaveTrigger { get; private set; } = default!;
+
         protected override void Awake()
         {
             base.Awake();
+
+            AutoSaveTrigger = gameObject.AddComponent<AutoSaveTrigger>();
+            AutoSaveTrigger.IsEnabled = false;
+
+            SaveSystem = new();
 
             GlobalSettings = new();
 

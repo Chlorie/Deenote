@@ -37,7 +37,7 @@ namespace Deenote.UIFramework.Controls
                 };
 
                 if (Utils.SetField(ref _isChecked_bf, val)) {
-                    DoVisualTransition(UISystem.ColorArgs);
+                    DoVisualTransition();
                     IsCheckedChanged?.Invoke(value);
                 }
             }
@@ -63,15 +63,15 @@ namespace Deenote.UIFramework.Controls
             };
 
             if (Utils.SetField(ref _isChecked_bf, val)) {
-                DoVisualTransition(UISystem.ColorArgs);
+                DoVisualTransition();
                 switch (value) {
                     case true:
                         _checkmarkImage.gameObject.SetActive(true);
-                        _checkmarkImage.sprite = UISystem.ThemeArgs.CheckBoxCheckedIcon;
+                        _checkmarkImage.sprite = UISystem.ThemeResources.CheckBoxCheckedIcon;
                         break;
                     case null:
                         _checkmarkImage.gameObject.SetActive(true);
-                        _checkmarkImage.sprite = UISystem.ThemeArgs.CheckBoxIndeterminateIcon;
+                        _checkmarkImage.sprite = UISystem.ThemeResources.CheckBoxIndeterminateIcon;
                         break;
                     case false:
                         _checkmarkImage.gameObject.SetActive(false);
@@ -87,7 +87,7 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
+        protected override void DoVisualTransition(UIThemeArgs args, PressVisualState state)
         {
             Color bg, fg, bdr;
             if (IsChecked == false) {
@@ -110,7 +110,7 @@ namespace Deenote.UIFramework.Controls
             _borderImage.color = bdr;
             _checkmarkImage.color = fg;
 
-            var theme = UISystem.ThemeArgs;
+            var theme = UISystem.ThemeResources;
 
             switch (IsChecked) {
                 case true:

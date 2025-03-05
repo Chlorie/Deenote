@@ -21,7 +21,7 @@ namespace Deenote.UIFramework.Controls
             get => _isChecked_bf;
             set {
                 if (Utils.SetField(ref _isChecked_bf, value)) {
-                    DoVisualTransition(UISystem.ColorArgs);
+                    DoVisualTransition();
                     IsCheckedChanged?.Invoke(value);
                 }
             }
@@ -32,7 +32,7 @@ namespace Deenote.UIFramework.Controls
         public void SetIsCheckedWithoutNotify(bool value)
         {
             _isChecked_bf = value;
-            DoVisualTransition(UISystem.ColorArgs);
+            DoVisualTransition();
         }
 
         void IPointerClickHandler.OnPointerClick(PointerEventData eventData)
@@ -42,7 +42,7 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
+        protected override void DoVisualTransition(UIThemeArgs args, PressVisualState state)
         {
             const float HoverScale = 18f / 14f;
 

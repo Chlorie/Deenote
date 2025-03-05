@@ -5,7 +5,9 @@ using Deenote.Core.GamePlay;
 using Deenote.Core.Project;
 using Deenote.Library.Components;
 using Deenote.Localization;
+using Deenote.UIFramework;
 using Deenote.UIFramework.Controls;
+using System;
 using System.Collections.Immutable;
 using UnityEngine;
 
@@ -23,10 +25,17 @@ namespace Deenote.UI.Dialogs
         [SerializeField] ToggleSwitch _vSyncToggle = default!;
         [SerializeField] Dropdown _languageDropdown = default!;
         [SerializeField] Dropdown _autoSaveDropdown = default!;
-        [SerializeField] ToggleSwitch _embedAudioDataToggle = default!;
+        //[SerializeField] ToggleSwitch _embedAudioDataToggle = default!;
+        [SerializeField] Dropdown _uiThemeDropdown = default!;
         [SerializeField] ToggleSwitch _showFpsToggle = default!;
         [SerializeField] ToggleSwitch _showIneffectivePropertiesToggle = default!;
         [SerializeField] ToggleSwitch _distinguishPianoNotesToggle = default!;
+
+        #region LocalizationKeys
+
+        private const string UIThemeLocalizationKeyPrefix = "UITheme_";
+
+        #endregion
 
         private void Start()
         {
@@ -70,6 +79,12 @@ namespace Deenote.UI.Dialogs
             //_embedAudioDataToggle.IsCheckedChanged+=MainSystem.ProjectManager.
 
             // Display
+
+            _uiThemeDropdown.ResetOptions(UISystem.Themes, theme => LocalizableText.Localized($"{UIThemeLocalizationKeyPrefix}{theme.ThemeName}"));
+            _uiThemeDropdown.SetValueWithoutNotify(_uiThemeDropdown.FindItemIndex(UISystem.CurrentTheme));
+            _uiThemeDropdown.SelectedIndexChanged += val => UISystem.CurrentTheme = (UIThemeArgs)_uiThemeDropdown.Options[val].Item!;
+            UISystem.ThemeChanged += val => _uiThemeDropdown.SetValueWithoutNotify(_uiThemeDropdown.FindItemIndex(val));
+            _uiThemeDropdown.SetValueWithoutNotify(_uiThemeDropdown.FindItemIndex(UISystem.CurrentTheme));
 
             _showFpsToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsFpsShown = val;
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(

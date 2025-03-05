@@ -41,14 +41,14 @@ namespace Deenote.UIFramework.Controls
             _collapseButton.Clicked += () => IsExpanded = !IsExpanded;
         }
 
-        protected override void DoVisualTransition(UIThemeColorArgs args)
+        protected override void DoVisualTransition(UIThemeArgs args)
         {
             _backgroundImage.enabled = IsExpanded;
             _contentRectTransform.gameObject.SetActive(IsExpanded);
             _arrowImage.rectTransform.localScale = _arrowImage.rectTransform.localScale with { y = IsExpanded ? -1 : 1 };
         }
 
-        protected override void OnThemeChanged(UIThemeColorArgs args)
+        protected override void OnThemeChanged(UIThemeArgs args)
         {
             _backgroundImage.color = args.CardBackgroundDefaultColor;
             _lineImage.color = args.TextDisabledColor;

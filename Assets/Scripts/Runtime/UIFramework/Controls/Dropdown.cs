@@ -90,7 +90,7 @@ namespace Deenote.UIFramework.Controls
         private void Awake()
         {
             _dropdownItems = new PooledObjectListView<DropdownItem>(
-                UnityUtils.CreateObjectPool(UISystem.ThemeArgs.DropdownItemPrefab, _contentRectTransform,
+                UnityUtils.CreateObjectPool(UISystem.ThemeResources.DropdownItemPrefab, _contentRectTransform,
                 item => item.OnInstantiate(this), defaultCapacity: 0));
 
             for (int i = 0; i < _options.Count; i++) {
@@ -135,6 +135,15 @@ namespace Deenote.UIFramework.Controls
             return -1;
         }
 
+        public int FindItemIndex(object item)
+        {
+            for (int i = 0; i < _options.Count; i++) {
+                if (_options[i].Item == item)
+                    return i;
+            }
+            return -1;
+        }
+
         public void ResetOptions(ReadOnlySpan<string> texts)
         {
             _options.Clear();
@@ -150,6 +159,22 @@ namespace Deenote.UIFramework.Controls
         }
 
         public void ResetOptions<T>(IReadOnlyCollection<T> items, Func<T, LocalizableText> textSelector)
+        {
+            _options.Clear();
+            using (var resetter = _dropdownItems.Resetting()) {
+                int i = 0;
+                foreach (var item in items) {
+                    var option = new Option { Text = textSelector(item), Item = item };
+                    _options.Add(option);
+                    resetter.Add(out var dropdownItem);
+                    dropdownItem.Initialize(i, option);
+                    i++;
+                }
+            }
+            _dropdownItems.SetSiblingIndicesInOrder();
+        }
+
+        public void ResetOptions<T>(ReadOnlySpan<T> items, Func<T, LocalizableText> textSelector)
         {
             _options.Clear();
             using (var resetter = _dropdownItems.Resetting()) {

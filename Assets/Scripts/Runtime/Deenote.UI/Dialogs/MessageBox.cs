@@ -1,15 +1,14 @@
 #nullable enable
 
-using CommunityToolkit.HighPerformance.Buffers;
 using Cysharp.Threading.Tasks;
-using Deenote.UIFramework.Controls;
-using Deenote.UI.Dialogs.Elements;
 using Deenote.Library;
+using Deenote.Library.Collections;
+using Deenote.UI.Dialogs.Elements;
+using Deenote.UIFramework.Controls;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using Deenote.Library.Collections;
 
 namespace Deenote.UI.Dialogs
 {
@@ -74,15 +73,6 @@ namespace Deenote.UI.Dialogs
                 CloseSelfModalDialog();
                 return clicked;
             }
-        }
-
-        public UniTask<int> OpenAsync(in MessageBoxArgs data, string contentArg0, string contentArg1)
-        {
-            using var so = SpanOwner<string>.Allocate(2);
-            var span = so.Span;
-            span[0] = contentArg0;
-            span[1] = contentArg1;
-            return OpenAsync(data, contentArgs: span);
         }
     }
 }

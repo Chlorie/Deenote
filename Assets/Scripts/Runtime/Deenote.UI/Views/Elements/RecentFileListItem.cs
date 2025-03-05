@@ -42,7 +42,7 @@ namespace Deenote.UI.Views.Elements
             _button.Clicked += UniTask.Action(async () =>
             {
                 if (MainSystem.ProjectManager.CurrentProject is not null) {
-                    var res = await MainWindow.MessageBox.OpenAsync(_openProjOnOpenMsgBoxArgs);
+                    var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_openProjOnOpenMsgBoxArgs);
                     if (res != 0)
                         return;
                 }
@@ -51,7 +51,7 @@ namespace Deenote.UI.Views.Elements
                 if (File.Exists(FilePath)) {
                     bool res = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(FilePath);
                     if (!res) {
-                        MainWindow.MessageBox.OpenAsync(_loadProjFailedMsgBoxArgs)
+                        MainWindow.DialogManager.OpenMessageBoxAsync(_loadProjFailedMsgBoxArgs)
                             .Forget();
                     }
                     Parent.TouchRecentFile(this);
@@ -59,13 +59,13 @@ namespace Deenote.UI.Views.Elements
                 }
 
                 // File not found
-                var click = await MainWindow.MessageBox.OpenAsync(_fileNotFoundMsgBoxArgs);
+                var click = await MainWindow.DialogManager.OpenMessageBoxAsync(_fileNotFoundMsgBoxArgs);
                 switch (click) {
                     case 0: // Remove
                         Parent.RemoveRecentFile(this);
                         return;
                     case 1: { // Reselect
-                        var res = await MainWindow.FileExplorer.OpenSelectFileAsync(
+                        var res = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
                             LocalizableText.Localized("OpenProject_FileExplorer_Title"),
                             MainSystem.Args.SupportLoadProjectFileExtensions,
                             Path.GetDirectoryName(FilePath));
@@ -73,7 +73,7 @@ namespace Deenote.UI.Views.Elements
                             return;
                         bool openRes = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(res.Path);
                         if (!openRes) {
-                            MainWindow.MessageBox.OpenAsync(_loadProjFailedMsgBoxArgs).Forget();
+                            MainWindow.DialogManager.OpenMessageBoxAsync(_loadProjFailedMsgBoxArgs).Forget();
                             Parent.RemoveRecentFile(this);
                             return;
                         }

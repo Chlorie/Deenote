@@ -21,7 +21,7 @@ namespace Deenote.UI.Views
         [SerializeField] ToggleSwitch _horizontalGridSnapToggle = default!;
         [SerializeField] ToggleSwitch _verticalGridSnapToggle = default!;
 
-        [SerializeField] RadioButtonGroup _curveKindRadioGroup = default!;
+        //[SerializeField] RadioButtonGroup _curveKindRadioGroup = default!;
         [SerializeField] RadioButton _linearCurveRadio = default!;
         [SerializeField] RadioButton _cubicCurveRadio = default!;
         [SerializeField] Button _generateCurveButton = default!;

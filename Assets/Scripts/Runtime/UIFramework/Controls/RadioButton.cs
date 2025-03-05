@@ -37,7 +37,7 @@ namespace Deenote.UIFramework.Controls
         internal void SetIsCheckedInternal(bool value, bool notify)
         {
             if (Utils.SetField(ref _isChecked_bf, value)) {
-                DoVisualTransition(UISystem.ColorArgs);
+                DoVisualTransition();
                 if (value is true && notify)
                     Checked?.Invoke();
             }
@@ -59,7 +59,7 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        protected override void DoVisualTransition(UIThemeColorArgs args, PressVisualState state)
+        protected override void DoVisualTransition(UIThemeArgs args, PressVisualState state)
         {
             const float HoverScale = 18f / 14f;
 
@@ -99,6 +99,6 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-        internal void UpdateVisual() => DoVisualTransition(UISystem.ColorArgs);
+        internal void UpdateVisual() => DoVisualTransition();
     }
 }

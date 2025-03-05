@@ -37,7 +37,7 @@ namespace Deenote.UI.Dialogs.Elements
             {
                 if (Dialog.TryNavigateToDirectory(Directory))
                     return;
-                var res = await MainWindow.MessageBox.OpenAsync(_dirNotFoundMsgBoxArgs);
+                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_dirNotFoundMsgBoxArgs);
                 if (res != 0)
                     return;
                 Dialog.UnpinDirectory(this);
