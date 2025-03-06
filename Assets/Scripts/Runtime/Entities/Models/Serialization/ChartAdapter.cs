@@ -42,7 +42,7 @@ namespace Deenote.Entities.Models.Serialization
                     Time = note._time,
                     Size = note.size,
                 };
-                model._sounds.AddRange(note.sounds);
+                model.Sounds.AddRange(note.sounds);
                 return model;
             }).ToList();
 

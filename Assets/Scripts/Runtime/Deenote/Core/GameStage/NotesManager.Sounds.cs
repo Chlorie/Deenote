@@ -1,6 +1,8 @@
 #nullable enable
 
+using CommunityToolkit.HighPerformance;
 using Deenote.Entities.Models;
+using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Core.GameStage
@@ -9,8 +11,6 @@ namespace Deenote.Core.GameStage
     {
         private int _nextHitBackgroundNoteIndex;
         private int _nextHitSoundNoteIndex;
-
-        // TODO:NExt在gpmanager调用，顺便需要在发生变动时更新上面两个变量
 
         private void UpdateNoteSoundsRelatively(bool forward, bool playSound)
         {
@@ -49,7 +49,7 @@ namespace Deenote.Core.GameStage
             for (int i = prevHitNoteIndex; i < _nextHitSoundNoteIndex; i++) {
                 if (chart.NoteNodes[i] is NoteModel note) {
                     _game.HitSoundPlayer.PlaySound(note.Kind);
-                    _game.PianoSoundPlayer.PlaySounds(note.Sounds);
+                    _game.PianoSoundPlayer.PlaySounds(note.Sounds.AsSpan());
                 }
             }
             for (int i = prevHitBackgroundNoteIndex; i < _nextHitBackgroundNoteIndex; i++) {

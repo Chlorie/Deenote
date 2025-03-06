@@ -36,10 +36,11 @@ namespace Deenote.Inputting
                 editor.PasteNotes();
 
             // Edit
-            if (UnityUtils.IsKeyDown(KeyCode.RightShift))
-                editor.Placer.Options |= StageNotePlacer.PlacementOptions.PlaceSlide;
-            if (UnityUtils.IsKeyUp(KeyCode.RightShift))
-                editor.Placer.Options &= ~StageNotePlacer.PlacementOptions.PlaceSlide;
+            if (UnityUtils.IsKeyDown(KeyCode.J)) {
+                editor.Placer.Options |= (StageNotePlacer.PlacementOptions.PlaceSlide | StageNotePlacer.PlacementOptions.PastingRememberPosition);
+            }
+            if (UnityUtils.IsKeyUp(KeyCode.J))
+                editor.Placer.Options &= ~(StageNotePlacer.PlacementOptions.PlaceSlide | StageNotePlacer.PlacementOptions.PastingRememberPosition);
 
             if (UnityUtils.IsKeyDown(KeyCode.G))
                 editor.Placer.SnapToPositionGrid = editor.Placer.SnapToTimeGrid = !(editor.Placer.SnapToPositionGrid && editor.Placer.SnapToTimeGrid);

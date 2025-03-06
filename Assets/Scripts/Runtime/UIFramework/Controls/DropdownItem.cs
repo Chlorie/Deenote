@@ -26,10 +26,10 @@ namespace Deenote.UIFramework.Controls
         internal void Initialize(int selfIndex, in Dropdown.Option option)
         {
             _selfIndex = selfIndex;
-            if (option.Sprite is null)
-                _button.Image.WithColorAlpha(0);
+            if (option.Sprite == null)
+                _button.Image.gameObject.SetActive(false);
             else {
-                _button.Image.WithColorAlpha(1);
+                _button.Image.gameObject.SetActive(true);
                 _button.Image.sprite = option.Sprite!;
             }
 

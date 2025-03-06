@@ -28,7 +28,7 @@ namespace Deenote.UIFramework
                     imggo.AddComponent<CanvasRenderer>();
                     var img = imggo.AddComponent<Image>();
                     img.color = Color.clear;
-                    img.rectTransform.parent = go.transform;
+                    img.rectTransform.SetParent(go.transform, false);
                     img.rectTransform.anchorMin = Vector2.zero;
                     img.rectTransform.anchorMax = Vector2.one;
                     img.rectTransform.offsetMin = Vector2.zero;

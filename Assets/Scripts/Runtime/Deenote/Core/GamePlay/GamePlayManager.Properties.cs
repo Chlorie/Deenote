@@ -30,6 +30,7 @@ namespace Deenote.Core.GamePlay
                 configs.Add("stage/sudden_plus", SuddenPlus);
                 configs.Add("stage/early_display_slow_notes", EarlyDisplaySlowNotes);
                 configs.Add("stage/ignore_note_speed_property", IgnoreNoteSpeed);
+                configs.Add("stage/pause_when_lose_focus", PauseWhenLoseFocus);
 
                 configs.Add("stage/music_speed", MusicSpeed);
                 configs.Add("stage/hitsound_volume", HitSoundVolume);
@@ -41,13 +42,14 @@ namespace Deenote.Core.GamePlay
                 HighlightedNoteSpeed = configs.GetSingle("stage/highlight_note_speed", 1f);
                 IsFilterNoteSpeed = configs.GetBoolean("stage/filter_note_speed", false);
 
-                NoteFallSpeed = configs.GetInt32("stage/note_speed", 50);
+                NoteFallSpeed = configs.GetInt32("stage/note_speed", 40);
                 IsShowLinkLines = configs.GetBoolean("stage/show_link_lines", true);
                 IsPianoNotesDistinguished = configs.GetBoolean("stage/piano_note_distinguish", true);
                 IsStageEffectOn = configs.GetBoolean("stage/sudden_plus", true);
                 SuddenPlus = configs.GetSingle("stage/sudden_plus", 0f);
                 EarlyDisplaySlowNotes = configs.GetBoolean("stage/early_display_slow_notes", false);
                 IgnoreNoteSpeed = configs.GetBoolean("stage/ignore_note_speed_property", false);
+                PauseWhenLoseFocus = configs.GetBoolean("stage/pause_when_lose_focus", true);
 
                 MusicSpeed = configs.GetInt32("stage/music_speed", 10);
                 HitSoundVolume = configs.GetSingle("stage/hitsound_volume", 0f);
@@ -112,6 +114,7 @@ namespace Deenote.Core.GamePlay
         private bool _isStageEffectOn_bf;
         private bool _earlyDisplayLowSpeedNotes_bf;
         private bool _ignoreNoteSpeed_bf;
+        private bool _pauseWhenLoseFocus_bf;
 
         /// <summary>
         /// Range [5, 95], display [0.5, 9.5]
@@ -251,6 +254,16 @@ namespace Deenote.Core.GamePlay
                     if (IsStageLoaded() && IsChartLoaded()) {
                         NotesManager.RefreshStageActiveNotes();
                     }
+                }
+            }
+        }
+
+        public bool PauseWhenLoseFocus
+        {
+            get => _pauseWhenLoseFocus_bf;
+            set {
+                if (Utils.SetField(ref _pauseWhenLoseFocus_bf, value)) {
+                    NotifyFlag(NotificationFlag.PauseWhenLoseFocus);
                 }
             }
         }

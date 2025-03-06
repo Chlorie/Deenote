@@ -50,7 +50,7 @@ namespace Deenote.Core.GamePlay
                     TimeGridLineKind.TempoLine => args.TempoLineColor,
                     _ => throw new System.NotImplementedException(),
                 };
-                var z = _game.ConvertNoteCoordTimeToWorldZ(time);
+                var z = _game.ConvertNoteCoordTimeToWorldZ(time, _editor.Placer.PlacingNoteSpeed);
                 collector.AddLine(new Vector2(minx, z), new Vector2(maxx, z), color, args.TimeGridWidth);
             }
         }
@@ -72,7 +72,7 @@ namespace Deenote.Core.GamePlay
             var tempoIndex = project.GetTempoIndex(currentTime);
             if (tempoIndex < 0)
                 tempoIndex = 0;
-            float appearTime = currentTime + _game.StageNoteAppearAheadTime;
+            float appearTime = currentTime + _game.GetStageNoteAppearAheadTime(_editor.Placer.PlacingNoteSpeed);
             float minSubBeatInterval = Tempo.MinBeatLineInterval / TimeGridSubBeatCount;
 
             for (; tempoIndex < project.Tempos.Length; tempoIndex++) {
@@ -167,7 +167,7 @@ namespace Deenote.Core.GamePlay
             return prevDelta <= nextDelta ? prevSubBeatTime : nextSubBeatTime;
         }
 
-        // TODO: Floor/CeilToNext...里有几个处理note与格线过近时的递归调用，疑似可以写成非递归，建议后续看看
+        // Optimize: Floor/CeilToNext...里有几个处理note与格线过近时的递归调用，疑似可以写成非递归，建议后续看看
 
         /// <returns><see langword="null"/> if given time is earlier than first tempo</returns>
         public float? FloorToNextNearestTimeGridTime(float time)

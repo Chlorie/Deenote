@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fbaba924affb6149a0186bf5674c3b4, type: 3}
   m_Name: Light
   m_EditorClassIdentifier: 
-  ThemeName: 
+  ThemeName: Light
   TextPrimaryColor: {r: 0, g: 0, b: 0, a: 0.89411765}
   TextSecondaryColor: {r: 0, g: 0, b: 0, a: 0.61960787}
   TextTertiaryColor: {r: 0, g: 0, b: 0, a: 0.44705883}

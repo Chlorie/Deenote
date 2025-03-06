@@ -62,7 +62,7 @@ namespace Deenote.Core.GamePlay
                     _ => throw new InvalidOperationException("Unknown curve kind"),
                 };
                 IsCurveOn = true;
-                UpdateCurveLine();
+                UpdateCurveLines();
             }
         }
 
@@ -113,14 +113,14 @@ namespace Deenote.Core.GamePlay
                 for (int i = 0; i < strip.Length; i++) {
                     var pos = _curveRenderPositions[i];
                     var x = _game.ConvertNoteCoordPositionToWorldX(pos.Position);
-                    var z = _game.ConvertNoteCoordTimeToWorldZ(pos.Time - _game.MusicPlayer.Time);
+                    var z = _game.ConvertNoteCoordTimeToWorldZ(pos.Time - _game.MusicPlayer.Time, _editor.Placer.PlacingNoteSpeed);
                     strip[i] = new Vector2(x, z);
                 }
                 collector.AddLineStrip(strip, args.CurveLineColor, args.CurveLineWidth);
             }
         }
 
-        private void UpdateCurveLine()
+        private void UpdateCurveLines()
         {
             if (!IsCurveOn)
                 return;
@@ -128,7 +128,7 @@ namespace Deenote.Core.GamePlay
                 return;
 
             var currentTime = _game.MusicPlayer.Time;
-            var stageMaxTime = _game.StageNoteAppearAheadTime;
+            var stageMaxTime = currentTime + _game.GetStageNoteActiveAheadTime(_editor.Placer.PlacingNoteSpeed);
 
             using var coords_so = _positionCurveData.GetRenderValues(currentTime, stageMaxTime);
             var coords = coords_so.Span;

@@ -165,10 +165,19 @@ namespace Deenote.UI.Views
 
                 MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector =>
                 {
-                    bool val = selector.SelectedNotes.Length > 1;
-                    _fillCurveButton.IsInteractable = val;
-                    _curveApplySizeButton.IsInteractable = val;
-                    _curveApplySpeedButton.IsInteractable = val;
+                    if (MainSystem.GamePlayManager.Grids.IsCurveOn) {
+                        _fillCurveButton.IsInteractable = _curveFillAmount > 0;
+                        var appliable = selector.SelectedNotes.Length > 0;
+                        _curveApplySizeButton.IsInteractable = appliable;
+                        _curveApplySpeedButton.IsInteractable = appliable;
+                    }
+                    else {
+                        var fillable = false; // selector.SelectedNotes.Length >= 2;
+                        _fillCurveButton.IsInteractable = fillable;
+                        var appliable = false; // selector.SelectedNotes.Length > 2;
+                        _curveApplySizeButton.IsInteractable = appliable;
+                        _curveApplySpeedButton.IsInteractable = appliable;
+                    }
                 };
             }
 
@@ -184,8 +193,12 @@ namespace Deenote.UI.Views
                 };
                 _bpmEndTimeInput.EditSubmitted += val =>
                 {
-                    if (float.TryParse(val, out var fval))
-                        _bpmEndTime = fval;
+                    if (float.TryParse(val, out var fval)) {
+                        if (MainSystem.ProjectManager.IsProjectLoaded())
+                            _bpmEndTime = Mathf.Min(fval, MainSystem.GamePlayManager.MusicPlayer.ClipLength);
+                        else
+                            _bpmEndTime = fval;
+                    }
                     SyncFloatInput(_bpmEndTimeInput, _bpmEndTime);
                 };
                 _bpmValueInput.EditSubmitted += val =>
@@ -194,7 +207,12 @@ namespace Deenote.UI.Views
                         _bpmValue = fval;
                     SyncFloatInput(_bpmValueInput, _bpmValue);
                 };
-                _bpmFillButton.Clicked += () => MainSystem.StageChartEditor.InsertTempo(new Entities.TempoRange(_bpmValue, _bpmStartTime, _bpmEndTime));
+                _bpmFillButton.Clicked += () =>
+                {
+                    MainSystem.ProjectManager.AssertProjectLoaded();
+                    var endTime = Mathf.Min(_bpmEndTime, MainSystem.GamePlayManager.MusicPlayer.ClipLength);
+                    MainSystem.StageChartEditor.InsertTempo(new Entities.TempoRange(_bpmValue, _bpmStartTime, _bpmEndTime));
+                };
 
                 MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector =>
                 {
@@ -218,6 +236,14 @@ namespace Deenote.UI.Views
                     _bpmValue = 60f / interval;
                     SyncFloatInput(_bpmValueInput, _bpmValue);
                 };
+
+                MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                    GamePlayManager.NotificationFlag.CurrentChart,
+                    manager =>
+                    {
+                        var chartLoaded = manager.IsChartLoaded();
+                        _bpmFillButton.IsInteractable = chartLoaded;
+                    });
             }
         }
     }

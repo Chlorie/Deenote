@@ -3,6 +3,7 @@
 using CommunityToolkit.HighPerformance.Buffers;
 using Deenote.Entities.Models;
 using Deenote.Library;
+using Deenote.Library.Collections;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,12 +46,12 @@ namespace Deenote.Entities.Storage
             };
 
             var chartCount = reader.ReadInt32();
-            proj.Charts.Capacity = chartCount;
+            proj.Charts.EnsureCapacity(chartCount);
             for (int i = 0; i < chartCount; i++)
                 proj.Charts.Add(ReadChart(reader));
 
             var tempoCount = reader.ReadInt32();
-            proj._tempos.Capacity = tempoCount;
+            proj._tempos.EnsureCapacity(tempoCount);
             for (int i = 0; i < tempoCount; i++)
                 proj._tempos.Add(reader.Read<Tempo>());
 
@@ -67,20 +68,18 @@ namespace Deenote.Entities.Storage
             writer.Write(chart.RemapMinVolume);
             writer.Write(chart.RemapMaxVolume);
 
-            writer.Write(chart._holdCount);
+            //writer.Write(chart._holdCount); // Not required
 
-            using var dp_linkNotes = DictionaryPool<NoteModel, int>.Get(out var linkNotes);
+            using var dp_linkNotes = DictionaryPool<NoteModel, int>.Get(out var linkNotesLookup);
             int noteIndex = 0;
-            foreach (var node in chart.NoteNodes) {
-                if (node is not NoteModel note)
-                    continue;
+            foreach (var note in chart.EnumerateNoteModels()) {
                 if (note.NextLink is not null)
-                    linkNotes.Add(note, noteIndex);
+                    linkNotesLookup.Add(note, noteIndex);
                 noteIndex++;
             }
-            writer.Write(noteIndex);
+            writer.Write(noteIndex); // noteModelCount
             foreach (var note in chart.EnumerateNoteModels()) {
-                WriteNote(writer, note, linkNotes);
+                WriteNote(writer, note, linkNotesLookup);
             }
 
             writer.Write(chart.BackgroundNotes.Length);
@@ -115,6 +114,7 @@ namespace Deenote.Entities.Storage
                 Level = level,
             };
 
+
             var noteCount = reader.ReadInt32();
             using var so_notes = SpanOwner<NoteModel>.Allocate(noteCount);
             var notes = so_notes.Span;
@@ -122,7 +122,7 @@ namespace Deenote.Entities.Storage
             for (int i = 0; i < notes.Length; i++) {
                 notes[index++] = ReadNote(reader, notes);
             }
-            ChartModel.Marshal.ResetNotes(chart, notes);
+            ChartModel.Marshal.SetNoteModels(chart, notes);
 
             var soundCount = reader.ReadInt32();
             chart._backgroundNotes.Capacity = soundCount;
@@ -153,7 +153,7 @@ namespace Deenote.Entities.Storage
             writer.Write(note.Duration);
             writer.Write(note.Kind);
             writer.Write(note.Speed);
-            writer.Write(note.Sounds.Length);
+            writer.Write(note.Sounds.Count);
             foreach (var sound in note.Sounds)
                 WriteSound(writer, sound);
             writer.Write(note.Shift);
@@ -176,9 +176,9 @@ namespace Deenote.Entities.Storage
             note.Kind = reader.Read<NoteModel.NoteKind>();
             note.Speed = reader.ReadSingle();
             var soundsLen = reader.ReadInt32();
-            note._sounds.Capacity = soundsLen;
+            note.Sounds.Capacity = soundsLen;
             for (int i = 0; i < soundsLen; i++)
-                note._sounds.Add(ReadSound(reader));
+                note.Sounds.Add(ReadSound(reader));
             note.Shift = reader.ReadSingle();
             note.EventId = reader.ReadString();
             note.WarningType = reader.Read<WarningType>();
@@ -210,9 +210,9 @@ namespace Deenote.Entities.Storage
             var time = reader.ReadSingle();
             var len = reader.ReadInt32();
             note.Time = time;
-            note._sounds.Capacity = len;
+            note.Sounds.Capacity = len;
             for (var i = 0; i < len; i++)
-                note._sounds.Add(ReadSound(reader));
+                note.Sounds.Add(ReadSound(reader));
             return new SoundNoteModel(note);
         }
 

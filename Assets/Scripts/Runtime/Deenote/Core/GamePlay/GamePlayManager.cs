@@ -18,8 +18,6 @@ namespace Deenote.Core.GamePlay
 {
     public sealed partial class GamePlayManager : FlagNotifiableMonoBehaviour<GamePlayManager, GamePlayManager.NotificationFlag>
     {
-        private PerspectiveViewForegroundBase _perspectiveViewForegroundPrefab = default!;
-
         private NotesManager _notesManager = default!;
         private GridsManager _gridsManager = default!;
         [SerializeField] GameMusicPlayer _musicPlayer = default!;
@@ -70,7 +68,7 @@ namespace Deenote.Core.GamePlay
 
         private void Awake()
         {
-            _gridsManager = new GridsManager(this);
+            _gridsManager = new GridsManager(this, MainSystem.StageChartEditor);
             _pianoSoundPlayer = new StagePianoSoundPlayer(MainSystem.PianoSoundSource);
             _notesManager = new NotesManager(this);
 
@@ -78,8 +76,6 @@ namespace Deenote.Core.GamePlay
 
             GameStageSceneLoader.StageLoaded += loader =>
             {
-                _perspectiveViewForegroundPrefab = loader.PerspectiveViewForeground;
-
                 Stage = loader.StageController;
                 Stage.OnInstantiate(this);
                 NotesManager.Initialize(
@@ -98,6 +94,9 @@ namespace Deenote.Core.GamePlay
 
             MusicPlayer.TimeChanged += args =>
             {
+                if (!IsChartLoaded())
+                    return;
+
                 var forward = args.NewTime > args.OldTime;
                 NotesManager.ShiftStageActiveNotes(!args.IsByJump && _manualPlaySpeedMultiplier is null);
                 NotifyFlag(NotificationFlag.ActiveNoteUpdated);
@@ -142,25 +141,19 @@ namespace Deenote.Core.GamePlay
             _gridsManager.Dispose();
         }
 
-        private void Start()
-        {
-            // TODO: Fake
-            NoteFallSpeed = 10;
-            IsPianoNotesDistinguished = true;
-            IsStageEffectOn = true;
-
-            MusicSpeed = 10;
-
-            Grids.TimeGridSubBeatCount = 1;
-            Grids.PositionGridCount = 9;
-        }
-
         private void Update()
         {
-            if (CurrentChart is null)
+            if (!IsChartLoaded())
                 return;
             if (!MusicPlayer.IsPlaying && _manualPlaySpeedMultiplier is { } manuallPlaySpeed)
                 MusicPlayer.Nudge(Time.deltaTime * manuallPlaySpeed);
+        }
+
+        private void OnApplicationFocus(bool focus)
+        {
+            if (!focus && PauseWhenLoseFocus) {
+                MusicPlayer.Stop();
+            }
         }
 
         public void UpdateNotes(bool noteCollectionChangedOrNoteTimeRelatedPropertyChanged, bool notesVisualDataChanged)
@@ -278,6 +271,8 @@ namespace Deenote.Core.GamePlay
             StageEffectOn,
             DistinguishPianoNotes,
             EarlyDisplaySlowNotes,
+            PauseWhenLoseFocus,
+
             ActiveNoteUpdated,
 
             CurrentChart,

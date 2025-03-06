@@ -2,8 +2,8 @@
 
 using CommunityToolkit.Diagnostics;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using Trarizon.Library.Collections;
 using UnityEngine.Pool;
 
 namespace Deenote.Entities.Models
@@ -23,7 +23,8 @@ namespace Deenote.Entities.Models
 
         public NoteKind Kind { get => _kind; set => _kind = value; }
         public float Speed { get => _speed; set => _speed = value; }
-        public ReadOnlySpan<PianoSoundValueModel> Sounds => _sounds.AsSpan();
+
+        public List<PianoSoundValueModel> Sounds => _sounds;
 
         public float Shift { get => _shift; set => _shift = value; }
         public string EventId { get => _eventId; set => _eventId = value; }
@@ -57,7 +58,7 @@ namespace Deenote.Entities.Models
 
         public bool IsHold => Kind is not NoteKind.Swipe && Duration > 0f;
 
-        public bool HasSounds => _sounds.Count > 0;
+        public bool HasSounds => Sounds.Count > 0;
 
         public float EndTime => Time + GetActualDuration();
 
@@ -166,10 +167,10 @@ namespace Deenote.Entities.Models
 
             for (int i = 1; i < notes.Length; i++) {
                 var sounds = notes[i].Sounds;
-                if (first.Length != sounds.Length)
+                if (first.Count != sounds.Count)
                     return false;
 
-                for (int j = 0; j < sounds.Length; j++) {
+                for (int j = 0; j < sounds.Count; j++) {
                     if (first[j] != sounds[j])
                         return false;
                 }

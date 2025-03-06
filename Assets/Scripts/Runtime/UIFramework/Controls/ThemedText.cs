@@ -14,7 +14,7 @@ namespace Deenote.UIFramework.Controls
         protected override void OnThemeChanged(UIThemeArgs args)
         {
             if (_color is not UIThemeColor.None)
-                _text.color = UISystem.CurrentTheme.GetColor(_color);
+                _text.color = args.GetColor(_color);
 
         }
 

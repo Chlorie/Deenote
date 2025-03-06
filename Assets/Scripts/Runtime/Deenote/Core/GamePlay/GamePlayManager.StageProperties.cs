@@ -30,8 +30,8 @@ namespace Deenote.Core.GamePlay
         public float ConvertWorldXToNoteCoordPosition(float x)
             => x / (Stage!.Args.NotePanelWidth / EntityArgs.StageMaxPositionWidth);
 
-        public float ConvertWorldZToNoteCoordTime(float z)
-            => z / Stage!.Args.NoteTimeToZBaseMultiplier / ActualNoteFallSpeed;
+        public float ConvertWorldZToNoteCoordTime(float z, float noteSpeed = 1f)
+            => ConvertWorldZToNoteCoordTimeBase(z) / ActualNoteFallSpeed / noteSpeed;
 
         public float ConvertNoteCoordPositionToWorldX(float position)
             => position * (Stage!.Args.NotePanelWidth / EntityArgs.StageMaxPositionWidth);
@@ -45,7 +45,7 @@ namespace Deenote.Core.GamePlay
         public (float X, float Z) ConvertNoteCoordToWorldPosition(NoteCoord coord, float noteSpeed = 1f)
             => (ConvertNoteCoordPositionToWorldX(coord.Position), ConvertNoteCoordTimeToWorldZ(coord.Time, noteSpeed));
 
-        public bool TryConvertPerspectiveViewportPointToNoteCoord(Vector2 perspectiveViewPanelViewportPoint, out NoteCoord coord)
+        public bool TryConvertPerspectiveViewportPointToNoteCoord(Vector2 perspectiveViewPanelViewportPoint, float noteSpeed, out NoteCoord coord)
         {
             AssertStageLoaded();
 
@@ -57,7 +57,7 @@ namespace Deenote.Core.GamePlay
             if (Stage.TryConvertPerspectiveViewPointToNotePanelPosition(perspectiveViewPanelViewportPoint, out var notePanelPosition)) {
                 coord = new NoteCoord(
                     ConvertWorldXToNoteCoordPosition(notePanelPosition.X),
-                    ConvertWorldZToNoteCoordTime(notePanelPosition.Z) + MusicPlayer.Time);
+                    ConvertWorldZToNoteCoordTime(notePanelPosition.Z, noteSpeed) + MusicPlayer.Time);
                 return true;
             }
 
@@ -69,6 +69,9 @@ namespace Deenote.Core.GamePlay
 
         private float ConvertNoteCoordTimeToWorldZBase(float time)
             => time * Stage!.Args.NoteTimeToZBaseMultiplier;
+
+        private float ConvertWorldZToNoteCoordTimeBase(float z)
+            => z / Stage!.Args.NoteTimeToZBaseMultiplier;
 
         #endregion
     }

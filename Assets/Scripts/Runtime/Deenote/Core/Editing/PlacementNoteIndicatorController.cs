@@ -17,29 +17,29 @@ namespace Deenote.Core.Editing
         private StageNotePlacer _placer = default!;
 
         private (Vector2 Start, Vector2 Offset)? _linkLine;
-        private NoteModel _notePrototype = default!;
+        private NoteModel _note = default!;
 
-        public NoteModel NotePrototype => _notePrototype;
+        public NoteModel NotePrototype => _note;
 
         internal void OnInstantiate(StageNotePlacer placer)
         {
             _placer = placer;
+
+            _note = new();
 
             var game = _placer._editor._game;
             game.AssertStageLoaded();
             game.Stage.PerspectiveLinesRenderer.LineCollecting += _OnPerspectiveLineCollecting;
         }
 
-        internal void Initialize(NoteModel note)
+        internal void Refresh()
         {
-            _notePrototype = note;
-
             _placer._editor._game.AssertStageLoaded();
 
             var game = _placer._editor._game;
             var stage = _placer._editor._game.Stage;
             var args = stage.Args;
-            var prefab = note switch {
+            var prefab = _note switch {
                 { Kind: NoteModel.NoteKind.Swipe } => args.SwipeNoteSpritePrefab,
                 { Kind: NoteModel.NoteKind.Slide } => args.SlideNoteSpritePrefab,
                 { HasSounds: true } => args.BlackNoteSpritePrefab,
@@ -49,26 +49,32 @@ namespace Deenote.Core.Editing
             };
 
             _noteSpriteRenderer.sprite = prefab.Sprite;
-            _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(note.Size, 1f, 1f) * prefab.Scale;
+            _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(_note.Size, 1f, 1f) * prefab.Scale;
 
-            if (note.NextLink is not null) {
-                var (tox, toz) = game.ConvertNoteCoordToWorldPosition(note.NextLink.PositionCoord - note.PositionCoord);
+            if (_note.NextLink is not null) {
+                var (tox, toz) = game.ConvertNoteCoordToWorldPosition(_note.NextLink.PositionCoord - _note.PositionCoord);
                 _linkLine = (Vector2.zero, new Vector2(tox, toz));
             }
             else {
                 _linkLine = null;
             }
 
-            if (note.IsHold) {
+            if (_note.IsHold) {
                 ref readonly var holdprefab = ref stage.Args.HoldSpritePrefab;
                 _holdBodySpriteRender.gameObject.SetActive(true);
                 _holdBodySpriteRender.transform.WithLocalScaleXY(
-                    note.Size * holdprefab.ScaleX,
-                    game.ConvertNoteCoordTimeToHoldScaleY(note.Duration));
+                    _note.Size * holdprefab.ScaleX,
+                    game.ConvertNoteCoordTimeToHoldScaleY(_note.Duration, _note.Speed));
             }
             else {
                 _holdBodySpriteRender.gameObject.SetActive(false);
             }
+        }
+
+        internal void Initialize(NoteModel note)
+        {
+            _note = note;
+            Refresh();
         }
 
         private void OnDestroy()
@@ -100,7 +106,7 @@ namespace Deenote.Core.Editing
             _placer._editor._game.AssertStageLoaded();
 
             var localCoord = coord - new NoteCoord(position: 0, time: _placer._editor._game.MusicPlayer.Time);
-            var (x, z) = _placer._editor._game.ConvertNoteCoordToWorldPosition(localCoord);
+            var (x, z) = _placer._editor._game.ConvertNoteCoordToWorldPosition(localCoord, _note.Speed);
             transform.WithLocalPositionXZ(x, z);
         }
     }

@@ -29,15 +29,14 @@ namespace Deenote.UIFramework.Controls
                 && IsInteractable;
         }
 
-        protected void DoVisualTransition() => DoVisualTransition();
+        protected void DoVisualTransition() => DoVisualTransition(UISystem.CurrentTheme);
 
         protected abstract void DoVisualTransition(UIThemeArgs args);
 
-        protected override void OnThemeChanged(UIThemeArgs args) { }
-
-        /// <summary>
-        /// Invoke when awake or Theme changed
-        /// </summary>
+        protected override void OnThemeChanged(UIThemeArgs args)
+        {
+            DoVisualTransition(args);
+        }
 
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
         {
@@ -54,7 +53,6 @@ namespace Deenote.UIFramework.Controls
         protected override void Awake()
         {
             base.Awake();
-            DoVisualTransition();
         }
 
         protected virtual void OnEnable()

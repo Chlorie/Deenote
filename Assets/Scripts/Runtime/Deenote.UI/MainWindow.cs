@@ -69,7 +69,6 @@ namespace Deenote.UI
 #else
             _instance = instance;
 #endif
-            _settings = new();
             _pianoSoundPlayer = new(MainSystem.PianoSoundSource);
 
             ApplicationManager.Quitting += args =>

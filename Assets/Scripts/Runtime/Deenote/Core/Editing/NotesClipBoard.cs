@@ -25,7 +25,7 @@ namespace Deenote.Core.Editing
         {
             using (var resetter = _notes.Resetting(notes.Length)) {
                 foreach (var note in notes) {
-                    _notes.Add(out var cnote);
+                    resetter.Add(out var cnote);
                     note.CloneDataTo(cnote);
                 }
             }

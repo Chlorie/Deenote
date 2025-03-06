@@ -141,6 +141,7 @@ Dialog_PreferencesGameStageEffect_Label=Stage Effect
 Dialog_PreferencesMouseSensitivity_Label=Mouse Scroll Sensitivity
 Dialog_PreferencesMouseSensitivityInvert_Button=Invert
 Dialog_PreferencesDistinguishPianoNotes_Label=Distinguish Piano Notes
+Dialog_PreferencesPauseGamePlayWhenLoseFocus_Label=Pause Game Play When Lose Focus
 Dialog_PreferencesSystem_Header=System
 Dialog_PreferencesVSync_Label=VSync
 Dialog_PreferencesLanguage_Label=Language
@@ -150,6 +151,7 @@ Dialog_PreferencesAutoSaveOn_Option=On
 Dialog_PreferencesAutoSaveOnAndSaveJson_Option=On And Save Json
 Dialog_PreferencesEmbedProjectAudio_Label=Embed Audio Data In Project
 Dialog_PreferencesUI_Header=UI
+Dialog_PreferencesTheme_Label=Theme
 Dialog_PreferencesShowFps_Label=Show FPS
 Dialog_PreferencesShowIneffectiveProp_Label=Show Ineffective Properties
 
@@ -205,8 +207,12 @@ NewProject_FileExplorer_SelectDirectory_Title=Select directory.
 
 NewProjectOnOpen_MsgBox_Content="""
     Current project will be closed when you start a new project.
-    <color=#ff5555>Make sure that you have SAVED your project!</color>
     """
+NewProjectOnUnsavedOpen_MsgBox_Content="""
+    Thr current project has unsaved changes,
+    <color=#ff5555>your changes will be lost</color> when you start a new project.
+    """
+
 NewProjectOnOpen_MsgBox_Y=Create
 NewProjectOnOpen_MsgBox_N=Cancel
 
@@ -226,7 +232,10 @@ OpenProject_FileExplorer_Title=Open project.
 
 OpenProjectOnOpen_MsgBox_Content="""
     Current project will be closed when you start a new project.
-    <color=#ff5555>Make sure that you have SAVED your project!</color>
+    """
+OpenProjectOnUnsavedOpen_MsgBox_Content="""
+    The current project has unsaved changes,
+    <color=#ff5555>your changes will be lost</color> when you start a new project.
     """
 OpenProjectOnOpen_MsgBox_Y=Open
 OpenProjectOnOpen_MsgBox_N=Cancel

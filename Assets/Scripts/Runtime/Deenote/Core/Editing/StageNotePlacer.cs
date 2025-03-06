@@ -8,6 +8,7 @@ using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Deenote.Core.Editing
 {
@@ -33,9 +34,10 @@ namespace Deenote.Core.Editing
 
         private Transform _indicatorPanelTransform = default!;
         private PooledObjectListView<PlacementNoteIndicatorController> _indicators;
+        private PooledObjectListView<NoteModel> _notePrototypes;
 
         // Placement
-        private NoteModel _placeNotePrototype = default!;
+        //private NoteModel _placeNotePrototype = default!;
         private Vector2 _freezeMouseScreenPosition;
         private Vector2 _placingMouseScreenPosition;
         private NoteCoord _freezeNoteCoord;
@@ -49,7 +51,11 @@ namespace Deenote.Core.Editing
         private PlacementOptions _options_bf;
         private bool _isIndicatorOn_bf;
         private bool _snapToPositionGrid_bf;
-        private bool _snapToTimeGrid;
+        private bool _snapToTimeGrid_bf;
+        /// <summary>
+        /// Access use <see cref="PlacingNoteSpeed"/>, use <see cref="GamePlayManager.HighlightedNoteSpeed"/> when null
+        /// </summary>
+        private float? _placingNoteSpeed;
 
         public bool IsPlacing => _state is PlacementState.Placing or PlacementState.PlacingLinks;
 
@@ -63,13 +69,13 @@ namespace Deenote.Core.Editing
                     if (diff.HasFlag(PlacementOptions.PlaceSlide)) {
                         switch (_state) {
                             case PlacementState.Idle or PlacementState.Placing:
-                                Debug.Assert(_indicators.Count == 1);
-                                _placeNotePrototype.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
-                                _indicators[0].Initialize(_placeNotePrototype);
+                                Debug.Assert(_notePrototypes.Count == 1);
+                                _notePrototypes[0].Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
+                                RefreshIndicators();
                                 break;
                             case PlacementState.PlacingLinks:
                                 break;
-                            case PlacementState.PlacingMultiple:
+                            case PlacementState.Pasting:
                                 break;
                             default:
                                 break;
@@ -86,10 +92,7 @@ namespace Deenote.Core.Editing
             get => _isIndicatorOn_bf;
             set {
                 if (Utils.SetField(ref _isIndicatorOn_bf, value)) {
-                    if (value)
-                        RefreshIndicators();
-                    else
-                        _indicators.Clear();
+                    SetIndicatorsVisibility(value);
                     NotifyFlag(NotificationFlag.IsIndicatorOn);
                 }
             }
@@ -107,36 +110,73 @@ namespace Deenote.Core.Editing
 
         public bool SnapToTimeGrid
         {
-            get => _snapToTimeGrid;
+            get => _snapToTimeGrid_bf;
             set {
-                if (Utils.SetField(ref _snapToTimeGrid, value)) {
+                if (Utils.SetField(ref _snapToTimeGrid_bf, value)) {
                     NotifyFlag(NotificationFlag.SnapToTimeGrid);
+                }
+            }
+        }
+
+        public float PlacingNoteSpeed
+        {
+            get => _placingNoteSpeed ?? _editor._game.HighlightedNoteSpeed;
+        }
+
+        private void SetPlacingNoteSpeed(float? value, bool forceUpdate = false)
+        {
+            if (Utils.SetField(ref _placingNoteSpeed, value)) {
+                SetIndicatorsNoteSpeed();
+                NotifyFlag(NotificationFlag.PlacingNoteSpeed);
+            }
+            else if (forceUpdate) {
+                SetIndicatorsNoteSpeed();
+                NotifyFlag(NotificationFlag.PlacingNoteSpeed);
+            }
+
+            void SetIndicatorsNoteSpeed()
+            {
+                if (_state is not PlacementState.Pasting) {
+                    var speed = PlacingNoteSpeed;
+                    if (!_indicators.IsNull) {
+                        foreach (var indicator in _indicators) {
+                            indicator.NotePrototype.Speed = speed;
+                            indicator.Refresh();
+                        }
+                    }
                 }
             }
         }
 
         internal StageNotePlacer(StageChartEditor editor)
         {
-            _placeNotePrototype = new NoteModel();
             _editor = editor;
-            
+            _notePrototypes = new PooledObjectListView<NoteModel>(
+                new ObjectPool<NoteModel>(() => new NoteModel()));
+            _notePrototypes.Add(out _);
+
             _editor._game.RegisterNotification(
                 GamePlayManager.NotificationFlag.CurrentChart,
-                manager =>
-                {
-                    CancelPlaceNote();
-                });
+                manager => CancelPlaceNote());
+            _editor._game.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.HighlightedNoteSpeed,
+                manager => SetPlacingNoteSpeed(null, forceUpdate: true));
             _editor._game.StageLoaded += args =>
             {
-                    _indicatorPanelTransform = args.Stage.NoteIndicatorPanelTransform;
-                    _indicators = new(UnityUtils.CreateObjectPool(args.Stage.Args.PlacementNoteIndicatorPrefab,
-                        _indicatorPanelTransform,
-                        item =>
-                        {
-                            item.OnInstantiate(this);
-                        }));
-                    RefreshIndicators();
+                _indicatorPanelTransform = args.Stage.NoteIndicatorPanelTransform;
+                _indicators.Clear();
 
+                var indicators = new PooledObjectListView<PlacementNoteIndicatorController>(
+                    UnityUtils.CreateObjectPool(args.Stage.Args.PlacementNoteIndicatorPrefab,
+                        _indicatorPanelTransform,
+                        item => item.OnInstantiate(this)));
+
+                foreach (var note in _notePrototypes) {
+                    indicators.Add(out var indicator);
+                    indicator.Initialize(note);
+                }
+
+                _indicators = indicators;
             };
             _editor._game.MusicPlayer.TimeChanged += args =>
             {
@@ -146,14 +186,7 @@ namespace Deenote.Core.Editing
             };
         }
 
-        internal void Unity_Start()
-        {
-            // TODO: Temp
-            SnapToPositionGrid = SnapToTimeGrid = true;
-            IsIndicatorOn = true;
-        }
-
-        public NoteModel ClonePlaceNotePrototype() => _placeNotePrototype.Clone();
+        public NoteModel ClonePlaceNotePrototype() => _notePrototypes[0].Clone();
 
         #region Mouse Place
 
@@ -167,14 +200,14 @@ namespace Deenote.Core.Editing
                 case PlacementState.PlacingLinks:
                     CancelPlaceNote();
                     break;
-                case PlacementState.PlacingMultiple:
+                case PlacementState.Pasting:
                     return;
                 case PlacementState.Idle or _:
                     break;
             }
 
             // When pasting, we needn't change the note type when mouse dragging
-            if (_state is PlacementState.PlacingMultiple)
+            if (_state is PlacementState.Pasting)
                 return;
 
             _freezeMouseScreenPosition = mouseScreenPosition;
@@ -196,31 +229,37 @@ namespace Deenote.Core.Editing
             _placingMouseScreenPosition = mouseScreenPosition;
             _placingNoteCoord = coord;
 
-            if (!IsIndicatorOn)
-                return;
-
-            _indicatorPanelTransform.gameObject.SetActive(true);
             switch (_state) {
                 case PlacementState.Placing:
+                    SetIndicatorsVisibility(true);
                     ChangePlacingNoteKind();
                     break;
                 case PlacementState.PlacingLinks:
+                    SetIndicatorsVisibility(true);
                     DragLink();
                     break;
-                case PlacementState.PlacingMultiple when IsInPlacementArea(coord):
+                case PlacementState.Pasting when IsInPlacementArea(coord):
+                    SetIndicatorsVisibility(true);
                     MoveCopied();
                     break;
                 case PlacementState.Idle when IsInPlacementArea(coord):
+                    SetIndicatorsVisibility(true);
                     MoveIndicator();
                     break;
                 default:
-                    HideIndicators();
+                    SetIndicatorsVisibility(false);
                     break;
             }
 
             void ChangePlacingNoteKind()
             {
+                Debug.Assert(_notePrototypes.Count == 1);
                 Debug.Assert(_indicators.Count == 1);
+
+                var note = _notePrototypes[0];
+                var indicator = _indicators[0];
+                Debug.Assert(indicator.NotePrototype == note);
+
                 var delta = MathUtils.Abs(_placingMouseScreenPosition - _freezeMouseScreenPosition);
                 // Draw swipe note when the angle between mouse movement direction
                 // and horizontal line is within 30 degree
@@ -228,36 +267,32 @@ namespace Deenote.Core.Editing
 
                 // Swipe
                 if (delta.x >= SwipeHorizontalDragDeltaThreshold && delta.x > delta.y) {
-                    _placeNotePrototype.Kind = NoteModel.NoteKind.Swipe;
-                    _placeNotePrototype.Duration = 0f;
-                    var indicator = _indicators[0];
-                    indicator.Initialize(_placeNotePrototype);
+                    note.Kind = NoteModel.NoteKind.Swipe;
+                    note.Duration = 0f;
+                    indicator.Refresh();
                     // Indicator may be moved if create hold by dragging down
                     indicator.MoveTo(_freezeNoteCoord);
                 }
                 // Hold
                 else if (delta.y >= HoldVerticalDragDeltaThreshold) {
-                    _placeNotePrototype.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
+                    note.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
                     var dragEndCoordTime = _editor._game.Grids.Quantize(coord, false, SnapToTimeGrid).Time;
                     if (dragEndCoordTime >= _freezeNoteCoord.Time) {
-                        _placeNotePrototype.Duration = dragEndCoordTime - _freezeNoteCoord.Time;
-                        var indicator = _indicators[0];
-                        indicator.Initialize(_placeNotePrototype);
+                        note.Duration = dragEndCoordTime - _freezeNoteCoord.Time;
+                        indicator.Refresh();
                         indicator.MoveTo(_freezeNoteCoord);
                     }
                     else {
-                        _placeNotePrototype.Duration = _freezeNoteCoord.Time - dragEndCoordTime;
-                        var indicator = _indicators[0];
-                        indicator.Initialize(_placeNotePrototype);
+                        note.Duration = _freezeNoteCoord.Time - dragEndCoordTime;
+                        indicator.Refresh();
                         indicator.MoveTo(_freezeNoteCoord with { Time = dragEndCoordTime });
                     }
                 }
                 // Click
                 else {
-                    _placeNotePrototype.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
-                    _placeNotePrototype.Duration = 0f;
-                    var indicator = _indicators[0];
-                    indicator.Initialize(_placeNotePrototype);
+                    note.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
+                    note.Duration = 0f;
+                    indicator.Refresh();
                     indicator.MoveTo(_freezeNoteCoord);
                 }
             }
@@ -271,6 +306,7 @@ namespace Deenote.Core.Editing
                 if (currentCoordTime > startCoordTime) {
                     if (prevCoordTime < startCoordTime) {
                         // If mouse is below the base note at prev frame, remove all extra notes
+                        _notePrototypes.RemoveRange(..^1);
                         _indicators.RemoveRange(..^1);
                         prevCoordTime = startCoordTime;
                     }
@@ -281,6 +317,7 @@ namespace Deenote.Core.Editing
                 }
                 else if (currentCoordTime < startCoordTime) {
                     if (prevCoordTime > startCoordTime) {
+                        _notePrototypes.RemoveRange(1..);
                         _indicators.RemoveRange(1..);
                         prevCoordTime = startCoordTime;
                     }
@@ -294,13 +331,13 @@ namespace Deenote.Core.Editing
                 void AtUpMoveUp()
                 {
                     float compareTime = prevCoordTime;
-                    // Optimize
                     while (true) {
-                        //                          TODO: It could be more clear if we have FloorToNearest(currentCoordTime)
+                        // Optimize: It could be more clear if we have FloorToNearest(currentCoordTime)
                         var nGridTime = _editor._game.Grids.CeilToNextNearestTimeGridTime(compareTime);
                         if (nGridTime is not { } gridTime)
                             return;
                         if (currentCoordTime >= gridTime) {
+                            // TODO: _notePrototype修改
                             _indicators.Add(out var newIndicator);
                             InitIndicator(newIndicator, gridTime);
                             LinkNotes(_indicators[^1].NotePrototype, _indicators[^1].NotePrototype);
@@ -366,16 +403,17 @@ namespace Deenote.Core.Editing
 
                 void InitIndicator(PlacementNoteIndicatorController indicator, float gridTime)
                 {
-                    // Optimize, Here creates a lot ot NoteModel instance, considering use a pool
-                    var cloneNotePrototype = _placeNotePrototype.Clone();
+                    var note = indicator.NotePrototype;
+                    _indicators[0].NotePrototype.CloneDataTo(note);
                     var cloneCoord = new NoteCoord(
                         MathUtils.MapTo(gridTime, prevCoordTime, currentCoordTime, _linkDragPrevCoord.Position, coord.Position),
                         gridTime);
                     cloneCoord = _editor._game.Grids.Quantize(cloneCoord, SnapToPositionGrid, false); // Time already snapped
-                    indicator.MoveTo(cloneCoord);
                     // Indicator.NotePrototype's coord is relative to _indicators[0]
-                    cloneNotePrototype.PositionCoord = cloneCoord;
-                    indicator.Initialize(cloneNotePrototype);
+                    note.PositionCoord = cloneCoord;
+
+                    indicator.Refresh();
+                    indicator.MoveTo(cloneCoord);
                 }
 
                 void LinkNotes(NoteModel prev, NoteModel next)
@@ -395,19 +433,22 @@ namespace Deenote.Core.Editing
                 }
 
                 Debug.Assert(_indicators.Count == _editor.ClipBoard.Notes.Length);
-                var baseCoord = coord - _editor.ClipBoard.BaseCoord;
-                for (int i = 0; i < _indicators.Count; i++) {
-                    var indicator = _indicators[i];
-                    var note = _editor.ClipBoard.Notes[i];
-                    indicator.MoveTo(NoteCoord.ClampPosition(baseCoord + note.PositionCoord));
-                }
+
+                MoveIndicatorsTo(coord);
+
+                //var baseCoord = coord - _editor.ClipBoard.BaseCoord;
+                //for (int i = 0; i < _indicators.Count; i++) {
+                //    var indicator = _indicators[i];
+                //    var note = _editor.ClipBoard.Notes[i];
+                //    indicator.MoveTo(NoteCoord.ClampPosition(coord + note.PositionCoord));
+                //}
             }
 
             void MoveIndicator()
             {
                 Debug.Assert(_indicators.Count == 1);
                 var moveCoord = _editor._game.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
-                _indicators[0].MoveTo(moveCoord);
+                MoveIndicatorsTo(moveCoord);
             }
         }
 
@@ -417,11 +458,18 @@ namespace Deenote.Core.Editing
                 return;
 
             switch (_state) {
-                case PlacementState.Placing: PlaceNote(); break;
-                case PlacementState.PlacingLinks: PlaceLink(); break;
-                case PlacementState.PlacingMultiple: PasteNotes(); break;
+                case PlacementState.Placing:
+                    PlaceNote();
+                    break;
+                case PlacementState.PlacingLinks:
+                    PlaceLink();
+                    break;
+                case PlacementState.Pasting:
+                    PasteNotes();
+                    break;
                 // Already cancelled
-                case PlacementState.Idle or _: return;
+                case PlacementState.Idle or _:
+                    return;
             }
 
             CancelPlaceNote(); // Reset states
@@ -430,31 +478,27 @@ namespace Deenote.Core.Editing
 
             void PlaceNote()
             {
+                Debug.Assert(_notePrototypes.Count == 1);
                 Debug.Assert(_indicators.Count == 1);
-                Debug.Assert(_indicators[0].NotePrototype == _placeNotePrototype);
+                Debug.Assert(_indicators[0].NotePrototype == _notePrototypes[0]);
 
+                var note = _notePrototypes[0];
                 NoteCoord placeCoord;
-                if (_placeNotePrototype.IsHold && coord.Time < _freezeNoteCoord.Time)
+                if (note.IsHold && coord.Time < _freezeNoteCoord.Time)
                     // If placing hold by dragging down, the actual time of hold is the end coord's time
                     placeCoord = _freezeNoteCoord with { Time = coord.Time };
                 else
                     placeCoord = _freezeNoteCoord;
-                // TODO: indicator应该是一直在修改note 的位置，只要isindicatorOn，或许这句话多余
-                placeCoord = _editor._game.Grids.Quantize(placeCoord, SnapToPositionGrid, SnapToTimeGrid);
-                _editor.AddNote(placeCoord, _placeNotePrototype);
+                // Optimize: indicator应该是一直在修改note 的位置，只要isindicatorOn，或许这句话多余
+                //placeCoord = _editor._game.Grids.Quantize(placeCoord, SnapToPositionGrid, SnapToTimeGrid);
+                _editor.AddNote(note, placeCoord);
             }
 
             void PlaceLink()
             {
                 var placeCoord = _editor._game.Grids.Quantize(_freezeNoteCoord, SnapToPositionGrid, SnapToTimeGrid);
-                // TODO:如果indicators关掉似乎就不对了
-                // 不过后续打算改成下键的时候indicator还是会开启看情况选择吧
-                using var so_notes = SpanOwner<NoteModel>.Allocate(_indicators.Count);
-                var notes = so_notes.Span;
-                for (int i = 0; i < notes.Length; i++) {
-                    notes[i] = _indicators[i].NotePrototype;
-                }
-                _editor.AddMultipleNotes(placeCoord, notes);
+
+                _editor.AddMultipleNotes(_notePrototypes.AsSpan(), placeCoord);
             }
 
             void PasteNotes()
@@ -470,48 +514,36 @@ namespace Deenote.Core.Editing
                     placeCoord = _editor._game.Grids.Quantize(coord, SnapToPositionGrid, SnapToTimeGrid);
                 }
 
-                _editor.AddMultipleNotes(placeCoord, _editor.ClipBoard.Notes);
+                _editor.AddMultipleNotes(_editor.ClipBoard.Notes, placeCoord);
             }
         }
 
         public void CancelPlaceNote()
         {
             _state = PlacementState.Idle;
-            _placeNotePrototype.UnlinkWithoutCutChain();
-            _placeNotePrototype.Duration = 0f;
-            _placeNotePrototype.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
+            var note = _notePrototypes[0];
+            note.UnlinkWithoutCutChain();
+            note.Duration = 0f;
+            note.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
+            note.Speed = PlacingNoteSpeed;
+            note.Sounds.Clear();
+            _notePrototypes.SetCount(1);
             RefreshIndicators();
+            SetPlacingNoteSpeed(null);
         }
 
         #endregion
 
+        private void SetIndicatorsVisibility(bool visible)
+        {
+            if (_indicatorPanelTransform != null) {
+                _indicatorPanelTransform.gameObject.SetActive(visible);
+            }
+        }
+
         public void HideIndicators()
         {
             _indicatorPanelTransform.gameObject.SetActive(false);
-        }
-
-        /// <summary>
-        /// Get which notes to display, does not update position here
-        /// </summary>
-        private void RefreshIndicators()
-        {
-            if (!IsIndicatorOn)
-                return;
-
-            if (!_editor._game.IsStageLoaded())
-                return;
-
-            if (_state is PlacementState.PlacingMultiple) {
-                using var indicators = _indicators.Resetting();
-                foreach (var note in _editor.ClipBoard.Notes) {
-                    indicators.Add(out var indicator);
-                    indicator.Initialize(note);
-                }
-            }
-            else {
-                _indicators.SetCount(1);
-                _indicators[0].Initialize(_placeNotePrototype);
-            }
         }
 
         internal void PreparePasteClipBoard()
@@ -521,14 +553,24 @@ namespace Deenote.Core.Editing
                 case PlacementState.Placing:
                 case PlacementState.PlacingLinks:
                     return;
-                case PlacementState.PlacingMultiple:
-                    break;
+                case PlacementState.Pasting:
                 case PlacementState.Idle or _:
                     break;
             }
 
-            _state = PlacementState.PlacingMultiple;
+            if (_editor.ClipBoard.Notes.Length == 0)
+                return;
+
+            _state = PlacementState.Pasting;
+            using (var resetter = _notePrototypes.Resetting(_editor.ClipBoard.Notes.Length)) {
+                var baseCoord = _editor.ClipBoard.BaseCoord;
+                foreach (var cnote in _editor.ClipBoard.Notes) {
+                    resetter.Add(out var note);
+                    cnote.CloneDataTo(note, cloneSounds: true);
+                }
+            }
             RefreshIndicators();
+            SetPlacingNoteSpeed(_indicators[0].NotePrototype.Speed);
         }
 
         private bool IsInPlacementArea(NoteCoord coord)
@@ -542,6 +584,36 @@ namespace Deenote.Core.Editing
                 return false;
 
             return true;
+        }
+
+        private void MoveIndicatorsTo(NoteCoord coord)
+        {
+            Debug.Assert(_indicators.Count >= 1);
+
+            if (_indicators.Count == 1) {
+                _indicators[0].MoveTo(coord);
+                return;
+            }
+
+            var baseCoord = coord - _indicators[0].NotePrototype.PositionCoord;
+            foreach (var indicator in _indicators) {
+                var c = baseCoord + indicator.NotePrototype.PositionCoord;
+                c = NoteCoord.Clamp(c, _editor._game.MusicPlayer.ClipLength);
+                indicator.MoveTo(c);
+            }
+        }
+
+        private void RefreshIndicators()
+        {
+            if (_indicators.IsNull)
+                return;
+
+            using (var resetter = _indicators.Resetting(_notePrototypes.Count)) {
+                foreach (var note in _notePrototypes) {
+                    resetter.Add(out var indicator);
+                    indicator.Initialize(note);
+                }
+            }
         }
 
         private enum PlacementState
@@ -559,9 +631,9 @@ namespace Deenote.Core.Editing
             /// </summary>
             PlacingLinks,
             /// <summary>
-            /// Pasting, or maybe some other situations
+            /// Pasting
             /// </summary>
-            PlacingMultiple,
+            Pasting,
         }
 
         public enum PlacementOptions
@@ -569,7 +641,6 @@ namespace Deenote.Core.Editing
             None = 0,
             PastingRememberPosition = 1 << 0,
             PlaceSlide = 1 << 1,
-            PlaceSoundNoteByDefault = 1 << 2,
         }
 
         public enum NotificationFlag
@@ -577,6 +648,8 @@ namespace Deenote.Core.Editing
             IsIndicatorOn,
             SnapToPositionGrid,
             SnapToTimeGrid,
+
+            PlacingNoteSpeed,
         }
     }
 }

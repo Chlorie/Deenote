@@ -821,7 +821,7 @@ namespace Deenote.Entities.Models
 
             protected override void SetValue(NoteModel note, ImmutableArray<PianoSoundValueModel> value)
             {
-                var sounds = note._sounds;
+                var sounds = note.Sounds;
                 sounds.Clear();
                 foreach (var s in value) {
                     sounds.Add(s);

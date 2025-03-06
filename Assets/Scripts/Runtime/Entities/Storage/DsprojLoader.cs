@@ -118,11 +118,12 @@ namespace Deenote.Entities.Storage
                 };
 
                 Debug.Assert(oldProject.charts.Length == 4);
-                foreach (var oldChart in oldProject.charts) {
+                for (int i = 0; i < oldProject.charts.Length; i++) {
+                    Chart? oldChart = oldProject.charts[i];
                     if (oldChart.notes.Count == 0)
                         continue;
                     var chartModel = ToVer3(oldChart);
-                    chartModel.Difficulty = ToDifficulty(oldChart.difficulty);
+                    chartModel.Difficulty = ToDifficulty(i);
                     chartModel.Level = oldChart.level;
                     project.Charts.Add(chartModel);
                 }
@@ -173,9 +174,9 @@ namespace Deenote.Entities.Storage
                     Kind = oldNote.isLink ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click,
                 };
 
-                note._sounds.Capacity = oldNote.sounds.Capacity;
+                note.Sounds.Capacity = oldNote.sounds.Capacity;
                 foreach (var s in oldNote.sounds) {
-                    note._sounds.Add(ToVer3(s));
+                    note.Sounds.Add(ToVer3(s));
                 }
                 return note;
             }

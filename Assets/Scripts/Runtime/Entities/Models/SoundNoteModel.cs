@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Entities.Models
@@ -15,7 +16,7 @@ namespace Deenote.Entities.Models
             set => _noteModel._time = value;
         }
 
-        public ReadOnlySpan<PianoSoundValueModel> Sounds => _noteModel.Sounds;
+        public ReadOnlySpan<PianoSoundValueModel> Sounds => _noteModel.Sounds.AsSpan();
 
         // In some charts there're no-sound notes at background, which has no effect
         // other than increase json size.

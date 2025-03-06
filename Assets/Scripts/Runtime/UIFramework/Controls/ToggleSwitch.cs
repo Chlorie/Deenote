@@ -78,6 +78,7 @@ namespace Deenote.UIFramework.Controls
 
                 _backgroundImage.color = bg;
                 _borderImage.color = bdr;
+                _knobImage.color = knb;
             }
             var knbscale = state is PressVisualState.Pressed or PressVisualState.Hovering
                 ? HoverScale : 1f;

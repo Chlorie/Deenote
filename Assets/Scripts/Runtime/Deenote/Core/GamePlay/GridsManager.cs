@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Core.Editing;
 using Deenote.Core.GamePlay.Audio;
 using Deenote.Core.GameStage;
 using Deenote.Core.Project;
@@ -12,16 +13,21 @@ namespace Deenote.Core.GamePlay
     public sealed partial class GridsManager : FlagNotifiable<GridsManager, GridsManager.NotificationFlag>, IDisposable
     {
         private readonly GamePlayManager _game;
+        private readonly StageChartEditor _editor;
 
-        public GridsManager(GamePlayManager manager)
+        public GridsManager(GamePlayManager manager, StageChartEditor editor)
         {
             _game = manager;
+            _editor = editor;
             MainSystem.ProjectManager.RegisterNotification(
                 ProjectManager.NotificationFlag.ProjectTempos,
                 _OnTemposChanged);
             _game.RegisterNotification(
                 GamePlayManager.NotificationFlag.SuddenPlus,
                 _OnSuddenPlusChanged);
+            _editor.Placer.RegisterNotification(
+                StageNotePlacer.NotificationFlag.PlacingNoteSpeed,
+                _OnPlacingNoteSpeedChanged);
             _game.MusicPlayer.TimeChanged += _OnStageTimeChanged;
             _game.StageLoaded += args =>
             {
@@ -36,8 +42,8 @@ namespace Deenote.Core.GamePlay
 
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
-                PositionGridCount = configs.GetInt32("stage/grids/pos_grid_count");
-                TimeGridSubBeatCount = configs.GetInt32("stage/grids/time_grid_count");
+                PositionGridCount = configs.GetInt32("stage/grids/pos_grid_count", 9);
+                TimeGridSubBeatCount = configs.GetInt32("stage/grids/time_grid_count", 1);
             };
         }
 
@@ -59,10 +65,15 @@ namespace Deenote.Core.GamePlay
 
         private void _OnTemposChanged(ProjectManager manager) => UpdateTimeGrids();
         private void _OnSuddenPlusChanged(GamePlayManager manager) => UpdatePositionGrids();
+        private void _OnPlacingNoteSpeedChanged(StageNotePlacer _)
+        {
+            UpdateTimeGrids();
+            UpdateCurveLines();
+        }
         private void _OnStageTimeChanged(GameMusicPlayer.TimeChangedEventArgs args)
         {
             UpdateTimeGrids();
-            UpdateCurveLine();
+            UpdateCurveLines();
         }
         private void _OnPerspectiveLineCollecting(PerspectiveLinesRenderer.LineCollector collector)
         {
@@ -70,7 +81,7 @@ namespace Deenote.Core.GamePlay
             SubmitPositionGridsRender(collector);
             SubmitCurveRender(collector);
         }
-        
+
         #endregion
 
         public NoteCoord Quantize(NoteCoord coord, bool snapPosition, bool snapTime)

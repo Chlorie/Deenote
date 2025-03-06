@@ -76,12 +76,9 @@ namespace Deenote.Core.Project
 
         private async UniTask SaveCurrentProjectToAsyncInternal(string targetFilePath, CancellationToken cancellationToken)
         {
-            // TODO: 可能要考虑一下多次点击导致的冲突
-            Debug.Assert(CurrentProject is not null);
-            var proj = CurrentProject!;
-
-            await ProjectIO.SaveAsync(proj, targetFilePath, cancellationToken);
-            // HACK should set in entity.csproj
+            // TODO: 可能要考虑一下多次点击导致的冲突(cancel前一个
+            AssertProjectLoaded();
+            await ProjectIO.SaveAsync(CurrentProject, targetFilePath, cancellationToken);
         }
 
         #region Validation
@@ -99,9 +96,9 @@ namespace Deenote.Core.Project
         /// </summary>
         [System.Diagnostics.Conditional("UNITY_ASSERTIONS")]
         [MemberNotNull(nameof(CurrentProject))]
-        public void AssertProjectLoaded()
+        public void AssertProjectLoaded(string message = "Project not loaded")
 #pragma warning disable CS8774
-            => Debug.Assert(CurrentProject is not null, "Project not loaded");
+            => Debug.Assert(CurrentProject is not null, message);
 #pragma warning restore CS8774
 
         [MemberNotNullWhen(true, nameof(CurrentProject))]

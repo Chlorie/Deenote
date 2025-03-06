@@ -5,6 +5,8 @@ using Deenote.Library.Collections;
 using System;
 using System.Collections.Generic;
 using Trarizon.Library.Collections;
+using Trarizon.Library.Collections.Generic;
+using UnityEngine;
 
 namespace Deenote.Entities.Models
 {
@@ -64,6 +66,32 @@ namespace Deenote.Entities.Models
 
                 NoteTimeComparer.AssertInOrder(visibleNotes);
                 NoteTimeComparer.AssertInOrder(backgroundNotes);
+            }
+
+            public static void SetNoteModels(ChartModel chart, ReadOnlySpan<NoteModel> notes)
+            {
+                if (notes.IsEmpty) {
+                    chart._holdCount = 0;
+                    chart._visibleNoteNodes = new();
+                    return;
+                }
+
+                var holdCount = 0;
+                var noteNodes = new SortedList<IStageNoteNode>(NoteTimeComparer.Instance);
+
+                foreach (var note in notes) {
+                    Debug.Assert(note.IsVisibleOnStage());
+                    noteNodes.AddFromEnd(note);
+                    if (note.IsHold) {
+                        holdCount++;
+                        noteNodes.AddFromEnd(new NoteTailNode(note));
+                    }
+                }
+
+                chart._holdCount = holdCount;
+                chart._visibleNoteNodes = new List<IStageNoteNode>(noteNodes);
+
+                NoteTimeComparer.AssertInOrder(chart._visibleNoteNodes);
             }
 
             public static void ResetNotes(ChartModel chart, ReadOnlySpan<NoteModel> notes)

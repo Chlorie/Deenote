@@ -56,14 +56,6 @@ namespace Deenote
             _ = GameStageSceneLoader.LoadAsync("DeemoStage");
         }
 
-        private void OnApplicationFocus(bool focus)
-        {
-            // TODO: make this configurable
-            //if (!focus && GameStage.IsMusicPlaying) {
-            //    GameStage.PauseStage();
-            //}
-        }
-
         public static partial class Args
         {
             public const string DeenotePreferFileExtension = ".dnt";

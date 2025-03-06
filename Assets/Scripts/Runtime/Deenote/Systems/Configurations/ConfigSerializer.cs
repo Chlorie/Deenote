@@ -76,6 +76,18 @@ namespace Deenote.Systems.Configurations
                 return defaultValue;
             }
 
+            public List<string>? GetStringList(string key)
+            {
+                if (_configs is null)
+                    return null;
+                if (_configs.TryGetValue(key, out var value)) {
+                    if (value?.Type is JTokenType.Array) {
+                        value.ToObject<List<string>>();
+                    }
+                }
+                return null;
+            }
+
             private JToken? GetToken(string key, JTokenType tokenType)
             {
                 if (_configs is null)
@@ -99,6 +111,8 @@ namespace Deenote.Systems.Configurations
             public void Add(string key, bool value) => AddInternal(key, value);
             public void AddDictionary<TValue>(string key, IReadOnlyDictionary<string, TValue> dictionary) => AddInternal(key, dictionary);
             public void AddObject(string key, object obj) => AddInternal(key, obj);
+
+            public void AddList(string key, IEnumerable<string> list) => AddInternal(key, list);
 
             private void AddInternal(string key, object value)
             {

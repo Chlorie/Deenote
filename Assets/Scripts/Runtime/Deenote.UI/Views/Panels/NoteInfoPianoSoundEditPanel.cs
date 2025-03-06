@@ -173,7 +173,7 @@ namespace Deenote.UI.Views.Panels
                 return;
             }
 
-            var sounds = _editingNotes[0].Sounds;
+            var sounds = _editingNotes[0].Sounds.AsSpan();
             using (var resetter = _soundItems.Resetting(sounds.Length)) {
                 foreach (var s in sounds) {
                     resetter.Add(out var item);

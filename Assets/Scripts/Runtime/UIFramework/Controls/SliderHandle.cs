@@ -92,6 +92,7 @@ namespace Deenote.UIFramework.Controls
 
         protected override void OnThemeChanged(UIThemeArgs args)
         {
+            base.OnThemeChanged(args);
             _backgroundImage.color = args.ControlSolidDefaultColor;
         }
     }

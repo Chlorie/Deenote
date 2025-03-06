@@ -12,6 +12,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using Deenote.Core.Editing;
+using Trarizon.Library.Collections;
 
 namespace Deenote.UI.Views
 {
@@ -338,13 +339,13 @@ namespace Deenote.UI.Views
                     _soundsButton.Text.SetRawText(NoSoundButtonText);
                     break;
                 case 1: {
-                    var sounds = notes[0].Sounds;
+                    var sounds = notes[0].Sounds.AsSpan();
                     _soundsButton.Text.SetRawText(GetSoundsDisplayText(sounds));
                     break;
                 }
                 default: {
                     if (NoteModel.HasSameSounds(notes)) {
-                        _soundsButton.Text.SetRawText(GetSoundsDisplayText(notes[0].Sounds));
+                        _soundsButton.Text.SetRawText(GetSoundsDisplayText(notes[0].Sounds.AsSpan()));
                     }
                     else {
                         _soundsButton.Text.SetRawText(NoSoundButtonText);

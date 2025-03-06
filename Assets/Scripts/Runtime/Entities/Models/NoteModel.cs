@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Library.Collections;
 using System;
 using UnityEngine;
 
@@ -73,10 +74,10 @@ namespace Deenote.Entities.Models
             note.Vibrate = Vibrate;
 #pragma warning restore CS0618
 
-            if (cloneSounds && _sounds.Count > 0) {
-                note._sounds.Capacity = _sounds.Count;
+            if (cloneSounds && Sounds.Count > 0) {
+                note.Sounds.EnsureCapacity(Sounds.Count);
                 foreach (var s in Sounds) {
-                    note._sounds.Add(s);
+                    note.Sounds.Add(s);
                 }
             }
         }

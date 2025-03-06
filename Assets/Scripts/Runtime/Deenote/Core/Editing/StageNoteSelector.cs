@@ -89,10 +89,8 @@ namespace Deenote.Core.Editing
 
             var prevCount = _selectedNotes.Count;
             _selectedNotes.AddRange(notes);
-            if (prevCount > 0) {
-                foreach (var note in _selectedNotes.AsSpan()[prevCount..]) {
-                    note.IsSelected = true;
-                }
+            foreach (var note in _selectedNotes.AsSpan()[prevCount..]) {
+                note.IsSelected = true;
             }
         }
 
@@ -247,7 +245,7 @@ namespace Deenote.Core.Editing
 
             _game.Stage.SetSelectionPanelRect(startCoord, endCoord);
 
-            // Optimize
+            // Optimize:现在是全遍历
             // TODO: should consider note sprite size
             // 我在考虑从raycast映射后的coord直接就是考虑sprite size后的coord，
             // 这个size问题能不能试着在raycast2coord的方法里解决
@@ -258,7 +256,7 @@ namespace Deenote.Core.Editing
 
                 note.SetIsInSelectionRange(inRange);
                 if (inRange)
-                    _inDragRangeNotes.Add(note); // TODO: 这个不会重复加？
+                    _inDragRangeNotes.Add(note);
 
                 if (note.IsSelected) {
                     _selectedNotes.Add(note);
@@ -282,10 +280,9 @@ namespace Deenote.Core.Editing
                         && pos - halfSize <= endCoord.Position;
                 }
 
-                // TODO: 目前如果note按时间顺序出现的话，在往下框选并倒退时间，可能导致一些在提前显示
-                // 模式下能出现的note的选择情况怪怪的，理论上应该做个_game.EarlyDisplaySlowNotes的
-                // 判断，但是在按时间顺序的模式下的选择判断太怪了，没想好怎么写
-                
+                // TODO: 目前如果note按时间顺序出现的话，在往下框选并倒退时间，可能导致一些在提前显示模式下能出现的note的选择情况怪怪的，
+                // 理论上应该做个_game.EarlyDisplaySlowNotes的判断，但是在按时间顺序的模式下的选择判断太怪了，没想好怎么写
+
                 // The note is on stage
                 if (time < currentTime + _game.GetStageNoteAppearAheadTime(speed)) {
                     var pseudoTime = ToPseudoTime(time);

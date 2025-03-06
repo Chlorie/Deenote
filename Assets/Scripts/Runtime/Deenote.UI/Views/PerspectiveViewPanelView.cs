@@ -67,18 +67,16 @@ namespace Deenote.UI.Views
             InitAspectRatioController();
             RegisterKeyBindings();
 
-            MainSystem.GamePlayManager.StageLoaded += _OnStageLoaded;
-
-            MainSystem.GamePlayManager.MusicPlayer.TimeChanged += args =>
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                var mousePos = Input.mousePosition;
-                if (TryConvertScreenPointToNoteCoord(mousePos, null!, out var coord)) {
-                    MainSystem.StageChartEditor.Placer.UpdateMovePlace(coord, mousePos);
-                }
-                else {
-                    MainSystem.StageChartEditor.Placer.HideIndicators();
-                }
+                configs.Add("ui/perspective_aspect_ratio", AspectRatio);
             };
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
+            {
+                AspectRatio = configs.GetSingle("ui/perspective_aspect_ratio", 4f / 3f);
+            };
+
+            MainSystem.GamePlayManager.StageLoaded += _OnStageLoaded;
 
             void InitAspectRatioController()
             {

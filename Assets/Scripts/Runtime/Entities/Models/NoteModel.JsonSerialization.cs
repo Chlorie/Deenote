@@ -20,7 +20,7 @@ namespace Deenote.Entities.Models
         private NoteType_Legacy _serializeType = NoteType_Legacy.Hit;
 
         [JsonProperty("sounds", Order = 1)]
-        internal List<PianoSoundValueModel> _sounds;
+        private List<PianoSoundValueModel> _sounds;
 
         [JsonProperty("pos", Order = 2)]
         internal float _position;

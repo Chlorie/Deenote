@@ -40,13 +40,21 @@ namespace Deenote.UI.Views
                 if (val >= 0)
                     MainWindow.PerspectiveViewPanelView.AspectRatio = PredefinedAspectValues[val];
             };
-            MainWindow.PerspectiveViewPanelView.AspectRatioChanged += aspectRatio =>
-            {
-                var index = Array.IndexOf(PredefinedAspectValues, aspectRatio);
-                _aspectRatioDropdown.SetValueWithoutNotify(index);
-            };
+            MainWindow.PerspectiveViewPanelView.AspectRatioChanged += SetAspectRatio;
+            SetAspectRatio(MainWindow.PerspectiveViewPanelView.AspectRatio);
 
             _fullScreenButton.Clicked += () => MainWindow.PerspectiveViewPanelView.SetIsFullScreen(true);
+
+            void SetAspectRatio(float aspectRatio)
+            {
+                for (int i = 0; i < PredefinedAspectValues.Length; i++) {
+                    if (Mathf.Approximately(aspectRatio, PredefinedAspectValues[i])) {
+                        _aspectRatioDropdown.SetValueWithoutNotify(i);
+                        return;
+                    }
+                }
+                _aspectRatioDropdown.SetValueWithoutNotify(-1);
+            }
 
             #endregion
 

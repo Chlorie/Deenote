@@ -15,6 +15,8 @@ namespace Deenote.UI.Views.Elements
     public sealed class ProjectInfoChartListItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] Button _button = default!;
+        [SerializeField] UnityEngine.UI.Image _difficutyIconImage = default!;
+        [SerializeField] TextBlock _nameText = default!;
         [SerializeField] TextBlock _levelText = default!;
         [SerializeField] Button _exportButton = default!;
         [SerializeField] Button _removeButton = default!;
@@ -71,16 +73,16 @@ namespace Deenote.UI.Views.Elements
         public void RefreshUI()
         {
             var (sprite, color) = MainWindow.PerspectiveViewPanelView.StageForeground.Args.GetDifficultyArgs(ChartModel.Difficulty);
-            _button.Image.sprite = sprite;
-            _button.Text.TmpText.color = color;
+            _difficutyIconImage.sprite = sprite;
+            _nameText.TmpText.color = color;
             _levelText.TmpText.color = color;
-            if (ChartModel.Name is null) {
-                _button.Text.SetRawText(ChartModel.Difficulty.ToDisplayString());
-                _button.Text.TmpText.fontStyle |= FontStyles.Italic;
+            if (string.IsNullOrEmpty(ChartModel.Name)) {
+                _nameText.SetRawText(ChartModel.Difficulty.ToDisplayString());
+                _nameText.TmpText.fontStyle |= FontStyles.Italic;
             }
             else {
-                _button.Text.SetRawText(ChartModel.Name);
-                _button.Text.TmpText.fontStyle &= ~FontStyles.Italic;
+                _nameText.SetRawText(ChartModel.Name);
+                _nameText.TmpText.fontStyle &= ~FontStyles.Italic;
             }
             _levelText.SetRawText($"Lv {ChartModel.Level}");
         }

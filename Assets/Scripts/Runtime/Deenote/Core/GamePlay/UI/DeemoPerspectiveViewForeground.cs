@@ -64,11 +64,6 @@ namespace Deenote.GamePlay.UI
             _shockWaveEnterPosX = _shockWaveEnterPosTransform.anchorMin.x;
             _shockWaveExitPosX = _shockWaveExitPosTransform.anchorMin.x;
 
-            // TODO:这怎么有这个玩意
-            //MainSystem.GameStage.PerspectiveView.RegisterPropertyChangeNotificationAndInvoke(
-            //    GameStage.PerspectiveViewController.NotifyProperty.AspectRatio,
-            //    view => _aspectRatioFitter.aspectRatio = view.AspectRatio);
-
             _timeSlider.onValueChanged.AddListener(val => MainSystem.GamePlayManager.MusicPlayer.Time = val);
             _pauseButton.onClick.AddListener(() => MainSystem.GamePlayManager.MusicPlayer.TogglePlayingState());
 

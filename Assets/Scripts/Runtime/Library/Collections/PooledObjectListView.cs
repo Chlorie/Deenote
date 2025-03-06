@@ -20,6 +20,8 @@ namespace Deenote.Library.Collections
 
         public int Count => _items.Count;
 
+        public bool IsNull => _items is null;
+
         public PooledObjectListView(ObjectPool<T> pool)
         {
             _pool = pool;
@@ -85,6 +87,8 @@ namespace Deenote.Library.Collections
 
         public void Clear(bool clearPool = false)
         {
+            if (_items is null)
+                return;
             foreach (var item in _items) {
                 _pool.Release(item);
             }

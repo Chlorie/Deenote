@@ -1,18 +1,19 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
-using Deenote.Localization;
+using Deenote.Core;
+using Deenote.Core.Project;
 using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
+using Deenote.Localization;
 using Deenote.UI.Dialogs;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
 using Deenote.UIFramework.Controls;
 using System.IO;
+using System.Linq;
 using UnityEngine;
-using Deenote.Core.Project;
-using Deenote.Core;
 
 namespace Deenote.UI.Views
 {
@@ -45,10 +46,20 @@ namespace Deenote.UI.Views
             LocalizableText.Localized("NewProjectOnOpen_MsgBox_Content"),
             LocalizableText.Localized("NewProjectOnOpen_MsgBox_Y"),
             LocalizableText.Localized("NewProjectOnOpen_MsgBox_N"));
+        private static readonly MessageBoxArgs _newProjectOnUnsavedOpenMsgBoxArgs = new(
+            LocalizableText.Localized("NewProject_MsgBox_Title"),
+            LocalizableText.Localized("NewProjectOnUnsavedOpen_MsgBox_Content"),
+            LocalizableText.Localized("NewProjectOnOpen_MsgBox_Y"),
+            LocalizableText.Localized("NewProjectOnOpen_MsgBox_N"));
 
         private static readonly MessageBoxArgs _openProjOnOpenMsgBoxArgs = new(
             LocalizableText.Localized("OpenProject_MsgBox_Title"),
             LocalizableText.Localized("OpenProjectOnOpen_MsgBox_Content"),
+            LocalizableText.Localized("OpenProjectOnOpen_MsgBox_Y"),
+            LocalizableText.Localized("OpenProjectOnOpen_MsgBox_N"));
+        private static readonly MessageBoxArgs _openProjOnUnsavedOpenMsgBoxArgs = new(
+            LocalizableText.Localized("OpenProject_MsgBox_Title"),
+            LocalizableText.Localized("OpenProjectOnUnsavedOpen_MsgBox_Content"),
             LocalizableText.Localized("OpenProjectOnOpen_MsgBox_Y"),
             LocalizableText.Localized("OpenProjectOnOpen_MsgBox_N"));
 
@@ -100,12 +111,29 @@ namespace Deenote.UI.Views
                 _recentFilePrefab, _recentFilesCollapsable.Content,
                 item => item.OnInstantiate(this), defaultCapacity: 0, maxSize: MaxRecentFilesCount));
 
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
+            {
+                configs.AddList("ui/recent_files", _recentFiles.Select(item => item.FilePath));
+            };
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
+            {
+                var recents = configs.GetStringList("ui/recent_files");
+            };
+
             // Register
             {
                 _newButton.Clicked += UniTask.Action(NewProjectListener);
                 _openButton.Clicked += UniTask.Action(OpenProjectListener);
-                _saveButton.Clicked += UniTask.Action(SaveProjectListener);
-                _saveAsButton.Clicked += UniTask.Action(SaveAsProjectListener);
+                _saveButton.Clicked += () =>
+                {
+                    _ = SaveProjectListener();
+                    MainSystem.SaveSystem.SaveConfigurations();
+                };
+                _saveAsButton.Clicked += () =>
+                {
+                    _ = SaveAsProjectListener();
+                    MainSystem.SaveSystem.SaveConfigurations();
+                };
                 _preferenceButton.Clicked += () => MainWindow.DialogManager.PreferencesDialog.Open();
 
                 // Abouts
@@ -144,8 +172,11 @@ namespace Deenote.UI.Views
 
         private async UniTaskVoid NewProjectListener()
         {
-            if (MainSystem.ProjectManager.CurrentProject is not null) {
-                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_newProjectOnOpenMsgBoxArgs);
+            if (MainSystem.ProjectManager.IsProjectLoaded()) {
+                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(
+                    MainSystem.StageChartEditor.HasUnsavedChange
+                        ? _newProjectOnUnsavedOpenMsgBoxArgs
+                        : _newProjectOnOpenMsgBoxArgs);
                 if (res != 0)
                     return;
             }
@@ -158,8 +189,11 @@ namespace Deenote.UI.Views
 
         private async UniTaskVoid OpenProjectListener()
         {
-            if (MainSystem.ProjectManager.CurrentProject is not null) {
-                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_openProjOnOpenMsgBoxArgs);
+            if (MainSystem.ProjectManager.IsProjectLoaded()) {
+                var res = await MainWindow.DialogManager.OpenMessageBoxAsync(
+                    MainSystem.StageChartEditor.HasUnsavedChange
+                        ?_openProjOnUnsavedOpenMsgBoxArgs
+                        :_openProjOnOpenMsgBoxArgs);
                 if (res != 0) return;
             }
 
@@ -191,22 +225,23 @@ namespace Deenote.UI.Views
         {
             Debug.Assert(MainSystem.ProjectManager.CurrentProject is not null, "Unexpected interactable save button when current project is null");
             var proj = MainSystem.ProjectManager.CurrentProject!;
-            
+
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
-            
+
             await MainSystem.ProjectManager.SaveCurrentProjectAsync();
+            await UniTask.SwitchToMainThread();
             AddPathToRecentFiles(proj.ProjectFilePath);
-            MainSystem.SaveSystem.SaveConfigurations();
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
 
         private async UniTaskVoid SaveAsProjectListener()
         {
-            Debug.Assert(MainSystem.ProjectManager.CurrentProject is not null, "Unexpected interactable save button when current project is null");
+            MainSystem.ProjectManager.AssertProjectLoaded("Unexpected interactable save button when current project is not loaded");
         SelectFile:
             var feRes = await MainWindow.DialogManager.OpenFileExplorerInputFileAsync(
                 LocalizableText.Localized(SaveAsFileExplorerTitleKey),
+                MainSystem.ProjectManager.CurrentProject.MusicName,
                 MainSystem.Args.DeenotePreferFileExtension);
             if (feRes.IsCancelled)
                 return;
@@ -222,7 +257,7 @@ namespace Deenote.UI.Views
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectToAsync(feRes.Path);
-            MainSystem.SaveSystem.SaveConfigurations();
+            await UniTask.SwitchToMainThread();
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
 
@@ -230,7 +265,7 @@ namespace Deenote.UI.Views
 
         #region Recent Files
 
-        internal void AddPathToRecentFiles(string filePath)
+        private void AddPathToRecentFiles(string filePath)
         {
             int findIndex = _recentFiles.FindIndex(filePath, static (item, fp) => item.FilePath == fp);
             if (findIndex >= 0) {

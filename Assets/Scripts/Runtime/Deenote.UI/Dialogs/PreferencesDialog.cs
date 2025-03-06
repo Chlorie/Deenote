@@ -22,6 +22,8 @@ namespace Deenote.UI.Dialogs
         [SerializeField] ToggleSwitch _stageEffectToggle = default!;
         [SerializeField] TextBox _mouseSensitivityInput = default!;
         [SerializeField] Button _mouseSensitivityInvertButton = default!;
+        [SerializeField] ToggleSwitch _distinguishPianoNotesToggle = default!;
+        [SerializeField] ToggleSwitch _pauseStageWhenLoseFocusToggle = default!;
         [SerializeField] ToggleSwitch _vSyncToggle = default!;
         [SerializeField] Dropdown _languageDropdown = default!;
         [SerializeField] Dropdown _autoSaveDropdown = default!;
@@ -29,7 +31,6 @@ namespace Deenote.UI.Dialogs
         [SerializeField] Dropdown _uiThemeDropdown = default!;
         [SerializeField] ToggleSwitch _showFpsToggle = default!;
         [SerializeField] ToggleSwitch _showIneffectivePropertiesToggle = default!;
-        [SerializeField] ToggleSwitch _distinguishPianoNotesToggle = default!;
 
         #region LocalizationKeys
 
@@ -46,15 +47,20 @@ namespace Deenote.UI.Dialogs
                 GamePlayManager.NotificationFlag.StageEffectOn,
                 manager => _stageEffectToggle.SetIsCheckedWithoutNotify(manager.IsStageEffectOn));
 
+            _pauseStageWhenLoseFocusToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.PauseWhenLoseFocus = val;
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.PauseWhenLoseFocus,
+                manager => _pauseStageWhenLoseFocusToggle.SetIsCheckedWithoutNotify(manager.PauseWhenLoseFocus));
+
             _mouseSensitivityInput.EditSubmitted += val =>
             {
                 if (float.TryParse(val, out var fval))
-                    MainWindow.Settings.GameViewScrollSensitivity = fval;
+                    MainSystem.GlobalSettings.GameViewScrollSensitivity = fval;
                 _mouseSensitivityInput.SetValueWithoutNotify(fval.ToString("F1"));
             };
-            _mouseSensitivityInvertButton.Clicked += () => MainWindow.Settings.GameViewScrollSensitivity = -MainWindow.Settings.GameViewScrollSensitivity;
-            MainWindow.Settings.RegisterNotificationAndInvoke(
-                MainWindow.SettingsData.NotificationFlag.GameViewScrollSensitivity,
+            _mouseSensitivityInvertButton.Clicked += () => MainSystem.GlobalSettings.GameViewScrollSensitivity = -MainSystem.GlobalSettings.GameViewScrollSensitivity;
+            MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
+                GlobalSettings.NotificationFlag.GameViewScrollSensitivity,
                 settings => _mouseSensitivityInput.SetValueWithoutNotify(settings.GameViewScrollSensitivity.ToString("F1")));
 
             // System

@@ -19,10 +19,10 @@ namespace Deenote.Entities.Models
         public float Speed { get; set; }
 
         [JsonProperty("oriVMin", Order = 1), Obsolete("For serialzation only")]
-        private int _SerializeMinVolume => _SerializeNotes.SelectMany(n => n._sounds, (n, s) => s.Velocity).Min();
+        private int _SerializeMinVolume => _SerializeNotes.SelectMany(n => n.Sounds, (n, s) => s.Velocity).Min();
 
         [JsonProperty("oriVMax", Order = 2), Obsolete("For serialzation only")]
-        private int _SerializeMaxVolume => _SerializeNotes.SelectMany(n => n._sounds, (n, s) => s.Velocity).Max();
+        private int _SerializeMaxVolume => _SerializeNotes.SelectMany(n => n.Sounds, (n, s) => s.Velocity).Max();
 
         [JsonProperty("remapVMin", Order = 3)]
         public int RemapMinVolume { get; set; }
