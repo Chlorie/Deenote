@@ -84,7 +84,7 @@ namespace Deenote.Core.GameStage
             _nextActiveNoteIndex = 0;
         }
 
-        internal void UpdateNotesAppearOrder()
+        private void UpdateNotesAppearOrder()
         {
             if (_stageNoteNodesInAppearOrder is null) {
                 _stageNoteNodesInAppearOrder = new SortedList<IStageNoteNode>(Comparer<IStageNoteNode>.Create((l, r) =>
@@ -148,8 +148,17 @@ namespace Deenote.Core.GameStage
 
         private void ReselectActiveVisibleNotes()
         {
-            UpdateNotesAppearOrder();
+            if (_game.IsApplySpeedDifference) {
+                ReselectActiveVisibleNotesInternal(_stageNoteNodesInAppearOrder.AsSpan());
+            }
+            else {
+                _game.AssertChartLoaded();
+                ReselectActiveVisibleNotesInternal(_game.CurrentChart.NoteNodes);
+            }
+        }
 
+        private void ReselectActiveVisibleNotesInternal(ReadOnlySpan<IStageNoteNode> noteNodesInAppearOrder)
+        {
             _game.AssertStageLoaded();
             _game.AssertChartLoaded();
 
@@ -196,14 +205,14 @@ namespace Deenote.Core.GameStage
             _nextActiveNoteIndex = index;
 
             // Iterate node in falling time, by appear time order
-            var indexInAppearOrder = _stageNoteNodesInAppearOrder.AsSpan()
+            var indexInAppearOrder = noteNodesInAppearOrder
                 .FindLowerBoundIndex(new AppearTimeComparable(currentTime, this));
 
             for (int i = indexInAppearOrder - 1; i >= 0; i--) {
-                var node = _stageNoteNodesInAppearOrder[i];
+                var node = noteNodesInAppearOrder[i];
                 if (node is NoteModel note) {
                     if (note.Time > currentTime)
-                        AddTrackNote(note, _game.StageNoteAppearAheadTime);
+                        AddTrackNote(note);
                 }
             }
             _nextActiveNoteIndexInAppearOrder = indexInAppearOrder;
@@ -226,14 +235,14 @@ namespace Deenote.Core.GameStage
                 if (node is not NoteModel note)
                     return;
                 if (note.EndTime > deactiveNoteTime) {
-                    AddTrackNote(note, _game.StageNoteAppearAheadTime);
+                    AddTrackNote(note);
                 }
             }
 
             float ToPseudoTime(float time, float noteSpeed)
             {
                 var currentTime = _game.MusicPlayer.Time;
-                return currentTime + (time - currentTime) * noteSpeed;
+                return currentTime + (time - currentTime) * _game.GetDisplayNoteSpeed(noteSpeed);
             }
         }
 
@@ -255,6 +264,7 @@ namespace Deenote.Core.GameStage
         /// </param>
         private void ShiftActiveVisibleNotes(bool forward)
         {
+
             ReselectActiveVisibleNotes();
             return;
 
@@ -479,18 +489,30 @@ namespace Deenote.Core.GameStage
 #endif
         }
 
+        /// <summary>
+        /// Called when note collection changed, add/remove or notes' time/speed etc. changed
+        /// </summary>
         internal void RefreshStageActiveNotes()
         {
             var currentTime = _game.MusicPlayer.Time;
+
+            UpdateNotesAppearOrder();
             ReselectActiveVisibleNotes();
+
             UpdateNoteSoundsRelatively(currentTime >= _time, false);
             _time = currentTime;
         }
 
+        /// <summary>
+        /// Called when music time changed
+        /// </summary>
+        /// <param name="playSound"></param>
         internal void ShiftStageActiveNotes(bool playSound)
         {
             var currentTime = _game.MusicPlayer.Time;
+
             ShiftActiveVisibleNotes(currentTime >= _time);
+
             UpdateNoteSoundsRelatively(currentTime >= _time, playSound);
             _time = currentTime;
         }

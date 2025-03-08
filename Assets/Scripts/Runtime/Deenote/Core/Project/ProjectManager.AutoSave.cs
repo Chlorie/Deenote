@@ -13,8 +13,6 @@ namespace Deenote.Core.Project
     {
         private const string AutoSaveJsonDirName = "$Deenote_AutoSave";
 
-        private CancellationTokenSource? _autoSaveCts;
-
         private ProjectAutoSaveOption _autoSave_bf;
         public ProjectAutoSaveOption AutoSave
         {
@@ -31,66 +29,38 @@ namespace Deenote.Core.Project
 
         private void AutoSaveHandler()
         {
-            switch (AutoSave) {
-                case ProjectAutoSaveOption.On:
-                    if (IsProjectLoaded()) {
+            if (IsProjectLoaded()) {
+                switch (AutoSave) {
+                    case ProjectAutoSaveOption.On:
                         _ = SaveProjectAsync();
-                    }
-                    break;
-                case ProjectAutoSaveOption.OnAndSaveJson:
-                    if (IsProjectLoaded()) {
+                        break;
+                    case ProjectAutoSaveOption.OnAndSaveJson:
                         _ = SaveProjectAndJsonAsync();
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    default:
+                        break;
+                }
             }
 
             async UniTaskVoid SaveProjectAsync()
             {
-                _autoSaveCts?.Cancel();
-                _autoSaveCts?.Dispose();
-                var cts = new CancellationTokenSource();
-                _autoSaveCts = cts;
-                try {
-                    ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
-                    await SaveCurrentProjectAsync(_autoSaveCts.Token);
-                    ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
-                    if (cts == _autoSaveCts)
-                        _autoSaveCts = null;
-                } finally {
-                    cts.Dispose();
-                }
+                _saveCts.Reset();
+                ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
+                await SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
+                ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
             }
 
             async UniTaskVoid SaveProjectAndJsonAsync()
             {
-                _autoSaveCts?.Cancel();
-                _autoSaveCts?.Dispose();
-                var cts = new CancellationTokenSource();
-                _autoSaveCts = cts;
-                try {
-                    ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
-                    var projSaveTask = SaveCurrentProjectAsync();
+                _saveCts.Reset();
+                ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
+                var projSaveTask = SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
+                var chartSaveTask = SaveCurrentProjectChartJsonsAsync(_saveCts.Token);
 
-                    var time = DateTime.Now;
-                    string dir = Path.Combine(Path.GetDirectoryName(CurrentProject.ProjectFilePath), AutoSaveJsonDirName);
-                    string filename = Path.GetFileNameWithoutExtension(CurrentProject.ProjectFilePath);
-                    if (!Directory.Exists(dir))
-                        Directory.CreateDirectory(dir);
-                    foreach (var chart in CurrentProject.Charts) {
-                        var chartname = string.IsNullOrEmpty(chart.Name) ? chart.Difficulty.ToLowerCaseString() : chart.Name;
-                        File.WriteAllText(
-                            Path.Combine(dir, $"{filename}.{chartname}.{time:yyMMddHHmmss}.json"),
-                            chart.ToJsonString());
-                    }
-                    await projSaveTask;
-                    ProjectAutoSaved?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
-                    if (cts == _autoSaveCts)
-                        _autoSaveCts = null;
-                } finally {
-                    cts.Dispose();
-                }
+                await projSaveTask;
+                await chartSaveTask;
+
+                ProjectAutoSaved?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
             }
         }
 

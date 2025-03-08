@@ -20,6 +20,7 @@ namespace Deenote.Core.GamePlay
 
         private PositionGridGenerationKind _positionGridGenerationKind_bf = PositionGridGenerationKind.ByKeyCount;
         private int _positionGridCount_bf;
+        private bool _positionGridVisible_bf;
         private float _positionGridOffset_bf;
         private bool _isPositionBorderVisible_bf;
 
@@ -66,6 +67,17 @@ namespace Deenote.Core.GamePlay
                 if (Utils.SetField(ref _positionGridCount_bf, value)) {
                     UpdatePositionGrids();
                     NotifyFlag(NotificationFlag.PositionGridChanged);
+                }
+            }
+        }
+
+        public bool PositionGridVisible
+        {
+            get => _positionGridVisible_bf;
+            set {
+                if (Utils.SetField(ref _positionGridVisible_bf, value)) {
+                    UpdatePositionGrids();
+                    NotifyFlag(NotificationFlag.PositionGridVisible);
                 }
             }
         }
@@ -120,6 +132,9 @@ namespace Deenote.Core.GamePlay
 
         private void SubmitPositionGridsRender(PerspectiveLinesRenderer.LineCollector collector)
         {
+            if (_positionGridLines.Count == 0)
+                return;
+
             _game.AssertStageLoaded();
 
             float minZ = _game.ConvertNoteCoordTimeToWorldZ(0f);
@@ -146,6 +161,10 @@ namespace Deenote.Core.GamePlay
         private void UpdatePositionGrids()
         {
             _positionGridLines.Clear();
+
+            if (!PositionGridVisible)
+                return;
+
             switch (PositionGridGeneration) {
                 case PositionGridGenerationKind.ByCountAndOffset:
                     for (int i = 0; i < PositionGridCount_Legacy; i++) {

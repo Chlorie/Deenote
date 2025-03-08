@@ -301,7 +301,7 @@ namespace Deenote.Core.Editing
                 }
 
                 float ToPseudoTime(float time)
-                    => currentTime + (time - currentTime) * speed;
+                    => currentTime + (time - currentTime) * _game.GetDisplayNoteSpeed(speed);
 
                 float ToAboveStagePseudoTime(float time, float speed)
                     => time + (_game.StageNoteAppearAheadTime - _game.GetStageNoteAppearAheadTime(speed));

@@ -1,14 +1,17 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
+using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.Entities.Storage;
 using Deenote.Library;
 using Deenote.Library.Components;
 using System;
+using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Deenote.Core.Project
@@ -25,6 +28,9 @@ namespace Deenote.Core.Project
                 }
             }
         }
+
+        private bool _isSaving;
+        private ResetableCancellationTokenSource _saveCts = new();
 
         private void Awake()
         {
@@ -60,25 +66,55 @@ namespace Deenote.Core.Project
             return true;
         }
 
-        public UniTask SaveCurrentProjectAsync(CancellationToken cancellationToken = default)
+        public UniTask SaveCurrentProjectAsync()
         {
-            if (CurrentProject is null)
+            if (!IsProjectLoaded())
                 return UniTask.CompletedTask;
-            return SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, cancellationToken);
+            _saveCts.Reset();
+            return SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
         }
 
-        public UniTask SaveCurrentProjectToAsync(string targetFilePath, CancellationToken cancellationToken = default)
+        public UniTask SaveCurrentProjectToAsync(string targetFilePath)
         {
-            if (CurrentProject is null)
+            if (!IsProjectLoaded())
                 return UniTask.CompletedTask;
-            return SaveCurrentProjectToAsyncInternal(targetFilePath, cancellationToken);
+            _saveCts.Reset();
+            return SaveCurrentProjectToAsyncInternal(targetFilePath, _saveCts.Token);
         }
 
         private async UniTask SaveCurrentProjectToAsyncInternal(string targetFilePath, CancellationToken cancellationToken)
         {
-            // TODO: 可能要考虑一下多次点击导致的冲突(cancel前一个
             AssertProjectLoaded();
-            await ProjectIO.SaveAsync(CurrentProject, targetFilePath, cancellationToken);
+
+            _isSaving = true;
+            try {
+                await ProjectIO.SaveAsync(CurrentProject, targetFilePath, cancellationToken);
+            } finally {
+                _isSaving = false;
+            }
+        }
+
+        private async UniTask SaveCurrentProjectChartJsonsAsync(CancellationToken cancellationToken)
+        {
+            AssertProjectLoaded();
+
+            var time = DateTime.Now;
+            string dir = Path.Combine(Path.GetDirectoryName(CurrentProject.ProjectFilePath), AutoSaveJsonDirName);
+            string filename = Path.GetFileNameWithoutExtension(CurrentProject.ProjectFilePath);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            var tasks = new Task[CurrentProject.Charts.Count];
+            for (int i = 0; i < CurrentProject.Charts.Count; i++) {
+                ChartModel? chart = CurrentProject.Charts[i];
+                var chartname = string.IsNullOrEmpty(chart.Name) ? chart.Difficulty.ToLowerCaseString() : chart.Name;
+
+                tasks[i] = File.WriteAllTextAsync(
+                    Path.Combine(dir, $"{filename}.{chartname}.{time:yyMMddHHmmss}.json"),
+                    chart.ToJsonString(), cancellationToken);
+            }
+
+            await Task.WhenAll(tasks);
         }
 
         #region Validation

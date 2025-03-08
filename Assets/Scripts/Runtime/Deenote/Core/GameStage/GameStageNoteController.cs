@@ -353,11 +353,11 @@ namespace Deenote.Core.GameStage
             var stage = _game.Stage;
 
             if (NoteModel.IsSelected)
-                _noteSpriteRenderer.WithColorSolid(stage.Args.NoteSelectedColor);
+                _noteSpriteRenderer.WithColorRGB(stage.Args.NoteSelectedColor);
             else if (NoteModel.IsCollided)
-                _noteSpriteRenderer.WithColorSolid(stage.Args.NoteCollidedColor);
+                _noteSpriteRenderer.WithColorRGB(stage.Args.NoteCollidedColor);
             else
-                _noteSpriteRenderer.WithColorSolid(Color.white);
+                _noteSpriteRenderer.WithColorRGB(Color.white);
         }
 
         private void SetAppearAheadTime0SuddenPlus(GameStageNoteController? previousStageNote)

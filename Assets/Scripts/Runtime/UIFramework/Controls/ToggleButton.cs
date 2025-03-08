@@ -12,8 +12,8 @@ namespace Deenote.UIFramework.Controls
     {
         [SerializeField] Image _backgroundImage = default!;
         [SerializeField] Image _borderImage = default!;
-        [SerializeField] Image _image = default!;
-        [SerializeField] TextBlock _text = default!;
+        [SerializeField] Image? _image;
+        [SerializeField] TextBlock? _text;
         [SerializeField] ButtonColorSet _colorSet;
 
         [Header("Control")]
@@ -110,7 +110,10 @@ namespace Deenote.UIFramework.Controls
             }
 
             _backgroundImage.color = bg;
-            _text.TmpText.color = _image.color = fg;
+            if (_text != null)
+                _text.TmpText.color = fg;
+            if (_image != null)
+                _image.color = fg;
             _borderImage.color = bdr;
         }
 

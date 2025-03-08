@@ -6,6 +6,7 @@ using Deenote.Localization;
 using Deenote.UI.Dialogs;
 using Deenote.UI.Dialogs.Elements;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using UnityEngine;
 
@@ -18,6 +19,9 @@ namespace Deenote.UI
         [SerializeField] NewProjectDialog _newProjectDialog = default!;
         [SerializeField] PreferencesDialog _preferencesDialog = default!;
         [SerializeField] AboutDialog _aboutDialog = default!;
+        [SerializeField] GameObject _raycastBlocker = default!;
+
+        private readonly Stack<ModalDialog> _activeDialogs = new();
 
         public NewProjectDialog NewProjectDialog => _newProjectDialog;
         public PreferencesDialog PreferencesDialog => _preferencesDialog;
@@ -68,5 +72,29 @@ namespace Deenote.UI
         {
             return _fileExplorerDialog.OpenInputFileAsync(dialogTitle, defaultInput, fileExtension, initialDirectory);
         }
+
+        public void RegisterModalDialog(ModalDialog dialog)
+        {
+            dialog.IsActiveChanged += (dlg, active) =>
+            {
+                if (active) {
+                    _activeDialogs.Push(dlg);
+                    _raycastBlocker.SetActive(true);
+                    _raycastBlocker.transform.SetAsLastSibling();
+                    dlg.transform.SetAsLastSibling();
+                }
+                else {
+                    var popped = _activeDialogs.Pop();
+                    Debug.Assert(popped == dlg);
+                    if (_activeDialogs.TryPeek(out var top)) {
+                        top.transform.SetAsLastSibling();
+                    }
+                    else {
+                        _raycastBlocker.SetActive(false);
+                    }
+                }
+            };
+        }
+
     }
 }

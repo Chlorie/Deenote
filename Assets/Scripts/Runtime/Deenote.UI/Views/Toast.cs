@@ -23,7 +23,7 @@ namespace Deenote.UI.Views
             };
         }
 
-        public void Initialize(int uid, LocalizableText text)
+        internal void Initialize(int uid, LocalizableText text)
         {
             Uid = uid;
             _text.SetText(text);

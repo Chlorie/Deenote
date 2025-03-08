@@ -72,7 +72,7 @@ namespace Deenote.UI.Views.Elements
 
         public void RefreshUI()
         {
-            var (sprite, color) = MainWindow.PerspectiveViewPanelView.StageForeground.Args.GetDifficultyArgs(ChartModel.Difficulty);
+            var (sprite, color) = MainWindow.Views.PerspectiveViewPanelView.StageForeground.Args.GetDifficultyArgs(ChartModel.Difficulty);
             _difficutyIconImage.sprite = sprite;
             _nameText.TmpText.color = color;
             _levelText.TmpText.color = color;

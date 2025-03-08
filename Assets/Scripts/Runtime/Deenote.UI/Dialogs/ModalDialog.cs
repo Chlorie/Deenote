@@ -11,7 +11,7 @@ namespace Deenote.UI.Dialogs
 
         protected virtual void Awake()
         {
-            MainWindow.RegisterModalDialog(this);
+            MainWindow.DialogManager.RegisterModalDialog(this);
         }
 
         protected void OpenSelfModalDialog()

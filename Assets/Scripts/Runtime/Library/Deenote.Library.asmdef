@@ -4,7 +4,8 @@
     "references": [
         "UniTask",
         "Unity.TextMeshPro",
-        "Trarizon.Library"
+        "Trarizon.Library",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

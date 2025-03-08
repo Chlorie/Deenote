@@ -1,7 +1,5 @@
 using Deenote.Library;
 using Deenote.Library.Components;
-using Deenote.Systems.Inputting;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Deenote
@@ -12,19 +10,15 @@ namespace Deenote
         private bool _isIneffectivePropertiesVisible;
         private bool _isFpsShown;
         private float _gameViewScrollSensitivity_bf;
-        private Dictionary<string, ContextualKeyBindingList> _keyBindings;
 
         public GlobalSettings()
         {
-            _keyBindings = new();
-
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
                 configs.Add("vsync", IsVSyncOn);
                 configs.Add("ineffective_prop_visible", IsIneffectivePropertiesVisible);
                 configs.Add("fps_shown", IsFpsShown);
                 configs.Add("scroll_sensitivity", GameViewScrollSensitivity);
-                configs.AddDictionary("key_bindings", _keyBindings);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
@@ -32,7 +26,6 @@ namespace Deenote
                 IsIneffectivePropertiesVisible = configs.GetBoolean("ineffective_prop_visible");
                 IsFpsShown = configs.GetBoolean("fps_shown");
                 GameViewScrollSensitivity = configs.GetSingle("scroll_sensitivity", 1f);
-                _keyBindings = configs.GetObject("key_bindings", _keyBindings) ?? new();
             };
         }
 

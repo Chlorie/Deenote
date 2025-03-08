@@ -34,7 +34,7 @@ namespace Deenote.Library
         public static void WithColorAlpha(this SpriteRenderer spriteRenderer, float alpha)
             => spriteRenderer.color = spriteRenderer.color with { a = alpha };
 
-        public static void WithColorSolid(this SpriteRenderer spriteRenderer, Color color)
+        public static void WithColorRGB(this SpriteRenderer spriteRenderer, Color color)
             => spriteRenderer.color = color with { a = spriteRenderer.color.a };
 
         public static void WithColorAlpha(this Graphic graphic, float alpha)

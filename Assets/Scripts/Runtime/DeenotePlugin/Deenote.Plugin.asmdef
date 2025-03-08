@@ -4,7 +4,9 @@
     "references": [
         "Deenote",
         "Deenote.UI",
-        "UniTask"
+        "UniTask",
+        "Deenote.UIFramework",
+        "Deenote.Localization"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -41,7 +41,7 @@ namespace Deenote.UI.Views.Elements
         {
             _button.Clicked += UniTask.Action(async () =>
             {
-                if (MainSystem.ProjectManager.CurrentProject is not null) {
+                if (MainSystem.ProjectManager.IsProjectLoaded()) {
                     var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_openProjOnOpenMsgBoxArgs);
                     if (res != 0)
                         return;

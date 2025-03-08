@@ -73,7 +73,7 @@ namespace Deenote.Core.GameStage
 
         private void _OnProjectNameChanged(ProjectManager manager)
         {
-            if (manager.CurrentProject is not null)
+            if (manager.IsProjectLoaded())
                 _staveMusicNameText.text = manager.CurrentProject.MusicName;
         }
 

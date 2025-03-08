@@ -363,7 +363,7 @@ namespace Deenote.Entities.Models
                 for (int i = _indices.Length - 1; i >= 0; i--) {
                     if (_chart._visibleNoteNodes[_indices[i]] is NoteModel) {
                         ref var collsion = ref _collisions[i];
-                        collsion ??= _chart.GetCollidedNotesTo(i);
+                        collsion ??= _chart.GetCollidedNotesTo(_indices[i]);
                         collsion.Value.DecrementModelCollisionCounts();
                     }
 

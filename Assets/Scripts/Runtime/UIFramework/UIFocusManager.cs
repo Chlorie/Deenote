@@ -3,24 +3,47 @@
 using Deenote.Library.Components;
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace Deenote.UIFramework
 {
     internal sealed class UIFocusManager : PersistentSingletonBehavior<UIFocusManager>
     {
-        public event Action<MouseButton, Vector2>? FocusChanged;
+        private IFocusable? _focusing;
+        private bool _wasFocusedThisFrame;
+
+        public event Action<IFocusable?>? FocusingChanged;
+
 
         private void LateUpdate()
         {
-            if (FocusChanged is not null) {
-                Vector2? position = null;
-                for (int i = 0; i < 3; i++) {
-                    if (Input.GetMouseButtonDown(i)) {
-                        FocusChanged.Invoke((MouseButton)i, position ??= Input.mousePosition);
-                    }
-                }
+            if (_wasFocusedThisFrame) {
+                _wasFocusedThisFrame = false;
+                return;
             }
+            if (_focusing is null)
+                return;
+
+            var mouse = Mouse.current;
+            if (mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame) {
+                Focus(null);
+            }
+        }
+
+        internal void Focus(IFocusable? focusable)
+        {
+            _wasFocusedThisFrame = true;
+            if (_focusing == focusable)
+                return;
+
+            if (_focusing is not null)
+                _focusing.IsFocused = false;
+            _focusing = focusable;
+            if (_focusing is not null)
+                _focusing.IsFocused = true;
+
+            FocusingChanged?.Invoke(_focusing);
         }
     }
 }

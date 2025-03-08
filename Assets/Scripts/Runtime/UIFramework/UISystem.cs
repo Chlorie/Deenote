@@ -4,13 +4,15 @@ using CommunityToolkit.Diagnostics;
 using Deenote.Library;
 using System;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Deenote.UIFramework
 {
     public static class UISystem
     {
+        private static GameObject? _gameObject;
         private static UIThemeResources? _darkThemeResources;
+
+        internal static GameObject GameObject => _gameObject ??= new GameObject(nameof(UISystem));
 
         internal static UIThemeResources ThemeResources
         {
@@ -27,13 +29,15 @@ namespace Deenote.UIFramework
             set {
                 var index = Array.IndexOf(_themeArgs, value);
                 Guard.IsGreaterThanOrEqualTo(index, 0);
-                if(Utils.SetField(ref _currentThemeIndex, index)) {
+                if (Utils.SetField(ref _currentThemeIndex, index)) {
                     ThemeChanged?.Invoke(_themeArgs[index]);
                 }
             }
         }
 
         public static ReadOnlySpan<UIThemeArgs> Themes => _themeArgs;
+
+        internal static UIFocusManager FocusManager => UIFocusManager.Instance;
 
         public static bool SetTheme(string name)
         {
@@ -57,12 +61,12 @@ namespace Deenote.UIFramework
             }
         }
 
-        public static event Action<MouseButton, Vector2> MouseFocusChanged
-        {
-            add => UIFocusManager.Instance.FocusChanged += value;
-            remove => UIFocusManager.Instance.FocusChanged -= value;
-        }
-
         public static event Action<UIThemeArgs>? ThemeChanged;
+
+        public static event Action<IFocusable> FocusedControlChanged
+        {
+            add => FocusManager.FocusingChanged += value;
+            remove => FocusManager.FocusingChanged -= value;
+        }
     }
 }

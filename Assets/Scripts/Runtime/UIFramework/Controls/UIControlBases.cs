@@ -125,7 +125,7 @@ namespace Deenote.UIFramework.Controls
         }
     }
 
-    public abstract class UIFocusableControlBase : UIVisualTransitionControl, IPointerDownHandler
+    public abstract class UIFocusableControlBase : UIVisualTransitionControl, IFocusable, IPointerDownHandler
     {
         [SerializeField] protected bool _isFocused;
 
@@ -154,26 +154,21 @@ namespace Deenote.UIFramework.Controls
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
-            _isFocused = true;
-            _pointerDownFrame = Time.frameCount;
-            DoVisualTransition();
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            UISystem.MouseFocusChanged += (_, _) =>
-            {
-                if (_pointerDownFrame == Time.frameCount)
-                    return;
-                Unfocus();
-            };
+            UISystem.FocusManager.Focus(this);
         }
 
         protected void Unfocus()
         {
-            _isFocused = false;
-            DoVisualTransition();
+            UISystem.FocusManager.Focus(null);
+        }
+
+        bool IFocusable.IsFocused
+        {
+            get => _isFocused = true;
+            set {
+                _isFocused = value;
+                DoVisualTransition();
+            }
         }
 
         protected enum FocusVisualState

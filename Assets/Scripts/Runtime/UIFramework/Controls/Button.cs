@@ -5,7 +5,6 @@ using Deenote.Library;
 using System;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -14,15 +13,15 @@ namespace Deenote.UIFramework.Controls
     public sealed class Button : UIPressableControlBase, IPointerClickHandler
     {
         [SerializeField] Image _backgroundImage = default!;
-        [SerializeField] Image _image = default!;
-        [SerializeField] TextBlock _text = default!;
+        [SerializeField] Image? _image;
+        [SerializeField] TextBlock? _text;
         [SerializeField] Image _borderImage = default!;
 
         [SerializeField] ButtonColorSet _colorSet;
 
-        public Image Image => _image;
+        public Image Image => _image!;
 
-        public TextBlock Text => _text;
+        public TextBlock Text => _text!;
 
         public ButtonColorSet ColorSet
         {

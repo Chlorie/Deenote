@@ -100,7 +100,7 @@ namespace Deenote.GamePlay.UI
                 ProjectManager.NotificationFlag.CurrentProject,
                 manager =>
                 {
-                    if (manager.CurrentProject is not null)
+                    if (manager.IsProjectLoaded())
                         _musicNameText.text = manager.CurrentProject.MusicName;
                 });
 

@@ -136,10 +136,11 @@ namespace Deenote.UI.Views
                 manager.RegisterNotificationAndInvoke(ProjectManager.NotificationFlag.CurrentProject,
                     manager =>
                     {
-                        if (manager.CurrentProject is not { } proj) {
+                        if (!manager.IsProjectLoaded()) {
                             _projectInfoGroup.gameObject.SetActive(false);
                         }
                         else {
+                            var proj=manager.CurrentProject;
                             _projectInfoGroup.gameObject.SetActive(true);
                             SetAudio(proj.AudioFileRelativePath);
                             SetName(proj.MusicName);
@@ -151,31 +152,31 @@ namespace Deenote.UI.Views
                 manager.RegisterNotification(ProjectManager.NotificationFlag.ProjectAudio,
                     manager =>
                     {
-                        if (manager.CurrentProject is { } proj)
+                        if (manager.IsProjectLoaded() && manager.CurrentProject is var proj)
                             SetAudio(proj.AudioFileRelativePath);
                     });
                 manager.RegisterNotification(ProjectManager.NotificationFlag.ProjectMusicName,
                     manager =>
                     {
-                        if (manager.CurrentProject is { } proj)
+                        if (manager.IsProjectLoaded() && manager.CurrentProject is var proj)
                             SetName(proj.MusicName);
                     });
                 manager.RegisterNotification(ProjectManager.NotificationFlag.ProjectComposer,
                     manager =>
                     {
-                        if (manager.CurrentProject is { } proj)
+                        if (manager.IsProjectLoaded() && manager.CurrentProject is var proj)
                             SetComposer(proj.Composer);
                     });
                 manager.RegisterNotification(ProjectManager.NotificationFlag.ProjectChartDesigner,
                     manager =>
                     {
-                        if (manager.CurrentProject is { } proj)
+                        if (manager.IsProjectLoaded() && manager.CurrentProject is var proj)
                             SetCharter(proj.ChartDesigner);
                     });
                 manager.RegisterNotification(ProjectManager.NotificationFlag.ProjectCharts,
                     manager =>
                     {
-                        if (manager.CurrentProject is { } proj)
+                        if (manager.IsProjectLoaded() && manager.CurrentProject is var proj)
                             SetCharts(manager.CurrentProject.Charts);
                     });
 

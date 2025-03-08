@@ -6,7 +6,8 @@
         "UniTask",
         "Unity.TextMeshPro",
         "Deenote.Localization",
-        "Trarizon.Library"
+        "Trarizon.Library",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

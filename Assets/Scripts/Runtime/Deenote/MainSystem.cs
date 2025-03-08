@@ -8,7 +8,6 @@ using Deenote.Core.GamePlay;
 using Deenote.Core.GameStage;
 using Deenote.Core.Project;
 using Deenote.Library.Components;
-using Deenote.Systems.Inputting;
 using System.Collections.Immutable;
 using UnityEngine;
 
@@ -22,7 +21,6 @@ namespace Deenote
         [SerializeField] ProjectManager _projectManager = default!;
         [SerializeField] GamePlayManager _gamePlayManager = default!;
         [SerializeField] StageChartEditor _stageChartEditor = default!;
-        [SerializeField] KeyBindingManager _keyBindingManager = default!;
 
         public static SaveSystem SaveSystem { get; private set; } = default!;
         public static GlobalSettings GlobalSettings { get; private set; } = default!;
@@ -32,7 +30,6 @@ namespace Deenote
         public static ProjectManager ProjectManager => Instance._projectManager;
         public static GamePlayManager GamePlayManager => Instance._gamePlayManager;
         public static StageChartEditor StageChartEditor => Instance._stageChartEditor;
-        public static KeyBindingManager KeyBindingManager => Instance._keyBindingManager;
 
         internal AutoSaveTrigger AutoSaveTrigger { get; private set; } = default!;
 

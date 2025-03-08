@@ -16,7 +16,7 @@ namespace Deenote.Plugin
         public StageChartEditor Editor { get; }
         public GlobalSettings GlobalSettings { get; }
 
-        public MainWindow MainWindow { get; }
+        public IMainWindow UI { get; }
 
         private DeenotePluginContext()
         {
@@ -24,6 +24,7 @@ namespace Deenote.Plugin
             GameManager = MainSystem.GamePlayManager;
             Editor = MainSystem.StageChartEditor;
             GlobalSettings = MainSystem.GlobalSettings;
+            UI = MainWindow.Instance;
         }
     }
 }

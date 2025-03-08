@@ -19,7 +19,7 @@ namespace Deenote.Core.GameStage
 
         #region Collection Modification
 
-        private void AddTrackNote(NoteModel noteModel, float appearAheadTime)
+        private void AddTrackNote(NoteModel noteModel)
         {
             var item = _pool.Get();
             item.Initialize(noteModel);

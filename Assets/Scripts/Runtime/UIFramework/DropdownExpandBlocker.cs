@@ -15,7 +15,7 @@ namespace Deenote.UIFramework
         {
             get {
                 if (_instance is null) {
-                    var go = new GameObject(nameof(DropdownExpandBlocker));
+                    var go = UISystem.GameObject;
                     var canvas = go.AddComponent<Canvas>();
                     canvas.renderMode = RenderMode.ScreenSpaceOverlay;
                     canvas.sortingOrder = 100;

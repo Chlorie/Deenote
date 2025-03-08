@@ -7,12 +7,13 @@ using Deenote.Library;
 using Deenote.Library.Components;
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Views
 {
-    public sealed partial class PerspectiveViewPanelView : MonoBehaviour
+    public sealed partial class PerspectiveViewPanelView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] AspectRatioFitter _aspectRatioFitter = default!;
         [SerializeField] RawImage _viewRawImage = default!;
@@ -21,6 +22,8 @@ namespace Deenote.UI.Views
         [SerializeField] Transform _windowScreenParentTransform = default!;
         [SerializeField] Transform _fullScreenParentTransform = default!;
         [SerializeField] RectTransform _contentTransform = default!;
+
+        [SerializeField] GraphicRaycaster _raycaster = default!;
 
         private RenderTexture _viewRenderTexture = default!;
 
@@ -51,7 +54,6 @@ namespace Deenote.UI.Views
         public void SetIsFullScreen(bool full)
         {
             if (Utils.SetField(ref _isFullScreen_bf, full)) {
-
                 _contentTransform.parent = full ? _fullScreenParentTransform : _windowScreenParentTransform;
                 _fullScreenParentTransform.gameObject.SetActive(full);
                 _windowScreenParentTransform.gameObject.SetActive(!full);
@@ -65,7 +67,6 @@ namespace Deenote.UI.Views
         private void Awake()
         {
             InitAspectRatioController();
-            RegisterKeyBindings();
 
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
@@ -113,7 +114,20 @@ namespace Deenote.UI.Views
             }
             StageForeground = foreground;
 
-            _OnStageLoaded_Input();
+            _raycaster.enabled = true;
         }
+
+        #region Pointer
+
+        /// <summary>
+        /// InputManager requires this to judge if mouse actions should be enabled.
+        /// </summary>
+        public bool IsHovering { get; private set; }
+        void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
+            => IsHovering = true;
+        void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
+            => IsHovering = false;
+       
+        #endregion
     }
 }

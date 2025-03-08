@@ -21,6 +21,7 @@ namespace Deenote.Core.GamePlay
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
                 configs.Add("stage/highlight_note_speed", HighlightedNoteSpeed);
+                configs.Add("stage/apply_speed_diff", IsApplySpeedDifference);
                 configs.Add("stage/filter_note_speed", IsFilterNoteSpeed);
 
                 configs.Add("stage/note_speed", NoteFallSpeed);
@@ -40,6 +41,7 @@ namespace Deenote.Core.GamePlay
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
                 HighlightedNoteSpeed = configs.GetSingle("stage/highlight_note_speed", 1f);
+                IsApplySpeedDifference = configs.GetBoolean("stage/apply_speed_diff", true);
                 IsFilterNoteSpeed = configs.GetBoolean("stage/filter_note_speed", false);
 
                 NoteFallSpeed = configs.GetInt32("stage/note_speed", 40);
@@ -59,6 +61,7 @@ namespace Deenote.Core.GamePlay
         }
 
         private float _highlightedNoteSpeed_bf;
+        private bool _applySpeedDifference_bf;
         private bool _filterNoteSpeed_bf;
 
         /// <summary>
@@ -78,6 +81,19 @@ namespace Deenote.Core.GamePlay
                         }
                     }
                     NotifyFlag(NotificationFlag.HighlightedNoteSpeed);
+                }
+            }
+        }
+
+        public bool IsApplySpeedDifference
+        {
+            get => _applySpeedDifference_bf;
+            set {
+                if (Utils.SetField(ref _applySpeedDifference_bf, value)) {
+                    if (IsChartLoaded() && IsStageLoaded()) {
+                        NotesManager.RefreshStageActiveNotes();
+                    }
+                    NotifyFlag(NotificationFlag.IsApplySpeedDifference);
                 }
             }
         }

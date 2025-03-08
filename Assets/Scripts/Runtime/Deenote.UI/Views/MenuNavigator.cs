@@ -31,6 +31,11 @@ namespace Deenote.UI.Views
             _toolkitButton.IsCheckedChanged += _toolkitPage.SetActive;
         }
 
+        private void Start()
+        {
+            _menuButton.SetIsChecked(true);
+        }
+
         private void UpdateLayoutPadding(bool pageOn)
         {
             if (pageOn)

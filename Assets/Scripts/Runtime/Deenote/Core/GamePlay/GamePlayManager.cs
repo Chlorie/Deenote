@@ -259,6 +259,7 @@ namespace Deenote.Core.GamePlay
         public enum NotificationFlag
         {
             HighlightedNoteSpeed,
+            IsApplySpeedDifference,
             IsFilterNoteSpeed,
 
             NoteSpeed,

@@ -54,8 +54,9 @@ MonoBehaviour:
   _leftButton: {fileID: 2388814825685474613}
   _textBox: {fileID: 8510316250383359686}
   _rightButton: {fileID: 511440819175143873}
-  <MinValue>k__BackingField: 0
-  <MaxValue>k__BackingField: 1
+  _step: 1
+  _minValue: 0
+  _maxValue: 0
 --- !u!1001 &853994287689743430
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -421,7 +422,7 @@ PrefabInstance:
     - target: {fileID: 4498465869320416693, guid: 61bb944d53f8c1c42a42c2ef3f659a6c,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: -96
+      value: -88
       objectReference: {fileID: 0}
     - target: {fileID: 4498465869320416693, guid: 61bb944d53f8c1c42a42c2ef3f659a6c,
         type: 3}

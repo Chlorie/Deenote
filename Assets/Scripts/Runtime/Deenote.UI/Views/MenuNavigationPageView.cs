@@ -122,16 +122,16 @@ namespace Deenote.UI.Views
 
             // Register
             {
-                _newButton.Clicked += UniTask.Action(NewProjectListener);
-                _openButton.Clicked += UniTask.Action(OpenProjectListener);
+                _newButton.Clicked += UnityUtils.Action(MenuCreateNewProjectAsync);
+                _openButton.Clicked += UnityUtils.Action(MenuOpenProjectAsync);
                 _saveButton.Clicked += () =>
                 {
-                    _ = SaveProjectListener();
+                    _ = MenuSaveProjectAsync();
                     MainSystem.SaveSystem.SaveConfigurations();
                 };
                 _saveAsButton.Clicked += () =>
                 {
-                    _ = SaveAsProjectListener();
+                    _ = MenuSaveProjectAsAsync();
                     MainSystem.SaveSystem.SaveConfigurations();
                 };
                 _preferenceButton.Clicked += () => MainWindow.DialogManager.PreferencesDialog.Open();
@@ -161,7 +161,7 @@ namespace Deenote.UI.Views
                     ProjectManager.NotificationFlag.CurrentProject,
                     manager =>
                     {
-                        bool active = manager.CurrentProject is not null;
+                        bool active = manager.IsProjectLoaded();
                         _saveButton.IsInteractable = active;
                         _saveAsButton.IsInteractable = active;
                     });
@@ -170,7 +170,7 @@ namespace Deenote.UI.Views
 
         #region Notification Listener
 
-        private async UniTaskVoid NewProjectListener()
+        public async UniTask MenuCreateNewProjectAsync()
         {
             if (MainSystem.ProjectManager.IsProjectLoaded()) {
                 var res = await MainWindow.DialogManager.OpenMessageBoxAsync(
@@ -187,13 +187,13 @@ namespace Deenote.UI.Views
             }
         }
 
-        private async UniTaskVoid OpenProjectListener()
+        public async UniTask MenuOpenProjectAsync()
         {
             if (MainSystem.ProjectManager.IsProjectLoaded()) {
                 var res = await MainWindow.DialogManager.OpenMessageBoxAsync(
                     MainSystem.StageChartEditor.HasUnsavedChange
-                        ?_openProjOnUnsavedOpenMsgBoxArgs
-                        :_openProjOnOpenMsgBoxArgs);
+                        ? _openProjOnUnsavedOpenMsgBoxArgs
+                        : _openProjOnOpenMsgBoxArgs);
                 if (res != 0) return;
             }
 
@@ -221,10 +221,10 @@ namespace Deenote.UI.Views
             }
         }
 
-        private async UniTaskVoid SaveProjectListener()
+        public async UniTask MenuSaveProjectAsync()
         {
-            Debug.Assert(MainSystem.ProjectManager.CurrentProject is not null, "Unexpected interactable save button when current project is null");
-            var proj = MainSystem.ProjectManager.CurrentProject!;
+            MainSystem.ProjectManager.AssertProjectLoaded("Unexpected interactable save button when current project is null");
+            var proj = MainSystem.ProjectManager.CurrentProject;
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
 
@@ -235,7 +235,7 @@ namespace Deenote.UI.Views
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
 
-        private async UniTaskVoid SaveAsProjectListener()
+        public async UniTask MenuSaveProjectAsAsync()
         {
             MainSystem.ProjectManager.AssertProjectLoaded("Unexpected interactable save button when current project is not loaded");
         SelectFile:

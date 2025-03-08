@@ -272,7 +272,7 @@ namespace Deenote.Core.Editing
 
         public void InsertTempo(TempoRange range)
         {
-            if (_project.CurrentProject is null)
+            if (!_project.IsProjectLoaded())
                 return;
 
             _operations.Do(_project.CurrentProject.InsertTempo(range)

@@ -19,6 +19,7 @@ namespace Deenote.Core.GamePlay
         private List<TimeGridLineData> _timeGridLines = new();
 
         private int _timeGridSubBeatCount_bf;
+        private bool _timeGridVisible_bf;
 
         /// <summary>
         /// Range [0,64]
@@ -35,9 +36,23 @@ namespace Deenote.Core.GamePlay
             }
         }
 
+        public bool TimeGridVisible
+        {
+            get => _timeGridVisible_bf;
+            set {
+                if (Utils.SetField(ref _timeGridVisible_bf, value)) {
+                    UpdateTimeGrids();
+                    NotifyFlag(NotificationFlag.TimeGridVisible);
+                }
+            }
+        }
+
         private void SubmitTimeGridRender(PerspectiveLinesRenderer.LineCollector collector)
         {
             _game.AssertStageLoaded();
+
+            if (_timeGridLines.Count == 0)
+                return;
 
             float minx = _game.ConvertNoteCoordPositionToWorldX(-EntityArgs.StageMaxPosition);
             float maxx = _game.ConvertNoteCoordPositionToWorldX(EntityArgs.StageMaxPosition);
@@ -60,12 +75,15 @@ namespace Deenote.Core.GamePlay
         private void UpdateTimeGrids()
         {
             var projManager = MainSystem.ProjectManager;
-            if (projManager.CurrentProject is null)
+            if (!projManager.IsProjectLoaded())
                 return;
             if (!_game.IsStageLoaded())
                 return;
 
             _timeGridLines.Clear();
+
+            if (!TimeGridVisible)
+                return;
 
             var project = projManager.CurrentProject;
             var currentTime = _game.MusicPlayer.Time;

@@ -37,13 +37,17 @@ namespace Deenote.Core.GamePlay
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
                 configs.Add("stage/grids/pos_grid_count", PositionGridCount);
+                configs.Add("stage/grids/pos_grid_visible", PositionGridVisible);
                 configs.Add("stage/grids/time_grid_count", TimeGridSubBeatCount);
+                configs.Add("stage/grids/time_grid_visible", TimeGridVisible);
             };
 
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
                 PositionGridCount = configs.GetInt32("stage/grids/pos_grid_count", 9);
+                PositionGridVisible = configs.GetBoolean("stage/grids/pos_grid_visible", true);
                 TimeGridSubBeatCount = configs.GetInt32("stage/grids/time_grid_count", 1);
+                TimeGridVisible = configs.GetBoolean("stage/grids/time_grid_visible", true);
             };
         }
 
@@ -96,7 +100,9 @@ namespace Deenote.Core.GamePlay
         public enum NotificationFlag
         {
             TimeGridSubBeatCountChanged,
+            TimeGridVisible,
             PositionGridChanged,
+            PositionGridVisible,
             IsCurveOnChanged,
         }
     }

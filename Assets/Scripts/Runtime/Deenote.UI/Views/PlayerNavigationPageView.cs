@@ -38,12 +38,12 @@ namespace Deenote.UI.Views
             _aspectRatioDropdown.SelectedIndexChanged += val =>
             {
                 if (val >= 0)
-                    MainWindow.PerspectiveViewPanelView.AspectRatio = PredefinedAspectValues[val];
+                    MainWindow.Views.PerspectiveViewPanelView.AspectRatio = PredefinedAspectValues[val];
             };
-            MainWindow.PerspectiveViewPanelView.AspectRatioChanged += SetAspectRatio;
-            SetAspectRatio(MainWindow.PerspectiveViewPanelView.AspectRatio);
+            MainWindow.Views.PerspectiveViewPanelView.AspectRatioChanged += SetAspectRatio;
+            SetAspectRatio(MainWindow.Views.PerspectiveViewPanelView.AspectRatio);
 
-            _fullScreenButton.Clicked += () => MainWindow.PerspectiveViewPanelView.SetIsFullScreen(true);
+            _fullScreenButton.Clicked += () => MainWindow.Views.PerspectiveViewPanelView.SetIsFullScreen(true);
 
             void SetAspectRatio(float aspectRatio)
             {

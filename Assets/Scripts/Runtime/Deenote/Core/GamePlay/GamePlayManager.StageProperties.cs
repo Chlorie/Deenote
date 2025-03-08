@@ -15,15 +15,17 @@ namespace Deenote.Core.GamePlay
         /// visibility according to <see cref="StageNoteAppearAheadTime"/>
         /// </remarks>
         public float StageNoteActiveAheadTime => Stage!.Args.NotePanelBaseLengthTime / ActualNoteFallSpeed;
-        public float GetStageNoteActiveAheadTime(float noteSpeed) => StageNoteActiveAheadTime / noteSpeed;
+        public float GetStageNoteActiveAheadTime(float noteSpeed) => StageNoteActiveAheadTime / GetDisplayNoteSpeed(noteSpeed);
         public float GetStageNoteActiveTime(IStageNoteNode node) => node.Time - GetStageNoteActiveAheadTime(node.Speed);
 
         /// <summary>
         /// The time from a note(speed==1) appears to falls on the judgeline
         /// </summary>
         public float StageNoteAppearAheadTime => StageNoteActiveAheadTime * VisibleRangePercentage;
-        public float GetStageNoteAppearAheadTime(float noteSpeed) => StageNoteAppearAheadTime / noteSpeed;
+        public float GetStageNoteAppearAheadTime(float noteSpeed) => StageNoteAppearAheadTime / GetDisplayNoteSpeed(noteSpeed);
         public float GetStageNoteAppearTime(IStageNoteNode node) => node.Time - GetStageNoteAppearAheadTime(node.Speed);
+
+        internal float GetDisplayNoteSpeed(float speed) => IsApplySpeedDifference ? speed : 1f;
 
         #region Converters
 
@@ -31,16 +33,16 @@ namespace Deenote.Core.GamePlay
             => x / (Stage!.Args.NotePanelWidth / EntityArgs.StageMaxPositionWidth);
 
         public float ConvertWorldZToNoteCoordTime(float z, float noteSpeed = 1f)
-            => ConvertWorldZToNoteCoordTimeBase(z) / ActualNoteFallSpeed / noteSpeed;
+            => ConvertWorldZToNoteCoordTimeBase(z) / ActualNoteFallSpeed / GetDisplayNoteSpeed(noteSpeed);
 
         public float ConvertNoteCoordPositionToWorldX(float position)
             => position * (Stage!.Args.NotePanelWidth / EntityArgs.StageMaxPositionWidth);
 
         public float ConvertNoteCoordTimeToWorldZ(float time, float noteSpeed = 1f)
-            => ActualNoteFallSpeed * noteSpeed * ConvertNoteCoordTimeToWorldZBase(time);
+            => ActualNoteFallSpeed * GetDisplayNoteSpeed(noteSpeed) * ConvertNoteCoordTimeToWorldZBase(time);
 
         public float ConvertNoteCoordTimeToHoldScaleY(float time, float noteSpeed = 1f)
-            => ActualNoteFallSpeed * noteSpeed * ConvertNoteCoordTimeToWorldZBase(time) / Stage!.Args.HoldSpritePrefab.Sprite.bounds.size.y;
+            => ActualNoteFallSpeed * GetDisplayNoteSpeed(noteSpeed) * ConvertNoteCoordTimeToWorldZBase(time) / Stage!.Args.HoldSpritePrefab.Sprite.bounds.size.y;
 
         public (float X, float Z) ConvertNoteCoordToWorldPosition(NoteCoord coord, float noteSpeed = 1f)
             => (ConvertNoteCoordPositionToWorldX(coord.Position), ConvertNoteCoordTimeToWorldZ(coord.Time, noteSpeed));

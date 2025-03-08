@@ -49,21 +49,25 @@ namespace Deenote.Entities.Models
             for (int i = noteModelIndex - 1; i >= 0; i--) {
                 if (_visibleNoteNodes[i] is not NoteModel note)
                     continue;
-
+                if (note == editNote)
+                    continue;
+                
                 if (!EntityArgs.IsTimeCollided(editNote, note))
                     break;
                 if (EntityArgs.IsPositionCollided(editNote, note))
-                    collidedNotes.Add(editNote);
+                    collidedNotes.Add(note);
             }
 
             for (int i = noteModelIndex + 1; i < _visibleNoteNodes.Count; i++) {
                 if (_visibleNoteNodes[i] is not NoteModel note)
                     continue;
+                if (note == editNote)
+                    continue;
 
                 if (!EntityArgs.IsTimeCollided(editNote, note))
                     break;
                 if (EntityArgs.IsPositionCollided(editNote, note))
-                    collidedNotes.Add(editNote);
+                    collidedNotes.Add(note);
             }
 
             return new CollisionResult(editNote, collidedNotes);

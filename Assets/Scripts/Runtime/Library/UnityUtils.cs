@@ -17,6 +17,11 @@ namespace Deenote.Library
         public static void AddListener(this UnityEvent ev, Func<UniTaskVoid> uniTaskFunc)
             => ev.AddListener(UniTask.UnityAction(uniTaskFunc));
 
+        public static Action Action(Func<UniTask> uniTaskFunc) => uniTaskFunc._ActionExt;
+
+        private static void _ActionExt(this Func<UniTask> uniTaskFunc)
+            => uniTaskFunc().Forget();
+
         public static void Resize(this RenderTexture texture, Vector2Int newSize)
         {
             int width = newSize.x, height = newSize.y;

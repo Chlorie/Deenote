@@ -19,7 +19,13 @@ namespace Deenote.Core
             {
                 var args = new CancelEventArgs();
                 Quitting?.Invoke(args);
-                return !args.Cancel;
+                if (!args.Cancel) {
+                    MainSystem.SaveSystem.SaveConfigurations();
+                    return true;
+                }
+                else {
+                    return false;
+                }
             };
         }
 

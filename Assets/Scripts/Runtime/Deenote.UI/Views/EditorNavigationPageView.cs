@@ -13,13 +13,16 @@ namespace Deenote.UI.Views
     public sealed class EditorNavigationPageView : MonoBehaviour
     {
         [SerializeField] TextBox _highlightNoteSpeedInput = default!;
+        [SerializeField] ToggleButton _applySpeedDiffToggle = default!;
         [SerializeField] ToggleButton _filterNoteSpeedToggle = default!;
 
         [SerializeField] NumericStepper _musicSpeedNumericStepper = default!;
         [SerializeField] TextBox _horizontalGridCountInput = default!;
         [SerializeField] TextBox _verticalGridCountInput = default!;
-        [SerializeField] ToggleSwitch _horizontalGridSnapToggle = default!;
-        [SerializeField] ToggleSwitch _verticalGridSnapToggle = default!;
+        [SerializeField] ToggleButton _horizontalGridSnapToggle = default!;
+        [SerializeField] ToggleButton _horizontalGridVisibleToggle = default!;
+        [SerializeField] ToggleButton _verticalGridSnapToggle = default!;
+        [SerializeField] ToggleButton _verticalGridVisibleToggle = default!;
 
         //[SerializeField] RadioButtonGroup _curveKindRadioGroup = default!;
         [SerializeField] RadioButton _linearCurveRadio = default!;
@@ -73,6 +76,10 @@ namespace Deenote.UI.Views
                 MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                     GamePlayManager.NotificationFlag.HighlightedNoteSpeed,
                     manager => _highlightNoteSpeedInput.SetValueWithoutNotify(MainSystem.GamePlayManager.HighlightedNoteSpeed.ToString("F2")));
+                _applySpeedDiffToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsApplySpeedDifference = val;
+                MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                    GamePlayManager.NotificationFlag.IsApplySpeedDifference,
+                    manager => _applySpeedDiffToggle.SetIsCheckedWithoutNotify(manager.IsApplySpeedDifference));
                 _filterNoteSpeedToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsFilterNoteSpeed = val;
                 MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                     GamePlayManager.NotificationFlag.IsFilterNoteSpeed,
@@ -117,10 +124,20 @@ namespace Deenote.UI.Views
                     StageNotePlacer.NotificationFlag.SnapToTimeGrid,
                     placer => _horizontalGridSnapToggle.SetIsCheckedWithoutNotify(placer.SnapToTimeGrid));
 
+                _horizontalGridVisibleToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.Grids.TimeGridVisible = val;
+                MainSystem.GamePlayManager.Grids.RegisterNotificationAndInvoke(
+                    GridsManager.NotificationFlag.TimeGridVisible,
+                    grids => _horizontalGridVisibleToggle.SetIsCheckedWithoutNotify(grids.TimeGridVisible));
+
                 _verticalGridSnapToggle.IsCheckedChanged += val => MainSystem.StageChartEditor.Placer.SnapToPositionGrid = val;
                 MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
                     StageNotePlacer.NotificationFlag.SnapToPositionGrid,
                     placer => _verticalGridSnapToggle.SetIsCheckedWithoutNotify(placer.SnapToPositionGrid));
+
+                _verticalGridVisibleToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.Grids.PositionGridVisible = val;
+                MainSystem.GamePlayManager.Grids.RegisterNotificationAndInvoke(
+                    GridsManager.NotificationFlag.PositionGridVisible,
+                    grids => _verticalGridVisibleToggle.SetIsCheckedWithoutNotify(grids.PositionGridVisible));
             }
 
             // Curves

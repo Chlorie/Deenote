@@ -10,11 +10,14 @@ namespace Deenote.Runtime.Plugins
 {
     public sealed class LoadLegacyDeenoteConfigurations : IDeenotePlugin
     {
-        public string Name => "Load Legacy Configs";
+        public string GetName(string languageCode) => languageCode switch {
+            "zh" => "载入旧版Deenote配置",
+            "en" or _ => "Load Legacy Deenote Configs",
+        };
 
-        public string? Description => "Load configurations from Deenote v0.x.x";
+        public string? GetDescription(string languageCode) => null;
 
-        public UniTask ExecuteAsync(DeenotePluginContext context)
+        public UniTask ExecuteAsync(DeenotePluginContext context, in DeenotePluginArgs args)
         {
             var autoSave = (AutoSaveState)GetInt("Autosave", 0);
             var lightEffect = GetBool("Light Effect", false);
@@ -44,7 +47,7 @@ namespace Deenote.Runtime.Plugins
             context.GameManager.IsStageEffectOn = lightEffect;
             context.GlobalSettings.IsFpsShown = showFps;
             context.GlobalSettings.IsVSyncOn = vsync;
-            //context.MouseSensitivity
+            context.GlobalSettings.GameViewScrollSensitivity = mouseSensi / 10f;
             context.GameManager.NoteFallSpeed = noteSpeed * 5;
             context.GameManager.MusicSpeed = musicSpeed;
             context.GameManager.HitSoundVolume = effectVolume / 100f;
