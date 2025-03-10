@@ -165,6 +165,14 @@ namespace Deenote.UI.Views
                         _saveButton.IsInteractable = active;
                         _saveAsButton.IsInteractable = active;
                     });
+                MainSystem.ProjectManager.RegisterNotificationAndInvoke(
+                    ProjectManager.NotificationFlag.IsLoading,
+                    manager =>
+                    {
+                        bool active = !manager.IsLoading;
+                        _newButton.IsInteractable = active;
+                        _openButton.IsInteractable = active;
+                    });
             }
         }
 

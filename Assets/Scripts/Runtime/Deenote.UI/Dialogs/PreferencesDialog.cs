@@ -1,6 +1,7 @@
 #nullable enable
 
 using CommunityToolkit.Diagnostics;
+using Deenote.Core;
 using Deenote.Core.GamePlay;
 using Deenote.Core.Project;
 using Deenote.Library.Components;
@@ -24,10 +25,13 @@ namespace Deenote.UI.Dialogs
         [SerializeField] Button _mouseSensitivityInvertButton = default!;
         [SerializeField] ToggleSwitch _distinguishPianoNotesToggle = default!;
         [SerializeField] ToggleSwitch _pauseStageWhenLoseFocusToggle = default!;
+
+        [SerializeField] Dropdown _resolutionDropdown = default!;
         [SerializeField] ToggleSwitch _vSyncToggle = default!;
         [SerializeField] Dropdown _languageDropdown = default!;
         [SerializeField] Dropdown _autoSaveDropdown = default!;
         //[SerializeField] ToggleSwitch _embedAudioDataToggle = default!;
+
         [SerializeField] Dropdown _uiThemeDropdown = default!;
         [SerializeField] ToggleSwitch _showFpsToggle = default!;
         [SerializeField] ToggleSwitch _showIneffectivePropertiesToggle = default!;
@@ -64,6 +68,10 @@ namespace Deenote.UI.Dialogs
                 settings => _mouseSensitivityInput.SetValueWithoutNotify(settings.GameViewScrollSensitivity.ToString("F1")));
 
             // System
+
+            _resolutionDropdown.ResetOptions(_resolutionDropdownOptions.AsSpan());
+            _resolutionDropdown.SelectedIndexChanged += index => ApplicationManager.SetResolution(GetResolutionDropdownOption(index));
+            ApplicationManager.ResolutionChanged += vector => _resolutionDropdown.SetValueWithoutNotify(GetResolutionDropdownIndex(vector));
 
             _vSyncToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsVSyncOn = val;
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
@@ -137,6 +145,33 @@ namespace Deenote.UI.Dialogs
                 ProjectAutoSaveOption.OnAndSaveJson => 2,
                 _ => ThrowHelper.ThrowInvalidOperationException<int>(),
             };
+
+        #endregion
+
+        #region Resolutions
+
+        private static readonly ImmutableArray<string> _resolutionDropdownOptions = ImmutableArray.Create(
+            "960x540", "1280x720", "1600x900", "1920x1080");
+
+        private static Vector2Int GetResolutionDropdownOption(int optionIndex)
+            => optionIndex switch {
+                0 => new(960, 540),
+                1 => new(1280, 720),
+                2 => new(1600, 900),
+                3 => new(1920, 1080),
+                _ => ThrowHelper.ThrowInvalidOperationException<Vector2Int>(),
+            };
+
+        private static int GetResolutionDropdownIndex(Vector2Int option)
+        {
+            return (option.x, option.y) switch {
+                (960, 540) => 0,
+                (1280, 720) => 1,
+                (1600, 900) => 2,
+                (1920, 1080) => 3,
+                _ => -1,
+            };
+        }
 
         #endregion
     }

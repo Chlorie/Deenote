@@ -28,6 +28,10 @@ MonoBehaviour:
     type: 3}
   NoteInfoSoundsCollapseSprite: {fileID: 21300000, guid: 44fc3562342c77440a299711d9fcdc1d,
     type: 3}
+  NoteInfoSoundsQuickAddSprite: {fileID: 21300000, guid: 446001d0d9c78be4ab685cbfa50144fe,
+    type: 3}
+  NoteInfoSoundsQuickRemoveSprite: {fileID: 21300000, guid: 6963110718acabf46b98ee0c053a55cd,
+    type: 3}
   DeemoDifficultyIcons:
     Easy: {fileID: 21300000, guid: b538684605e33ba458ec3f1738888059, type: 3}
     Normal: {fileID: 21300000, guid: fe164f6d18bf10840bd7bf4bf828569f, type: 3}

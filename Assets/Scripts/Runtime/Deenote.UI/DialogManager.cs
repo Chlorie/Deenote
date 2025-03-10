@@ -2,12 +2,14 @@
 
 using CommunityToolkit.HighPerformance.Buffers;
 using Cysharp.Threading.Tasks;
+using Deenote.Library.Collections;
 using Deenote.Localization;
 using Deenote.UI.Dialogs;
 using Deenote.UI.Dialogs.Elements;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using UnityEngine;
 
 namespace Deenote.UI
@@ -26,6 +28,24 @@ namespace Deenote.UI
         public NewProjectDialog NewProjectDialog => _newProjectDialog;
         public PreferencesDialog PreferencesDialog => _preferencesDialog;
         public AboutDialog AboutDialog => _aboutDialog;
+
+        private void Awake()
+        {
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
+            {
+                configs.AddList("ui/file_exploer/pinned", _fileExplorerDialog._pinnedItems.Select(item => item.Directory));
+                configs.Add("ui/new_proj/same_dir", _newProjectDialog._saveToAudioDirectory);
+            };
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
+            {
+                var pinneds = configs.GetStringList("ui/file_exploer/pinned");
+                foreach (var pinned in pinneds.AsSpanOrEmpty()) {
+                    _fileExplorerDialog._pinnedItems.Add(out var item);
+                    item.Initialize(pinned);
+                }
+                _newProjectDialog._saveToAudioDirectory = configs.GetBoolean("ui/new_proj/same_dir", false);
+            };
+        }
 
         public UniTask<int> OpenMessageBoxAsync(in MessageBoxArgs data, ReadOnlySpan<string> contentArgs = default)
         {
@@ -95,6 +115,5 @@ namespace Deenote.UI
                 }
             };
         }
-
     }
 }

@@ -70,7 +70,7 @@ namespace Deenote.Plugin
         }
         public string? GetDescription(string languageCode) => DescriptionGetter?.Invoke(languageCode);
 
-        public UniTask ExecuteAsync(DeenotePluginContext context, in DeenotePluginArgs args)
+        public UniTask ExecuteAsync(DeenotePluginContext context, DeenotePluginArgs args)
         {
             if (_func is Func<DeenotePluginContext, UniTask> contextFunc)
                 return contextFunc.Invoke(context);

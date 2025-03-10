@@ -3,7 +3,9 @@
 using Deenote.Entities.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Trarizon.Library.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Pool;
 
 namespace Deenote.Core.GameStage
@@ -22,6 +24,7 @@ namespace Deenote.Core.GameStage
         private void AddTrackNote(NoteModel noteModel)
         {
             var item = _pool.Get();
+            Debug.Assert(!_trackingNotesInTimeOrder.ToList().Contains(item));
             item.Initialize(noteModel);
             _trackingNotesInTimeOrder.Add(item);
             _trackingNotesAppearTimeOrder.Add(item);
@@ -34,6 +37,13 @@ namespace Deenote.Core.GameStage
             }
             _trackingNotesInTimeOrder.Clear();
             _trackingNotesAppearTimeOrder.Clear();
+        }
+
+        private void RemoveTrackNote(GameStageNoteController noteController)
+        {
+            _pool.Release(noteController);
+            _trackingNotesAppearTimeOrder.Remove(noteController);
+            _trackingNotesInTimeOrder.Remove(noteController);
         }
         /*
         /// <summary>

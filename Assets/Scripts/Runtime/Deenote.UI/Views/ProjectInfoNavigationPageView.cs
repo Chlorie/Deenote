@@ -140,7 +140,7 @@ namespace Deenote.UI.Views
                             _projectInfoGroup.gameObject.SetActive(false);
                         }
                         else {
-                            var proj=manager.CurrentProject;
+                            var proj = manager.CurrentProject;
                             _projectInfoGroup.gameObject.SetActive(true);
                             SetAudio(proj.AudioFileRelativePath);
                             SetName(proj.MusicName);

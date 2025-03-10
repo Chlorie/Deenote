@@ -1,13 +1,12 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
-using Deenote.UIFramework.Controls;
-using Deenote.UI.Dialogs.Elements;
 using Deenote.Library;
-using System.IO;
-using System.Threading;
-using UnityEngine;
 using Deenote.Localization;
+using Deenote.UI.Dialogs.Elements;
+using Deenote.UIFramework.Controls;
+using System.IO;
+using UnityEngine;
 
 namespace Deenote.UI.Dialogs
 {
@@ -35,7 +34,10 @@ namespace Deenote.UI.Dialogs
         [SerializeField] Button _createButton = default!;
         [SerializeField] Button _cancelButton = default!;
 
-        private bool IsSaveToAudioDirectory => _sameDirectoryCheckBox.IsChecked.GetValueOrDefault();
+        private (bool IsValid, string Text) _projectName;
+        private (bool IsValid, string Text) _audioFilePath;
+        private (bool IsValid, string Text) _directory;
+        internal bool _saveToAudioDirectory;
 
         #region MessageBoxArgs
 
@@ -71,7 +73,7 @@ namespace Deenote.UI.Dialogs
 
         #endregion
 
-        private CancellationTokenSource? _sharedCts;
+        private ResetableCancellationTokenSource _cts = new();
 
         private string _projectResultPath = default!;
 
@@ -81,28 +83,40 @@ namespace Deenote.UI.Dialogs
 
             _dialog.CloseButton.Clicked += () =>
             {
-                CloseSelfModalDialog();
-                _sharedCts?.Cancel();
+                _cts.Cancel();
+            };
+            _cancelButton.Clicked += () =>
+            {
+                _cts.Cancel();
             };
 
             _projectNameInput.ValueChanged += val =>
             {
                 if (string.IsNullOrEmpty(val) || !Utils.IsValidFileName(val)) {
+                    _projectName = (false, val);
                     _projectNameErrorText.gameObject.SetActive(true);
-                    UpdateResultText(false);
                 }
                 else {
+                    _projectName = (true, val);
                     _projectNameErrorText.gameObject.SetActive(false);
-                    UpdateResultText(true);
                 }
+                UpdateResult();
+
+                //if (string.IsNullOrEmpty(val) || !Utils.IsValidFileName(val)) {
+                //    _projectNameErrorText.gameObject.SetActive(true);
+                //    UpdateResultText(false);
+                //}
+                //else {
+                //    _projectNameErrorText.gameObject.SetActive(false);
+                //    UpdateResultText(true);
+                //}
             };
             _audioFileInput.ValueChanged += val =>
             {
                 bool valid = IsValidPath(val);
                 _audioFileErrorText.gameObject.SetActive(!valid);
-                if (IsSaveToAudioDirectory) {
-                    UpdateResultText(valid);
-                }
+                _audioFilePath = (valid, val);
+                UpdateResult();
             };
             _audioFileExploreButton.Clicked += UniTask.Action(async UniTaskVoid () =>
             {
@@ -111,11 +125,23 @@ namespace Deenote.UI.Dialogs
                     MainSystem.Args.SupportLoadAudioFileExtensions);
                 if (res.IsCancelled)
                     return;
-                if (string.IsNullOrWhiteSpace(_projectNameInput.Value))
-                    _projectNameInput.Value = Path.GetFileNameWithoutExtension(res.Path);
+                // If user hasnt input project name, we use the audio file name as the project name
+                if (string.IsNullOrWhiteSpace(_projectName.Text)) {
+                    var pname = Path.GetFileNameWithoutExtension(res.Path);
+                    Debug.Assert(Utils.IsValidFileName(pname));
+                    _projectName = (true, pname);
+                    _projectNameInput.SetValueWithoutNotify(pname);
+                }
+                Debug.Assert(IsValidPath(res.Path));
                 _audioFileInput.Value = res.Path;
             });
-            _directoryInput.ValueChanged += OnDirectoryValueChanged;
+            _directoryInput.ValueChanged += val =>
+            {
+                var valid = IsValidPath(val);
+                _directoryErrorText.gameObject.SetActive(!valid);
+                _directory = (valid, val);
+                UpdateResult();
+            };
             _directoryExploreButton.Clicked += UniTask.Action(async UniTaskVoid () =>
             {
                 var res = await MainWindow.DialogManager.OpenFileExplorerSelectDirectoryAsync(
@@ -124,20 +150,18 @@ namespace Deenote.UI.Dialogs
                     return;
                 _directoryInput.Value = res.Path;
             });
-            _sameDirectoryCheckBox.IsCheckedChanged += (val =>
+            _sameDirectoryCheckBox.IsCheckedChanged += val =>
             {
                 bool same = val.GetValueOrDefault();
+                _saveToAudioDirectory = same;
                 if (same) {
                     _directoryInputGameObject.SetActive(false);
                 }
                 else {
                     _directoryInputGameObject.SetActive(true);
-                    OnDirectoryValueChanged(_directoryInput.Value);
                 }
-                UpdateResultText(null);
-            });
-
-            _cancelButton.Clicked += CloseSelfModalDialog;
+                UpdateResult();
+            };
         }
 
         private static bool IsValidPath(string input)
@@ -145,43 +169,46 @@ namespace Deenote.UI.Dialogs
 
         private void ResetDialog()
         {
+            _projectName = default;
+            _audioFilePath = default;
+            //_directory = default; // Do not reset directory
+            _saveToAudioDirectory = false;
+
             _projectNameInput.Value = "";
             _audioFileInput.Value = "";
-            OnDirectoryValueChanged(_directoryInput.Value);
+            _directoryInput.Value = _directory.Text!;
             _sameDirectoryCheckBox.IsChecked = false;
+            // Do not show error text when dialog is just opened
+            _projectNameErrorText.gameObject.SetActive(false);
+            _audioFileErrorText.gameObject.SetActive(false);
+            _directoryErrorText.gameObject.SetActive(false);
+            UpdateResult();
         }
 
-        private void OnDirectoryValueChanged(string val)
+        private void UpdateResult()
         {
-            var valid = IsValidPath(val);
-            _directoryErrorText.gameObject.SetActive(!valid);
-            UpdateResultText(valid);
-        }
-
-        private void UpdateResultText(bool? isValid)
-        {
-            if (isValid is false)
-                goto SetInvalidPath;
+            if (!_projectName.IsValid)
+                goto Invalid;
+            if (!_audioFilePath.IsValid)
+                goto Invalid;
 
             string dir;
-            if (IsSaveToAudioDirectory) {
-                var audio = _audioFileInput.Value;
-                if (isValid is null && !IsValidPath(audio))
-                    goto SetInvalidPath;
-                dir = Path.GetDirectoryName(audio);
+            if (_saveToAudioDirectory) {
+                dir = Path.GetDirectoryName(_audioFilePath.Text);
             }
             else {
-                dir = _directoryInput.Value;
-                if (isValid is null && !IsValidPath(dir))
-                    goto SetInvalidPath;
+                if (!_directory.IsValid)
+                    goto Invalid;
+                dir = _directory.Text;
             }
-            _projectResultPath = Path.Combine(dir, $"{_projectNameInput.Value}.dnt");
+            _projectResultPath = Path.Combine(dir, $"{_projectName.Text}.dnt");
             _createResultText.gameObject.SetActive(true);
             _createResultText.SetLocalizedText(ProjectPathCreateHintKey, _projectResultPath);
             _createButton.IsInteractable = true;
 
-        SetInvalidPath:
-            _createResultText.gameObject.SetActive(false);
+            return;
+        Invalid:
+            _createResultText.SetRawText("");
             _createButton.IsInteractable = false;
         }
 

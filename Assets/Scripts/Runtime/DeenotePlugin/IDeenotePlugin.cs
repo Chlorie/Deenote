@@ -6,13 +6,13 @@ using System.Collections.Immutable;
 
 namespace Deenote.Plugin
 {
-    public delegate UniTask DeenotePluginExecution(DeenotePluginContext context, in DeenotePluginArgs args);
+    public delegate UniTask DeenotePluginExecution(DeenotePluginContext context, DeenotePluginArgs args);
 
     public interface IDeenotePlugin
     {
         string GetName(string languageCode);
         string? GetDescription(string languageCode);
-        UniTask ExecuteAsync(DeenotePluginContext context, in DeenotePluginArgs args);
+        UniTask ExecuteAsync(DeenotePluginContext context, DeenotePluginArgs args);
     }
 
     public interface IDeenotePluginGroup

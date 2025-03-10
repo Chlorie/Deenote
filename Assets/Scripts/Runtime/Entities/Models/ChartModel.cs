@@ -1,6 +1,7 @@
 #nullable enable
 
 using Deenote.Entities.Comparisons;
+using Deenote.Entities.Models.Serialization;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -73,7 +74,17 @@ namespace Deenote.Entities.Models
 
         public string ToJsonString()
         {
-            return JsonConvert.SerializeObject(this);
+            return ToJsonString(ChartSerializationVersion.DeemoIIV2);
+        }
+
+        public string ToJsonString(ChartSerializationVersion version)
+        {
+            var versions = version switch {
+                ChartSerializationVersion.DeemoV2 => ChartSerializationVersions.DeemoV2,
+                ChartSerializationVersion.DeemoIIV2 => ChartSerializationVersions.DeemoIIV2,
+                _ => throw new NotImplementedException(),
+            };
+            return ChartSerializer.Serialize(this, versions);
         }
     }
 }

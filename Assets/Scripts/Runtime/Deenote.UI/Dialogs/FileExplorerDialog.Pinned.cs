@@ -1,10 +1,10 @@
 #nullable enable
 
-using Deenote.UI.Dialogs.Elements;
 using Deenote.Library;
+using Deenote.Library.Collections;
+using Deenote.UI.Dialogs.Elements;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
-using Deenote.Library.Collections;
 
 namespace Deenote.UI.Dialogs
 {
@@ -13,7 +13,7 @@ namespace Deenote.UI.Dialogs
         [Header("Pinned Directories")]
         [SerializeField] FileExplorerPinnedDirectoryListItem _pinnedItemPrefab = default!;
         [SerializeField] Transform _pinnedItemParentTransform = default!;
-        private PooledObjectListView<FileExplorerPinnedDirectoryListItem> _pinnedItems;
+        internal PooledObjectListView<FileExplorerPinnedDirectoryListItem> _pinnedItems;
 
         private void Awake_Pinned()
         {

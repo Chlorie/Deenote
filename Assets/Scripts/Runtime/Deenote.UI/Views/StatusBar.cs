@@ -30,6 +30,8 @@ namespace Deenote.UI.Views
         public void SetLocalizedStatusMessage(string key, ReadOnlySpan<string> args = default)
             => SetStatusMessage(LocalizableText.Localized(key), args);
 
+        public void SetRawTextStatusMessage(string text) => SetStatusMessage(LocalizableText.Raw(text));
+
         private void Awake()
         {
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(

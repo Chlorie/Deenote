@@ -7,6 +7,7 @@ using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.InputSystem.InputActions;
 using Deenote.Library;
+using Deenote.Library.Components;
 using Deenote.UI;
 using Deenote.UIFramework;
 using UnityEngine;
@@ -42,18 +43,18 @@ namespace Deenote.Inputting
 
             UISystem.FocusedControlChanged += ctrl =>
             {
-                SetEnable(ctrl is null);
+                SetGeneralsEnable(ctrl is null);
             };
         }
 
         private void OnEnable()
         {
-            SetEnable(true);
+            SetGeneralsEnable(true);
         }
 
         private void OnDisable()
         {
-            SetEnable(false);
+            SetGeneralsEnable(false);
         }
 
         private void Update()
@@ -62,13 +63,19 @@ namespace Deenote.Inputting
         }
 
 
-        private void SetEnable(bool enable)
+        private void SetGeneralsEnable(bool enable)
         {
             if (Utils.SetField(ref _isEnabled, enable)) {
-                if (enable)
-                    _inputActions.Enable();
-                else
-                    _inputActions.Disable();
+                if (enable) {
+                    _inputActions.StageSettings.Enable();
+                    _inputActions.EditorSettings.Enable();
+                    _inputActions.ProjectManagement.Enable();
+                }
+                else {
+                    _inputActions.StageSettings.Disable();
+                    _inputActions.EditorSettings.Disable();
+                    _inputActions.ProjectManagement.Disable();
+                }
             }
         }
 
@@ -79,6 +86,18 @@ namespace Deenote.Inputting
 
         private void RegisterStageGamePlay()
         {
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.CurrentChart,
+                manager =>
+                {
+                    if (manager.IsChartLoaded()) {
+                        _inputActions.StageGamePlay.Enable();
+                    }
+                    else {
+                        _inputActions.StageGamePlay.Disable();
+                    }
+                });
+
             var actions = _inputActions.StageGamePlay;
             actions.PauseResume.started += _ => _game.MusicPlayer.TogglePlayingState();
             actions.AutoResetPlay.started += _ =>
@@ -166,6 +185,18 @@ namespace Deenote.Inputting
 
         private void RegisterNoteEdit()
         {
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+               GamePlayManager.NotificationFlag.CurrentChart,
+               manager =>
+               {
+                   if (manager.IsChartLoaded()) {
+                       _inputActions.StageGamePlay.Enable();
+                   }
+                   else {
+                       _inputActions.StageGamePlay.Disable();
+                   }
+               });
+
             var actions = _inputActions.NoteEdit;
             actions.SelectAllNotes.started += _ => _editor.Selector.SelectAll();
             actions.RemoveSelectedNotes.started += _ => _editor.RemoveSelectedNotes();

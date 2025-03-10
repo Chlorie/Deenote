@@ -104,6 +104,21 @@ namespace Deenote.UI.Views
             }
         }
 
+        private void Start()
+        {
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.CurrentChart,
+                manager =>
+                {
+                    if (manager.IsChartLoaded()) {
+                        _viewRawImage.enabled = true;
+                    }
+                    else {
+                        _viewRawImage.enabled = false;
+                    }
+                });
+        }
+
         private void _OnStageLoaded(GamePlayManager.StageLoadedEventArgs args)
         {
             args.Stage.PerspectiveCamera.ApplyToRenderTexture(_viewRenderTexture);
@@ -127,7 +142,7 @@ namespace Deenote.UI.Views
             => IsHovering = true;
         void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
             => IsHovering = false;
-       
+
         #endregion
     }
 }

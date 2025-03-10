@@ -18,7 +18,7 @@ namespace Deenote.UI.Views
 
         private void Awake()
         {
-            _pool = UnityUtils.CreateObjectPool(_toastPrefab, transform, defaultCapacity: 1);
+            _pool = UnityUtils.CreateObjectPool(_toastPrefab, transform, item => item.OnInstantiate(this), defaultCapacity: 1);
         }
 
         public void ShowToast(LocalizableText message)
@@ -43,6 +43,10 @@ namespace Deenote.UI.Views
 
         public void ShowLocalizedToast(string key)
             => ShowToast(LocalizableText.Localized(key));
+
+        public void ShowRawTextToast(string text) => ShowToast(LocalizableText.Raw(text));
+
+        public UniTask ShowRawTextToastAsync(string text, float duration_s) => ShowToastAsync(LocalizableText.Raw(text), duration_s);
 
         private Toast ActivateToast(LocalizableText text)
         {

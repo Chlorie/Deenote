@@ -84,7 +84,7 @@ namespace Deenote.UI.Views.Panels
                 StageChartEditor.NotificationFlag.NoteSounds, _OnSelectedNotesSoundsChanged);
             MainSystem.StageChartEditor.Selector.SelectedNotesChanging += _OnSelectedNotesChanging;
             MainSystem.StageChartEditor.Selector.SelectedNotesChanged += _OnSelectedNotesChanged;
-            
+
             _OnSelectedNotesChanged(MainSystem.StageChartEditor.Selector);
         }
 

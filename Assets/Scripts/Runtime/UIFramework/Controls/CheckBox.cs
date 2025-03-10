@@ -44,7 +44,7 @@ namespace Deenote.UIFramework.Controls
 #else
             get => _isChecked_bf;
             set {
-                if(Utils.SetField(ref _isChecked_bf, value)) {
+                if (Utils.SetField(ref _isChecked_bf, value)) {
                     TranslateVisual();
                     OnValueChanged.Invoke(value);
                 }

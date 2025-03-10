@@ -69,7 +69,7 @@ namespace Deenote.Entities.Models
             foreach (var link in links) {
                 NoteModel? prev = null;
                 foreach (var note in link.Notes) {
-                    note._kind = NoteModel.NoteKind.Slide;
+                    note.Kind = NoteModel.NoteKind.Slide;
                     note._prevLink = prev;
                     if (prev != null)
                         prev._nextLink = note;

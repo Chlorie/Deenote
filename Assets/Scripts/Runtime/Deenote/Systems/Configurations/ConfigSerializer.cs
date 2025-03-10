@@ -100,11 +100,15 @@ namespace Deenote.Systems.Configurations
             }
         }
 
-        public struct ConfigRegistration
+        public readonly struct ConfigRegistration
         {
-            private Dictionary<string, object>? _configs;
+            private readonly Dictionary<string, object> _configs = new();
 
-            internal IDictionary<string, object> Configs => _configs ??= new();
+            public ConfigRegistration()
+            {
+            }
+
+            internal IDictionary<string, object> Configs => _configs;
 
             public void Add(string key, int value) => AddInternal(key, value);
             public void Add(string key, float value) => AddInternal(key, value);

@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Collections.Immutable;
 
 namespace Deenote.Entities

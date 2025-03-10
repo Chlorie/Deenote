@@ -48,7 +48,7 @@ namespace Deenote.UIFramework
 
         SurfaceStrokeDefaultColor = 140,
         SurfaceStrokeFlyoutColor,
-        
+
         CardBackgroundDefaultColor = 170,
         CardBackgroundSecondaryColor,
 

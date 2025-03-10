@@ -12,8 +12,8 @@ namespace Deenote.Entities.Models
 
         public float Time
         {
-            get => _noteModel._time;
-            set => _noteModel._time = value;
+            get => _noteModel.Time;
+            set => _noteModel.Time = value;
         }
 
         public ReadOnlySpan<PianoSoundValueModel> Sounds => _noteModel.Sounds.AsSpan();

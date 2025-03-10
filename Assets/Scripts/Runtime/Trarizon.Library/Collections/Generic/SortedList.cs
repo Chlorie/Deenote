@@ -145,6 +145,16 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         return index;
     }
 
+    public void RemoveRange(Range range)
+    {
+        var (ofs, len) = range.GetOffsetAndLength(_count);
+        var movCount = _count - ofs - len;
+        Array.Copy(_array, ofs + len, _array, ofs, movCount);
+        ArrayGrowHelper.FreeManaged(_array, (ofs + movCount)..);
+        _count -= len;
+        _version++;
+    }
+
     public int RemoveFrom(T item, int searchStartIndex)
     {
         if (searchStartIndex <= 0) {

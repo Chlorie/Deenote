@@ -44,6 +44,13 @@ namespace Deenote.Core
         #region Resolution
 
         private static Vector2Int? _resolution;
+        public static event Action<Vector2Int>? ResolutionChanged;
+
+        public static void SetResolution(Vector2Int resolution)
+        {
+            Screen.SetResolution(resolution.x, resolution.y, false);
+            ResolutionChanged?.Invoke(resolution);
+        }
 
         public static void SetAspectRatio(float ratio, bool rememberCurrentResolution)
         {
@@ -53,6 +60,7 @@ namespace Deenote.Core
             }
             int width = (int)(height * ratio);
             Screen.SetResolution(width, height, false);
+            ResolutionChanged?.Invoke(new(width, height));
         }
 
         public static void RecoverResolution()

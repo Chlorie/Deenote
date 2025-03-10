@@ -26,7 +26,7 @@ namespace Deenote
         [RuntimeInitializeOnLoadMethod]
         private static void RegisterBuiltinPlugins()
         {
-            DeenotePluginManager.RegisterPlugin(new LoadLegacyDeenoteConfigurations());
+            DeenotePluginManager.RegisterPluginGroup(new OldVersionCompatibility());
             DeenotePluginManager.RegisterPluginGroup(new CommandShortcutButtons());
         }
 

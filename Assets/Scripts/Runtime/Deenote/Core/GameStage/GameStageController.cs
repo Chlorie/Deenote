@@ -26,8 +26,8 @@ namespace Deenote.Core.GameStage
         /// </summary>
         public Transform NotePanelTransform => _notePanelTransform;
 
-        public Transform NoteIndicatorPanelTransform=>_noteIndicatorPanelTransform;
-      
+        public Transform NoteIndicatorPanelTransform => _noteIndicatorPanelTransform;
+
         [field: SerializeField]
         public GameStageArgs Args { get; private set; } = default!;
         [field: SerializeField]

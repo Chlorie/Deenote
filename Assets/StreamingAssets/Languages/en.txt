@@ -124,10 +124,13 @@ Dialog_FileExplorerCancel_Label=Cancel
 Dialog_NewProject_Title=New Project
 Dialog_NewProjectName_Label=Project Name
 Dialog_NewProjectName_PlaceHolder=Enter project name...
+Dialog_NewProjectName_Invalid=Invalid project name.
 Dialog_NewProjectAudioFile_Label=Audio File
-Dialog_NewProjectAudioFile_PlaceHolder=Enter audio file path...
+Dialog_NewProjectAudioFile_PlaceHolder=Enter or select audio file path...
+Dialog_NewProjectAudioFile_Invalid=Invalid audio file path.
 Dialog_NewProjectDirectory_Label=Directory
 Dialog_NewProjectDirectory_PlaceHolder=Enter directory path...
+Dialog_NewProjectDirectory_Invalid=Invalid directory name.
 Dialog_NewProjectSameDir_Label=Place project file at the directory of audio file
 Dialog_NewProjectResultPath=The project will be created as "{0}".
 Dialog_NewProject_Create_Button=Create
@@ -143,6 +146,7 @@ Dialog_PreferencesMouseSensitivityInvert_Button=Invert
 Dialog_PreferencesDistinguishPianoNotes_Label=Distinguish Piano Notes
 Dialog_PreferencesPauseGamePlayWhenLoseFocus_Label=Pause Game Play When Lose Focus
 Dialog_PreferencesSystem_Header=System
+Dialog_PreferencesResolution_Label=Resolution
 Dialog_PreferencesVSync_Label=VSync
 Dialog_PreferencesLanguage_Label=Language
 Dialog_PreferencesAutoSave_Label=Auto Save
@@ -155,9 +159,6 @@ Dialog_PreferencesTheme_Label=Theme
 Dialog_PreferencesShowFps_Label=Show FPS
 Dialog_PreferencesShowIneffectiveProp_Label=Show Ineffective Properties
 
-NewProjectDialog_ProjectName_Invalid=Invalid project name.
-NewProjectDialog_AudioFile_Invalid=Invalid audio file path.
-NewProjectDialog_Directory_Invalid=Invalid directory name.
 
 # Dynamic / MessageBox
 
@@ -260,7 +261,7 @@ AutoSaveProject_Status_Saved=Project auto saved.
 
 #### Open Recent project
 
-OpenRecentProject_MsgBox_Title
+OpenRecentProject_MsgBox_Title=Open Recent Project
 
 OpenRecentProjectFileNotFound_MsgBox_Content=File not found. Do you want to remove this path?
 OpenRecentProjectFileNotFound_MsgBox_Y=Remove
@@ -342,7 +343,15 @@ Dialog_AboutDevelopers_Page_NachtgeistW_Content="""
 Dialog_AboutDevelopers_Page_Trarizon=Trarizon
 Dialog_AboutDevelopers_Page_Trarizon_Title=Trarizon
 Dialog_AboutDevelopers_Page_Trarizon_Content="""
-    TODO:
+        Trarizonです。我在做完本科毕业设计后开始了这个项目的重构，期间因为各种事情各种拖拖拉拉到现在才差不多完成。
+        
+        关于这个项目的后续。我也不知道未来还有没有精力来继续优化这个项目。反正如果有的话我尽量，但是请不要报太大期待。。
+
+        PS: 事实上在去年fork这个项目的时候我并不没有完全计划要完成重构，最初只是想看看能做到哪一步。所以事实上前几个月我在重构的消息基本是盐酸发出来的.jpg
+        感谢盐酸几年来孜孜不倦的催更.jpg
+
+    - Trarizon
+    - 9 Mar 2025
     """
 
 ## Tutorials
@@ -356,50 +365,50 @@ Dialog_AboutTurorials_Page_Shortcuts_Title=Shortcuts
 Dialog_AboutTurorials_Page_Shortcuts_Content="""
     -Project-
 
-    [Ctrl+N] Create a new project file
-    [Ctrl+O] Open a project file
-    [Ctrl+S] Save current project
-    [Ctrl+Shift+S] Save the project as another file
-    [Ctrl+E] Export all charts created in this project to JSON files
-    [Ctrl+Q] Quit the program
+    <Ctrl+N> Create a new project file
+    <Ctrl+O> Open a project file
+    <Ctrl+S> Save current project
+    <Ctrl+Shift+S> Save the project as another file
+    <Ctrl+E> Export all charts created in this project to JSON files
+    <Ctrl+Q> Quit the program
 
     -Stage-
 
-    [Enter] Toggle play/stop state
-    [Space] Instant play (Play while holding space, stop and go back to where you started playing when you release space)
-    [Home] Jump to the start of the song
-    [End] Jump to the end of the song
-    [Esc] Exit full screen mode
-    [Ctrl+Up/Down] Adjust note falling speed
-    [Alt+Up/Down] Adjust music playing speed
-    [Up/Down or Mouse wheel scroll] Scroll the chart backward/forward
-    [Shift+Up/Down] Scroll the chart faster
+    <Enter> Toggle play/stop state
+    <Space> Instant play (Play while holding space, stop and go back to where you started playing when you release space)
+    <Home> Jump to the start of the song
+    <End> Jump to the end of the song
+    <Esc> Exit full screen mode
+    <Ctrl+Up/Down> Adjust note falling speed
+    <Alt+Up/Down> Adjust music playing speed
+    <Up/Down or Mouse wheel scroll> Scroll the chart backward/forward
+    <Shift+Up/Down> Scroll the chart faster
 
     -Editor-
 
-    [Ctrl+Z] Undo (Max undo steps: 100)
-    [Ctrl+Shift+Z] Redo
-    [Delete] Delete select notes
-    [G] Toggle whether or not to snap to grid
-    [Ctrl+A] Select all notes
-    [L] Link selected notes (Change to slide notes)
-    [U] Unlink selected notes (Change back to click notes)
-    [P] Add empty sound to no-sound selected notes (Change to piano notes)
-    [Ctrl+P] Remove sounds (Change to no sound notes)
-    [Q] Quantize selected notes to the grids
-    [A/D] Adjust selected notes' position values left/right by 0.01
-    [W/S] Adjust selected notes' time values up/down by 1ms
-    [Shift+W/A/S/D] Adjust selected notes' position/time by 0.1/10ms
-    [Z/X] Adjust selected notes' size values by -0.01/0.01
-    [Shift+Z/X] Adjust selected notes' size values by -0.1/0.1
-    [M] Reflect selected notes across the middle line (position = 0 line)
-    [Ctrl+X] Cut selected notes
-    [Ctrl+C] Copy selected notes
-    [Ctrl+V] Paste notes from the clipboard
-    [I] Form a curve passing selected notes (natural cubic spline interpolation)
-    [Shift+I] Form a curve passing selected notes (linear interpolation)
-    [Ctrl+I] Delete the curve
-    [F] Fill notes on the curve
+    <Ctrl+X> Cut selected notes
+    <Ctrl+C> Copy selected notes
+    <Ctrl+V> Paste notes from the clipboard
+    <Ctrl+Z> Undo (Max undo steps: 100)
+    <Ctrl+Shift+Z> Redo
+    <Delete> Delete select notes
+    <Ctrl+A> Select all notes
+    <G> Toggle whether or not to snap to grid
+    <L> Link selected notes (Change to slide notes)
+    <;/U> Unlink selected notes (Change back to click notes)
+    <O> Change note to swipe/flick note
+    <P> Add empty sound to no-sound selected notes (Change to piano notes)
+    <[> Remove sounds (Change to no sound notes)
+    <Q> Quantize selected notes to the grids
+    <W/A/S/D> Adjust selected notes' position/time by 0.01/1ms
+    <Shift+W/A/S/D> Adjust selected notes' position/time by 0.1/10ms
+    <Z/X> Adjust selected notes' size values by -0.01/0.01
+    <Shift+Z/X> Adjust selected notes' size values by -0.1/0.1
+    <M> Reflect selected notes across the middle line (position = 0 line)
+    <F> Fill notes on the curve
+
+    <L Mouse> Select note/Cancel placing note
+    <R Mouse> Press to start place note, move up-down placing hold, move left-right placing swipe
     """
 
 Dialog_AboutTurorials_Page_UpgradeGuide=Upgrade Guide
@@ -411,7 +420,7 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 ## Update History
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
-AboutDialog_Versions_Dnt_1_0_Content=Now developing...
+AboutDialog_Versions_Dnt_1_0_Content=Completely refactored. Support DEEMO II chart edit.
 
 AboutDialog_Versions_Dnt_0_7_3=Deenote 0.7.3
 AboutDialog_Versions_Dnt_0_7_3_Content=Added function of saving selected resolution.<br/>Replace the font of song title, now numbers and some punctuations look official.

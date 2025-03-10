@@ -59,11 +59,15 @@ namespace Deenote.GamePlay.UI
             }
         }
 
+
         protected override void Awake()
         {
             _shockWaveEnterPosX = _shockWaveEnterPosTransform.anchorMin.x;
             _shockWaveExitPosX = _shockWaveExitPosTransform.anchorMin.x;
+        }
 
+        private void Start()
+        {
             _timeSlider.onValueChanged.AddListener(val => MainSystem.GamePlayManager.MusicPlayer.Time = val);
             _pauseButton.onClick.AddListener(() => MainSystem.GamePlayManager.MusicPlayer.TogglePlayingState());
 

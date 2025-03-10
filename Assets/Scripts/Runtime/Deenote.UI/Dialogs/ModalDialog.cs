@@ -16,14 +16,24 @@ namespace Deenote.UI.Dialogs
 
         protected void OpenSelfModalDialog()
         {
-            gameObject.SetActive(true);
-            IsActiveChanged?.Invoke(this, true);
+            if (!gameObject.activeSelf) {
+                gameObject.SetActive(true);
+                IsActiveChanged?.Invoke(this, true);
+            }
+            else {
+                Debug.LogWarning("Trying to open modal dialog when dialog is already active");
+            }
         }
 
         protected void CloseSelfModalDialog()
         {
-            gameObject.SetActive(false);
-            IsActiveChanged?.Invoke(this, false);
+            if (gameObject.activeSelf) {
+                gameObject.SetActive(false);
+                IsActiveChanged?.Invoke(this, false);
+            }
+            else {
+                Debug.LogWarning("Trying to close modal dialog when dialog is already inactive");
+            }
         }
     }
 }

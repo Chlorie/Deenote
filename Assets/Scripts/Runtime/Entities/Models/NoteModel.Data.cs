@@ -10,7 +10,7 @@ namespace Deenote.Entities.Models
 {
     partial class NoteModel
     {
-        internal NoteKind _kind;
+        private NoteKind _kind;
 
         public float Position { get => _position; set => _position = value; }
         public float Time { get => _time; set => _time = value; }

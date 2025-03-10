@@ -29,8 +29,19 @@ namespace Deenote.Core.Project
             }
         }
 
+        private bool _isLoading;
         private bool _isSaving;
         private ResetableCancellationTokenSource _saveCts = new();
+
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set {
+                if (Utils.SetField(ref _isLoading, value)) {
+                    NotifyFlag(NotificationFlag.IsLoading);
+                }
+            }
+        }
 
         private void Awake()
         {
@@ -51,6 +62,8 @@ namespace Deenote.Core.Project
 
         public async UniTask<bool> OpenLoadProjectFileAsync(string filePath)
         {
+            using var loadingScope = new LoadingScope(this);
+
             var proj = await ProjectIO.LoadAsync(filePath);
             if (proj is null)
                 return false;
@@ -144,6 +157,7 @@ namespace Deenote.Core.Project
 
         public enum NotificationFlag
         {
+            IsLoading,
             AutoSave,
 
             CurrentProject,
@@ -153,6 +167,22 @@ namespace Deenote.Core.Project
             ProjectChartDesigner,
             ProjectCharts,
             ProjectTempos,
+        }
+
+        private readonly struct LoadingScope : IDisposable
+        {
+            private readonly ProjectManager _self;
+
+            public LoadingScope(ProjectManager self)
+            {
+                _self = self;
+                _self.IsLoading = true;
+            }
+
+            public void Dispose()
+            {
+                _self.IsLoading = false;
+            }
         }
     }
 }

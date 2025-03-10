@@ -1,0 +1,561 @@
+﻿zh
+中文
+
+# Static
+
+UITheme_Dark=暗色
+UITheme_Light=亮色
+
+## Menu
+
+Nav_Menu=菜单
+NavPanel_NewProject=新建
+NavPanel_OpenProject=打开
+NavPanel_SaveProject=保存
+NavPanel_SaveProjectAs=另存为...
+NavPanel_RecentFiles=最近打开文件
+NavPanel_Preferences=首选项
+NavPanel_About=关于
+NavPanel_UpdateHistory=更新历史
+NavPanel_Tutorials=教程
+NavPanel_CheckUpdate=检查更新
+
+Nav_Project=项目
+NavPanel_Project_Header=项目
+NavPanel_ProjectAudio_Label=音频
+NavPanel_ProjectName_Label=名称
+NavPanel_ProjectComposer_Label=作曲家
+NavPanel_ProjectChartDesigner_Label=谱面设计
+NavPanel_ProjectCharts_Label=谱面
+NavPanel_ProjectAddChart=新建
+NavPanel_ProjectLoadChart=加载
+NavPanel_Chart_Header=谱面
+NavPanel_ChartName_Label=标记名称
+NavPanel_ChartDifficulty_Label=难度
+NavPanel_ChartLevel_Label=等级
+NavPanel_ChartSpeed_Label=Speed
+NavPanel_ChartRemapVolume_Label=重映射音量
+
+Nav_Player=播放器
+NavPanel_Player_Header=播放器
+NavPanel_View_Label=预览视图
+NavPanel_PlayerNoteFallSpeed_Label=音符下落速度
+NavPanel_MusicVolume_Label=音乐音量
+NavPanel_EffectVolume_Label=音效音量
+NavPanel_PianoVolume_Label=钢琴音量
+NavPanel_SuddenPlus_Label=上隐
+NavPanel_LinksIndicator_Label=滑键连线
+NavPanel_PlacementIndicator_Label=显示摆放位置预览
+NavPanel_EarlyShowSlowNotes=慢速音符提前显示
+
+Nav_Toolkit=工具
+
+Nav_Editor=编辑
+NavPanel_Note_Header=音符
+NavPanel_NoteSelected_Header=音符 (已选中{0}个)
+NavPanel_NotePosition_Label=位置
+NavPanel_NoteTime_Label=时间
+NavPanel_NoteSize_Label=宽度
+NavPanel_NoteDuration_Label=Hold时长
+NavPanel_NoteKindClick_Label=Click
+NavPanel_NoteKindSlide_Label=Slide
+NavPanel_NoteKindSwipe_Label=Swipe
+NavPanel_NoteSpeed_Label=速度
+NavPanel_NoteSounds_Label=钢琴音
+NavPanel_NoteSoundsEdit=编辑
+NavPanel_NotePiano_Play=播放
+NavPanel_NotePiano_Revert=撤销修改
+NavPanel_NoteShift_Label=Shift
+NavPanel_NoteEventId_Label=Event Id
+NavPanel_NoteWarningType_Label=Warning Type
+NavPanel_NoteVibrate_Label=Vibrate
+NavPanel_NotePropertyMultipleValue_PlaceHolder=多个不同值
+NavPanel_Editor_Header=编辑器
+NavPanel_EditorPlaceNoteSpeed=默认放置音符速度
+NavPanel_EditorMusicSpeed_Label=音乐速度
+NavPanel_EditorGrids_SubHeader=格线
+NavPanel_EditorGridSnap_Label=吸附
+NavPanel_EditorCurve_SubHeader=曲线
+NavPanel_EditorCurveLinear_Label=直线
+NavPanel_EditorCurveCubic_Label=曲线
+NavPanel_EditorCurveGenerate_Label=生成
+NavPanel_EditorCurveDisable_Label=取消格线
+NavPanel_EditorCurveFillAmount_PlaceHolder=填充数量
+NavPanel_EditorCurveFill_Label=填充
+NavPanel_EditorCurveAutoApply_SubHeader=属性应用插值
+NavPanel_EditorCurveAutoApplyApply_Label=应用
+NavPanel_EditorBpm_SubHeader=BPM
+NavPanel_EditorBpmTime_Label=时间
+NavPanel_EditorBpmTimeStart_PlaceHolder=起始
+NavPanel_EditorBpmTimeEnd_PlaceHolder=结束
+NavPanel_EditorBpmBpm_Label=BPM
+NavPanel_EditorBpmFill_Label=填充
+
+
+## Status Bar
+StatusBar_Fps=FPS: {0}
+
+
+## Dialogs
+
+Dialog_About_Title=关于
+Dialog_AboutDevelopers_Section=开发者
+Dialog_AboutTutorials_Section=教程
+Dialog_AboutUpdateHistory_Section=更新历史
+
+Dialog_FileExplorer_Title=文件浏览器
+Dialog_FileExplorerConfirm_Label=确认
+Dialog_FileExplorerCancel_Label=取消
+
+Dialog_NewProject_Title=新建项目
+Dialog_NewProjectName_Label=项目名称
+Dialog_NewProjectName_PlaceHolder=输入项目名称...
+Dialog_NewProjectAudioFile_Label=音频文件
+Dialog_NewProjectAudioFile_PlaceHolder=输入或选择音频文件路径...
+Dialog_NewProjectDirectory_Label=项目位置
+Dialog_NewProjectDirectory_PlaceHolder=输入或选择项目保存文件夹路径...
+Dialog_NewProjectSameDir_Label=将项目放在音频文件同一目录下
+Dialog_NewProjectResultPath=项目将新建为 "{0}".
+Dialog_NewProject_Create_Button=创建
+Dialog_NewProject_Cancel_Button=取消
+Dialog_FileExplorer_SelectAudio_Title=选择音频
+Dialog_FileExplorer_SelectDirectory_Title=选择目录
+
+Dialog_Preferences_Title=首选项
+Dialog_PreferencesGameStage_Header=游戏场景
+Dialog_PreferencesGameStageEffect_Label=场景动效
+Dialog_PreferencesMouseSensitivity_Label=鼠标滚轮灵敏度
+Dialog_PreferencesMouseSensitivityInvert_Button=反转
+Dialog_PreferencesDistinguishPianoNotes_Label=区分钢琴音符
+Dialog_PreferencesPauseGamePlayWhenLoseFocus_Label=应用失去焦点时暂停
+Dialog_PreferencesSystem_Header=系统
+Dialog_PreferencesResolution_Label=分辨率
+Dialog_PreferencesVSync_Label=垂直同步
+Dialog_PreferencesLanguage_Label=语言
+Dialog_PreferencesAutoSave_Label=自动保存
+Dialog_PreferencesAutoSaveOff_Option=关闭
+Dialog_PreferencesAutoSaveOn_Option=打开
+Dialog_PreferencesAutoSaveOnAndSaveJson_Option=打开并保存Json
+Dialog_PreferencesEmbedProjectAudio_Label=嵌入音频文件到项目中
+Dialog_PreferencesUI_Header=UI
+Dialog_PreferencesTheme_Label=主题
+Dialog_PreferencesShowFps_Label=显示FPS
+Dialog_PreferencesShowIneffectiveProp_Label=显示无效音符属性
+
+NewProjectDialog_ProjectName_Invalid=无效项目名称.
+NewProjectDialog_AudioFile_Invalid=无效音频文件路径.
+NewProjectDialog_Directory_Invalid=无效文件夹路径.
+
+# Dynamic / MessageBox
+
+## System
+
+Quit_MsgBox_Title=退出
+QuitUnsaved_MsgBox_Content=项目未保存，是否确定退出？
+Quit_MsgBox_Y=退出
+Quit_MsgBox_N=取消
+
+Version_NoInternet_Toast=网络未连接
+Version_UpToDate_Toast=Deenote已是最新版本。
+NewVersion_MsgBox_Title=发现新版本。
+NewVersion_MsgBox_Content=当前版本：{0}，最新版本：{1}
+NewVersion_MsgBox_1=前往发布页
+NewVersion_MsgBox_2=前往下载页
+NewVersion_MsgBox_N=稍后更新
+
+UnhandledException_Toast="""
+    检测到未处理的异常
+    完整的错误信息已被保存到exceptions.log
+    """
+
+## Menu
+
+### File
+
+DirExists_MsgBox_Content=该路径存在同名文件夹，请重新选择路径。
+DirExists_MsgBox_Y=OK
+
+FileExistsOverwrite_MsgBox_Content=该路径存在同名文件，是否选择覆盖该文件？
+FileExistsOverwrite_MsgBox_Y=覆盖
+FileExistsOverwrite_MsgBox_N=取消
+
+#### FileExplorer Pin
+
+DirNotFound_MsgBox_Title=未找到指定目录
+PinDirNotFound_MsgBox_Content=未找到指定目录，是否在固定列表中移除该目录？
+PinDirNotFound_MsgBox_Y=移除
+PinDirNotFound_MsgBox_N=取消
+
+#### New Project
+
+NewProject_MsgBox_Title=新建项目
+NewProject_Status_Created=项目已新建。
+NewProject_FileExplorer_SelectDirectory_Title=选择目录。
+
+NewProjectOnOpen_MsgBox_Content="""
+    新建项目后当前项目会被关闭
+    """
+NewProjectOnUnsavedOpen_MsgBox_Content="""
+    当前项目有未保存的更改
+    新建项目会<color=#ff5555>丢失未保存的更改</color>
+    """
+
+NewProjectOnOpen_MsgBox_Y=创建
+NewProjectOnOpen_MsgBox_N=取消
+
+NewProjectAudioLoadFailed_MsgBox_Content=无法加载音频文件，请重新选择文件。
+NewProjectAudioLoadFailed_MsgBox_Y=OK
+
+NewProjectAudioNotExists_MsgBox_Content=未找到指定音频文件。
+NewProjectAudioNotExists_MsgBox_Y=OK
+
+#### Open Project
+
+OpenProject_MsgBox_Title=打开项目
+OpenProject_Status_Loaded=项目已加载。
+OpenProject_Status_Loading=项目加载中...
+OpenProject_Status_LoadFailed=项目加载失败。
+OpenProject_FileExplorer_Title=打开项目
+
+OpenProjectOnOpen_MsgBox_Content="""
+    打开新项目后当前项目会被关闭.
+    """
+OpenProjectOnUnsavedOpen_MsgBox_Content="""
+    当前项目有未保存的更改
+    打开新项目会<color=#ff5555>丢失未保存的更改</color>
+    """
+OpenProjectOnOpen_MsgBox_Y=打开
+OpenProjectOnOpen_MsgBox_N=取消
+
+LoadProjectFailed_MsgBox_Content="""
+    项目文件加载失败，该文件可能非Deenote项目文件或已损坏，
+    请重新选择。
+    """
+LoadProjectFailed_MsgBox_Y=OK
+LoadProjectFailed_MsgBox_N=取消
+
+#### Save Project
+
+SaveProject_MsgBox_Title=保存项目
+SaveProject_Status_Saving=项目保存中...
+SaveProject_Status_Saved=项目已保存。
+SaveProject_FileExplorer_Title=保存项目
+SaveAsProject_FileExplorer_Title=另存为...
+
+AutoSaveProject_Status_Saving=项目自动保存中...
+AutoSaveProject_Status_Saved=项目已自动保存。
+
+#### Open Recent project
+
+OpenRecentProject_MsgBox_Title=打开最近项目
+
+OpenRecentProjectFileNotFound_MsgBox_Content=未找到文件。是否从最近项目中移除该路径？
+OpenRecentProjectFileNotFound_MsgBox_Y=移除
+OpenRecentProjectFileNotFound_MsgBox_X=重新选择
+OpenRecentProjectFileNotFound_MsgBox_N=取消
+
+### Project
+
+LoadAudio_MsgBox_Title=加载音频文件
+LoadAudioFailed_MsgBox_Content=音频文件加载失败，请尝试选择其他文件。
+LoadAudioFailed_MsgBox_Y=OK
+SelectAudio_FileExplorer_Title=选择音频文件
+
+LoadChart_MsgBox_Title=加载谱面
+LoadChart_Status_Loaded=谱面已加载。
+SelectChart_FileExplorer_Title=选择谱面文件
+LoadChartFailed_MsgBox_Content=谱面文件加载失败，请尝试选择其他文件。
+LoadChartFailed_MsgBox_Y=OK
+
+ExportChart_Status_Exporting=谱面文件导出中...
+ExportChart_Status_Exported=谱面文件已导出。
+ExportChart_FileExplorer_Title=导出谱面到...
+
+# About contents
+
+## Developers
+
+Dialog_AboutDevelopers_Page_HCl=HCl
+Dialog_AboutDevelopers_Page_HCl_Title=HCl
+Dialog_AboutDevelopers_Page_HCl_Content="""
+    Deenote By HCl
+
+    -必须要说的那些话-
+        谢谢你使用我写的程序！
+        有些事我在开头还是必须要提一下的：此应用只得被用于Deemo谱面自制，严禁用于任何商业用途。这个应用制作自制谱面只是用来观看的，但如果你从某些渠道得知了将谱面导入游戏的方法，<color=#ff7f7f>请不要</color>散布（甚至公开）破解或修改过的游戏文件。这样做的话后果自负。
+
+    -一些乱七八糟的东西-
+        [自我介绍一下？>
+            本人是个音游玩家，圈名HCl。目前（在写这个的时候）年龄17岁，在中国科学技术大学（USTC）学习计算数学，今年大三。
+        [关于这个应用呢？>
+            我写这个就是用来玩的。因为本人编程能力不强，C#/Unity3D这方面还是个新手所以代码里可能会有5000兆个bug，但是谁关心这个啊？（不是，所有人都关心。）因为我还是个学生，而且你们都知道的，大三非常忙，所以我写这个的时间不是很多，求别催。
+            关于在0.5.6版本添加的拖动文件到窗口内打开的功能，我是用了Schwarzer（Lanota谱面编辑器Lanotalium的作者，是个dalao，推荐看一看他的作品）写的一个动态链接库。所以这块出了问题的话你们知道应该找谁XD
+        [别的呢？>
+            希望你们喜欢Deenote。没了。（怎么跟英文那边说好的不一样呢.jpg）
+
+    -已知bug-
+        关于UI和快捷键的bug很多（比如你在钢琴窗口打开的时候试图打开新项目的话钢琴窗口会留在那不会关闭，这有可能会导致一些问题产生）。现在的状况不是我修不了而是修这个实在费事费时间...所以请给我足够的时间...
+
+    -如果你发现了更多bug或者想提一些新功能的建议-
+        请在github上Deenote的repo这里建立Issue，链接：https://github.com/Chlorie/Deenote/issues。不要总私聊我...
+    
+    -鸣谢-
+        感谢Cytunity和Deemo Note Memory（的制作者们）给我带来的灵感。
+        感谢Schwarzer同学的dll。
+        特别要感谢rkevin和ゆゆ提供的技术支持！
+
+    - HCl
+    - 2017-12-2
+    """
+
+Dialog_AboutDevelopers_Page_NachtgeistW=NachtgeistW
+Dialog_AboutDevelopers_Page_NachtgeistW_Title=NachtgeistW
+Dialog_AboutDevelopers_Page_NachtgeistW_Content="""
+        这里夜轮。我出于某种原因捡起了这个项目，开始边学 C# 边试图修 Deenote。
+        我今年大三，而盐酸已经以优异的成绩大学毕业，他今年研一。
+        0.7.3 是在残像的帮助下写的。一并感谢。
+        我也不知道我会给这个项目带来什么，所以走一步算一步吧。
+        感谢你使用 Deenote。
+
+    - 夜轮
+    - 2020-1-31
+    """
+
+Dialog_AboutDevelopers_Page_Trarizon=Trarizon
+Dialog_AboutDevelopers_Page_Trarizon_Title=Trarizon
+Dialog_AboutDevelopers_Page_Trarizon_Content="""
+        Trarizonです。我在做完本科毕业设计后开始了这个项目的重构，期间因为各种事情各种拖拖拉拉到现在才差不多完成。
+        
+        关于这个项目的后续。我也不知道未来还有没有精力来继续优化这个项目。反正如果有的话我尽量，但是请不要报太大期待。。
+
+        PS: 事实上在去年fork这个项目的时候我并不没有完全计划要完成重构，最初只是想看看能做到哪一步。所以事实上前几个月我在重构的消息基本是盐酸发出来的.jpg
+        感谢盐酸几年来孜孜不倦的催更.jpg
+
+    - Trarizon
+    - 9 Mar 2025
+    """
+
+## Tutorials
+
+Dialog_AboutTurorials_Page_Tutorial=教程
+Dialog_AboutTurorials_Page_Tutorial_Title=教程
+Dialog_AboutTurorials_Page_Tutorial_Content=<color=#800000ff>Coming S∞n</color>
+
+Dialog_AboutTurorials_Page_Shortcuts=快捷键列表
+Dialog_AboutTurorials_Page_Shortcuts_Title=快捷键列表
+Dialog_AboutTurorials_Page_Shortcuts_Content="""
+    -项目-
+
+    <Ctrl+N> 新建项目
+    <Ctrl+O> 打开项目文件
+    <Ctrl+S> 保存当前项目
+    <Ctrl+Shift+S> 项目另存为
+    <Ctrl+E> 导出该项目的所有谱面文件为json
+
+    -场景-
+
+    <Enter> 播放/暂停
+    <Space> 按住播放，松开时回到原位
+    <Home> 跳转到音乐开始位置
+    <End> 跳转到音乐结束位置
+    <Esc> 退出全屏
+    <Ctrl+Up/Down> 调整音符下落速度
+    <Alt+Up/Down> 调整音乐播放速度
+    <Up/Down/鼠标滚轮> 调整音乐播放位置
+    <Shift+Up/Down> 快速调整音乐播放位置
+
+    -编辑-
+
+    <Ctrl+X> 剪切
+    <Ctrl+C> 复制
+    <Ctrl+V> 粘贴
+    <Ctrl+Z> 撤销 (最大撤销数: 100)
+    <Ctrl+Shift+Z> 重做
+    <Delete> 删除选中音符
+    <Ctrl+A> 选择所有音符
+    <G> 反转是否吸附到格线
+    <L> 转换为Slide音符并连接
+    <;/U> 转换为Click音符
+    <O> 转换为Swipe/Flick音符
+    <P> 给无钢琴音的音符添加单个空钢琴音
+    <[> 删除钢琴音
+    <Q> 将选中音符吸附到格线
+    <W/A/S/D> 调整选中音符的位置(0.01)/时间(1ms)
+    <Shift+W/A/S/D> 调整选中音符的位置(0.1)/时间(10ms)
+    <Alt+W/A/S/D> 将选中音符的位置/时间吸附到下一格线
+    <Z/X> 调整选中音符的大小(0.01)
+    <Shift+Z/X> 调整选中音符的大小(0.1)
+    <M> 以Pos=0为线镜像音符位置
+    <F> Fill notes on the curve
+
+    <鼠标左键> 选择音符/取消放置音符
+    <鼠标右键> 按下开始放置音符，上下滑动放置Hold音符，左右滑动放置Swipe音符
+    """
+
+Dialog_AboutTurorials_Page_UpgradeGuide=新版迁移
+Dialog_AboutTurorials_Page_UpgradeGuide_Title=新版迁移
+Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
+    TODO
+    """
+
+## Update History
+
+AboutDialog_Versions_Dnt_1_0=Deenote 1.0
+AboutDialog_Versions_Dnt_1_0_Content=完全重构，支持Deemo II谱面编辑。
+
+AboutDialog_Versions_Dnt_0_7_3=Deenote 0.7.3
+AboutDialog_Versions_Dnt_0_7_3_Content=增加了保存选定分辨率的功能。<br/>换掉了歌曲标题的字体，现在数字和部分标点跟官方一样了。
+
+AboutDialog_Versions_Dnt_0_7_2=Deenote 0.7.2
+AboutDialog_Versions_Dnt_0_7_2_Content=修复了更新检查的问题。<br/>加入了自动保存Json谱面的功能。
+
+AboutDialog_Versions_Dnt_0_7_1=Deenote 0.7.1
+AboutDialog_Versions_Dnt_0_7_1_Content=修复了版本0.7新功能中的一个bug。
+
+AboutDialog_Versions_Dnt_0_7=Deenote 0.7
+AboutDialog_Versions_Dnt_0_7_Content=为组曲制作添加了谱面连接功能。
+
+AboutDialog_Versions_Dnt_0_6_12=Deenote 0.6.12
+AboutDialog_Versions_Dnt_0_6_12_Content="""
+    修改了charming光效的颜色。现在光效应该更偏橙色而不是黄色。
+    现在若发现未经处理的异常则会弹出对话框提醒并保存到文件，反馈bug会更容易一些。
+    取消了对.ogg文件的支持。
+    若在读取音频时捕获到异常, 用户会被强制重新选择音频文件。
+    """
+
+AboutDialog_Versions_Dnt_0_6_11=Deenote 0.6.11
+AboutDialog_Versions_Dnt_0_6_11_Content=终于修改了charming光效的着色器。现在光效要比以前好看多了。
+
+AboutDialog_Versions_Dnt_0_6_10=Deenote 0.6.10
+AboutDialog_Versions_Dnt_0_6_10_Content=部分地“修复”了mp3文件丢失第一帧的问题 (在所有采样前面增加一个空帧), 现在Deenote不会有奇怪的26毫秒offset了。
+
+AboutDialog_Versions_Dnt_0_6_9=Deenote 0.6.9
+AboutDialog_Versions_Dnt_0_6_9_Content=修复了不能打开文件的问题。<br/>修复了更新检查。
+
+AboutDialog_Versions_Dnt_0_6_8=Deenote 0.6.8
+AboutDialog_Versions_Dnt_0_6_8_Content="""
+    解决了导入JSON谱面会导致拍线消失的问题。
+    解决了谱面中note很多时插入新note导致栈溢出的问题。
+    """
+
+AboutDialog_Versions_Dnt_0_6_7=Deenote 0.6.7
+AboutDialog_Versions_Dnt_0_6_7_Content="""
+    增加了中文的本地化支持。
+    修复了一些小漏洞。
+    重叠note现在会显示红色。
+    """
+
+AboutDialog_Versions_Dnt_0_6_6=Deenote 0.6.6
+AboutDialog_Versions_Dnt_0_6_6_Content=优化了文件格式，项目文件将占用更少空间。
+
+AboutDialog_Versions_Dnt_0_6_5=Deenote 0.6.5
+AboutDialog_Versions_Dnt_0_6_5_Content="""
+    增加了镜像功能。
+    为调整note宽度添加了快捷键。
+    现在粘贴时按住Shift键，粘贴的note会保持被复制的note的横向位置。
+    """
+
+AboutDialog_Versions_Dnt_0_6_4=Deenote 0.6.4
+AboutDialog_Versions_Dnt_0_6_4_Content="""
+    在选中note信息中添加了note编号域。
+    修复漏洞：滑键导出格式不正确。
+    修复漏洞：导出文件名不正确。
+    """
+
+AboutDialog_Versions_Dnt_0_6_3=Deenote 0.6.3
+AboutDialog_Versions_Dnt_0_6_3_Content=现在关闭app应该不会出现问题了。<br/>增加了调整窗口大小的设置项。
+
+AboutDialog_Versions_Dnt_0_6_2=Deenote 0.6.2
+AboutDialog_Versions_Dnt_0_6_2_Content=修复漏洞：打开教程后所有输入都被忽略。
+
+AboutDialog_Versions_Dnt_0_6_1=Deenote 0.6.1
+AboutDialog_Versions_Dnt_0_6_1_Content=添加了中文教程。英文教程即将更新。
+
+AboutDialog_Versions_Dnt_0_6=Deenote 0.6
+AboutDialog_Versions_Dnt_0_6_Content=添加了曲线生成功能。
+
+AboutDialog_Versions_Dnt_0_5_10=Deenote 0.5.10
+AboutDialog_Versions_Dnt_0_5_10_Content="""
+    现在保存和读入文件不会再阻塞主线程了。
+    修复了关于音乐回放位置的严重漏洞。
+    """
+
+AboutDialog_Versions_Dnt_0_5_9=Deenote 0.5.9
+AboutDialog_Versions_Dnt_0_5_9_Content=将更新历史从关于中分离出来。<br/>添加了更新检测。<br/>修复用户界面的一些小漏洞。
+
+AboutDialog_Versions_Dnt_0_5_8=Deenote 0.5.8
+AboutDialog_Versions_Dnt_0_5_8_Content="""
+    现在你可以替换项目中使用的音乐文件了。
+    创建新文件时同后缀名的已有文件也会在文件选择窗口中显示。
+    """
+
+AboutDialog_Versions_Dnt_0_5_7=Deenote 0.5.7
+AboutDialog_Versions_Dnt_0_5_7_Content="""
+    修复漏洞：不能打开文件。
+    修复漏洞：滑键连线不能关闭。
+    删除了Schwarzer的名言，我还不想死（
+    """
+
+AboutDialog_Versions_Dnt_0_5_6=Deenote 0.5.6
+AboutDialog_Versions_Dnt_0_5_6_Content=添加了拖动文件到窗口打开文件的功能。（感谢Schwarzer！）
+
+AboutDialog_Versions_Dnt_0_5_5=Deenote 0.5.5
+AboutDialog_Versions_Dnt_0_5_5_Content=添加了对MP3音乐文件的支持。
+
+AboutDialog_Versions_Dnt_0_5_4=Deenote 0.5.4
+AboutDialog_Versions_Dnt_0_5_4_Content=彻底重写了连线显示的代码。
+
+AboutDialog_Versions_Dnt_0_5_3=Deenote 0.5.3
+AboutDialog_Versions_Dnt_0_5_3_Content=添加了垂直同步的开关。<br/>现在编辑器设置也会被自动保存。
+
+AboutDialog_Versions_Dnt_0_5_2=Deenote 0.5.2
+AboutDialog_Versions_Dnt_0_5_2_Content=将钢琴音的默认音量从127调整为0。<br/>现在你可以导入OGG音乐文件了。
+
+AboutDialog_Versions_Dnt_0_5_1=Deenote 0.5.1
+AboutDialog_Versions_Dnt_0_5_1_Content=修复了删除滑键时剩余的滑键会连接错误的漏洞。
+
+AboutDialog_Versions_Dnt_0_5=Deenote 0.5
+AboutDialog_Versions_Dnt_0_5_Content=复制/粘贴功能。<br/>量化note功能。
+
+AboutDialog_Versions_Dnt_0_4=Deenote 0.4
+AboutDialog_Versions_Dnt_0_4_Content=全部note属性编辑功能。
+
+AboutDialog_Versions_Dnt_0_3_1=Deenote 0.3.1
+AboutDialog_Versions_Dnt_0_3_1_Content=文件后缀名关联。
+
+AboutDialog_Versions_Dnt_0_3_0_2=Deenote 0.3 build 2
+AboutDialog_Versions_Dnt_0_3_0_2_Content=稍微更改了拍线存储方式。<br/>重新设计了编辑板块的UI。
+
+AboutDialog_Versions_Dnt_0_3_0_1=Deenote 0.3 build 1
+AboutDialog_Versions_Dnt_0_3_0_1_Content=漏洞修复。
+
+AboutDialog_Versions_Dnt_0_2_1=Deenote 0.2.1
+AboutDialog_Versions_Dnt_0_2_1_Content=添加新note。<br/>连接/断开选中note。<br/>Note摆放位置指示。
+
+AboutDialog_Versions_Dnt_0_2=Deenote 0.2
+AboutDialog_Versions_Dnt_0_2_Content=选中note染色。<br/>删除note。<br/>拍线填充域自动填充。
+
+AboutDialog_Versions_Dnt_0_1=Deenote 0.1
+AboutDialog_Versions_Dnt_0_1_Content="""
+    添加了谱面预览功能的所有特效。
+    添加了一个手动BPM计算器。
+    音效的音量控制。
+    拍线填充及显示。
+    滑键间连线。
+    撤销/重做功能。
+    修复了一些漏洞。
+    选择note。
+    （隐藏功能：Cytus v2谱面直转。我觉得没人会用到这个功能，甚至都没人关心这个。）
+    """
+
+AboutDialog_Versions_DCE_0_2=Deemo Chart Editor 0.2
+AboutDialog_Versions_DCE_0_2_Content="""
+    添加了一些快捷键。
+    导出JSON格式谱面。
+    另存为功能。
+    添加了一些视觉效果（远处的note降低不透明度，添加note消失的逐帧动画及冲击波和圆形特效）
+    修复了一些漏洞。
+    """
+
+AboutDialog_Versions_DCE_0_1=Deemo Chart Editor 0.1
+AboutDialog_Versions_DCE_0_1_Content=完成了谱面预览功能。目前还没有特效。

@@ -18,7 +18,7 @@ namespace Deenote.UI.Views
         public void PlaySound(int pitch)
             => _source.PlaySoundAsync(pitch, 95, null, 0f, 1f).Forget();
 
-        public void PlaySound(PianoSoundValueModel sound) 
+        public void PlaySound(PianoSoundValueModel sound)
             => _ = _source.PlaySoundAsync(sound.Pitch, (int)(sound.Velocity * 1f), sound.Duration, sound.Delay, 1f);
 
         public void PlaySounds(ReadOnlySpan<PianoSoundValueModel> sounds)

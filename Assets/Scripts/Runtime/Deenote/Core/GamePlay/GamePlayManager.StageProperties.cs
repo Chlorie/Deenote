@@ -27,6 +27,17 @@ namespace Deenote.Core.GamePlay
 
         internal float GetDisplayNoteSpeed(float speed) => IsApplySpeedDifference ? speed : 1f;
 
+        /// <summary>
+        /// Get the time as if the note has speed == 1 and it falls on the current position in world
+        /// <br/>
+        /// The return value may be useless if note is not active on stage
+        /// </summary>
+        internal float GetNotePseudoTime(float time,float noteSpeed)
+        {
+            var currentTime = MusicPlayer.Time;
+            return currentTime + (time - currentTime) * GetDisplayNoteSpeed(noteSpeed);
+        }
+
         #region Converters
 
         public float ConvertWorldXToNoteCoordPosition(float x)

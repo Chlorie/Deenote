@@ -25,6 +25,8 @@ namespace Deenote.UI
         public Sprite NoteInfoSoundsEditSprite;
         public Sprite NoteInfoSoundsAcceptSprite;
         public Sprite NoteInfoSoundsCollapseSprite;
+        public Sprite NoteInfoSoundsQuickAddSprite;
+        public Sprite NoteInfoSoundsQuickRemoveSprite;
         [Header("Project Info")]
         public DeemoDifficultyIconSet DeemoDifficultyIcons;
 

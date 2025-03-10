@@ -17,7 +17,7 @@ namespace Deenote.Runtime.Plugins
 
         public string? GetDescription(string languageCode) => null;
 
-        public UniTask ExecuteAsync(DeenotePluginContext context, in DeenotePluginArgs args)
+        public UniTask ExecuteAsync(DeenotePluginContext context, DeenotePluginArgs args)
         {
             var autoSave = (AutoSaveState)GetInt("Autosave", 0);
             var lightEffect = GetBool("Light Effect", false);

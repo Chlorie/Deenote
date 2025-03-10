@@ -29,6 +29,7 @@ namespace Deenote.UI.Views
         [SerializeField] ToggleButton _swipeNoteKindToggle = default!;
         [SerializeField] TextBox _speedInput = default!;
         [SerializeField] Button _soundsButton = default!;
+        [SerializeField] Button _soundsQuickAddRemoveButton = default!;
         [SerializeField] NoteInfoPianoSoundEditPanel _soundEditPanel = default!;
         [SerializeField] TextBox _shiftInput = default!;
         [SerializeField] TextBox _eventIdInput = default!;
@@ -48,6 +49,7 @@ namespace Deenote.UI.Views
 
         private const string NoSoundButtonText = "-";
 
+        private bool _isSoundQuickAdd;
 
         private void Awake()
         {
@@ -160,6 +162,10 @@ namespace Deenote.UI.Views
                     : MainWindow.Args.UIIcons.NoteInfoSoundsEditSprite;
             };
             _soundsButton.Image.sprite = MainWindow.Args.UIIcons.NoteInfoSoundsEditSprite;
+            _soundsQuickAddRemoveButton.Clicked += () =>
+            {
+                MainSystem.StageChartEditor.EditSelectedNoteSounds(_isSoundQuickAdd);
+            };
             _soundEditPanel.IsDirtyChanged += dirty =>
             {
                 _soundsButton.Image.sprite = dirty
@@ -223,6 +229,7 @@ namespace Deenote.UI.Views
                     case 0:
                         _noteHeaderText.SetLocalizedText(NoteNonSelectedHeader);
                         SetControlsActive(false);
+                        NotifyMultiSoundsChanged(notes);
                         break;
                     case 1:
                         _noteHeaderText.SetLocalizedText(NoteSelectedHeader, "1");
@@ -337,20 +344,35 @@ namespace Deenote.UI.Views
             switch (notes.Length) {
                 case 0:
                     _soundsButton.Text.SetRawText(NoSoundButtonText);
+                    _soundsQuickAddRemoveButton.IsInteractable = false;
                     break;
                 case 1: {
                     var sounds = notes[0].Sounds.AsSpan();
                     _soundsButton.Text.SetRawText(GetSoundsDisplayText(sounds));
+                    _soundsQuickAddRemoveButton.IsInteractable = true;
+                    SetSoundsQuickActionButton(sounds.Length > 0);
                     break;
                 }
                 default: {
+                    _soundsQuickAddRemoveButton.IsInteractable = true;
                     if (NoteModel.HasSameSounds(notes)) {
-                        _soundsButton.Text.SetRawText(GetSoundsDisplayText(notes[0].Sounds.AsSpan()));
+                        var sounds = notes[0].Sounds.AsSpan();
+                        _soundsButton.Text.SetRawText(GetSoundsDisplayText(sounds));
+                        SetSoundsQuickActionButton(sounds.Length > 0);
                     }
                     else {
                         _soundsButton.Text.SetRawText(NoSoundButtonText);
+                        SetSoundsQuickActionButton(true);
                     }
                     break;
+                }
+
+                void SetSoundsQuickActionButton(bool hasSounds)
+                {
+                    _isSoundQuickAdd = !hasSounds;
+                    _soundsQuickAddRemoveButton.Image.sprite = _isSoundQuickAdd
+                        ? MainWindow.Args.UIIcons.NoteInfoSoundsQuickAddSprite
+                        : MainWindow.Args.UIIcons.NoteInfoSoundsQuickRemoveSprite;
                 }
             }
 

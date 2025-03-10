@@ -31,7 +31,7 @@ namespace Deenote.Unity.Editor.PropertyDrawers
             textOrKeyInput.style.flexGrow = 1;
 
             isLocalizedToggle.RegisterValueChangedCallback(ev => textOrKeyLabel.text = ev.newValue ? "Key" : "Text");
-            
+
             var valueContainer = new VisualElement();
             valueContainer.style.flexDirection = FlexDirection.Row;
             valueContainer.style.flexGrow = 1;

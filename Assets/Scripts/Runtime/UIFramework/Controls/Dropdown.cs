@@ -108,7 +108,7 @@ namespace Deenote.UIFramework.Controls
 
         private void Start()
         {
-            if (_options.Count > 0) {
+            if (_selectedIndex_bf < 0 && _options.Count > 0) {
                 SelectedIndex = 0;
             }
         }

@@ -23,6 +23,11 @@ namespace Deenote.UI.Views
             };
         }
 
+        internal void OnInstantiate(ToastManager manager)
+        {
+            _toastManager = manager;
+        }
+
         internal void Initialize(int uid, LocalizableText text)
         {
             Uid = uid;

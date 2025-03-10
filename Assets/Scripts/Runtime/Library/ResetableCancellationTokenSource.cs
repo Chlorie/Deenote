@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Deenote.Library
@@ -10,6 +11,12 @@ namespace Deenote.Library
         private CancellationTokenSource? _cts;
 
         public CancellationToken Token => _cts?.Token ?? CancellationToken.None;
+
+        public void Cancel()
+        {
+            Debug.Assert(_cts != null);
+            _cts!.Cancel();
+        }
 
         public void Reset()
         {

@@ -51,7 +51,7 @@ namespace Deenote.Entities.Models
                     continue;
                 if (note == editNote)
                     continue;
-                
+
                 if (!EntityArgs.IsTimeCollided(editNote, note))
                     break;
                 if (EntityArgs.IsPositionCollided(editNote, note))

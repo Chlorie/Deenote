@@ -133,7 +133,6 @@ namespace Deenote.Core.GamePlay
             using var coords_so = _positionCurveData.GetRenderValues(currentTime, stageMaxTime);
             var coords = coords_so.Span;
             if (coords.IsEmpty) {
-                // TODO:Next: 这个扔到submit里判断时间
                 _shouldRenderCurve = false;
                 return;
             }

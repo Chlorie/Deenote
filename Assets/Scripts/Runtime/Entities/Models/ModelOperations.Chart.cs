@@ -758,7 +758,7 @@ namespace Deenote.Entities.Models
                 _oldLinkContexts = oldLinks;
             }
 
-            protected override void SetValue(NoteModel note, NoteModel.NoteKind value) => note._kind = value;
+            protected override void SetValue(NoteModel note, NoteModel.NoteKind value) => note.Kind = value;
 
             protected override void OnRedoingValueChanging(bool isFirstRedo, int index, NoteModel.NoteKind newValue)
             {

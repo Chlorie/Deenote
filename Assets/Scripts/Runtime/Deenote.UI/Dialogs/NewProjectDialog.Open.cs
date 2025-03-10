@@ -18,21 +18,20 @@ namespace Deenote.UI.Dialogs
             OpenSelfModalDialog();
             ResetDialog();
 
-            Debug.Assert(_sharedCts is null, $"Unexpected multiple open of {nameof(NewProjectDialog)}");
-            var cts = _sharedCts = new CancellationTokenSource();
+            _cts.Reset();
 
             try {
             ReAwaitButtonClick:
 
-                await _createButton.OnClickAsync(cts.Token);
+                await _createButton.OnClickAsync(_cts.Token);
 
                 if (_projectResultPath is null) {
                     Debug.Assert(false, "Unexcepted value");
                     goto ReAwaitButtonClick;
                 }
 
-                string audioFilePath = _audioFileInput.Value;
-                if (File.Exists(audioFilePath)) {
+                string audioFilePath = _audioFilePath.Text;
+                if (!File.Exists(audioFilePath)) {
                     await MainWindow.DialogManager.OpenMessageBoxAsync(_audioNotExistsMsgBoxArgs);
                     goto ReAwaitButtonClick;
                 }
@@ -54,7 +53,7 @@ namespace Deenote.UI.Dialogs
                     using var audioFs = File.OpenRead(audioFilePath);
                     AudioClip? clip;
                     _contentRaycastBlocker.SetActive(true);
-                    clip = await AudioUtils.TryLoadAsync(audioFs, Path.GetExtension(audioFilePath), cts.Token);
+                    clip = await AudioUtils.TryLoadAsync(audioFs, Path.GetExtension(audioFilePath), _cts.Token);
                     if (clip is null) {
                         await MainWindow.DialogManager.OpenMessageBoxAsync(_audioLoadFailedMsgBoxArgs);
                         goto ReAwaitButtonClick;
@@ -67,7 +66,7 @@ namespace Deenote.UI.Dialogs
                     audioFs.Read(audioBytes);
                     var proj = new ProjectModel(_projectResultPath, audioBytes, Path.GetRelativePath(_projectResultPath, audioFilePath)) {
                         AudioClip = clip,
-                        MusicName = _projectNameInput.Value,
+                        MusicName = _projectName.Text
                     };
                     proj.Charts.Add(new ChartModel(new()) {
                         Difficulty = Difficulty.Hard,
@@ -80,8 +79,6 @@ namespace Deenote.UI.Dialogs
                 return null;
             } finally {
                 _contentRaycastBlocker.SetActive(false);
-                _sharedCts?.Dispose();
-                _sharedCts = null;
                 CloseSelfModalDialog();
             }
         }
