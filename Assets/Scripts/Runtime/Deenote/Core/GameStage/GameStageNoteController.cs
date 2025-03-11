@@ -4,6 +4,7 @@ using Deenote.Core.GamePlay;
 using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.Library;
+using Deenote.Library.Numerics;
 using UnityEngine;
 
 namespace Deenote.Core.GameStage

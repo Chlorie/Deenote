@@ -6,6 +6,7 @@ using Deenote.Core.GamePlay;
 using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
+using Deenote.Entities.Operations;
 using Deenote.Library.Collections;
 using System;
 

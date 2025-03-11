@@ -9,6 +9,7 @@ using Deenote.UI.Dialogs.Elements;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -33,15 +34,14 @@ namespace Deenote.UI
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.AddList("ui/file_exploer/pinned", _fileExplorerDialog._pinnedItems.Select(item => item.Directory));
+                configs.AddList("ui/file_exploer/pinned", _fileExplorerDialog._pinnedDirectories);
                 configs.Add("ui/new_proj/same_dir", _newProjectDialog._saveToAudioDirectory);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
                 var pinneds = configs.GetStringList("ui/file_exploer/pinned");
                 foreach (var pinned in pinneds.AsSpanOrEmpty()) {
-                    _fileExplorerDialog._pinnedItems.Add(out var item);
-                    item.Initialize(pinned);
+                    _fileExplorerDialog._pinnedDirectories.Add(pinned);
                 }
                 _newProjectDialog._saveToAudioDirectory = configs.GetBoolean("ui/new_proj/same_dir", false);
             };
@@ -70,14 +70,26 @@ namespace Deenote.UI
         /// list the last explored dir if <see langword="null" />
         /// </param>
         /// <returns></returns>
-        public UniTask<FileExplorerDialog.Result> OpenFileExplorerSelectFileAsync(LocalizableText dialogTitle, ImmutableArray<string> extensionFilters, string? initialDirectory = null)
+        public async UniTask<FileExploreResult> OpenFileExplorerSelectFileAsync(LocalizableText? dialogTitle, ImmutableArray<string> extensionFilters, string? initialDirectory = null)
         {
-            return _fileExplorerDialog.OpenSelectFileAsync(dialogTitle, extensionFilters, initialDirectory); ;
+            FileExplorerDialog.FilePathFilter filter = extensionFilters.IsDefaultOrEmpty
+                ? FileExplorerDialog.FilePathFilter.NoFilter
+                : FileExplorerDialog.FilePathFilter.FilterByExtensions(extensionFilters);
+
+            var res = await _fileExplorerDialog.OpenAsync(dialogTitle, filter, FileExplorerDialog.InputBar.ReadOnly, initialDirectory);
+            if (res.IsCancelled)
+                return default;
+
+            Debug.Assert(res.SelectedFilePath is not null);
+            return new FileExploreResult(res.SelectedFilePath!);
         }
 
-        public UniTask<FileExplorerDialog.Result> OpenFileExplorerSelectDirectoryAsync(LocalizableText dialogTitle, string? initialDirectory = null)
+        public async UniTask<FileExploreResult> OpenFileExplorerSelectDirectoryAsync(LocalizableText? dialogTitle, string? initialDirectory = null)
         {
-            return _fileExplorerDialog.OpenSelectDirectoryAsync(dialogTitle, initialDirectory); ;
+            var res = await _fileExplorerDialog.OpenAsync(dialogTitle, FileExplorerDialog.FilePathFilter.DirectoriesOnly, FileExplorerDialog.InputBar.Collapsed, initialDirectory);
+            if (res.IsCancelled)
+                return default;
+            return new(res.CurrentDirectory);
         }
 
         /// <summary>
@@ -88,9 +100,17 @@ namespace Deenote.UI
         /// <param name="fileExtension"></param>
         /// <param name="initialDirectory"></param>
         /// <returns></returns>
-        public UniTask<FileExplorerDialog.Result> OpenFileExplorerInputFileAsync(LocalizableText dialogTitle, string? defaultInput, string? fileExtension = null, string? initialDirectory = null)
+        public async UniTask<FileExploreResult> OpenFileExplorerInputFileAsync(LocalizableText? dialogTitle, string? defaultInput, string? fileExtension = null, ImmutableArray<string> extensionFilters = default, string? initialDirectory = null)
         {
-            return _fileExplorerDialog.OpenInputFileAsync(dialogTitle, defaultInput, fileExtension, initialDirectory);
+            var filter = (fileExtension, extensionFilters) switch {
+                (_, { IsDefaultOrEmpty: false }) => FileExplorerDialog.FilePathFilter.FilterByExtensions(extensionFilters),
+                (null, { IsDefaultOrEmpty: true }) => FileExplorerDialog.FilePathFilter.NoFilter,
+                (not null, { IsDefaultOrEmpty: true }) => FileExplorerDialog.FilePathFilter.FilterByExtensions(ImmutableArray.Create(fileExtension)),
+            };
+            var res = await _fileExplorerDialog.OpenAsync(dialogTitle, filter, FileExplorerDialog.InputBar.WithDefaultText(defaultInput, fileExtension), initialDirectory);
+            if (res.IsCancelled)
+                return default;
+            return new(Path.Combine(res.CurrentDirectory, $"{res.InputFileNameWithoutExtension}{fileExtension}"));
         }
 
         public void RegisterModalDialog(ModalDialog dialog)
@@ -114,6 +134,20 @@ namespace Deenote.UI
                     }
                 }
             };
+        }
+
+        public readonly struct FileExploreResult
+        {
+            private readonly string? _path;
+
+            public string Path => _path!;
+
+            public bool IsCancelled => _path is null;
+
+            internal FileExploreResult(string path)
+            {
+                _path = path;
+            }
         }
     }
 }

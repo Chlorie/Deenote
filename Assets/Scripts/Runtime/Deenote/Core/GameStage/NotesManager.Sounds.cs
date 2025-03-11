@@ -2,7 +2,7 @@
 
 using CommunityToolkit.HighPerformance;
 using Deenote.Entities.Models;
-using Trarizon.Library.Collections;
+using Deenote.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Core.GameStage

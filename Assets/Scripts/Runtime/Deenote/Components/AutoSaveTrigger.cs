@@ -1,6 +1,7 @@
 #nullable enable
 
 using Deenote.Library;
+using Deenote.Library.Numerics;
 using System;
 using UnityEngine;
 

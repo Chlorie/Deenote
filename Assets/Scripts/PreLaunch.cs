@@ -7,6 +7,7 @@ using Deenote.Plugin;
 using Deenote.Runtime.Plugins;
 using Deenote.UI;
 using Deenote.UI.Dialogs.Elements;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace Deenote
@@ -33,19 +34,23 @@ namespace Deenote
         [RuntimeInitializeOnLoadMethod]
         private static void UnregisterBuiltinPlugins()
         {
-            ApplicationManager.Quitting += args =>
+            ApplicationManager.Quitting += QuitRegistration;
+
+            static void QuitRegistration(CancelEventArgs args)
             {
-                if (!MainSystem.StageChartEditor.HasUnsavedChange) {
+                if (!MainSystem.StageChartEditor.OperationMemento.HasUnsavedChange) {
                     return;
                 }
                 var res = MainWindow.DialogManager.OpenMessageBoxAsync(_quitUnsavedMsgBoxArgs)
                     .ContinueWith(val =>
                     {
-                        if (val == 0)
+                        if (val == 0) {
+                            ApplicationManager.Quitting -= QuitRegistration;
                             ApplicationManager.Quit();
+                        }
                     });
                 args.Cancel = true;
-            };
+            }
         }
     }
 }

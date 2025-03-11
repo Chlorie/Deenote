@@ -1,12 +1,11 @@
 #nullable enable
 
-using CommunityToolkit.HighPerformance;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Deenote.Library
+namespace Deenote.Library.IO
 {
     public static class IOUtils
     {

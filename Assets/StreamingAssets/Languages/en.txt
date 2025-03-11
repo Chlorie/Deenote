@@ -135,8 +135,6 @@ Dialog_NewProjectSameDir_Label=Place project file at the directory of audio file
 Dialog_NewProjectResultPath=The project will be created as "{0}".
 Dialog_NewProject_Create_Button=Create
 Dialog_NewProject_Cancel_Button=Cancel
-Dialog_FileExplorer_SelectAudio_Title=Select Audio
-Dialog_FileExplorer_SelectDirectory_Title=Select Directory
 
 Dialog_Preferences_Title=Preferences
 Dialog_PreferencesGameStage_Header=Game Stage
@@ -204,7 +202,8 @@ PinDirNotFound_MsgBox_N=Cancel
 
 NewProject_MsgBox_Title=Create new project
 NewProject_Status_Created=New project created.
-NewProject_FileExplorer_SelectDirectory_Title=Select directory.
+NewProject_FileExplorer_SelectAudio_Title=Select Audio.
+NewProject_FileExplorer_SelectDirectory_Title=Select Directory.
 
 NewProjectOnOpen_MsgBox_Content="""
     Current project will be closed when you start a new project.

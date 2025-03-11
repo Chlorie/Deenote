@@ -2,63 +2,19 @@
 
 using Cysharp.Threading.Tasks;
 using Deenote.Localization;
-using System.Collections.Immutable;
-using System.IO;
 using UnityEngine;
 
 namespace Deenote.UI.Dialogs
 {
     partial class FileExplorerDialog
     {
-        /// <summary>
-        /// Open dialog and select a file
-        /// </summary>
-        /// <param name="extensionFilters">Filtered extensions</param>
-        /// <param name="initialDirectory">
-        /// The listed directory when dialog is open,
-        /// list the last explored dir if <see langword="null" />
-        /// </param>
-        /// <returns></returns>
-        public async UniTask<Result> OpenSelectFileAsync(LocalizableText dialogTitle, ImmutableArray<string> extensionFilters, string? initialDirectory = null)
-        {
-            PathFilter filter = extensionFilters.IsDefaultOrEmpty
-                ? PathFilter.NoFilter
-                : PathFilter.FilterByExtensions(extensionFilters);
-            if (await OpenAsync(dialogTitle, filter, InputBar.ReadOnly, initialDirectory)) {
-                Debug.Assert(CurrentSelectedFilePath != null);
-                return new Result(CurrentSelectedFilePath!);
-            }
-            return default;
-        }
+        private const string DefaultFileExplorerTitleLocalizedKey = "Dialog_FileExplorer_Title";
 
-        public async UniTask<Result> OpenSelectDirectoryAsync(LocalizableText dialogTitle, string? initialDirectory = null)
-        {
-            if (await OpenAsync(dialogTitle, PathFilter.DirectoriesOnly, InputBar.Collapsed, initialDirectory))
-                return new Result(CurrentDirectory);
-            return default;
-        }
-
-        /// <summary>
-        /// Open dialog and input a fileName
-        /// </summary>
-        /// <param name="fileExtension">The extension of inputted file</param>
-        /// <param name="initialDirectory"></param>
-        /// <returns></returns>
-        public async UniTask<Result> OpenInputFileAsync(LocalizableText dialogTitle, string? defaultInput, string? fileExtension = null, string? initialDirectory = null)
-        {
-            PathFilter filter = fileExtension is null
-                ? PathFilter.NoFilter
-                : PathFilter.FilterByExtensions(ImmutableArray.Create(fileExtension));
-            if (await OpenAsync(dialogTitle, filter, InputBar.WithDefaultText(defaultInput, fileExtension), initialDirectory))
-                return new Result(Path.Combine(CurrentDirectory, $"{_fileNameInput.Value}{fileExtension}"));
-            return default;
-        }
-
-        private async UniTask<bool> OpenAsync(LocalizableText dialogTitle, PathFilter filter, InputBar inputBar, string? initialDirectory = null)
+        internal async UniTask<Result> OpenAsync(LocalizableText? dialogTitle, FilePathFilter pathFilter, InputBar inputBar, string? initialDirectory = null)
         {
             OpenSelfModalDialog();
 
-            _dialog.SetTitle(dialogTitle);
+            _dialog.SetTitle(dialogTitle ?? LocalizableText.Localized(DefaultFileExplorerTitleLocalizedKey));
 
             var clickTask = UniTask.WhenAny(
                 _confirmButton.OnClickAsync(),
@@ -67,29 +23,8 @@ namespace Deenote.UI.Dialogs
 
             // Initialization
 
-            _pathFilter = filter;
-            _inputBar = inputBar;
-            switch (inputBar.Kind) {
-                case InputBarKind.Collapsed:
-                    _fileNameColumnTransform.gameObject.SetActive(false);
-                    _confirmButton.IsInteractable = true;
-                    break;
-                case InputBarKind.ReadOnly:
-                    _fileNameColumnTransform.gameObject.SetActive(true);
-                    _fileNameInput.gameObject.SetActive(false);
-                    _fileNameText.SetRawText("");
-                    _confirmButton.IsInteractable = false;
-                    break;
-                case InputBarKind.Input:
-                    _fileNameColumnTransform.gameObject.SetActive(true);
-                    _fileNameInput.gameObject.SetActive(true);
-                    _fileNameText.SetRawText(inputBar.HintExtension);
-                    if (inputBar.InputText is { } it) {
-                        _fileNameInput.Value = it;
-                    }
-                    _confirmButton.IsInteractable = false;
-                    break;
-            }
+            _pathFilter = pathFilter;
+            SetInputBar(inputBar);
             CurrentSelectedFilePath = null;
 
             NavigateToDirectory(initialDirectory ?? CurrentDirectory, true, true);
@@ -101,21 +36,25 @@ namespace Deenote.UI.Dialogs
 
             CloseSelfModalDialog();
 
-            return click == 0;
+            return new Result(this, click != 0);
         }
 
         public readonly struct Result
         {
-            private readonly string? _path;
+            private readonly FileExplorerDialog _dialog;
+            private readonly bool _cancelled;
 
-            public string Path => _path!;
+            public bool IsCancelled => _cancelled;
 
-            public bool IsCancelled => _path is null;
-
-            internal Result(string path)
+            public Result(FileExplorerDialog dialog,bool cancelled)
             {
-                _path = path;
+                _dialog = dialog;
+                _cancelled = cancelled;
             }
+
+            public string CurrentDirectory => _dialog.CurrentDirectory;
+            public string? SelectedFilePath => _dialog.CurrentSelectedFilePath;
+            public string? InputFileNameWithoutExtension => _dialog._fileNameInput.Value;
         }
     }
 }

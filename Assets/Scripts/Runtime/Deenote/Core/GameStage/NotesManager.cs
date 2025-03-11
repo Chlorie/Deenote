@@ -4,13 +4,13 @@ using Deenote.Core.GamePlay;
 using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
-using Deenote.Library;
+using Deenote.Library.Collections;
+using Deenote.Library.Collections.Generic;
+using Deenote.Library.Numerics;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Trarizon.Library.Collections;
-using Trarizon.Library.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -315,7 +315,7 @@ namespace Deenote.Core.GameStage
 
             var newNextActiveNoteIndexInAppearOrder = noteNodesInAppearOrder[_nextActiveNoteIndexInAppearOrder..]
                 .LinearSearch(new AppearTimeComparable(currentTime, this));
-            MathUtils.FlipNegative(ref newNextActiveNoteIndexInAppearOrder);
+            NumberUtils.FlipNegative(ref newNextActiveNoteIndexInAppearOrder);
             newNextActiveNoteIndexInAppearOrder += _nextActiveNoteIndexInAppearOrder;
             Debug.Log($"{_nextActiveNoteIndexInAppearOrder}, {newNextActiveNoteIndexInAppearOrder}");
             foreach (var node in noteNodesInAppearOrder[_nextActiveNoteIndexInAppearOrder..newNextActiveNoteIndexInAppearOrder]) {

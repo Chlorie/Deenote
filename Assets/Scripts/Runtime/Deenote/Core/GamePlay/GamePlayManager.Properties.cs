@@ -205,6 +205,7 @@ namespace Deenote.Core.GamePlay
                 if (Utils.SetField(ref _suddenPlus_bf, value)) {
                     _cacheVisibleRangePercentage = null;
                     if (IsStageLoaded() && IsChartLoaded()) {
+                        NotesManager.RefreshStageActiveNotes();
                         foreach (var note in NotesManager.OnStageNotes) {
                             note.RefreshColorAlpha();
                         }

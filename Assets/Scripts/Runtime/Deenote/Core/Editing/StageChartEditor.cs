@@ -7,6 +7,7 @@ using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Entities.Operations;
+using Deenote.Library.Collections.Generic;
 using Deenote.Library.Components;
 using System;
 using System.Collections.Immutable;
@@ -17,19 +18,19 @@ namespace Deenote.Core.Editing
 {
     public sealed partial class StageChartEditor : FlagNotifiableMonoBehaviour<StageChartEditor, StageChartEditor.NotificationFlag>
     {
-        private const int MaxOperationUndoCount = 100;
 
         internal ProjectManager _project = default!;
         internal GamePlayManager _game = default!;
 
-        private UndoableOperationHistory _operations = default!;
+        private OperationMemento _operations = default!;
 
         public StageNotePlacer Placer { get; private set; } = default!;
         public StageNoteSelector Selector { get; private set; } = default!;
+        public OperationMemento OperationMemento => _operations;
 
         private void Awake()
         {
-            _operations = new(MaxOperationUndoCount);
+            _operations = new();
 
             Awake_ClipBoard();
 
@@ -59,7 +60,7 @@ namespace Deenote.Core.Editing
                 GamePlayManager.NotificationFlag.CurrentChart,
                 manager =>
                 {
-                    _operations.Clear();
+                    _operations.Reset();
                 });
         }
 
@@ -178,48 +179,6 @@ namespace Deenote.Core.Editing
         }
 
         #endregion
-
-        public bool HasUnsavedChange => _operations.CanUndo;
-
-        public void UndoOperation() => _operations.Undo();
-
-        public void RedoOperation() => _operations.Redo();
-
-        /*
-        #region Notify
-
-        public void NotifyCurveGeneratedWithSelectedNotes()
-        {
-            if (Stage.Chart is null)
-                return;
-            if (SelectedNotes.Length < 2)
-                return;
-
-            NoteModel first = SelectedNotes[0];
-            NoteModel last = SelectedNotes[^1];
-
-            _operationHistory.Do(Stage.Chart.Notes.RemoveNotes(SelectedNotes[1..^1])
-                .WithRedoneAction(() =>
-                {
-                    _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
-                    _noteSelectionController.ClearSelection();
-                    _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteKind);
-                    OnNotesChanged(true, true, noteDataChangedExceptTime: true);
-                })
-                .WithUndoneAction(removedNotes =>
-                {
-                    _propertyChangeNotifier.Invoke(this, NotifyProperty.SelectedNotes_Changing);
-                    _noteSelectionController.SelectNote(first);
-                    _noteSelectionController.SelectNotes(removedNotes.OfType<NoteModel>());
-                    _noteSelectionController.SelectNote(last);
-                    _propertyChangeNotifier.Invoke(this, NotifyProperty.NoteKind);
-                    OnNotesChanged(true, true, noteDataChangedExceptTime: true);
-                }));
-            NoteTimeComparer.AssertInOrder(Stage.Chart.Notes);
-        }
-
-        #endregion
-        */
 
         public enum NotificationFlag
         {

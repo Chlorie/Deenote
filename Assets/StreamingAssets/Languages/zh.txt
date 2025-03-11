@@ -118,8 +118,6 @@ Dialog_NewProjectSameDir_Label=将项目放在音频文件同一目录下
 Dialog_NewProjectResultPath=项目将新建为 "{0}".
 Dialog_NewProject_Create_Button=创建
 Dialog_NewProject_Cancel_Button=取消
-Dialog_FileExplorer_SelectAudio_Title=选择音频
-Dialog_FileExplorer_SelectDirectory_Title=选择目录
 
 Dialog_Preferences_Title=首选项
 Dialog_PreferencesGameStage_Header=游戏场景
@@ -190,7 +188,8 @@ PinDirNotFound_MsgBox_N=取消
 
 NewProject_MsgBox_Title=新建项目
 NewProject_Status_Created=项目已新建。
-NewProject_FileExplorer_SelectDirectory_Title=选择目录。
+NewProject_FileExplorer_SelectAudio_Title=选择音频文件
+NewProject_FileExplorer_SelectDirectory_Title=选择目录
 
 NewProjectOnOpen_MsgBox_Content="""
     新建项目后当前项目会被关闭

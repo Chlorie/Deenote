@@ -18,15 +18,19 @@ namespace Deenote.Entities.Models
         [JsonProperty("speed", Order = 0)]
         public float Speed { get; set; }
 
+        [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("oriVMin", Order = 1), Obsolete("For serialzation only")]
         private int _SerializeMinVolume => _SerializeNotes.SelectMany(n => n.Sounds, (n, s) => s.Velocity).Min();
 
+        [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("oriVMax", Order = 2), Obsolete("For serialzation only")]
         private int _SerializeMaxVolume => _SerializeNotes.SelectMany(n => n.Sounds, (n, s) => s.Velocity).Max();
 
+        [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("remapVMin", Order = 3)]
         public int RemapMinVolume { get; set; }
 
+        [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("remapVMax", Order = 4)]
         public int RemapMaxVolume { get; set; }
 
@@ -41,6 +45,7 @@ namespace Deenote.Entities.Models
                 .Where(n => n.IsSlide && n.PrevLink is null)
                 .Select(n => new NoteLinkIterator(n));
 
+        [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("lines", Order = 7), Obsolete("For serialzation only")]
         private IEnumerable<SpeedLineValueModel.Serializer> _SerializeLines
             => _speedLines.Adjacent()

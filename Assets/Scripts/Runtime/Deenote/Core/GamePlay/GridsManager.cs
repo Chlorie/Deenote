@@ -20,14 +20,17 @@ namespace Deenote.Core.GamePlay
             _game = manager;
             _editor = editor;
             MainSystem.ProjectManager.RegisterNotification(
-                ProjectManager.NotificationFlag.ProjectTempos,
-                _OnTemposChanged);
+                ProjectManager.NotificationFlag.CurrentProject,
+                _OnCurrentProjectChanged);
             _game.RegisterNotification(
                 GamePlayManager.NotificationFlag.SuddenPlus,
                 _OnSuddenPlusChanged);
             _editor.Placer.RegisterNotification(
                 StageNotePlacer.NotificationFlag.PlacingNoteSpeed,
                 _OnPlacingNoteSpeedChanged);
+            _editor.RegisterNotification(
+                StageChartEditor.NotificationFlag.ProjectTempo,
+                _OnProjectTempoChanged);
             _game.MusicPlayer.TimeChanged += _OnStageTimeChanged;
             _game.StageLoaded += args =>
             {
@@ -53,9 +56,6 @@ namespace Deenote.Core.GamePlay
 
         public void Dispose()
         {
-            MainSystem.ProjectManager.UnregisterNotification(
-                ProjectManager.NotificationFlag.ProjectTempos,
-                _OnTemposChanged);
             _game.UnregisterNotification(
                 GamePlayManager.NotificationFlag.SuddenPlus,
                 _OnSuddenPlusChanged);
@@ -67,13 +67,14 @@ namespace Deenote.Core.GamePlay
 
         #region Registrations
 
-        private void _OnTemposChanged(ProjectManager manager) => UpdateTimeGrids();
+        private void _OnCurrentProjectChanged(ProjectManager manager) => UpdateTimeGrids();
         private void _OnSuddenPlusChanged(GamePlayManager manager) => UpdatePositionGrids();
         private void _OnPlacingNoteSpeedChanged(StageNotePlacer _)
         {
             UpdateTimeGrids();
             UpdateCurveLines();
         }
+        private void _OnProjectTempoChanged(StageChartEditor _) => UpdateTimeGrids();
         private void _OnStageTimeChanged(GameMusicPlayer.TimeChangedEventArgs args)
         {
             UpdateTimeGrids();

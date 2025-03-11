@@ -12,7 +12,6 @@ using System;
 using System.Linq;
 using UnityEngine;
 using Deenote.Core.Editing;
-using Trarizon.Library.Collections;
 
 namespace Deenote.UI.Views
 {

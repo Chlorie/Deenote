@@ -2,6 +2,7 @@
 
 using Deenote.Entities;
 using Deenote.Entities.Models;
+using Deenote.Entities.Operations;
 using UnityEngine;
 
 namespace Deenote
@@ -29,7 +30,7 @@ namespace Deenote
                 chart.Level = "10";
                 chart.Difficulty = Difficulty.Hard;
                 _project.Charts.Add(chart);
-                _project.InsertTempo(new TempoRange(160f, 1.5f, 11111f));
+                ((IUndoableOperation)(_project.InsertTempo(new TempoRange(160f, 1.5f, 11111f)))).Redo();
             }
             else {
                 Debug.LogError("Load test chart failed");

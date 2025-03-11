@@ -1,7 +1,7 @@
 #nullable enable
 
+using Deenote.Library.Collections;
 using System;
-using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Entities.Models

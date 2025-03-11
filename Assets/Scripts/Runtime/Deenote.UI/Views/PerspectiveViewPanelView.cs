@@ -5,6 +5,7 @@ using Deenote.Core.GamePlay;
 using Deenote.GamePlay.UI;
 using Deenote.Library;
 using Deenote.Library.Components;
+using Deenote.Library.Numerics;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;

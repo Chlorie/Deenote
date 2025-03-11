@@ -4,7 +4,6 @@ using Deenote.Entities.Comparisons;
 using Deenote.Library.Collections;
 using System;
 using System.Collections.Generic;
-using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Entities.Models
@@ -35,7 +34,7 @@ namespace Deenote.Entities.Models
 
         public int NoteCount => _visibleNoteNodes.Count - _holdCount;
 
-        public CollectionUtils.SpanOfTypeIterator<IStageNoteNode, NoteModel> EnumerateNoteModels()
+        public SpanUtils.OfTypeIterator<IStageNoteNode, NoteModel> EnumerateNoteModels()
             => NoteNodes.OfType<IStageNoteNode, NoteModel>();
 
         internal CollisionResult GetCollidedNotesTo(int noteModelIndex)

@@ -190,10 +190,10 @@ namespace Deenote.Inputting
                manager =>
                {
                    if (manager.IsChartLoaded()) {
-                       _inputActions.StageGamePlay.Enable();
+                       _inputActions.NoteEdit.Enable();
                    }
                    else {
-                       _inputActions.StageGamePlay.Disable();
+                       _inputActions.NoteEdit.Disable();
                    }
                });
 
@@ -203,8 +203,8 @@ namespace Deenote.Inputting
             actions.Copy.started += _ => _editor.CopySelectedNotes();
             actions.Cut.started += _ => _editor.CutSelectedNotes();
             actions.Paste.started += _ => _editor.PasteNotes();
-            actions.Redo.started += _ => _editor.RedoOperation();
-            actions.Undo.started += _ => _editor.UndoOperation();
+            actions.Redo.started += _ => _editor.OperationMemento.Redo();
+            actions.Undo.started += _ => _editor.OperationMemento.Undo();
             actions.TimeDec.started += _ => _editor.EditSelectedNotesTime(t => t - TimeDelta);
             actions.TimeInc.started += _ => _editor.EditSelectedNotesTime(t => t + TimeDelta);
             actions.TimeDecLarge.started += _ => _editor.EditSelectedNotesTime(t => t - TimeDeltaLarge);
@@ -227,7 +227,7 @@ namespace Deenote.Inputting
             actions.KindSlide.started += _ => _editor.EditSelectedNotesKind(NoteModel.NoteKind.Slide);
             actions.KindSwipe.started += _ => _editor.EditSelectedNotesKind(NoteModel.NoteKind.Swipe);
             actions.SoundAdd.started += _ => _editor.EditSelectedNoteSounds(true);
-            actions.SoundAdd.started += _ => _editor.EditSelectedNoteSounds(false);
+            actions.SoundRemove.started += _ => _editor.EditSelectedNoteSounds(false);
         }
 
         #endregion
@@ -255,11 +255,11 @@ namespace Deenote.Inputting
 
         private void Update_MouseAction()
         {
-            if (MainWindow.Views.PerspectiveViewPanelView.IsHovering) {
-                if (_game.IsChartLoaded() && _game.IsStageLoaded()) {
-                    var mouse = Mouse.current;
-                    var pos = mouse.position.ReadValue();
+            if (_game.IsChartLoaded() && _game.IsStageLoaded()) {
+                var mouse = Mouse.current;
+                var pos = mouse.position.ReadValue();
 
+                if (MainWindow.Views.PerspectiveViewPanelView.IsHovering) {
                     if (mouse.leftButton.wasPressedThisFrame)
                         OnLeftMouseDown(pos);
                     if (mouse.rightButton.wasPressedThisFrame)
@@ -268,8 +268,8 @@ namespace Deenote.Inputting
                         OnLeftMouseUp(pos);
                     if (mouse.rightButton.wasReleasedThisFrame)
                         OnRightMouseUp(pos);
-                    OnMouseMove(pos);
                 }
+                OnMouseMove(pos);
             }
         }
 

@@ -2,10 +2,9 @@
 
 using Deenote.Entities.Comparisons;
 using Deenote.Library.Collections;
+using Deenote.Library.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using Trarizon.Library.Collections;
-using Trarizon.Library.Collections.Generic;
 using UnityEngine;
 
 namespace Deenote.Entities.Models

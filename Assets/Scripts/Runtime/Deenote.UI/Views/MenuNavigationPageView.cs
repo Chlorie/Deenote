@@ -182,7 +182,7 @@ namespace Deenote.UI.Views
         {
             if (MainSystem.ProjectManager.IsProjectLoaded()) {
                 var res = await MainWindow.DialogManager.OpenMessageBoxAsync(
-                    MainSystem.StageChartEditor.HasUnsavedChange
+                    MainSystem.StageChartEditor.OperationMemento.HasUnsavedChange
                         ? _newProjectOnUnsavedOpenMsgBoxArgs
                         : _newProjectOnOpenMsgBoxArgs);
                 if (res != 0)
@@ -199,7 +199,7 @@ namespace Deenote.UI.Views
         {
             if (MainSystem.ProjectManager.IsProjectLoaded()) {
                 var res = await MainWindow.DialogManager.OpenMessageBoxAsync(
-                    MainSystem.StageChartEditor.HasUnsavedChange
+                    MainSystem.StageChartEditor.OperationMemento.HasUnsavedChange
                         ? _openProjOnUnsavedOpenMsgBoxArgs
                         : _openProjOnOpenMsgBoxArgs);
                 if (res != 0) return;

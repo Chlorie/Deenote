@@ -9,7 +9,6 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using Deenote.Localization;
-using Trarizon.Library.Collections;
 
 namespace Deenote.UIFramework.Controls
 {

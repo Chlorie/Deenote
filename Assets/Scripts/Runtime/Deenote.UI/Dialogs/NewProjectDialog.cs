@@ -2,6 +2,7 @@
 
 using Cysharp.Threading.Tasks;
 using Deenote.Library;
+using Deenote.Library.IO;
 using Deenote.Localization;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UIFramework.Controls;
@@ -68,8 +69,8 @@ namespace Deenote.UI.Dialogs
 
         private const string ProjectPathCreateHintKey = "Dialog_NewProjectResultPath";
 
-        private const string SelectAudioFileExplorerTitleKey = "Dialog_FileExplorer_SelectAudio_Title";
-        private const string SelectDirectoryExplorerTitleKey = "Dialog_FileExplorer_SelectDirectory_Title";
+        private const string SelectAudioFileExplorerTitleKey = "NewProject_FileExplorer_SelectAudio_Title";
+        private const string SelectDirectoryExplorerTitleKey = "NewProject_FileExplorer_SelectDirectory_Title";
 
         #endregion
 
@@ -92,7 +93,7 @@ namespace Deenote.UI.Dialogs
 
             _projectNameInput.ValueChanged += val =>
             {
-                if (string.IsNullOrEmpty(val) || !Utils.IsValidFileName(val)) {
+                if (string.IsNullOrEmpty(val) || !PathUtils.IsValidFileName(val)) {
                     _projectName = (false, val);
                     _projectNameErrorText.gameObject.SetActive(true);
                 }
@@ -128,7 +129,7 @@ namespace Deenote.UI.Dialogs
                 // If user hasnt input project name, we use the audio file name as the project name
                 if (string.IsNullOrWhiteSpace(_projectName.Text)) {
                     var pname = Path.GetFileNameWithoutExtension(res.Path);
-                    Debug.Assert(Utils.IsValidFileName(pname));
+                    Debug.Assert(PathUtils.IsValidFileName(pname));
                     _projectName = (true, pname);
                     _projectNameInput.SetValueWithoutNotify(pname);
                 }
@@ -165,7 +166,7 @@ namespace Deenote.UI.Dialogs
         }
 
         private static bool IsValidPath(string input)
-            => !string.IsNullOrWhiteSpace(input) && Utils.IsValidPath(input) && Path.IsPathFullyQualified(input);
+            => !string.IsNullOrWhiteSpace(input) && PathUtils.IsValidPath(input) && Path.IsPathFullyQualified(input);
 
         private void ResetDialog()
         {

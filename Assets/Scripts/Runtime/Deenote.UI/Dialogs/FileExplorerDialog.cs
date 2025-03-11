@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnityEngine;
 using Deenote.Library.Collections;
+using Deenote.Library.IO;
 
 namespace Deenote.UI.Dialogs
 {
@@ -32,7 +33,7 @@ namespace Deenote.UI.Dialogs
         [SerializeField] FileExplorerFileListItem _fileItemPrefab = default!;
         private PooledObjectListView<FileExplorerFileListItem> _fileItems;
 
-        private PathFilter _pathFilter;
+        private FilePathFilter _pathFilter;
         private InputBar _inputBar;
 
         private string _currentDirectory_bf = default!; // Use TryNavigateToDirectory to edit
@@ -63,6 +64,32 @@ namespace Deenote.UI.Dialogs
             }
         }
 
+        private void SetInputBar(InputBar inputBar)
+        {
+            _inputBar = inputBar;
+            switch (inputBar.Kind) {
+                case InputBarKind.Collapsed:
+                    _fileNameColumnTransform.gameObject.SetActive(false);
+                    _confirmButton.IsInteractable = true;
+                    break;
+                case InputBarKind.ReadOnly:
+                    _fileNameColumnTransform.gameObject.SetActive(true);
+                    _fileNameInput.gameObject.SetActive(false);
+                    _fileNameText.SetRawText("");
+                    _confirmButton.IsInteractable = false;
+                    break;
+                case InputBarKind.Input:
+                    _fileNameColumnTransform.gameObject.SetActive(true);
+                    _fileNameInput.gameObject.SetActive(true);
+                    _fileNameText.SetRawText(inputBar.HintExtension);
+                    if (inputBar.InputText is { } it) {
+                        _fileNameInput.Value = it;
+                    }
+                    _confirmButton.IsInteractable = false;
+                    break;
+            }
+        }
+
         protected override void Awake()
         {
             base.Awake();
@@ -71,7 +98,7 @@ namespace Deenote.UI.Dialogs
                 item => item.OnInstantiate(this)));
 
             Awake_Pinned();
-            _currentDirectory_bf = Directory.GetCurrentDirectory(); // App initialization
+            NavigateToDirectory(Directory.GetCurrentDirectory()); // App initialization
 
             _parentDirectoryButton.Clicked += () =>
             {
@@ -86,7 +113,7 @@ namespace Deenote.UI.Dialogs
             _fileNameInput.ValueChanged += fileName =>
             {
                 if (_inputBar.Kind is InputBarKind.Input)
-                    _confirmButton.IsInteractable = Utils.IsValidFileName(fileName);
+                    _confirmButton.IsInteractable = PathUtils.IsValidFileName(fileName);
             };
 
 #if UNITY_STANDALONE_WIN
@@ -170,26 +197,13 @@ namespace Deenote.UI.Dialogs
                     item.Initialize(dir, true);
                 }
 
-                switch (_pathFilter.Kind) {
-                    case PathFilterKind.NoFilter: {
-                        foreach (var file in Directory.GetFiles(CurrentDirectory)) {
+                if (_pathFilter.Kind is not PathFilterKind.DirectoriesOnly) {
+                    foreach (var file in Directory.GetFiles(CurrentDirectory)) {
+                        if (_pathFilter.IsFilePathShouldShow(file)) {
                             resetter.Add(out var item);
                             item.Initialize(file, false);
                         }
-                        break;
                     }
-                    case PathFilterKind.FilterByExtensions: {
-                        foreach (var file in Directory.GetFiles(CurrentDirectory)) {
-                            if (file.EndsWithOneOf(_pathFilter.ExtensionFilters.AsSpan())) {
-                                resetter.Add(out var item);
-                                item.Initialize(file, false);
-                            }
-                        }
-                        break;
-                    }
-                    case PathFilterKind.DirectoriesOnly:
-                    default:
-                        break;
                 }
             }
             _fileItems.SetSiblingIndicesInOrder();
@@ -207,7 +221,7 @@ namespace Deenote.UI.Dialogs
             }
         }
 
-        private enum PathFilterKind
+        internal enum PathFilterKind
         {
             NoFilter,
             DirectoriesOnly,
@@ -219,7 +233,7 @@ namespace Deenote.UI.Dialogs
             _dialog ??= GetComponent<Dialog>();
         }
 
-        private readonly struct PathFilter
+        internal readonly struct FilePathFilter
         {
             private readonly ImmutableArray<string> _filters;
 
@@ -234,29 +248,37 @@ namespace Deenote.UI.Dialogs
                 }
             }
 
-            public ImmutableArray<string> ExtensionFilters => _filters;
+            internal bool IsFilePathShouldShow(string path)
+            {
+                return Kind switch {
+                    PathFilterKind.NoFilter => true,
+                    PathFilterKind.DirectoriesOnly => false,
+                    PathFilterKind.FilterByExtensions => path.EndsWithOneOf(_filters.AsSpan()),
+                    _ => true,
+                };
+            }
 
-            private PathFilter(ImmutableArray<string> filters)
+            private FilePathFilter(ImmutableArray<string> filters)
             {
                 _filters = filters;
             }
 
-            public static PathFilter NoFilter => new(ImmutableArray<string>.Empty);
+            public static FilePathFilter NoFilter => new(ImmutableArray<string>.Empty);
 
-            public static PathFilter DirectoriesOnly => default;
+            public static FilePathFilter DirectoriesOnly => default;
 
-            public static PathFilter FilterByExtensions(ImmutableArray<string> extensionFilters)
+            public static FilePathFilter FilterByExtensions(ImmutableArray<string> extensionFilters)
                 => extensionFilters.IsDefaultOrEmpty ? default : new(extensionFilters);
         }
 
-        private enum InputBarKind
+        internal enum InputBarKind
         {
             Collapsed,
             ReadOnly,
             Input,
         }
 
-        private readonly struct InputBar
+        internal readonly struct InputBar
         {
             public InputBarKind Kind { get; }
 

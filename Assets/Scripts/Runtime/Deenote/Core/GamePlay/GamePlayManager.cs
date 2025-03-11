@@ -168,6 +168,7 @@ namespace Deenote.Core.GamePlay
                 case (false, true):
                     foreach (var note in NotesManager.OnStageNotes) {
                         note.RefreshVisual();
+                        note.RefreshLinkLine();
                     }
                     break;
                 case (true, true):

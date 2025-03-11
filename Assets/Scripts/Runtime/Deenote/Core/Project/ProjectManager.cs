@@ -57,7 +57,7 @@ namespace Deenote.Core.Project
         {
 
             // TODO: Fake
-            CurrentProject = Fake.GetProject();
+            //CurrentProject = Fake.GetProject();
         }
 
         public async UniTask<bool> OpenLoadProjectFileAsync(string filePath)
@@ -166,7 +166,6 @@ namespace Deenote.Core.Project
             ProjectComposer,
             ProjectChartDesigner,
             ProjectCharts,
-            ProjectTempos,
         }
 
         private readonly struct LoadingScope : IDisposable

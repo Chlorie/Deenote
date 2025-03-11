@@ -14,16 +14,11 @@ namespace Deenote.UIFramework.Controls
         [SerializeField] Image _borderImage = default!;
         [SerializeField] Image _checkmarkImage = default!;
 
-#if UNITY_EDITOR
         [SerializeField]
         private SerializabeCheckedState _isChecked_bf;
-#else
-        private bool? _isChecked_bf;
-#endif
 
         public bool? IsChecked
         {
-#if UNITY_EDITOR
             get => _isChecked_bf switch {
                 SerializabeCheckedState.Unchecked => false,
                 SerializabeCheckedState.Checked => true,
@@ -41,15 +36,6 @@ namespace Deenote.UIFramework.Controls
                     IsCheckedChanged?.Invoke(value);
                 }
             }
-#else
-            get => _isChecked_bf;
-            set {
-                if (Utils.SetField(ref _isChecked_bf, value)) {
-                    TranslateVisual();
-                    OnValueChanged.Invoke(value);
-                }
-            }
-#endif
         }
 
         public event Action<bool?>? IsCheckedChanged;
@@ -127,8 +113,6 @@ namespace Deenote.UIFramework.Controls
             }
         }
 
-#if UNITY_EDITOR
         private enum SerializabeCheckedState { Unchecked, Checked, Indeterminate, }
-#endif
     }
 }

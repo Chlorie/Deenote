@@ -9,7 +9,6 @@ using Deenote.UI.Views.Elements;
 using Deenote.UIFramework.Controls;
 using System;
 using System.Collections.Generic;
-using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.UI.Views.Panels

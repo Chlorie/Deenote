@@ -1,14 +1,22 @@
 #nullable enable
 
+using Deenote.Library.Collections;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Trarizon.Library.Collections;
+using System.Runtime.CompilerServices;
 
 namespace Deenote.Library.Collections
 {
-    public static class ListUtils
+    public static partial class ListUtils
     {
+        public static Span<T> AsSpan<T>(this List<T> list) 
+            => Utils<T>.GetUnderlyingArray(list).AsSpan(..list.Count);
+
+        public static Span<T> AsSpanOrEmpty<T>(this List<T>? list)
+            => list is null ? Span<T>.Empty : list.AsSpan();
+
         public static void AddRange<T>(this List<T> list, ReadOnlySpan<T> collection)
         {
             foreach (var item in collection) {
@@ -41,7 +49,14 @@ namespace Deenote.Library.Collections
                 list.Capacity = minCapacity;
         }
 
-        public static Span<T> AsSpanOrEmpty<T>(this List<T>? list)
-            => list is null ? Span<T>.Empty : list.AsSpan();
+        private static class Utils<T>
+        {
+            public static ref T[] GetUnderlyingArray(List<T> list)
+            {
+                var arr = Unsafe.As<List<T>, StrongBox<T[]>>(ref list);
+                Debug.Assert(arr.Value is T[]);
+                return ref arr.Value;
+            }
+        }
     }
 }

@@ -7,17 +7,17 @@ using Deenote.Entities.Models;
 using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
+using Deenote.Library.Numerics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Trarizon.Library.Collections;
 using UnityEngine;
 
 namespace Deenote.Core.Editing
 {
     public sealed class StageNoteSelector
     {
-        private const float DragSelectionAreaMaxPosition = 4f;
+        private const float DragSelectionAreaMaxPosition = 6f;
 
         private GamePlayManager _game = default!;
 
@@ -239,9 +239,8 @@ namespace Deenote.Core.Editing
         {
             _game.AssertChartLoaded();
             _game.AssertStageLoaded();
-
-            Utils.SortAsc(ref startCoord.Position, ref endCoord.Position);
-            Utils.SortAsc(ref startCoord.Time, ref endCoord.Time);
+            NumberUtils.SortAsc(ref startCoord.Position, ref endCoord.Position);
+            NumberUtils.SortAsc(ref startCoord.Time, ref endCoord.Time);
 
             _game.Stage.SetSelectionPanelRect(startCoord, endCoord);
 
