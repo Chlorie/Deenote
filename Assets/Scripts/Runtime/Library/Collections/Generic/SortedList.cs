@@ -7,7 +7,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Trarizon.Library.Collections;
 
 namespace Deenote.Library.Collections.Generic;
 public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
@@ -91,6 +90,8 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
 
     public int LinearSearchFromEnd(T item) => AsSpan().LinearSearchFromEnd(item, _comparer);
 
+    public bool Contains(T item) => BinarySearch(item) >= 0;
+
     /// <summary>
     /// Binary search the index and insert with keeping the list in order
     /// </summary>
@@ -101,6 +102,16 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         InsertAt(index, item);
         return index;
     }
+
+    public void AddRange<TDerived>(ReadOnlySpan<TDerived> collection) where TDerived : T
+    {
+        foreach (var item in collection) {
+            Add(item);
+        }
+    }
+
+    public void AddRange<TDerived>(Span<TDerived> collection) where TDerived : T
+        => AddRange((ReadOnlySpan<TDerived>)collection);
 
     public void AddFromEnd(T item)
     {
@@ -157,6 +168,16 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         _version++;
     }
 
+    public void RemoveRange<TDerived>(ReadOnlySpan<TDerived> collection) where TDerived : T
+    {
+        foreach (var item in collection) {
+            Remove(item);
+        }
+    }
+
+    public void RemoveRange<TDerived>(Span<TDerived> collection) where TDerived : T
+        => RemoveRange((ReadOnlySpan<TDerived>)collection);
+
     public int RemoveFrom(T item, int searchStartIndex)
     {
         if (searchStartIndex <= 0) {
@@ -210,11 +231,29 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         _version++;
     }
 
+    public void Resort()
+    {
+        Array.Sort(_array, 0, _count, _comparer);
+    }
+
+    public void ResortBubble()
+    {
+        AlgorithmUtils.BubbleSort(_array.AsSpan(0, _count), _comparer);
+    }
+
     public void EnsureCapacity(int capacity)
     {
         if (capacity < _array.Length)
             return;
         ArrayGrowHelper.Grow(ref _array, capacity, _count);
+    }
+
+    public void NotifyEdited(T item)
+    {
+        var index = BinarySearch(item);
+        if (index < 0)
+            return;
+        NotifyEditedAt(index);
     }
 
     private void InsertAt(int index, T item)
@@ -273,7 +312,6 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     int IList<T>.IndexOf(T item) => Math.Max(BinarySearch(item), -1);
     void IList<T>.Insert(int index, T item) => ThrowHelper.ThrowInvalidOperationException("Cannot insert at specific position to SortedList");
-    bool ICollection<T>.Contains(T item) => BinarySearch(item) >= 0;
     bool ICollection<T>.Remove(T item) => Remove(item) >= 0;
     void ICollection<T>.Add(T item) => Add(item);
 

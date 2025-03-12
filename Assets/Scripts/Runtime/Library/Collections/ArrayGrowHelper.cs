@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Trarizon.Library.Collections;
+namespace Deenote.Library.Collections;
 internal static class ArrayGrowHelper
 {
     public static void FreeManaged<T>(T[] array)

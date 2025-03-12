@@ -1,10 +1,10 @@
 #nullable enable
 
+using Deenote.Library.Collections;
 using Deenote.Library.Collections.StackAlloc;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Trarizon.Library.Collections;
 
 namespace Deenote.Library.Collections.Generic
 {
@@ -55,6 +55,7 @@ namespace Deenote.Library.Collections.Generic
                 _array[_index] = item;
                 Increment(ref _index);
                 _tail = _index;
+                _activeCount++;
                 _count = _activeCount;
                 _version++;
                 return;

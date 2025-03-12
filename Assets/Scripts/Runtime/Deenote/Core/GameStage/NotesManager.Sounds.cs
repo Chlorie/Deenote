@@ -23,15 +23,15 @@ namespace Deenote.Core.GameStage
             var musicPlayer = _game.MusicPlayer;
 
             if (forward) {
-                while (_nextHitSoundNoteIndex < chart.NoteNodes.Length && chart.NoteNodes[_nextHitSoundNoteIndex].Time <= musicPlayer.Time)
+                while (_nextHitSoundNoteIndex < chart.NoteNodes.Count && chart.NoteNodes[_nextHitSoundNoteIndex].Time <= musicPlayer.Time)
                     _nextHitSoundNoteIndex++;
-                while (_nextHitBackgroundNoteIndex < chart.BackgroundNotes.Length && chart.BackgroundNotes[_nextHitBackgroundNoteIndex].Time <= musicPlayer.Time)
+                while (_nextHitBackgroundNoteIndex < chart.BackgroundSoundNotes.Count && chart.BackgroundSoundNotes[_nextHitBackgroundNoteIndex].Time <= musicPlayer.Time)
                     _nextHitBackgroundNoteIndex++;
             }
             else {
                 while (_nextHitSoundNoteIndex > 0 && chart.NoteNodes[_nextHitSoundNoteIndex - 1].Time > musicPlayer.Time)
                     _nextHitSoundNoteIndex--;
-                while (_nextHitBackgroundNoteIndex > 0 && chart.BackgroundNotes[_nextHitBackgroundNoteIndex - 1].Time > musicPlayer.Time)
+                while (_nextHitBackgroundNoteIndex > 0 && chart.BackgroundSoundNotes[_nextHitBackgroundNoteIndex - 1].Time > musicPlayer.Time)
                     _nextHitBackgroundNoteIndex--;
             }
 
@@ -53,7 +53,7 @@ namespace Deenote.Core.GameStage
                 }
             }
             for (int i = prevHitBackgroundNoteIndex; i < _nextHitBackgroundNoteIndex; i++) {
-                _game.PianoSoundPlayer.PlaySounds(chart.BackgroundNotes[i].Sounds);
+                _game.PianoSoundPlayer.PlaySounds(chart.BackgroundSoundNotes[i].Sounds);
             }
         }
 
@@ -65,9 +65,9 @@ namespace Deenote.Core.GameStage
             var chart = _game.CurrentChart;
             var musicPlayer = _game.MusicPlayer;
 
-            while (_nextHitSoundNoteIndex < chart.NoteNodes.Length && chart.NoteNodes[_nextHitSoundNoteIndex].Time <= musicPlayer.Time)
+            while (_nextHitSoundNoteIndex < chart.NoteNodes.Count && chart.NoteNodes[_nextHitSoundNoteIndex].Time <= musicPlayer.Time)
                 _nextHitSoundNoteIndex++;
-            while (_nextHitBackgroundNoteIndex < chart.BackgroundNotes.Length && chart.BackgroundNotes[_nextHitBackgroundNoteIndex].Time <= musicPlayer.Time)
+            while (_nextHitBackgroundNoteIndex < chart.BackgroundSoundNotes.Count && chart.BackgroundSoundNotes [_nextHitBackgroundNoteIndex].Time <= musicPlayer.Time)
                 _nextHitBackgroundNoteIndex++;
         }
     }

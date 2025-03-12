@@ -1,7 +1,9 @@
 #nullable enable
 
+using CommunityToolkit.Diagnostics;
 using Deenote.Entities.Comparisons;
 using Deenote.Library.Collections;
+using Deenote.Library.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,10 +15,10 @@ namespace Deenote.Entities.Models
         // `_visibleNotes` stores all visible `NoteModel`s and their `NoteTailNode`s if is hold
         // and `_holdCount` is ensured to be equal to count of `NoteTailNode` in `_visibleNotes`
         internal int _holdCount;
-        internal List<IStageNoteNode> _visibleNoteNodes;
-        internal List<SoundNoteModel> _backgroundNotes;
-        internal List<SpeedChangeWarningModel> _speedChangeWarnings;
-        internal List<SpeedLineValueModel> _speedLines;
+        //private List<IStageNoteNode> _visibleNoteNodes;
+        //internal List<SoundNoteModel> _backgroundNotes;
+        //internal List<SpeedChangeWarningModel> _speedChangeWarnings;
+        //internal List<SpeedLineValueModel> _speedLines;
 
         /// <summary>
         /// Notes that will be displayed on stage.
@@ -24,127 +26,84 @@ namespace Deenote.Entities.Models
         /// For hold notes, there will be 2 objects represent the
         /// hold head and hold tail, use <see cref="EnumerateNoteModels"/> get distinct notes
         /// </summary>
-        public ReadOnlySpan<IStageNoteNode> NoteNodes => _visibleNoteNodes.AsSpan();
+        public SortedList<IStageNoteNode> NoteNodes { get; internal set; }
+        public SortedList<SoundNoteModel> BackgroundSoundNotes { get; internal set; }
+        public SortedList<SpeedChangeWarningModel> SpeedChangeWarnings { get; internal set; }
+        public SortedList<SpeedLineValueModel> SpeedLines { get; internal set; }
 
-        public ReadOnlySpan<SoundNoteModel> BackgroundNotes => _backgroundNotes.AsSpan();
-
-        public ReadOnlySpan<SpeedChangeWarningModel> SpeedChangeWarnings => _speedChangeWarnings.AsSpan();
-
-        public ReadOnlySpan<SpeedLineValueModel> SpeedLines => _speedLines.AsSpan();
-
-        public int NoteCount => _visibleNoteNodes.Count - _holdCount;
+        public int NoteCount => NoteNodes.Count - _holdCount;
 
         public SpanUtils.OfTypeIterator<IStageNoteNode, NoteModel> EnumerateNoteModels()
-            => NoteNodes.OfType<IStageNoteNode, NoteModel>();
+            => NoteNodes.AsSpan().OfType<IStageNoteNode, NoteModel>();
 
-        internal CollisionResult GetCollidedNotesTo(int noteModelIndex)
+        internal CollisionResult GetCollidedNotesTo(NoteModel note)
         {
-            NoteTimeComparer.AssertInOrder(_visibleNoteNodes);
-            Debug.Assert(_visibleNoteNodes[noteModelIndex] is NoteModel);
+            var index = NoteNodes.BinarySearch(note);
+            if (index < 0)
+                ThrowHelper.ThrowInvalidOperationException("The chart doesn't contain the given note");
 
+            return GetCollidedNotesToByIndex(index);
+        }
+
+        private CollisionResult GetCollidedNotesToByIndex(int index)
+        {
+            Debug.Assert(NoteNodes[index] is NoteModel);
+
+            var note = (NoteModel)NoteNodes[index];
             var collidedNotes = new List<NoteModel>();
-            var editNote = (NoteModel)_visibleNoteNodes[noteModelIndex];
 
-            for (int i = noteModelIndex - 1; i >= 0; i--) {
-                if (_visibleNoteNodes[i] is not NoteModel note)
+            foreach (var node in NoteNodes.AsSpan()[(index + 1)..]) {
+                if (node is not NoteModel n)
                     continue;
-                if (note == editNote)
-                    continue;
-
-                if (!EntityArgs.IsTimeCollided(editNote, note))
+                if (!EntityArgs.IsTimeCollided(n, note))
                     break;
-                if (EntityArgs.IsPositionCollided(editNote, note))
-                    collidedNotes.Add(note);
+                if (EntityArgs.IsPositionCollided(n, note))
+                    collidedNotes.Add(n);
+            }
+            foreach (var node in NoteNodes.AsSpan()[..index].AsReversed()) {
+                if (node is not NoteModel n)
+                    continue;
+                if (!EntityArgs.IsTimeCollided(n, note))
+                    break;
+                if (EntityArgs.IsPositionCollided(n, note))
+                    collidedNotes.Add(n);
             }
 
-            for (int i = noteModelIndex + 1; i < _visibleNoteNodes.Count; i++) {
-                if (_visibleNoteNodes[i] is not NoteModel note)
-                    continue;
-                if (note == editNote)
-                    continue;
-
-                if (!EntityArgs.IsTimeCollided(editNote, note))
-                    break;
-                if (EntityArgs.IsPositionCollided(editNote, note))
-                    collidedNotes.Add(note);
-            }
-
-            return new CollisionResult(editNote, collidedNotes);
+            return new CollisionResult(note, collidedNotes);
         }
 
-        public int Search(NoteModel note)
+        internal NoteTailNode? FindTailOf(NoteModel note)
         {
-            var index = _visibleNoteNodes.BinarySearch(note, NoteTimeComparer.Instance);
-            if (index < 0)
-                return index;
+            if (!note.IsHold)
+                return null;
 
-            var find = _visibleNoteNodes[index];
-            if (find == note)
-                return index;
-
-            for (int i = index - 1; i >= 0; i--) {
-                var near = _visibleNoteNodes[i];
-                if (near.Time != note.Time)
-                    break;
-                if (near == note)
-                    return i;
+            // The comparer of StageNoteNodes will compare node.Time first, so this should work
+            var index = NoteNodes.AsSpan().FindLowerBoundIndex(new NodeTimeComparable(note.EndTime));
+            for (; index < NoteNodes.Count; index++) {
+                var node = NoteNodes[index];
+                if (node is NoteTailNode tail && tail.HeadModel == note)
+                    return tail;
             }
 
-            for (int i = index + 1; i < _visibleNoteNodes.Count; i++) {
-                var near = _visibleNoteNodes[i];
-                if (near.Time != note.Time)
-                    break;
-                if (near == note)
-                    return i;
-            }
-
-            return ~index;
+            Debug.Assert(false, "Tail node of a hold note is not found");
+            return null;
         }
 
-        internal int IndexOfTailOf(int noteModelIndex)
+        internal int IndexOfTailOf(NoteModel note)
         {
-            NoteTimeComparer.AssertInOrder(_visibleNoteNodes);
-            Debug.Assert(_visibleNoteNodes[noteModelIndex] is NoteModel);
+            if (!note.IsHold)
+                return -1;
 
-            var head = (NoteModel)_visibleNoteNodes[noteModelIndex];
-
-            for (int i = noteModelIndex + 1; i < _visibleNoteNodes.Count; i++) {
-                var note = _visibleNoteNodes[i];
-                if (note is NoteTailNode tail && tail.HeadModel == head)
-                    return i;
+            // The comparer of StageNoteNodes will compare node.Time first, so this should work
+            var index = NoteNodes.AsSpan().FindLowerBoundIndex(new NodeTimeComparable(note.EndTime));
+            for (; index < NoteNodes.Count; index++) {
+                var node = NoteNodes[index];
+                if (node is NoteTailNode tail && tail.HeadModel == note)
+                    return index;
             }
 
-            Debug.Assert(false, "Chart contains a hold note but its tail doesnt exist");
+            Debug.Assert(false, "Tail node of a hold note is not found");
             return -1;
-        }
-
-        internal int SearchTailOf(NoteModel note)
-        {
-            var index = _visibleNoteNodes.AsSpan().BinarySearch(new NoteTimeComparable(note.EndTime));
-            if (index < 0)
-                return index;
-
-            var find = _visibleNoteNodes[index];
-            if (find is NoteTailNode tail && tail.HeadModel == note)
-                return index;
-
-            for (int i = index - 1; i >= 0; i--) {
-                var near = _visibleNoteNodes[i];
-                if (near.Time != note.Time)
-                    break;
-                if (near is NoteTailNode nearAsTail && nearAsTail.HeadModel == note)
-                    return i;
-            }
-
-            for (int i = index + 1; i < _visibleNoteNodes.Count; i++) {
-                var near = _visibleNoteNodes[i];
-                if (near.Time != note.Time)
-                    break;
-                if (near is NoteTailNode nearAsTail && nearAsTail.HeadModel == note)
-                    return i;
-            }
-
-            return ~index;
         }
 
         internal readonly struct CollisionResult

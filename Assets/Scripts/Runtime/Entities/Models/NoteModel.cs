@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Entities.Models;
 using Deenote.Library.Collections;
 using System;
 using UnityEngine;
@@ -9,6 +10,8 @@ namespace Deenote.Entities.Models
     [Serializable]
     public sealed partial class NoteModel : IStageNoteNode
     {
+        private uint _uid;
+
         [field: SerializeField]
         private bool _isSelected;
         /// <summary>
@@ -42,9 +45,12 @@ namespace Deenote.Entities.Models
 
         bool IStageNoteNode.IsComboNode => !IsHold;
 
+        uint IStageNoteNode.Uid => _uid;
+
         public NoteModel()
         {
             _sounds = new();
+            IStageNoteNode.InitUid(ref _uid);
         }
 
         public NoteModel Clone(bool cloneSounds = true)

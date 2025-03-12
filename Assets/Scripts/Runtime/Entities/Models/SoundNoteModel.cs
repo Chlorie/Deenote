@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Entities.Models;
 using Deenote.Library.Collections;
 using System;
 using UnityEngine;
@@ -27,6 +28,14 @@ namespace Deenote.Entities.Models
         {
             Debug.Assert(!note.IsVisibleOnStage());
             _noteModel = note;
+        }
+
+        public SoundNoteModel(float time, ReadOnlySpan<PianoSoundValueModel> sounds)
+        {
+            _noteModel = new NoteModel();
+            _noteModel.Time = time;
+            _noteModel.Position = 12f;
+            _noteModel.Sounds.AddRange(sounds);
         }
 
         public SoundNoteModel Clone()

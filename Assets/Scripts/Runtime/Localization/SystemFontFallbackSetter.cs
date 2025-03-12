@@ -24,11 +24,11 @@ namespace Deenote.Localization
 
         private void LanguageChanged(LanguagePack languagePack)
         {
-            var languageCode = languagePack.LanguageCode;
-            if (_settings.Settings.FirstOrDefault(s => s.LanguageCode == languageCode)
-                is var settings && settings.LanguageCode != languageCode)
-                return;
-            SetFontFallbacks(settings.FontFileNames);
+            //var languageCode = languagePack.LanguageCode;
+            //if (_settings.Settings.FirstOrDefault(s => s.LanguageCode == languageCode)
+            //    is var settings && settings.LanguageCode != languageCode)
+            //    return;
+            //SetFontFallbacks(settings.FontFileNames);
         }
 
         private void SetFontFallbacks(string[] fontFileName)

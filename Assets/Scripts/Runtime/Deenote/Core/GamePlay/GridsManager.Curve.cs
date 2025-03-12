@@ -42,7 +42,7 @@ namespace Deenote.Core.GamePlay
 
         public void InitializeCurve(ReadOnlySpan<NoteModel> interpolationNotes, CurveKind kind)
         {
-            NoteTimeComparer.AssertInOrder(interpolationNotes);
+            NodeTimeComparer.AssertInOrder(interpolationNotes);
 
             _curveGenerationContext.InterpolationNotes.Clear();
             _positionCurveData = null;

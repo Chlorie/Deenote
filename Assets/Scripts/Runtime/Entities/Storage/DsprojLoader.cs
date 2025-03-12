@@ -91,8 +91,7 @@ namespace Deenote.Entities.Storage
 
             public static ProjectModel ToVer3(SerializableProjectData dataV1, string projectFilePath)
             {
-                var proj = ToVer3(dataV1.project, projectFilePath, $"Embeded Audio.wav");
-                proj.Composer = "Unknown";
+                var proj = ToVer3(dataV1.project, projectFilePath, dataV1.project.songName);
 
                 AudioUtils.EncodeToWav(dataV1.channel, dataV1.frequency, dataV1.length, dataV1.sampleData,
                     out var audioFileData);
@@ -103,8 +102,7 @@ namespace Deenote.Entities.Storage
 
             public static ProjectModel ToVer3(FullProjectDataV2 dataV2, string projectFilePath)
             {
-                var proj = ToVer3(dataV2.project, projectFilePath, $"Embedded Audio{dataV2.audioType}");
-                proj.Composer = "Unknown";
+                var proj = ToVer3(dataV2.project, projectFilePath, dataV2.project.songName);
                 proj.AudioFileData = dataV2.audio;
 
                 return proj;
@@ -128,10 +126,16 @@ namespace Deenote.Entities.Storage
                     project.Charts.Add(chartModel);
                 }
 
-                project._tempos = oldProject.charts[0].beats
-                    .Adjacent()
-                    .Select(beat => new Tempo(60f / (beat.Item2 - beat.Item1), beat.Item1))
-                    .ToList();
+                List<Tempo> tempos = new();
+                var beats = oldProject.charts[0].beats.Adjacent().Select(beat => new Tempo(60f / (beat.Item2 - beat.Item1), beat.Item1));
+                if (beats.TryFirst(out var first)) {
+                    tempos.Add(first);
+                    foreach (var (l, r) in beats.Adjacent()) {
+                        if (Mathf.Abs(l.Bpm - r.Bpm) > 0.05f)
+                            tempos.Add(r);
+                    }
+                }
+                project._tempos = tempos;
 
                 return project;
             }

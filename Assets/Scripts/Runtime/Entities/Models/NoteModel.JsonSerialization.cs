@@ -118,6 +118,7 @@ namespace Deenote.Entities.Models
             if (swipe)
                 Kind = NoteKind.Swipe;
             _warningType = warningType;
+            IStageNoteNode.InitUid(ref _uid);
         }
 
         [Obsolete("For json serialization only")]

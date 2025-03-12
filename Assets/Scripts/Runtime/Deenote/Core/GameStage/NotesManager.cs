@@ -1,7 +1,6 @@
 #nullable enable
 
 using Deenote.Core.GamePlay;
-using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Library.Collections;
@@ -100,7 +99,9 @@ namespace Deenote.Core.GameStage
                 _stageNoteNodesInAppearOrder.Clear();
             }
 
-            foreach (var node in _game.CurrentChart!.NoteNodes) {
+            _game.AssertChartLoaded();
+
+            foreach (var node in _game.CurrentChart.NoteNodes) {
                 _stageNoteNodesInAppearOrder.AddFromEnd(node);
             }
         }
@@ -138,7 +139,7 @@ namespace Deenote.Core.GameStage
         {
             _game.AssertChartLoaded();
 
-            var nodes = _game.CurrentChart.NoteNodes;
+            var nodes = _game.CurrentChart.NoteNodes.AsSpan();
             if (_nextActiveNoteIndex >= nodes.Length)
                 return null;
             else
@@ -154,7 +155,7 @@ namespace Deenote.Core.GameStage
             }
             else {
                 _game.AssertChartLoaded();
-                ReselectActiveVisibleNotesInternal(_game.CurrentChart.NoteNodes);
+                ReselectActiveVisibleNotesInternal(_game.CurrentChart.NoteNodes.AsSpan());
             }
         }
 
@@ -166,6 +167,7 @@ namespace Deenote.Core.GameStage
             ClearTrackNotes();
             var stage = _game.Stage;
             var chart = _game.CurrentChart;
+            var noteNodes = chart.NoteNodes.AsSpan();
 
             var currentTime = _game.MusicPlayer.Time;
             var deactiveDeltaTime = stage.Args.HitEffectSpritePrefabs.HitEffectTime;
@@ -177,8 +179,8 @@ namespace Deenote.Core.GameStage
 
             // Iterate nodes before current stage
             // Shoul track if note tail is on stage
-            for (; index < chart.NoteNodes.Length; index++) {
-                var node = chart.NoteNodes[index];
+            for (; index < noteNodes.Length; index++) {
+                var node = noteNodes[index];
                 if (node.Time > deactiveNoteTime)
                     break;
                 IncrementCombo(node);
@@ -187,8 +189,8 @@ namespace Deenote.Core.GameStage
             _nextInactiveNoteIndex = index;
 
             // Iterate nodes in hiteffect time
-            for (; index < chart.NoteNodes.Length; index++) {
-                var node = chart.NoteNodes[index];
+            for (; index < noteNodes.Length; index++) {
+                var node = noteNodes[index];
                 if (node.Time > currentTime)
                     break;
                 IncrementCombo(node);
@@ -199,8 +201,8 @@ namespace Deenote.Core.GameStage
 
             // Iterate nodes in falling time to find _nextActiveNoteIndex
             // Notes may have different speed, we do not track note here
-            for (; index < chart.NoteNodes.Length; index++) {
-                var node = chart.NoteNodes[index];
+            for (; index < noteNodes.Length; index++) {
+                var node = noteNodes[index];
                 if (node is NoteModel && _game.GetNotePseudoTime(node.Time, node.Speed) > activateNoteTime)
                     break;
             }
@@ -258,7 +260,7 @@ namespace Deenote.Core.GameStage
 
             var noteNodesInAppearOrder = _game.IsApplySpeedDifference
                 ? _stageNoteNodesInAppearOrder.AsSpan()
-                : _game.CurrentChart.NoteNodes;
+                : _game.CurrentChart.NoteNodes.AsSpan();
 
             if (forward)
                 ShiftActiveVisibleNotesForwardInternal(noteNodesInAppearOrder);
@@ -273,6 +275,7 @@ namespace Deenote.Core.GameStage
 
             var stage = _game.Stage;
             var chart = _game.CurrentChart;
+            var noteNodes = chart.NoteNodes.AsSpan();
 
             var currentTime = _game.MusicPlayer.Time;
             var deactiveDeltaTime = stage.Args.HitEffectSpritePrefabs.HitEffectTime;
@@ -281,7 +284,11 @@ namespace Deenote.Core.GameStage
             var activateNoteTime = currentTime + activateDeltaTime;
 
             var index = _nextInactiveNoteIndex;
-            IterateNotesUntil(ref index, deactiveNoteTime);
+            for (; index < noteNodes.Length; index++) {
+                var node = noteNodes[index];
+                if (node.Time > deactiveNoteTime)
+                    break;
+            }
             for (int i = 0; i < _trackingNotesInTimeOrder.Count; i++) {
                 var noteCtrl = _trackingNotesInTimeOrder[i];
                 var note = noteCtrl.NoteModel;
@@ -294,8 +301,8 @@ namespace Deenote.Core.GameStage
             _nextInactiveNoteIndex = index;
 
             index = _nextHitNoteIndex;
-            for (; index < chart.NoteNodes.Length; index++) {
-                var node = chart.NoteNodes[index];
+            for (; index < noteNodes.Length; index++) {
+                var node = noteNodes[index];
                 if (node.Time > currentTime)
                     break;
                 if (node.IsComboNode)
@@ -306,8 +313,8 @@ namespace Deenote.Core.GameStage
             // Iterate nodes in falling time to find _nextActiveNoteIndex
             // Notes may have different speed, we do not track note here
             index = _nextActiveNoteIndex;
-            for (; index < chart.NoteNodes.Length; index++) {
-                var node = chart.NoteNodes[index];
+            for (; index < noteNodes.Length; index++) {
+                var node = noteNodes[index];
                 if (node is NoteModel && _game.GetNotePseudoTime(node.Time, node.Speed) > activateNoteTime)
                     break;
             }
@@ -333,15 +340,6 @@ namespace Deenote.Core.GameStage
             }
 
             Debug.Assert(_trackingNotesInTimeOrder.Distinct().Count() == _trackingNotesInTimeOrder.Count());
-
-            void IterateNotesUntil(ref int index, float compareTime)
-            {
-                for (; index < chart.NoteNodes.Length; index++) {
-                    var node = chart.NoteNodes[index];
-                    if (node.Time > compareTime)
-                        break;
-                }
-            }
         }
 
         private void ShiftActiveVisibleNotesBackwardInternal(ReadOnlySpan<IStageNoteNode> noteNodesInAppearOrder)
@@ -351,6 +349,7 @@ namespace Deenote.Core.GameStage
 
             var stage = _game.Stage;
             var chart = _game.CurrentChart;
+            var noteNodes = chart.NoteNodes.AsSpan();
 
             var currentTime = _game.MusicPlayer.Time;
             var deactiveDeltaTime = stage.Args.HitEffectSpritePrefabs.HitEffectTime;
@@ -360,7 +359,7 @@ namespace Deenote.Core.GameStage
 
             var index = _nextInactiveNoteIndex - 1;
             for (; index >= 0; index--) {
-                var node = chart.NoteNodes[index];
+                var node = noteNodes[index];
                 if (node.Time <= deactiveNoteTime)
                     break;
                 if (node is NoteTailNode tail) {
@@ -377,7 +376,7 @@ namespace Deenote.Core.GameStage
 
             index = _nextHitNoteIndex - 1;
             for (; index >= 0; index--) {
-                var node = chart.NoteNodes[index];
+                var node = noteNodes[index];
                 if (node.Time <= currentTime)
                     break;
                 if (node.IsComboNode)
@@ -388,8 +387,8 @@ namespace Deenote.Core.GameStage
             // Iterate nodes in falling time to find _nextActiveNoteIndex
             // Notes may have different speed, we do not track note here
             index = _nextHitNoteIndex;
-            for (; index < chart.NoteNodes.Length; index++) {
-                var node = chart.NoteNodes[index];
+            for (; index < noteNodes.Length; index++) {
+                var node = noteNodes[index];
                 if (node is NoteModel && _game.GetNotePseudoTime(node.Time, node.Speed) > activateNoteTime)
                     break;
             }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Trarizon.Library.Collections;
+namespace Deenote.Library.Collections;
 public static partial class ComparisonUtils
 {
     internal readonly struct ComparerComparable<T, TComparer> : IComparable<T> where TComparer : IComparer<T>

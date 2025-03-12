@@ -5,6 +5,7 @@ using Deenote.Library.Collections;
 using Deenote.Library.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Deenote.Entities.Models
@@ -16,7 +17,7 @@ namespace Deenote.Entities.Models
             /// <remarks>
             /// Return collection will be null if <paramref name="notes"/> is empty, to reduce allocation
             /// </remarks>
-            public static void DeserializeNotes(ReadOnlySpan<NoteModel> notes,
+            public static void DeserializeNotesOld(ReadOnlySpan<NoteModel> notes,
                 out int holdCount,
                 out List<IStageNoteNode>? visibleNotes,
                 out List<SoundNoteModel>? backgroundNotes,
@@ -45,7 +46,7 @@ namespace Deenote.Entities.Models
                         }
                         visibleNotes.Add(note);
                         if (note.IsHold) {
-                            tailsBuffer.GetSortedModifier(NoteTimeComparer.Instance)
+                            tailsBuffer.GetSortedModifier(NodeTimeComparer.Instance)
                                 .Add(new NoteTailNode(note));
                         }
                     }
@@ -63,61 +64,93 @@ namespace Deenote.Entities.Models
                     }
                 }
 
-                NoteTimeComparer.AssertInOrder(visibleNotes);
-                NoteTimeComparer.AssertInOrder(backgroundNotes);
+                NodeTimeComparer.AssertInOrder(visibleNotes);
+                NodeTimeComparer.AssertInOrder(backgroundNotes);
+            }
+
+            public static void DeserializeNotes(ReadOnlySpan<NoteModel> notes,
+                out int holdCount,
+                out SortedList<IStageNoteNode>? visibleNotes,
+                out SortedList<SoundNoteModel>? soundNotes,
+                out SortedList<SpeedChangeWarningModel>? speedChangeWarnings)
+            {
+                if (notes.IsEmpty) {
+                    holdCount = 0;
+                    visibleNotes = null;
+                    soundNotes = null;
+                    speedChangeWarnings = null;
+                    return;
+                }
+
+                holdCount = 0;
+                visibleNotes = new SortedList<IStageNoteNode>(NodeTimeUniqueComparer.Instance);
+                soundNotes = new SortedList<SoundNoteModel>(NodeTimeComparer.Instance);
+                speedChangeWarnings = new SortedList<SpeedChangeWarningModel>(NodeTimeComparer.Instance);
+
+                foreach (var note in notes) {
+                    if (note.IsVisibleOnStage()) {
+                        visibleNotes.AddFromEnd(note);
+                        if (note.IsHold) {
+                            holdCount++;
+                            visibleNotes.AddFromEnd(new NoteTailNode(note));
+                        }
+                    }
+                    else if (note.WarningType is WarningType.SpeedChange) {
+                        speedChangeWarnings.AddFromEnd(new SpeedChangeWarningModel(note));
+                    }
+                    else {
+                        soundNotes.Add(new SoundNoteModel(note));
+                    }
+                }
             }
 
             public static void SetNoteModels(ChartModel chart, ReadOnlySpan<NoteModel> notes)
             {
                 if (notes.IsEmpty) {
                     chart._holdCount = 0;
-                    chart._visibleNoteNodes = new();
+                    chart.NoteNodes = new(NodeTimeUniqueComparer.Instance);
                     return;
                 }
 
                 var holdCount = 0;
-                var noteNodes = new SortedList<IStageNoteNode>(NoteTimeComparer.Instance);
 
                 foreach (var note in notes) {
                     Debug.Assert(note.IsVisibleOnStage());
-                    noteNodes.AddFromEnd(note);
+                    chart.NoteNodes.AddFromEnd(note);
                     if (note.IsHold) {
                         holdCount++;
-                        noteNodes.AddFromEnd(new NoteTailNode(note));
+                        chart.NoteNodes.AddFromEnd(new NoteTailNode(note));
                     }
                 }
 
                 chart._holdCount = holdCount;
-                chart._visibleNoteNodes = new List<IStageNoteNode>(noteNodes);
-
-                NoteTimeComparer.AssertInOrder(chart._visibleNoteNodes);
             }
 
             public static void ResetNotes(ChartModel chart, ReadOnlySpan<NoteModel> notes)
             {
-                DeserializeNotes(notes, out var holdCount, out var visibleNotes, out var backgroundNotes, out var speedChangeWarnings);
+                DeserializeNotes(notes, out var holdCount, out var stageNotes, out var backgroundNotes, out var speedChangeWarnings);
                 chart._holdCount = holdCount;
-                if (visibleNotes is null) {
-                    if (chart._visibleNoteNodes.Count > 0)
-                        chart._visibleNoteNodes = new();
+                if (stageNotes is null) {
+                    if (chart.NoteNodes.Count > 0)
+                        chart.NoteNodes.Clear();
                 }
                 else {
-                    chart._visibleNoteNodes = visibleNotes;
+                    chart.NoteNodes = stageNotes;
                 }
                 if (backgroundNotes is null) {
-                    if (chart._backgroundNotes.Count > 0)
-                        chart._backgroundNotes = new();
+                    if (chart.BackgroundSoundNotes.Count > 0)
+                        chart.BackgroundSoundNotes.Clear();
                 }
                 else {
-                    chart._backgroundNotes = backgroundNotes;
+                    chart.BackgroundSoundNotes = backgroundNotes;
                 }
 
                 if (speedChangeWarnings is null) {
-                    if (chart._speedChangeWarnings.Count > 0)
-                        chart._speedChangeWarnings = new();
+                    if (chart.SpeedChangeWarnings.Count > 0)
+                        chart.SpeedChangeWarnings.Clear();
                 }
                 else {
-                    chart._speedChangeWarnings = speedChangeWarnings;
+                    chart.SpeedChangeWarnings = speedChangeWarnings;
                 }
             }
         }

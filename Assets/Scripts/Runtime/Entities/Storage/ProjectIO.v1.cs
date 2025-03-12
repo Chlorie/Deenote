@@ -82,18 +82,18 @@ namespace Deenote.Entities.Storage
                 WriteNote(writer, note, linkNotesLookup);
             }
 
-            writer.Write(chart.BackgroundNotes.Length);
-            foreach (var note in chart.BackgroundNotes) {
+            writer.Write(chart.BackgroundSoundNotes.Count);
+            foreach (var note in chart.BackgroundSoundNotes) {
                 WriteSoundNote(writer, note);
             }
 
-            writer.Write(chart.SpeedChangeWarnings.Length);
+            writer.Write(chart.SpeedChangeWarnings.Count);
             foreach (var note in chart.SpeedChangeWarnings) {
                 WriteSpeedChangeWarning(writer, note);
             }
 
-            writer.Write(chart.SpeedLines.Length);
-            foreach (ref readonly var line in chart.SpeedLines) {
+            writer.Write(chart.SpeedLines.Count);
+            foreach (ref readonly var line in chart.SpeedLines.AsSpan()) {
                 WriteSpeedLine(writer, line);
             }
         }
@@ -125,21 +125,21 @@ namespace Deenote.Entities.Storage
             ChartModel.Marshal.SetNoteModels(chart, notes);
 
             var soundCount = reader.ReadInt32();
-            chart._backgroundNotes.Capacity = soundCount;
+            chart.BackgroundSoundNotes.EnsureCapacity(soundCount);
             for (int i = 0; i < soundCount; i++) {
-                chart._backgroundNotes.Add(ReadSoundNote(reader));
+                chart.BackgroundSoundNotes.AddFromEnd(ReadSoundNote(reader));
             }
 
             var speedChangeCount = reader.ReadInt32();
-            chart._speedChangeWarnings.Capacity = speedChangeCount;
+            chart.SpeedChangeWarnings.EnsureCapacity(speedChangeCount);
             for (int i = 0; i < speedChangeCount; i++) {
-                chart._speedChangeWarnings.Add(ReadSpeedChangeWarning(reader));
+                chart.SpeedChangeWarnings.AddFromEnd(ReadSpeedChangeWarning(reader));
             }
 
             var lineCount = reader.ReadInt32();
-            chart._speedLines.Capacity = lineCount;
+            chart.SpeedLines.EnsureCapacity(lineCount);
             for (int i = 0; i < lineCount; i++) {
-                chart._speedLines.Add(ReadSpeedLine(reader));
+                chart.SpeedLines.AddFromEnd(ReadSpeedLine(reader));
             }
 
             return chart;

@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Library.Collections.StackAlloc;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -8,8 +9,11 @@ public static partial class SpanUtils
 {
     #region Linq
 
-    public static OfTypeIterator<T, TResult> OfType<T, TResult>(this ReadOnlySpan<T> values) where TResult : T
-        => new(values);
+    public static ReadOnlyReversedSpan<T> AsReversed<T>(this ReadOnlySpan<T> values) => new(values);
+
+    public static ReversedSpan<T> AsReversed<T>(this Span<T> values) => new(values);
+
+    public static OfTypeIterator<T, TResult> OfType<T, TResult>(this ReadOnlySpan<T> values) where TResult : T => new(values);
 
     #endregion
 

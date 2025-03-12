@@ -56,7 +56,7 @@ namespace Deenote.Core.Editing
         public void AddSelect(NoteModel note)
         {
             _game.AssertChartLoaded();
-            Debug.Assert(_game.CurrentChart.Search(note) >= 0);
+            Debug.Assert(_game.CurrentChart.NoteNodes.Contains(note));
 
             if (note.IsSelected)
                 return;
@@ -75,7 +75,7 @@ namespace Deenote.Core.Editing
         public void AddSelectMultiple(IEnumerable<NoteModel> notes)
         {
             _game.AssertChartLoaded();
-            Debug.Assert(notes.All(note => _game.CurrentChart.Search(note) >= 0));
+            Debug.Assert(notes.All(note => _game.CurrentChart.NoteNodes.Contains(note)));
 
             OnSelectedNotesChanging();
             AddSelectMultipleNonNotify(notes);
@@ -85,7 +85,7 @@ namespace Deenote.Core.Editing
         private void AddSelectMultipleNonNotify(IEnumerable<NoteModel> notes)
         {
             _game.AssertChartLoaded();
-            Debug.Assert(notes.All(note => _game.CurrentChart.Search(note) >= 0));
+            Debug.Assert(notes.All(note => _game.CurrentChart.NoteNodes.Contains(note)));
 
             var prevCount = _selectedNotes.Count;
             _selectedNotes.AddRange(notes);
@@ -262,7 +262,7 @@ namespace Deenote.Core.Editing
                 }
             }
 
-            NoteTimeComparer.AssertInOrder(_selectedNotes);
+            NodeTimeComparer.AssertInOrder(_selectedNotes);
 
             bool IsInSelectionRange(NoteModel note)
             {

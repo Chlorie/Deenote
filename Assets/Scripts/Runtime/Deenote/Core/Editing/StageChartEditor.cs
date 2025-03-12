@@ -69,7 +69,7 @@ namespace Deenote.Core.Editing
         private void OnNoteCollectionChanged()
         {
             _game.AssertChartLoaded();
-            NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
+            NodeTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
             _game.UpdateNotes(true, false);
         }
 
@@ -85,7 +85,7 @@ namespace Deenote.Core.Editing
                 {
                     this.Selector.Clear();
                     OnNoteCollectionChanged();
-                    NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
+                    NodeTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
                 })
                 .OnUndone(note => OnNoteCollectionChanged()));
         }
@@ -113,16 +113,16 @@ namespace Deenote.Core.Editing
             NoteModel.CloneLinkDatas(notePrototypes, notes);
 
             _operations.Do(_game.CurrentChart.AddMultipleNotes(ImmutableCollectionsMarshal.AsImmutableArray(notes))
-                .OnRedone(nodes =>
+                .OnRedone(notes =>
                 {
-                    this.Selector.Reselect(nodes.OfType<NoteModel>());
+                    this.Selector.Reselect(notes);
                     OnNoteCollectionChanged();
                 })
-                .OnUndone(nodes =>
+                .OnUndone(notes =>
                 {
-                    this.Selector.DeselectMultiple(nodes.OfType<NoteModel>());
-
-                    NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
+                    this.Selector.DeselectMultiple(notes);
+                    OnNoteCollectionChanged();
+                    NodeTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
                 }));
         }
 
@@ -134,16 +134,16 @@ namespace Deenote.Core.Editing
                 return;
 
             _operations.Do(_game.CurrentChart.RemoveOrderedNotes(notes.ToImmutableArray())
-                .OnRedone((Action<ImmutableArray<IStageNoteNode>>)(nodes =>
+                .OnRedone(notes =>
                 {
                     this.Selector.Clear();
                     OnNoteCollectionChanged();
-                }))
-                .OnUndone((Action<ImmutableArray<IStageNoteNode>>)(nodes =>
+                })
+                .OnUndone(notes =>
                 {
-                    this.Selector.AddSelectMultiple(nodes.OfType<NoteModel>());
+                    this.Selector.AddSelectMultiple(notes);
                     OnNoteCollectionChanged();
-                })));
+                }));
         }
 
         public void RemoveSelectedNotes() => RemoveNotes(Selector.SelectedNotes);

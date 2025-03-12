@@ -198,11 +198,11 @@ namespace Deenote.Core.GamePlay
             {
                 var chart = CurrentChart;
 
-                for (int i = 0; i < chart.NoteNodes.Length; i++) {
+                for (int i = 0; i < chart.NoteNodes.Count; i++) {
                     if (chart.NoteNodes[i] is not NoteModel note)
                         continue;
 
-                    for (int j = i + 1; j < chart.NoteNodes.Length; j++) {
+                    for (int j = i + 1; j < chart.NoteNodes.Count; j++) {
                         if (chart.NoteNodes[j] is not NoteModel noteCmp)
                             continue;
 

@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Deenote.Library.Collections.StackAlloc;
-
 public readonly ref struct ReadOnlyConcatSpan<T>
 {
     private readonly ReadOnlySpan<T> _first;

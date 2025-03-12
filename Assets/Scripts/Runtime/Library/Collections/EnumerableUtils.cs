@@ -1,11 +1,22 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Deenote.Library.Collections
 {
     public static class EnumerableUtils
     {
+        public static bool TryFirst<T>(this IEnumerable<T> source, [MaybeNullWhen(false)] out T value)
+        {
+            using var enumerator = source.GetEnumerator();
+            if (enumerator.MoveNext()) {
+                value = enumerator.Current;
+                return true;
+            }
+            value = default;
+            return false;
+        }
         public static IEnumerable<T> Merge<T, TComparer>(this IEnumerable<T> first, IEnumerable<T> second, TComparer comparer) where TComparer : IComparer<T>
         {
             using var enumerator = first.GetEnumerator();

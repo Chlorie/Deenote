@@ -22,7 +22,7 @@ namespace Deenote.Core.Editing
         private void OnNotePropertyEdited(bool notesVerticalPositionChanged, bool notesVisualDataChanged, NotificationFlag flag)
         {
             _game.AssertChartLoaded();
-            NoteTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
+            NodeTimeComparer.AssertInOrder(_game.CurrentChart.NoteNodes);
             NotifyFlag(flag);
             _game.UpdateNotes(notesVerticalPositionChanged, notesVisualDataChanged);
         }

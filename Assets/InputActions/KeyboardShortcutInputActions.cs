@@ -680,7 +680,7 @@ namespace Deenote.InputSystem.InputActions
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""e44f4376-bddb-4e28-b3b4-dab6fc1bca6e"",
+                    ""id"": ""d04fdc5a-0647-4497-928a-82bc902cebfe"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",

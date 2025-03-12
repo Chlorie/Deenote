@@ -2,12 +2,17 @@
 
 using CommunityToolkit.Diagnostics;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Deenote.Library
 {
     internal static class ThrowUtils
     {
+        [DoesNotReturn]
+        internal static void KeyNotFound<T>(T key)
+           => throw new KeyNotFoundException($"Cannot find key '{key}' in collection.");
+
         [DoesNotReturn]
         internal static void CollectionModified()
            => throw new InvalidOperationException("Collection has been modified.");

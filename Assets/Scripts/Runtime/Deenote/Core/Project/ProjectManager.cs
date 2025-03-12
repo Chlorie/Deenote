@@ -57,7 +57,7 @@ namespace Deenote.Core.Project
         {
 
             // TODO: Fake
-            //CurrentProject = Fake.GetProject();
+            CurrentProject = Fake.GetProject();
         }
 
         public async UniTask<bool> OpenLoadProjectFileAsync(string filePath)

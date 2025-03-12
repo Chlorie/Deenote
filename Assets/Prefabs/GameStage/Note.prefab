@@ -138,6 +138,7 @@ MonoBehaviour:
   _circleEffectSpriteRenderer: {fileID: 8812887195934278477}
   _waveEffectSpriteRenderer: {fileID: 1470468537230542656}
   _glowEffectSpriteRenderer: {fileID: 7235899750922416966}
+  _state: 0
 --- !u!1 &3047225863070103751
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,13 +416,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5760359193592442030}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.17364816, y: 0, z: 0, w: 0.9848078}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5000001, z: 1.5000001}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3979883270878283023}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 20, y: 0, z: 0}
 --- !u!212 &5040793046721004696
 SpriteRenderer:
   m_ObjectHideFlags: 0

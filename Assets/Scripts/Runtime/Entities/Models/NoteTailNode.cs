@@ -1,11 +1,14 @@
 #nullable enable
 
+using Deenote.Entities.Models;
 using UnityEngine;
 
 namespace Deenote.Entities.Models
 {
     public sealed class NoteTailNode : IStageNoteNode
     {
+        private readonly uint _uid;
+
         public NoteModel HeadModel { get; }
 
         public float Time
@@ -22,7 +25,12 @@ namespace Deenote.Entities.Models
 
         bool IStageNoteNode.IsComboNode => true;
 
-        public NoteTailNode(NoteModel headModel) => HeadModel = headModel;
-    }
+        uint IStageNoteNode.Uid => _uid;
 
+        public NoteTailNode(NoteModel headModel)
+        {
+            HeadModel = headModel;
+            IStageNoteNode.InitUid(ref _uid);
+        }
+    }
 }

@@ -2,9 +2,11 @@
 
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models.Serialization;
-using Newtonsoft.Json;
+using Deenote.Library.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Deenote.Entities.Models
 {
@@ -22,10 +24,10 @@ namespace Deenote.Entities.Models
             RemapMinVolume = remapMinVolume;
             RemapMaxVolume = remapMaxVolume;
             _holdCount = 0;
-            _visibleNoteNodes = new List<IStageNoteNode>();
-            _backgroundNotes = new List<SoundNoteModel>();
-            _speedChangeWarnings = new List<SpeedChangeWarningModel>();
-            _speedLines = new List<SpeedLineValueModel>() { new(1f, 0f, WarningType.Default) };
+            NoteNodes = new SortedList<IStageNoteNode>(NodeTimeUniqueComparer.Instance);
+            BackgroundSoundNotes = new SortedList<SoundNoteModel>(NodeTimeComparer.Instance);
+            SpeedChangeWarnings = new SortedList<SpeedChangeWarningModel>(NodeTimeComparer.Instance);
+            SpeedLines = new SortedList<SpeedLineValueModel>(NodeTimeComparer.Instance) { new(1f, 0f, WarningType.Default) };
         }
 
         public ChartModel Clone()
@@ -36,37 +38,29 @@ namespace Deenote.Entities.Models
                 Level = Level,
             };
 
-            NoteTimeComparer.AssertInOrder(_visibleNoteNodes);
-            NoteTimeComparer.AssertInOrder(_backgroundNotes);
-
-            chart._visibleNoteNodes.Capacity = _visibleNoteNodes.Capacity;
             chart._holdCount = _holdCount;
-            var clones = new Dictionary<NoteModel, NoteModel>(_visibleNoteNodes.Count - _holdCount);
-            foreach (var note in _visibleNoteNodes) {
-                if (note is NoteModel model) {
-                    var cloneNote = model.Clone();
-                    chart._visibleNoteNodes.Add(cloneNote);
-                    if (model.IsHold) {
-                        clones.Add(model, cloneNote);
-                    }
-                }
-                else if (note is NoteTailNode tail) {
-                    var cloneNote = new NoteTailNode(clones[tail.HeadModel]);
-                    chart._visibleNoteNodes.Add(cloneNote);
-                }
-                else {
-                    throw new InvalidOperationException("Unknown IStageNoteNode type");
+            foreach (var note in chart.EnumerateNoteModels()) {
+                chart.NoteNodes.AddFromEnd(note);
+                if (note.IsHold) {
+                    chart.NoteNodes.AddFromEnd(new NoteTailNode(note));
                 }
             }
 
-            chart._backgroundNotes.Capacity = _backgroundNotes.Capacity;
-            foreach (var note in _backgroundNotes) {
-                chart._backgroundNotes.Add(note.Clone());
+            Debug.Assert(chart._holdCount == chart.NoteNodes.OfType<NoteTailNode>().Count());
+
+            chart.BackgroundSoundNotes.Capacity = BackgroundSoundNotes.Capacity;
+            foreach (var note in BackgroundSoundNotes) {
+                chart.BackgroundSoundNotes.AddFromEnd(note.Clone());
             }
 
-            chart._speedLines.Capacity = _speedLines.Capacity;
-            foreach (var line in _speedLines) {
-                chart._speedLines.Add(line);
+            chart.SpeedChangeWarnings.Capacity = SpeedChangeWarnings.Capacity;
+            foreach (var note in SpeedChangeWarnings) {
+                chart.SpeedChangeWarnings.AddFromEnd(note.Clone());
+            }
+
+            chart.SpeedLines.Capacity = SpeedLines.Capacity;
+            foreach (var line in SpeedLines) {
+                chart.SpeedLines.AddFromEnd(line);
             }
 
             return chart;

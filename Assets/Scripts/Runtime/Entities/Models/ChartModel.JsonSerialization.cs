@@ -3,6 +3,7 @@
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models.Serialization;
 using Deenote.Library.Collections;
+using Deenote.Library.Collections.Generic;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -36,8 +37,8 @@ namespace Deenote.Entities.Models
 
         [JsonProperty("notes", Order = 5), Obsolete("For serialzation only")]
         private IEnumerable<NoteModel> _SerializeNotes
-            => _visibleNoteNodes.OfType<NoteModel>()
-                .Merge(_backgroundNotes.Select(n => n._noteModel), NoteTimeComparer.Instance);
+            => NoteNodes.OfType<NoteModel>()
+                .Merge(BackgroundSoundNotes.Select(n => n._noteModel), NodeTimeComparer.Instance);
 
         [JsonProperty("links", Order = 6), Obsolete("For serialzation only")]
         private IEnumerable<NoteLinkIterator> _SerializeLinks
@@ -48,7 +49,7 @@ namespace Deenote.Entities.Models
         [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("lines", Order = 7), Obsolete("For serialzation only")]
         private IEnumerable<SpeedLineValueModel.Serializer> _SerializeLines
-            => _speedLines.Adjacent()
+            => SpeedLines.Adjacent()
                 .Where(tpl => tpl.Item1.Speed != 1f)
                 .Select(tpl => new SpeedLineValueModel.Serializer(tpl.Item1.Speed, tpl.Item1.StartTime, tpl.Item2.StartTime, tpl.Item1.WarningType));
 
@@ -63,9 +64,10 @@ namespace Deenote.Entities.Models
             // MaxVolume=oriVMax;
             RemapMinVolume = remapVMin;
             RemapMaxVolume = remapVMax;
-            Marshal.DeserializeNotes(notes.AsSpanOrEmpty(), out _holdCount, out _visibleNoteNodes!, out _backgroundNotes!, out _speedChangeWarnings!);
-            _visibleNoteNodes ??= new();
-            _backgroundNotes ??= new();
+            Marshal.DeserializeNotes(notes.AsSpanOrEmpty(), out _holdCount, out var visibleNotes, out var soundNotes, out var speedChanges);
+            NoteNodes = visibleNotes ?? new(NodeTimeUniqueComparer.Instance);
+            BackgroundSoundNotes = soundNotes ?? new(NodeTimeComparer.Instance);
+            SpeedChangeWarnings = speedChanges ??= new(NodeTimeComparer.Instance);
             DeserializeSpeedLines(lines);
 
             if (links is null)
@@ -83,36 +85,36 @@ namespace Deenote.Entities.Models
             }
         }
 
-        [MemberNotNull(nameof(_speedLines))]
+        [MemberNotNull(nameof(SpeedLines))]
         private void DeserializeSpeedLines(List<SpeedLineValueModel.Serializer>? lines)
         {
             if (lines is null || lines.Count == 0) {
-                _speedLines = new() { new SpeedLineValueModel(1f, 0f, WarningType.Default) };
+                SpeedLines = new(NodeTimeComparer.Instance) { new SpeedLineValueModel(1f, 0f, WarningType.Default) };
                 return;
             }
 
             lines.Sort((x, y) => Comparer<float>.Default.Compare(x.StartTime, y.StartTime));
 
-            var speedLines = new List<SpeedLineValueModel>();
+            var speedLines = new SortedList<SpeedLineValueModel>(NodeTimeComparer.Instance);
             float prevEndTime = 0f;
 
             foreach (var line in lines) {
                 if (line.StartTime > prevEndTime) {
-                    speedLines.Add(new(1f, prevEndTime, WarningType.Default));
+                    speedLines.AddFromEnd(new(1f, prevEndTime, WarningType.Default));
                 }
-                speedLines.Add(new(line.Speed, line.StartTime, line.WarningType));
+                speedLines.AddFromEnd(new(line.Speed, line.StartTime, line.WarningType));
                 prevEndTime = line.EndTime;
             }
-            speedLines.Add(new(1f, prevEndTime, WarningType.Default));
+            speedLines.AddFromEnd(new(1f, prevEndTime, WarningType.Default));
 
-            Debug.Assert(_visibleNoteNodes.OfType<NoteModel>()
+            Debug.Assert(NoteNodes.OfType<NoteModel>()
                 .All(note =>
                 {
                     var line = speedLines.Last(l => l.StartTime <= note.Time);
                     return line.Speed == note.Speed;
                 }));
 
-            _speedLines = speedLines;
+            SpeedLines = speedLines;
         }
 
         public static bool TryParse(string json, [NotNullWhen(true)] out ChartModel? chart)
@@ -121,6 +123,7 @@ namespace Deenote.Entities.Models
                 chart = JsonConvert.DeserializeObject<ChartModel>(json);
                 if (chart is not null) return true;
             } catch (Exception) {
+                Debug.LogError("Exception on parse chart json");
                 /* ignored */
             }
 
@@ -128,6 +131,7 @@ namespace Deenote.Entities.Models
                 chart = ChartAdapter.ParseDeV3Json(json);
                 if (chart is not null) return true;
             } catch (Exception) {
+                Debug.LogError("Exception on parse v3 chart json");
                 /* ignored */
             }
 

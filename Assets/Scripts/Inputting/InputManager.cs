@@ -28,6 +28,7 @@ namespace Deenote.Inputting
         private float? _musicResetTime;
 
         private bool _isEnabled;
+        private bool _isGamePlayEnabled;
 
         private void Awake()
         {
@@ -45,6 +46,10 @@ namespace Deenote.Inputting
             {
                 SetGeneralsEnable(ctrl is null);
             };
+
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.CurrentChart,
+                manager => SetGamePlayEnabled(manager.IsChartLoaded()));
         }
 
         private void OnEnable()
@@ -66,16 +71,30 @@ namespace Deenote.Inputting
         private void SetGeneralsEnable(bool enable)
         {
             if (Utils.SetField(ref _isEnabled, enable)) {
-                if (enable) {
-                    _inputActions.StageSettings.Enable();
-                    _inputActions.EditorSettings.Enable();
-                    _inputActions.ProjectManagement.Enable();
+                NotifyActionsEnable();
+            }
+        }
+
+        private void SetGamePlayEnabled(bool enable)
+        {
+            if (Utils.SetField(ref _isGamePlayEnabled, enable)) {
+                NotifyActionsEnable();
+            }
+        }
+
+        private void NotifyActionsEnable()
+        {
+            if (_isEnabled) {
+                _inputActions.StageSettings.Enable();
+                _inputActions.EditorSettings.Enable();
+                _inputActions.ProjectManagement.Enable();
+                if (_isGamePlayEnabled) {
+                    _inputActions.StageGamePlay.Enable();
+                    _inputActions.NoteEdit.Enable();
                 }
-                else {
-                    _inputActions.StageSettings.Disable();
-                    _inputActions.EditorSettings.Disable();
-                    _inputActions.ProjectManagement.Disable();
-                }
+            }
+            else {
+                _inputActions.Disable();
             }
         }
 
@@ -86,18 +105,6 @@ namespace Deenote.Inputting
 
         private void RegisterStageGamePlay()
         {
-            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
-                GamePlayManager.NotificationFlag.CurrentChart,
-                manager =>
-                {
-                    if (manager.IsChartLoaded()) {
-                        _inputActions.StageGamePlay.Enable();
-                    }
-                    else {
-                        _inputActions.StageGamePlay.Disable();
-                    }
-                });
-
             var actions = _inputActions.StageGamePlay;
             actions.PauseResume.started += _ => _game.MusicPlayer.TogglePlayingState();
             actions.AutoResetPlay.started += _ =>
@@ -185,18 +192,6 @@ namespace Deenote.Inputting
 
         private void RegisterNoteEdit()
         {
-            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
-               GamePlayManager.NotificationFlag.CurrentChart,
-               manager =>
-               {
-                   if (manager.IsChartLoaded()) {
-                       _inputActions.NoteEdit.Enable();
-                   }
-                   else {
-                       _inputActions.NoteEdit.Disable();
-                   }
-               });
-
             var actions = _inputActions.NoteEdit;
             actions.SelectAllNotes.started += _ => _editor.Selector.SelectAll();
             actions.RemoveSelectedNotes.started += _ => _editor.RemoveSelectedNotes();
