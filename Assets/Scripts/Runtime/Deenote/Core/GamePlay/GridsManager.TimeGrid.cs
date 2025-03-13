@@ -3,6 +3,7 @@
 using Deenote.Core.GameStage;
 using Deenote.Entities;
 using Deenote.Library;
+using Deenote.Library.Numerics;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -216,7 +217,7 @@ namespace Deenote.Core.GamePlay
                 return FloorToNextNearestTimeGridTime(prevBeatTime);
 
             float prevBeatDelta = time - prevBeatTime;
-            int prevSubBeatIndex = Mathf.CeilToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval) - 1;
+            int prevSubBeatIndex = Mathf.CeilToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval - TimeGridMinEqualityThreshold) - 1;
             float prevSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)prevSubBeatIndex / TimeGridSubBeatCount);
 
             if (time - prevSubBeatTime <= TimeGridMinEqualityThreshold)
@@ -245,21 +246,24 @@ namespace Deenote.Core.GamePlay
                 return project.Tempos.Length > 0 ? project.Tempos[0].StartTime : null;
 
             Tempo tempo = project.Tempos[tempoIndex];
+            // Is last tempo and last tempo is Bpm 0, there's no beatline
             if (tempoIndex == project.Tempos.Length - 1 && tempo.Bpm == 0f)
                 return null;
 
             float nextTempoTime = project.GetNonOverflowTempoTime(tempoIndex + 1);
+            // time is really near next tempo, we should ignore the next tempo time and ceil to the first subbeatline of next tempo
             if (time >= nextTempoTime - TimeGridMinEqualityThreshold)
                 return CeilToNextNearestTimeGridTime(nextTempoTime);
 
             int prevBeatIndex = tempo.GetBeatIndex(time);
             float nextBeatTime = tempo.GetBeatTime(prevBeatIndex + 1);
+            // time is really near 
             if (time >= nextBeatTime - TimeGridMinEqualityThreshold)
                 return CeilToNextNearestTimeGridTime(nextBeatTime);
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
             float prevBeatDelta = time - prevBeatTime;
-            int nextSubBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval) + 1;
+            int nextSubBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval+TimeGridMinEqualityThreshold) + 1;
             float nextSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)nextSubBeatIndex / TimeGridSubBeatCount);
             if (time >= nextSubBeatTime - TimeGridMinEqualityThreshold)
                 return CeilToNextNearestTimeGridTime(nextSubBeatTime);

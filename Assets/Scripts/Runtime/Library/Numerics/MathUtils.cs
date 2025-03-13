@@ -27,5 +27,29 @@ namespace Deenote.Library.Numerics
             value -= max;
             return true;
         }
+
+        /// <summary>
+        /// Fuck floating-point error
+        /// </summary>
+        public static int SafeFloorToInt(float value)
+        {
+            int result = Mathf.FloorToInt(value);
+            if (Mathf.Approximately(result + 1, value))
+                return result + 1;
+            else
+                return result;
+        }
+
+        /// <summary>
+        /// Fuck floating-point error
+        /// </summary>
+        public static int SafeCeilToInt(float value)
+        {
+            int result = Mathf.CeilToInt(value);
+            if (Mathf.Approximately(result - 1, value))
+                return result - 1;
+            else
+                return result;
+        }
     }
 }

@@ -1,6 +1,7 @@
 #nullable enable
 
 using CommunityToolkit.HighPerformance;
+using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Library.Collections;
 using UnityEngine;
@@ -40,9 +41,8 @@ namespace Deenote.Core.GameStage
             if (!musicPlayer.IsPlaying)
                 return;
 
-            // HACK: 播放过程中拖动进度条时，会有MusicPlayer.Update里的播放时SetTime反而使Time变小的情况。
-            // 所以原本是Debug.Assert改成了if判断。
-            // 后续再解决
+            // HACK: If drag time slider while music player, in MusicPlay.Update the SetTime may cause Time smaller
+            // So I changed the Debug.Assert to if statement. Maybe handle it later
             if (!forward)
                 return;
 
@@ -57,18 +57,14 @@ namespace Deenote.Core.GameStage
             }
         }
 
-        private void UpdateNoteSoundsIndices()
+        private void RefreshNoteSoundsIndices()
         {
             _game.AssertChartLoaded();
-            _nextHitSoundNoteIndex = 0;
-            _nextHitBackgroundNoteIndex = 0;
             var chart = _game.CurrentChart;
             var musicPlayer = _game.MusicPlayer;
 
-            while (_nextHitSoundNoteIndex < chart.NoteNodes.Count && chart.NoteNodes[_nextHitSoundNoteIndex].Time <= musicPlayer.Time)
-                _nextHitSoundNoteIndex++;
-            while (_nextHitBackgroundNoteIndex < chart.BackgroundSoundNotes.Count && chart.BackgroundSoundNotes [_nextHitBackgroundNoteIndex].Time <= musicPlayer.Time)
-                _nextHitBackgroundNoteIndex++;
+            _nextHitSoundNoteIndex = chart.NoteNodes.AsSpan().FindUpperBoundIndex(new NodeTimeComparable(musicPlayer.Time));
+            _nextHitBackgroundNoteIndex = chart.BackgroundSoundNotes.AsSpan().FindUpperBoundIndex(new NodeTimeComparable(musicPlayer.Time));
         }
     }
 }

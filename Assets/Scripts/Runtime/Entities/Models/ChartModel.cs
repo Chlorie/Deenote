@@ -39,7 +39,7 @@ namespace Deenote.Entities.Models
             };
 
             chart._holdCount = _holdCount;
-            foreach (var note in chart.EnumerateNoteModels()) {
+            foreach (var note in EnumerateNoteModels()) {
                 chart.NoteNodes.AddFromEnd(note);
                 if (note.IsHold) {
                     chart.NoteNodes.AddFromEnd(new NoteTailNode(note));

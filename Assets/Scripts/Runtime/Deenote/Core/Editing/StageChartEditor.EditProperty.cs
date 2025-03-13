@@ -16,7 +16,7 @@ namespace Deenote.Core.Editing
     {
         #region Simple Edit Note Properties
 
-        private static readonly PianoSoundValueModel[] _defaultNoteSounds
+        internal static readonly PianoSoundValueModel[] _defaultNoteSounds
             = new[] { new PianoSoundValueModel(0f, 0f, 72, 0) };
 
         private void OnNotePropertyEdited(bool notesVerticalPositionChanged, bool notesVisualDataChanged, NotificationFlag flag)

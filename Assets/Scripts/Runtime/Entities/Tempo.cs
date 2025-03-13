@@ -1,5 +1,6 @@
 #nullable enable
 
+using Deenote.Library.Numerics;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ namespace Deenote.Entities
 
             float timeOffsetToTempo = time - StartTime;
             float interval = 60 / Bpm;
-            return Mathf.FloorToInt(timeOffsetToTempo / interval);
+            return MathUtils.SafeFloorToInt(timeOffsetToTempo / interval);
         }
 
         public readonly int GetCeilingBeatIndex(float time)
@@ -44,7 +45,7 @@ namespace Deenote.Entities
 
             float timeOffsetToTempo = time - StartTime;
             float interval = 60 / Bpm;
-            return Mathf.CeilToInt(timeOffsetToTempo / interval);
+            return MathUtils.SafeCeilToInt(timeOffsetToTempo / interval);
         }
 
         public readonly float GetBeatTime(int beatIndex)

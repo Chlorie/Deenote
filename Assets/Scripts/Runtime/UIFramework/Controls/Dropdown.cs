@@ -18,7 +18,7 @@ namespace Deenote.UIFramework.Controls
 
         [SerializeField] List<Option> _options = new();
 
-        private PooledObjectListView<DropdownItem> _dropdownItems;
+        private PooledObjectListView<DropdownItem> _dropdownItems = default!;
 
         private bool _isInteractable_bf;
         public bool IsInteractable

@@ -1,5 +1,6 @@
 #nullable enable
 
+using CommunityToolkit.Diagnostics;
 using Deenote.Core.Editing;
 using Deenote.Core.GamePlay;
 using Deenote.GamePlay;
@@ -27,34 +28,20 @@ namespace Deenote.UI.Views
         [SerializeField] ToggleSwitch _placementIndicatorToggle = default!;
         [SerializeField] ToggleSwitch _earlyDisplaySlowNotesToggle = default!;
 
-        private static readonly string[] PredefinedAspectTexts = { "16:9", "4:3" };
-        private static readonly float[] PredefinedAspectValues = { 16f / 9f, 4f / 3f };
-
         private void Start()
         {
             #region View Screen
 
-            _aspectRatioDropdown.ResetOptions(PredefinedAspectTexts);
+            _aspectRatioDropdown.ResetOptions(_predefinedAspectTexts);
             _aspectRatioDropdown.SelectedIndexChanged += val =>
             {
                 if (val >= 0)
-                    MainWindow.Views.PerspectiveViewPanelView.AspectRatio = PredefinedAspectValues[val];
+                    MainWindow.Views.PerspectiveViewPanelView.AspectRatio = GetAspectRatioDropdownOption(val);
             };
-            MainWindow.Views.PerspectiveViewPanelView.AspectRatioChanged += SetAspectRatio;
-            SetAspectRatio(MainWindow.Views.PerspectiveViewPanelView.AspectRatio);
+            MainWindow.Views.PerspectiveViewPanelView.AspectRatioChanged += val => _aspectRatioDropdown.SetValueWithoutNotify(GetAspectRatioDropdownIndex(val));
+            _aspectRatioDropdown.SetValueWithoutNotify(GetAspectRatioDropdownIndex(MainWindow.Views.PerspectiveViewPanelView.AspectRatio));
 
             _fullScreenButton.Clicked += () => MainWindow.Views.PerspectiveViewPanelView.SetIsFullScreen(true);
-
-            void SetAspectRatio(float aspectRatio)
-            {
-                for (int i = 0; i < PredefinedAspectValues.Length; i++) {
-                    if (Mathf.Approximately(aspectRatio, PredefinedAspectValues[i])) {
-                        _aspectRatioDropdown.SetValueWithoutNotify(i);
-                        return;
-                    }
-                }
-                _aspectRatioDropdown.SetValueWithoutNotify(-1);
-            }
 
             #endregion
 
@@ -134,5 +121,22 @@ namespace Deenote.UI.Views
                 GamePlayManager.NotificationFlag.EarlyDisplaySlowNotes,
                 manager => _earlyDisplaySlowNotesToggle.SetIsCheckedWithoutNotify(manager.EarlyDisplaySlowNotes));
         }
+
+        private static readonly string[] _predefinedAspectTexts = { "16:9", "4:3" };
+        private static readonly float[] _predefinedAspectValues = { 16f / 9f, 4f / 3f };
+
+        private static float GetAspectRatioDropdownOption(int optionIndex)
+            => optionIndex switch {
+                0 => 16f / 9f,
+                1 => 4f / 3f,
+                _ => ThrowHelper.ThrowInvalidOperationException<float>(),
+            };
+
+        private static int GetAspectRatioDropdownIndex(float option)
+            => option switch {
+                16f / 9f => 0,
+                4f / 3f => 1,
+                _ => -1,
+            };
     }
 }

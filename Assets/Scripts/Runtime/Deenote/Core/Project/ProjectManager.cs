@@ -30,7 +30,6 @@ namespace Deenote.Core.Project
         }
 
         private bool _isLoading;
-        private bool _isSaving;
         private ResetableCancellationTokenSource _saveCts = new();
 
         public bool IsLoading
@@ -53,12 +52,12 @@ namespace Deenote.Core.Project
             MainSystem.Instance.AutoSaveTrigger.AutoSaving -= AutoSaveHandler;
         }
 
+#if  UNITY_EDITOR
         private void Start()
         {
-
-            // TODO: Fake
             CurrentProject = Fake.GetProject();
         }
+#endif
 
         public async UniTask<bool> OpenLoadProjectFileAsync(string filePath)
         {
@@ -79,32 +78,30 @@ namespace Deenote.Core.Project
             return true;
         }
 
-        public UniTask SaveCurrentProjectAsync()
+        public async UniTask SaveCurrentProjectAsync()
         {
             if (!IsProjectLoaded())
-                return UniTask.CompletedTask;
+                return;
             _saveCts.Reset();
-            return SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
+            ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(false));
+            await SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
+            ProjectSaved?.Invoke(new ProjectAutoSaveEventArgs(false));
         }
 
-        public UniTask SaveCurrentProjectToAsync(string targetFilePath)
+        public async UniTask SaveCurrentProjectToAsync(string targetFilePath)
         {
             if (!IsProjectLoaded())
-                return UniTask.CompletedTask;
+                return;
             _saveCts.Reset();
-            return SaveCurrentProjectToAsyncInternal(targetFilePath, _saveCts.Token);
+            ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(false));
+            await SaveCurrentProjectToAsyncInternal(targetFilePath, _saveCts.Token);
+            ProjectSaved?.Invoke(new ProjectAutoSaveEventArgs(false));
         }
 
         private async UniTask SaveCurrentProjectToAsyncInternal(string targetFilePath, CancellationToken cancellationToken)
         {
             AssertProjectLoaded();
-
-            _isSaving = true;
-            try {
-                await ProjectIO.SaveAsync(CurrentProject, targetFilePath, cancellationToken);
-            } finally {
-                _isSaving = false;
-            }
+            await ProjectIO.SaveAsync(CurrentProject, targetFilePath, cancellationToken);
         }
 
         private async UniTask SaveCurrentProjectChartJsonsAsync(CancellationToken cancellationToken)

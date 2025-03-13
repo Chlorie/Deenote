@@ -19,6 +19,7 @@ namespace Deenote.Core
         }
 
         private const string LogFile = "exceptions.log";
+        private const string UnhandledExceptionLocalizedKey = "UnhandledException_Toast";
 
         public static event Action<ExceptionInfo>? UnhandledExceptionOccurred;
 
@@ -50,8 +51,8 @@ namespace Deenote.Core
         private void HandleMessage(string message, string stackTrace)
         {
             using var sw = new StreamWriter(LogFile, append: true);
-            var msg = LocalizationSystem.GetText(LocalizableText.Localized("Misc_UnhandledExceptionMessage"));
-            sw.WriteLine(msg, message, stackTrace);
+            var msg = LocalizationSystem.GetText(LocalizableText.Localized(UnhandledExceptionLocalizedKey));
+            sw.WriteLine($"Unhandled Exception: {message}\n{stackTrace}");
             UnhandledExceptionOccurred?.Invoke(new ExceptionInfo(message, stackTrace));
         }
 

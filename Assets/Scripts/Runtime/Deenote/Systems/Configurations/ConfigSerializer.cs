@@ -82,7 +82,7 @@ namespace Deenote.Systems.Configurations
                     return null;
                 if (_configs.TryGetValue(key, out var value)) {
                     if (value?.Type is JTokenType.Array) {
-                        value.ToObject<List<string>>();
+                        return value.ToObject<List<string>>();
                     }
                 }
                 return null;
@@ -102,13 +102,13 @@ namespace Deenote.Systems.Configurations
 
         public readonly struct ConfigRegistration
         {
-            private readonly Dictionary<string, object> _configs = new();
+            private readonly Dictionary<string, object?> _configs = new();
 
             public ConfigRegistration()
             {
             }
 
-            internal IDictionary<string, object> Configs => _configs;
+            internal IDictionary<string, object?> Configs => _configs;
 
             public void Add(string key, int value) => AddInternal(key, value);
             public void Add(string key, float value) => AddInternal(key, value);
@@ -116,9 +116,9 @@ namespace Deenote.Systems.Configurations
             public void AddDictionary<TValue>(string key, IReadOnlyDictionary<string, TValue> dictionary) => AddInternal(key, dictionary);
             public void AddObject(string key, object obj) => AddInternal(key, obj);
 
-            public void AddList(string key, IEnumerable<string> list) => AddInternal(key, list);
+            public void AddList(string key, IEnumerable<string>? list) => AddInternal(key, list);
 
-            private void AddInternal(string key, object value)
+            private void AddInternal(string key, object? value)
             {
                 Configs.Add(key, value);
             }

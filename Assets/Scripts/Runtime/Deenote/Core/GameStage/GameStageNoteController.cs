@@ -2,6 +2,7 @@
 
 using Deenote.Core.GamePlay;
 using Deenote.Entities;
+using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Library;
 using Deenote.Library.Numerics;
@@ -210,8 +211,11 @@ namespace Deenote.Core.GameStage
 
                 if (!_game.EarlyDisplaySlowNotes) {
                     // In TimeOrder mode, the note should display only after its previous note displayed
-                    if (NoteModel.Time >= _game.NotesManager.GetNextActiveNodeInTimeOrderDisplayMode()?.Time)
-                        return true;
+                    if (_game.NotesManager.GetNextActiveNodeInTimeOrderDisplayMode() is { } next) {
+                        if (NodeTimeUniqueComparer.Instance.Compare(NoteModel, next) >= 0) {
+                            return true;
+                        }
+                    }
                 }
 
                 return false;
@@ -323,12 +327,10 @@ namespace Deenote.Core.GameStage
         {
             _game.AssertStageLoaded();
 
-            if (_state is NoteDisplayState.Fall && _game.IsShowLinkLines) {
+            if (_state is NoteDisplayState.Fall && _game.IsShowLinkLines && NoteModel.NextLink is not null) {
                 var currentTime = _game.MusicPlayer.Time;
 
                 var to = NoteModel.NextLink;
-                if (to is null)
-                    return;
                 var from = NoteModel;
 
                 var (fromX, fromZ) = _game.ConvertNoteCoordToWorldPosition(from.PositionCoord - new NoteCoord(0f, currentTime), from.Speed);

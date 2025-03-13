@@ -8,7 +8,6 @@ using Deenote.Library.Components;
 using Deenote.Localization;
 using Deenote.UIFramework;
 using Deenote.UIFramework.Controls;
-using System;
 using System.Collections.Immutable;
 using UnityEngine;
 
@@ -72,6 +71,7 @@ namespace Deenote.UI.Dialogs
             _resolutionDropdown.ResetOptions(_resolutionDropdownOptions.AsSpan());
             _resolutionDropdown.SelectedIndexChanged += index => ApplicationManager.SetResolution(GetResolutionDropdownOption(index));
             ApplicationManager.ResolutionChanged += vector => _resolutionDropdown.SetValueWithoutNotify(GetResolutionDropdownIndex(vector));
+            _resolutionDropdown.SetValueWithoutNotify(GetResolutionDropdownIndex(ApplicationManager.GetResolution()));
 
             _vSyncToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.IsVSyncOn = val;
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(

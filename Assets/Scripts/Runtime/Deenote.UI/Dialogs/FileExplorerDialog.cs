@@ -31,7 +31,7 @@ namespace Deenote.UI.Dialogs
 
         [Header("Prefabs")]
         [SerializeField] FileExplorerFileListItem _fileItemPrefab = default!;
-        private PooledObjectListView<FileExplorerFileListItem> _fileItems;
+        private PooledObjectListView<FileExplorerFileListItem> _fileItems = default!;
 
         private FilePathFilter _pathFilter;
         private InputBar _inputBar;

@@ -932,7 +932,7 @@
                 {
                     "name": "",
                     "id": "8e9bb5f5-60a7-4d08-a2a9-b011d8ef117b",
-                    "path": "",
+                    "path": "<Keyboard>/o",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1423,6 +1423,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "PlaceSoundNote",
+                    "type": "Button",
+                    "id": "c3f73f30-477e-4800-8fc6-5b9c75b91dcf",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1456,6 +1465,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "PlaceNoteSlideFlag",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "807c040c-3a21-41e7-81f6-02cc8c7ac4ed",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PlaceSoundNote",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

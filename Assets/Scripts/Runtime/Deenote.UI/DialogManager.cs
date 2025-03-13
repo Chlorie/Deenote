@@ -30,19 +30,18 @@ namespace Deenote.UI
         public PreferencesDialog PreferencesDialog => _preferencesDialog;
         public AboutDialog AboutDialog => _aboutDialog;
 
+        internal List<string>? _configtmpFileExplorerPinned;
+
         private void Awake()
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.AddList("ui/file_exploer/pinned", _fileExplorerDialog._pinnedDirectories);
+                configs.AddList("ui/file_exploer/pinned", _fileExplorerDialog.GetPinnedItems() ?? _configtmpFileExplorerPinned);
                 configs.Add("ui/new_proj/same_dir", _newProjectDialog._saveToAudioDirectory);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
-                var pinneds = configs.GetStringList("ui/file_exploer/pinned");
-                foreach (var pinned in pinneds.AsSpanOrEmpty()) {
-                    _fileExplorerDialog._pinnedDirectories.Add(pinned);
-                }
+                _configtmpFileExplorerPinned = configs.GetStringList("ui/file_exploer/pinned");
                 _newProjectDialog._saveToAudioDirectory = configs.GetBoolean("ui/new_proj/same_dir", false);
             };
         }

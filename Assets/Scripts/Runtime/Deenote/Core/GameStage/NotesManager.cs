@@ -59,14 +59,18 @@ namespace Deenote.Core.GameStage
         {
             _game = game;
             _trackingNotesInTimeOrder = new(Comparer<GameStageNoteController>.Create(
-                (l, r) => Comparer<float>.Default.Compare(l.NoteModel.Time, r.NoteModel.Time)));
+                (l, r) => NodeTimeUniqueComparer.Instance.Compare(l.NoteModel, r.NoteModel)));
             _trackingNotesAppearTimeOrder = new(Comparer<GameStageNoteController>.Create(
                 (l, r) =>
                 {
                     _game.AssertStageLoaded();
                     var ltime = _game.GetStageNoteAppearTime(l.NoteModel);
                     var rtime = _game.GetStageNoteAppearTime(r.NoteModel);
-                    return Comparer<float>.Default.Compare(ltime, rtime);
+                    var cmp = Comparer<float>.Default.Compare(ltime, rtime);
+                    if (cmp != 0) return cmp;
+                    cmp = NodeUniqueComparer.Instance.Compare(l.NoteModel, r.NoteModel);
+                    Debug.Assert(cmp != 0);
+                    return cmp;
                 }));
         }
 
@@ -92,7 +96,11 @@ namespace Deenote.Core.GameStage
                     _game.AssertStageLoaded();
                     var ltime = _game.GetStageNoteAppearTime(l);
                     var rtime = _game.GetStageNoteAppearTime(r);
-                    return Comparer<float>.Default.Compare(ltime, rtime);
+                    var cmp = Comparer<float>.Default.Compare(ltime, rtime);
+                    if (cmp != 0) return cmp;
+                    cmp = NodeUniqueComparer.Instance.Compare(l, r);
+                    Debug.Assert(cmp != 0);
+                    return cmp;
                 }));
             }
             else {
@@ -424,7 +432,7 @@ namespace Deenote.Core.GameStage
             UpdateNotesAppearOrder();
             ReselectActiveVisibleNotes();
 
-            UpdateNoteSoundsRelatively(currentTime >= _time, false);
+            RefreshNoteSoundsIndices();
             _time = currentTime;
         }
 

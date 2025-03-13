@@ -23,7 +23,7 @@ namespace Deenote.UI.Views.Panels
         [Header("Prefabs")]
         [SerializeField] NoteInfoPianoSoundEditListItem _soundItemPrefab = default!;
 
-        private PooledObjectListView<NoteInfoPianoSoundEditListItem> _soundItems;
+        private PooledObjectListView<NoteInfoPianoSoundEditListItem> _soundItems = default!;
 
         private readonly List<NoteModel> _editingNotes = new();
 

@@ -3,7 +3,7 @@
 using CommunityToolkit.Diagnostics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using UnityEngine;
 using UnityEngine.Pool;
 
 namespace Deenote.Entities.Models
@@ -94,6 +94,7 @@ namespace Deenote.Entities.Models
                 prevLink._nextLink = nextLink;
             if (nextLink is not null)
                 nextLink._prevLink = prevLink;
+            _prevLink = _nextLink = null;
         }
 
         /// <summary>

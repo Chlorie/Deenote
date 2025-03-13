@@ -314,7 +314,7 @@ namespace Deenote.Entities.Operations
                 foreach (var note in _notes) {
                     var collision = _chart.GetCollidedNotesTo(note);
                     if (!collision.CollidedNotes.IsEmpty)
-                        (_collisionsAfter ??= new()).Add(collision);
+                        (_collisionsBefore ??= new()).Add(collision);
                 }
             }
 
@@ -336,20 +336,20 @@ namespace Deenote.Entities.Operations
                         // And move current note before target note
                         NoteModel target = note;
                         for (; target.PrevLink != null; target = target.PrevLink) {
-                            if (target.PrevLink.Time <= note.Time)
+                            if (NodeTimeUniqueComparer.Instance.Compare(target.PrevLink, note) <= 0)
                                 break;
                         }
-                        if (!ReferenceEquals(target, note))
+                        if (target != note)
                             return new LinkContext(InsertBefore: true, note.PrevLink, target);
                     }
 
                     if (note.NextLink is not null) {
                         NoteModel target = note;
                         for (; target.NextLink != null; target = target.NextLink) {
-                            if (target.NextLink.Time >= note.Time)
+                            if (NodeTimeUniqueComparer.Instance.Compare(target.NextLink, note) >= 0)
                                 break;
                         }
-                        if (!ReferenceEquals(target, note))
+                        if (target != note)
                             return new LinkContext(false, note.NextLink, target);
                     }
 
@@ -572,16 +572,16 @@ namespace Deenote.Entities.Operations
                         next._prevLink = note;
                 }
                 else {
-                    if (note.PrevLink != prev) {
-                        note._prevLink = prev;
-                        if (prev is not null)
-                            prev._nextLink = note;
-                    }
-                    if (note.NextLink != next) {
-                        note._nextLink = next;
-                        if (next is not null)
-                            next._prevLink = note;
-                    }
+                    //if (note.PrevLink != prev) {
+                    //    note._prevLink = prev;
+                    //    if (prev is not null)
+                    //        prev._nextLink = note;
+                    //}
+                    //if (note.NextLink != next) {
+                    //    note._nextLink = next;
+                    //    if (next is not null)
+                    //        next._prevLink = note;
+                    //}
                 }
             }
 

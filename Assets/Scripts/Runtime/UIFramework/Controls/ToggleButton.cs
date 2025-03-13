@@ -34,10 +34,10 @@ namespace Deenote.UIFramework.Controls
         public void SetIsChecked(bool value)
         {
             if (Group is null)
-                SetIsCheckedInternal(value);
+                SetIsCheckedInternal(value, true);
             else {
                 if (IsChecked != value)
-                    Group.Toggle(this);
+                    Group.Toggle(this, true);
             }
         }
 
@@ -48,21 +48,20 @@ namespace Deenote.UIFramework.Controls
         public void SetIsCheckedWithoutNotify(bool value)
         {
             if (Group is null) {
-                if (Utils.SetField(ref _isChecked_bf, value)) {
-                    DoVisualTransition();
-                }
+                SetIsCheckedInternal(value, notify: false);
             }
             else {
                 if (IsChecked != value)
-                    Group.Toggle(this);
+                    Group.Toggle(this, notify: false);
             }
         }
 
-        internal void SetIsCheckedInternal(bool value)
+        internal void SetIsCheckedInternal(bool value, bool notify)
         {
             if (Utils.SetField(ref _isChecked_bf, value)) {
                 DoVisualTransition();
-                IsCheckedChanged?.Invoke(value);
+                if (notify)
+                    IsCheckedChanged?.Invoke(value);
             }
         }
 
@@ -70,9 +69,9 @@ namespace Deenote.UIFramework.Controls
         {
             if (IsLeftButtonOnInteractableControl(eventData)) {
                 if (Group is null)
-                    SetIsCheckedInternal(!IsChecked);
+                    SetIsCheckedInternal(!IsChecked, true);
                 else
-                    Group.Toggle(this);
+                    Group.Toggle(this, true);
             }
         }
 

@@ -58,9 +58,10 @@ namespace Deenote.UI.Views
                 _speedInput, _shiftInput, _eventIdInput,
                 _vibrateCheckBox,
             };
+        }
 
-
-
+        private void Start()
+        {
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
                 GlobalSettings.NotificationFlag.IneffectivePropertiesVisible,
                 settings =>
@@ -80,7 +81,7 @@ namespace Deenote.UI.Views
                     MainSystem.StageChartEditor.EditSelectedNotesPosition(value);
                 SyncFloatInput(_positionInput, value);
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NotePosition,
                 editor => NotifyMultiFloatValueChanged(_positionInput, editor.Selector.SelectedNotes, n => n.Position));
             _timeInput.EditSubmitted += text =>
@@ -89,10 +90,10 @@ namespace Deenote.UI.Views
                     MainSystem.StageChartEditor.EditSelectedNotesTime(value);
                 SyncFloatInput(_timeInput, value);
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteTime,
                 editor => NotifyMultiFloatValueChanged(_timeInput, editor.Selector.SelectedNotes, n => n.Time));
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NotePositionCoord,
                 editor =>
                 {
@@ -106,7 +107,7 @@ namespace Deenote.UI.Views
                     MainSystem.StageChartEditor.EditSelectedNotesSize(value);
                 SyncFloatInput(_sizeInput, value);
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteSize,
                 editor => NotifyMultiFloatValueChanged(_sizeInput, editor.Selector.SelectedNotes, n => n.Size));
 
@@ -116,7 +117,7 @@ namespace Deenote.UI.Views
                     MainSystem.StageChartEditor.EditSelectedNotesDuration(value);
                 SyncFloatInput(_durationInput, value);
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteDuration,
                 editor => NotifyMultiFloatValueChanged(_durationInput, editor.Selector.SelectedNotes, n => n.Duration));
 
@@ -139,7 +140,7 @@ namespace Deenote.UI.Views
                 if (check)
                     MainSystem.StageChartEditor.EditSelectedNotesKind(NoteModel.NoteKind.Swipe);
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteKind,
                 editor => NotifyMultiKindChanged(editor.Selector.SelectedNotes));
 
@@ -149,7 +150,7 @@ namespace Deenote.UI.Views
                     MainSystem.StageChartEditor.EditSelectedNotesSpeed(value);
                 SyncFloatInput(_speedInput, value);
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteSpeed,
                 editor => NotifyMultiFloatValueChanged(_speedInput, editor.Selector.SelectedNotes, n => n.Speed));
 
@@ -172,7 +173,7 @@ namespace Deenote.UI.Views
                     : MainWindow.Args.UIIcons.NoteInfoSoundsCollapseSprite;
             };
 
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteSounds,
                 editor => NotifyMultiSoundsChanged(editor.Selector.SelectedNotes));
 
@@ -186,7 +187,7 @@ namespace Deenote.UI.Views
                     MainSystem.StageChartEditor.EditSelectedNotesShift(value);
                 SyncFloatInput(_shiftInput, value);
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteShift,
                 editor => NotifyMultiFloatValueChanged(_shiftInput, editor.Selector.SelectedNotes, n => n.Shift));
             _eventIdInput.EditSubmitted += text =>
@@ -195,7 +196,7 @@ namespace Deenote.UI.Views
                 // Avoid display place holder
                 _eventIdInput.SetPlaceHolderText(LocalizableText.Raw(""));
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteEventId,
                 editor => NotifyMultiEventIdChanged(editor.Selector.SelectedNotes));
 
@@ -205,7 +206,7 @@ namespace Deenote.UI.Views
             //    if (index >= 0)
             //        MainSystem.StageChartEditor.EditSelectedNotesWarningType(WarningTypeExt.FromIndex(index));
             //};
-            //MainSystem.StageChartEditor.RegisterNotification(
+            //MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
             //    StageChartEditor.NotificationFlag.NoteWarningType,
             //    editor => NotifyMultiWarningTypeChanged(editor.Selector.SelectedNotes));
 
@@ -215,13 +216,16 @@ namespace Deenote.UI.Views
                     MainSystem.StageChartEditor.EditSelectedNotesVibrate(c);
                 }
             };
-            MainSystem.StageChartEditor.RegisterNotification(
+            MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteVibrate,
                 editor => NotifyMultiBoolValueChanged(_vibrateCheckBox, editor.Selector.SelectedNotes, n => n.Vibrate));
 
             #endregion
 
-            MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector =>
+            MainSystem.StageChartEditor.Selector.SelectedNotesChanged += _OnSelectedNotesChanged;
+            _OnSelectedNotesChanged(MainSystem.StageChartEditor.Selector);
+
+            void _OnSelectedNotesChanged(StageNoteSelector selector)
             {
                 var notes = selector.SelectedNotes;
                 switch (notes.Length) {
@@ -274,7 +278,7 @@ namespace Deenote.UI.Views
                         NotifyMultiBoolValueChanged(_vibrateCheckBox, notes, n => n.Vibrate);
                         break;
                 }
-            };
+            }
 
             void SetControlsActive(bool active)
             {

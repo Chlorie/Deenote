@@ -1,6 +1,5 @@
 #nullable enable
 
-using Deenote.Library.Collections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using UnityEngine.Pool;
 namespace Deenote.Library.Collections
 {
     [Serializable]
-    public readonly struct PooledObjectListView<T> : IEnumerable<T> where T : class
+    public sealed class PooledObjectListView<T> : IEnumerable<T> where T : class
     {
         private readonly ObjectPool<T> _pool;
         [SerializeField]
@@ -19,8 +18,6 @@ namespace Deenote.Library.Collections
         public T this[int index] => _items[index];
 
         public int Count => _items.Count;
-
-        public bool IsNull => _items is null;
 
         public PooledObjectListView(ObjectPool<T> pool)
         {

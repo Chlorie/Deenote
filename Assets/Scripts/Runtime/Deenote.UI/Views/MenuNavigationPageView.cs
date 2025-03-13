@@ -11,6 +11,7 @@ using Deenote.UI.Dialogs;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
 using Deenote.UIFramework.Controls;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -37,7 +38,10 @@ namespace Deenote.UI.Views
 
         [Header("Prefabs")]
         [SerializeField] RecentFileListItem _recentFilePrefab = default!;
-        private PooledObjectListView<RecentFileListItem> _recentFiles;
+        private PooledObjectListView<RecentFileListItem> _recentFiles = default!;
+
+        internal IEnumerable<string>? GetRecentFiles()
+            => _recentFiles?.Select(item => item.FilePath);
 
         #region MessageBoxArgs
 
@@ -96,8 +100,6 @@ namespace Deenote.UI.Views
         private const string OpenProjectLoadingStatusKey = "OpenProject_Status_Loading";
         private const string OpenProjectLoadedStatusKey = "OpenProject_Status_Loaded";
         private const string OpenProjectFailedStatusKey = "OpenProject_Status_LoadFailed";
-        private const string SaveProjectSavingStatusKey = "SaveProject_Status_Saving";
-        private const string SaveProjectSavedStatusKey = "SaveProject_Status_Saved";
         private const string SaveAsFileExplorerTitleKey = "SaveAsProject_FileExplorer_Title";
 
         private const string VersionCheckNoInternetToastKey = "Version_NoInternet_Toast";
@@ -110,16 +112,16 @@ namespace Deenote.UI.Views
             _recentFiles = new(UnityUtils.CreateObjectPool(
                 _recentFilePrefab, _recentFilesCollapsable.Content,
                 item => item.OnInstantiate(this), defaultCapacity: 0, maxSize: MaxRecentFilesCount));
+        }
 
-            MainSystem.SaveSystem.SavingConfigurations += configs =>
-            {
-                configs.AddList("ui/recent_files", _recentFiles.Select(item => item.FilePath));
-            };
-            MainSystem.SaveSystem.LoadedConfigurations += configs =>
-            {
-                var recents = configs.GetStringList("ui/recent_files");
-            };
-
+        private void Start()
+        {
+            if (MainWindow._configtmpRecentFiles is { } inits) {
+                foreach (var file in inits) {
+                    _recentFiles.Add(out var item);
+                    item.Initialize(file);
+                }
+            }
             // Register
             {
                 _newButton.Clicked += UnityUtils.Action(MenuCreateNewProjectAsync);
@@ -234,13 +236,9 @@ namespace Deenote.UI.Views
             MainSystem.ProjectManager.AssertProjectLoaded("Unexpected interactable save button when current project is null");
             var proj = MainSystem.ProjectManager.CurrentProject;
 
-            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
-
             await MainSystem.ProjectManager.SaveCurrentProjectAsync();
             await UniTask.SwitchToMainThread();
             AddPathToRecentFiles(proj.ProjectFilePath);
-
-            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
 
         public async UniTask MenuSaveProjectAsAsync()
@@ -263,10 +261,8 @@ namespace Deenote.UI.Views
                 if (res != 0) return;
             }
 
-            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectToAsync(feRes.Path);
             await UniTask.SwitchToMainThread();
-            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
         }
 
         #endregion

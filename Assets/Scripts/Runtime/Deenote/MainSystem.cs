@@ -22,6 +22,8 @@ namespace Deenote
         [SerializeField] GamePlayManager _gamePlayManager = default!;
         [SerializeField] StageChartEditor _stageChartEditor = default!;
 
+        private UnhandledExceptionHandler _unhandledExceptionHandler = default!;
+
         public static SaveSystem SaveSystem { get; private set; } = default!;
         public static GlobalSettings GlobalSettings { get; private set; } = default!;
 
@@ -39,6 +41,8 @@ namespace Deenote
 
             AutoSaveTrigger = gameObject.AddComponent<AutoSaveTrigger>();
             AutoSaveTrigger.IsEnabled = false;
+
+            _unhandledExceptionHandler = new();
 
             SaveSystem = new();
 

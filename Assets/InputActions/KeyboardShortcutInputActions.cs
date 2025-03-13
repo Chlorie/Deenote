@@ -956,7 +956,7 @@ namespace Deenote.InputSystem.InputActions
                 {
                     ""name"": """",
                     ""id"": ""8e9bb5f5-60a7-4d08-a2a9-b011d8ef117b"",
-                    ""path"": """",
+                    ""path"": ""<Keyboard>/o"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -1447,6 +1447,15 @@ namespace Deenote.InputSystem.InputActions
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PlaceSoundNote"",
+                    ""type"": ""Button"",
+                    ""id"": ""c3f73f30-477e-4800-8fc6-5b9c75b91dcf"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1480,6 +1489,17 @@ namespace Deenote.InputSystem.InputActions
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""PlaceNoteSlideFlag"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""807c040c-3a21-41e7-81f6-02cc8c7ac4ed"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlaceSoundNote"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1770,6 +1790,7 @@ namespace Deenote.InputSystem.InputActions
             m_EditorSettings_SnapToGrids = m_EditorSettings.FindAction("SnapToGrids", throwIfNotFound: true);
             m_EditorSettings_PasteRememberPosition = m_EditorSettings.FindAction("PasteRememberPosition", throwIfNotFound: true);
             m_EditorSettings_PlaceNoteSlideFlag = m_EditorSettings.FindAction("PlaceNoteSlideFlag", throwIfNotFound: true);
+            m_EditorSettings_PlaceSoundNote = m_EditorSettings.FindAction("PlaceSoundNote", throwIfNotFound: true);
             // ProjectManagement
             m_ProjectManagement = asset.FindActionMap("ProjectManagement", throwIfNotFound: true);
             m_ProjectManagement_NewProject = m_ProjectManagement.FindAction("NewProject", throwIfNotFound: true);
@@ -2291,6 +2312,7 @@ namespace Deenote.InputSystem.InputActions
         private readonly InputAction m_EditorSettings_SnapToGrids;
         private readonly InputAction m_EditorSettings_PasteRememberPosition;
         private readonly InputAction m_EditorSettings_PlaceNoteSlideFlag;
+        private readonly InputAction m_EditorSettings_PlaceSoundNote;
         public struct EditorSettingsActions
         {
             private @KeyboardShortcutInputActions m_Wrapper;
@@ -2298,6 +2320,7 @@ namespace Deenote.InputSystem.InputActions
             public InputAction @SnapToGrids => m_Wrapper.m_EditorSettings_SnapToGrids;
             public InputAction @PasteRememberPosition => m_Wrapper.m_EditorSettings_PasteRememberPosition;
             public InputAction @PlaceNoteSlideFlag => m_Wrapper.m_EditorSettings_PlaceNoteSlideFlag;
+            public InputAction @PlaceSoundNote => m_Wrapper.m_EditorSettings_PlaceSoundNote;
             public InputActionMap Get() { return m_Wrapper.m_EditorSettings; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -2316,6 +2339,9 @@ namespace Deenote.InputSystem.InputActions
                 @PlaceNoteSlideFlag.started += instance.OnPlaceNoteSlideFlag;
                 @PlaceNoteSlideFlag.performed += instance.OnPlaceNoteSlideFlag;
                 @PlaceNoteSlideFlag.canceled += instance.OnPlaceNoteSlideFlag;
+                @PlaceSoundNote.started += instance.OnPlaceSoundNote;
+                @PlaceSoundNote.performed += instance.OnPlaceSoundNote;
+                @PlaceSoundNote.canceled += instance.OnPlaceSoundNote;
             }
 
             private void UnregisterCallbacks(IEditorSettingsActions instance)
@@ -2329,6 +2355,9 @@ namespace Deenote.InputSystem.InputActions
                 @PlaceNoteSlideFlag.started -= instance.OnPlaceNoteSlideFlag;
                 @PlaceNoteSlideFlag.performed -= instance.OnPlaceNoteSlideFlag;
                 @PlaceNoteSlideFlag.canceled -= instance.OnPlaceNoteSlideFlag;
+                @PlaceSoundNote.started -= instance.OnPlaceSoundNote;
+                @PlaceSoundNote.performed -= instance.OnPlaceSoundNote;
+                @PlaceSoundNote.canceled -= instance.OnPlaceSoundNote;
             }
 
             public void RemoveCallbacks(IEditorSettingsActions instance)
@@ -2480,6 +2509,7 @@ namespace Deenote.InputSystem.InputActions
             void OnSnapToGrids(InputAction.CallbackContext context);
             void OnPasteRememberPosition(InputAction.CallbackContext context);
             void OnPlaceNoteSlideFlag(InputAction.CallbackContext context);
+            void OnPlaceSoundNote(InputAction.CallbackContext context);
         }
         public interface IProjectManagementActions
         {

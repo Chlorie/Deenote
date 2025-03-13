@@ -242,6 +242,7 @@ namespace Deenote.Inputting
             actions.PasteRememberPosition.canceled += _ => _editor.Placer.Options &= ~StageNotePlacer.PlacementOptions.PastingRememberPosition;
             actions.PlaceNoteSlideFlag.started += _ => _editor.Placer.Options |= StageNotePlacer.PlacementOptions.PlaceSlide;
             actions.PlaceNoteSlideFlag.canceled += _ => _editor.Placer.Options &= ~StageNotePlacer.PlacementOptions.PlaceSlide;
+            actions.PlaceSoundNote.started += _ => _editor.Placer.PlaceSoundNoteByDefault = !_editor.Placer.PlaceSoundNoteByDefault;
         }
 
         #endregion

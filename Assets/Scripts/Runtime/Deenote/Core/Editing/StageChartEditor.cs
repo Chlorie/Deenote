@@ -46,6 +46,10 @@ namespace Deenote.Core.Editing
                 Placer.SnapToPositionGrid = configs.GetBoolean("editor/snap_pos", true);
                 Placer.SnapToTimeGrid = configs.GetBoolean("editor/snap_time", true);
             };
+            MainSystem.ProjectManager.ProjectSaved += args =>
+            {
+                OperationMemento.SaveAtCurrent();
+            };
         }
 
         internal void OnInstantiate(ProjectManager project, GamePlayManager game)
@@ -90,6 +94,11 @@ namespace Deenote.Core.Editing
                 .OnUndone(note => OnNoteCollectionChanged()));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="notePrototypes"></param>
+        /// <param name="baseCoord">The coord that first note will be created</param>
         public void AddMultipleNotes(ReadOnlySpan<NoteModel> notePrototypes, NoteCoord baseCoord)
         {
             if (!_game.IsChartLoaded())
@@ -175,7 +184,7 @@ namespace Deenote.Core.Editing
                 if (applySpeed)
                     note.Speed = _game.Grids.GetCurveTransformedValue(time, GridsManager.CurveApplyProperty.Speed)!.Value;
             }
-            AddMultipleNotes(notes, new NoteCoord(0f, start));
+            AddMultipleNotes(notes, notes[0].PositionCoord);
         }
 
         #endregion

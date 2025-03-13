@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Deenote.Entities.Models;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Deenote.Entities.Storage
 {
@@ -12,14 +13,14 @@ namespace Deenote.Entities.Storage
         public const ushort DeenoteProjectFileHeader = 0xDEE0;
         public const byte DeenoteProjectFileVersionMark = 1;
 
-        public static UniTask<ProjectModel?> LoadAsync(string projectFilePath, CancellationToken cancellationToken = default)
-            => UniTask.RunOnThreadPool(() => Load(projectFilePath), configureAwait: false, cancellationToken);
+        public static Task<ProjectModel?> LoadAsync(string projectFilePath, CancellationToken cancellationToken = default)
+            => Task.Run(() => Load(projectFilePath), cancellationToken);
 
-        public static UniTask SaveAsync(ProjectModel project, string saveFilePath, CancellationToken cancellationToken = default)
+        public static Task SaveAsync(ProjectModel project, string saveFilePath, CancellationToken cancellationToken = default)
         {
             project.ProjectFilePath = saveFilePath;
             var saveProj = project.CloneForSave();
-            return UniTask.RunOnThreadPool(() => Save(saveProj, saveFilePath), configureAwait: false, cancellationToken);
+            return Task.Run(() => Save(saveProj, saveFilePath), cancellationToken);
         }
 
         private static ProjectModel? Load(string projectFilePath)

@@ -41,7 +41,7 @@ namespace Deenote.UIFramework.Controls
         public void ForceToggleOff()
         {
             if (_currentOnToggleButton is not null) {
-                _currentOnToggleButton.SetIsCheckedInternal(false);
+                _currentOnToggleButton.SetIsCheckedInternal(false, true);
                 _currentOnToggleButton = null;
                 ToggledOnButtonChanged?.Invoke(_currentOnToggleButton);
             }
@@ -53,14 +53,14 @@ namespace Deenote.UIFramework.Controls
             _toggleButtons.Add(toggle);
         }
 
-        internal void Toggle(ToggleButton button)
+        internal void Toggle(ToggleButton button, bool notify)
         {
             Debug.Assert(button.Group == this, "Toggle button has wrong group");
 
             if (_allowToggleOff) {
-                button.SetIsCheckedInternal(!button.IsChecked);
+                button.SetIsCheckedInternal(!button.IsChecked, notify);
                 if (button.IsChecked) {
-                    _currentOnToggleButton?.SetIsCheckedInternal(false);
+                    _currentOnToggleButton?.SetIsCheckedInternal(false, notify);
                     _currentOnToggleButton = button;
                 }
                 else {
@@ -71,8 +71,8 @@ namespace Deenote.UIFramework.Controls
             else {
                 if (button.IsChecked)
                     return;
-                button.SetIsCheckedInternal(true);
-                _currentOnToggleButton?.SetIsCheckedInternal(false);
+                button.SetIsCheckedInternal(true, notify);
+                _currentOnToggleButton?.SetIsCheckedInternal(false, notify);
                 _currentOnToggleButton = button;
             }
         }

@@ -54,12 +54,8 @@ namespace Deenote.UI.Views
 
         private void Start()
         {
-            _linearCurveRadio.SetChecked();
-        }
-
-        private void Awake()
-        {
             RegisterNotifications();
+            _linearCurveRadio.SetChecked();
         }
 
         internal void RegisterNotifications()
@@ -161,6 +157,9 @@ namespace Deenote.UI.Views
                 {
                     if (int.TryParse(val, out var ival)) {
                         _curveFillAmount = Mathf.Clamp(ival, MinCurveFillAmount, MaxCurveFillAmount);
+                        if (MainSystem.GamePlayManager.Grids.IsCurveOn) {
+                            _fillCurveButton.IsInteractable = _curveFillAmount > 0;
+                        }
                     }
                     SyncCurveFillAmount(MainSystem.GamePlayManager.Grids);
                 };
@@ -182,20 +181,23 @@ namespace Deenote.UI.Views
 
                 MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector =>
                 {
-                    if (MainSystem.GamePlayManager.Grids.IsCurveOn) {
-                        _fillCurveButton.IsInteractable = _curveFillAmount > 0;
-                        var appliable = selector.SelectedNotes.Length > 0;
-                        _curveApplySizeButton.IsInteractable = appliable;
-                        _curveApplySpeedButton.IsInteractable = appliable;
-                    }
-                    else {
-                        var fillable = false; // selector.SelectedNotes.Length >= 2;
-                        _fillCurveButton.IsInteractable = fillable;
-                        var appliable = false; // selector.SelectedNotes.Length > 2;
-                        _curveApplySizeButton.IsInteractable = appliable;
-                        _curveApplySpeedButton.IsInteractable = appliable;
-                    }
+                    var fillable = false; // selector.SelectedNotes.Length >= 2;
+                    _fillCurveButton.IsInteractable = fillable;
+                    var appliable = false; // selector.SelectedNotes.Length > 2;
+                    _curveApplySizeButton.IsInteractable = appliable;
+                    _curveApplySpeedButton.IsInteractable = appliable;
                 };
+                MainSystem.GamePlayManager.Grids.RegisterNotificationAndInvoke(
+                    GridsManager.NotificationFlag.IsCurveOnChanged,
+                    grids =>
+                    {
+                        if (grids.IsCurveOn) {
+                            _fillCurveButton.IsInteractable = _curveFillAmount > 0;
+                        }
+                        else {
+                            _fillCurveButton.IsInteractable = false;
+                        }
+                    });
             }
 
             // BPM

@@ -8,6 +8,7 @@ using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
 using Deenote.Library.Numerics;
+using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -34,6 +35,7 @@ namespace Deenote.Core.Editing
         private const float SwipeDragAngleCotangent = 1.7320508076f;
 
         private Transform _indicatorPanelTransform = default!;
+        private NoteModel _defaultPlaceNote;
         private PooledObjectListView<PlacementNoteIndicatorController> _indicators;
         private PooledObjectListView<NoteModel> _notePrototypes;
 
@@ -50,6 +52,7 @@ namespace Deenote.Core.Editing
         private PlacementState _state;
 
         private PlacementOptions _options_bf;
+        private bool _placeSoundNoteByDefault_bf;
         private bool _isIndicatorOn_bf;
         private bool _snapToPositionGrid_bf;
         private bool _snapToTimeGrid_bf;
@@ -71,7 +74,8 @@ namespace Deenote.Core.Editing
                         switch (_state) {
                             case PlacementState.Idle or PlacementState.Placing:
                                 Debug.Assert(_notePrototypes.Count == 1);
-                                _notePrototypes[0].Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
+                                _notePrototypes[0].Kind = _defaultPlaceNote.Kind = IsPlacingSlide
+                                    ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
                                 RefreshIndicators();
                                 break;
                             case PlacementState.PlacingLinks:
@@ -87,6 +91,30 @@ namespace Deenote.Core.Editing
         }
 
         private bool IsPlacingSlide => Options.HasFlag(PlacementOptions.PlaceSlide);
+
+        public bool PlaceSoundNoteByDefault
+        {
+            get => _placeSoundNoteByDefault_bf;
+            set {
+                if (Utils.SetField(ref _placeSoundNoteByDefault_bf, value)) {
+                    if (value) {
+                        _defaultPlaceNote.Sounds.Replace(StageChartEditor._defaultNoteSounds);
+                        if (_state is PlacementState.Idle) {
+                            _notePrototypes[0].Sounds.Replace(StageChartEditor._defaultNoteSounds);
+                            _indicators[0].Refresh();
+                        }
+                    }
+                    else {
+                        _defaultPlaceNote.Sounds.Clear();
+                        if (_state is PlacementState.Idle) {
+                            _notePrototypes[0].Sounds.Clear();
+                            _indicators[0].Refresh();
+                        }
+                    }
+                    NotifyFlag(NotificationFlag.PlaceSoundNoteByDefault);
+                }
+            }
+        }
 
         public bool IsIndicatorOn
         {
@@ -139,7 +167,8 @@ namespace Deenote.Core.Editing
             {
                 if (_state is not PlacementState.Pasting) {
                     var speed = PlacingNoteSpeed;
-                    if (!_indicators.IsNull) {
+                    _defaultPlaceNote.Speed = speed;
+                    if (_indicators is not null) {
                         foreach (var indicator in _indicators) {
                             indicator.NotePrototype.Speed = speed;
                             indicator.Refresh();
@@ -152,9 +181,12 @@ namespace Deenote.Core.Editing
         internal StageNotePlacer(StageChartEditor editor)
         {
             _editor = editor;
+            _defaultPlaceNote = new NoteModel();
             _notePrototypes = new PooledObjectListView<NoteModel>(
                 new ObjectPool<NoteModel>(() => new NoteModel()));
             _notePrototypes.Add(out _);
+
+            _indicators = null!;
 
             _editor._game.RegisterNotification(
                 GamePlayManager.NotificationFlag.CurrentChart,
@@ -165,7 +197,7 @@ namespace Deenote.Core.Editing
             _editor._game.StageLoaded += args =>
             {
                 _indicatorPanelTransform = args.Stage.NoteIndicatorPanelTransform;
-                _indicators.Clear();
+                _indicators?.Clear();
 
                 var indicators = new PooledObjectListView<PlacementNoteIndicatorController>(
                     UnityUtils.CreateObjectPool(args.Stage.Args.PlacementNoteIndicatorPrefab,
@@ -338,7 +370,7 @@ namespace Deenote.Core.Editing
                         if (nGridTime is not { } gridTime)
                             return;
                         if (currentCoordTime >= gridTime) {
-                            // TODO: _notePrototype修改
+                            // TODO: Modifier _notePrototype
                             _indicators.Add(out var newIndicator);
                             InitIndicator(newIndicator, gridTime);
                             LinkNotes(_indicators[^1].NotePrototype, _indicators[^1].NotePrototype);
@@ -523,11 +555,8 @@ namespace Deenote.Core.Editing
         {
             _state = PlacementState.Idle;
             var note = _notePrototypes[0];
+            _defaultPlaceNote.CloneDataTo(note, true);
             note.UnlinkWithoutCutChain();
-            note.Duration = 0f;
-            note.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
-            note.Speed = PlacingNoteSpeed;
-            note.Sounds.Clear();
             _notePrototypes.SetCount(1);
             RefreshIndicators();
             SetPlacingNoteSpeed(null);
@@ -606,7 +635,7 @@ namespace Deenote.Core.Editing
 
         private void RefreshIndicators()
         {
-            if (_indicators.IsNull)
+            if (_indicators is null)
                 return;
 
             using (var resetter = _indicators.Resetting(_notePrototypes.Count)) {
@@ -646,6 +675,7 @@ namespace Deenote.Core.Editing
 
         public enum NotificationFlag
         {
+            PlaceSoundNoteByDefault,
             IsIndicatorOn,
             SnapToPositionGrid,
             SnapToTimeGrid,

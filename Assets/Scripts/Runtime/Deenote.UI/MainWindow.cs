@@ -2,9 +2,11 @@
 
 using Deenote.Core;
 using Deenote.Localization;
+using Deenote.UI.Dialogs;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Deenote.UI
@@ -64,8 +66,16 @@ namespace Deenote.UI
 
         private const string UnhandledExceptionToastKey = "UnhandledException_Toast";
 
+        private const string SaveProjectSavingStatusKey = "SaveProject_Status_Saving";
+        private const string SaveProjectSavedStatusKey = "SaveProject_Status_Saved";
         private const string AutoSaveSavingStatusKey = "AutoSaveProject_Status_Saving";
         private const string AutoSaveSavedStatusKey = "AutoSaveProject_Status_Saved";
+
+        #endregion
+
+        #region Configurations temp
+
+        internal static List<string>? _configtmpRecentFiles;
 
         #endregion
 
@@ -84,17 +94,34 @@ namespace Deenote.UI
 #endif
             _pianoSoundPlayer = new(MainSystem.PianoSoundSource);
 
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
+            {
+                configs.Add("ui/perspective_aspect_ratio", Views.PerspectiveViewPanelView.AspectRatio);
+                configs.AddList("ui/recent_files", Views.MenuNavigationPageView.GetRecentFiles() ?? _configtmpRecentFiles);
+            };
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
+            {
+                Views.PerspectiveViewPanelView.AspectRatio = configs.GetSingle("ui/perspective_aspect_ratio", 4f / 3f);
+                _configtmpRecentFiles = configs.GetStringList("ui/recent_files");
+            };
+
             UnhandledExceptionHandler.UnhandledExceptionOccurred += args =>
             {
                 ToastManager.ShowLocalizedToastAsync(UnhandledExceptionToastKey, 3f);
             };
-            MainSystem.ProjectManager.ProjectAutoSaving += args =>
+            MainSystem.ProjectManager.ProjectSaving += args =>
             {
-                StatusBar.SetLocalizedStatusMessage(AutoSaveSavingStatusKey);
+                if (args.IsAutoSave)
+                    StatusBar.SetLocalizedStatusMessage(AutoSaveSavingStatusKey);
+                else
+                    StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             };
-            MainSystem.ProjectManager.ProjectAutoSaved += args =>
+            MainSystem.ProjectManager.ProjectSaved += args =>
             {
-                StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey);
+                if (args.IsAutoSave)
+                    StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey);
+                else
+                    StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
             };
         }
 

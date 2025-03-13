@@ -1,11 +1,8 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
-using Deenote.Entities;
 using Deenote.Library;
 using System;
-using System.IO;
-using System.Threading;
 
 namespace Deenote.Core.Project
 {
@@ -24,8 +21,8 @@ namespace Deenote.Core.Project
             }
         }
 
-        public event Action<ProjectAutoSaveEventArgs>? ProjectAutoSaving;
-        public event Action<ProjectAutoSaveEventArgs>? ProjectAutoSaved;
+        public event Action<ProjectAutoSaveEventArgs>? ProjectSaving;
+        public event Action<ProjectAutoSaveEventArgs>? ProjectSaved;
 
         private void AutoSaveHandler()
         {
@@ -45,26 +42,26 @@ namespace Deenote.Core.Project
             async UniTaskVoid SaveProjectAsync()
             {
                 _saveCts.Reset();
-                ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
+                ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(true));
                 await SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
-                ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
+                ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(true));
             }
 
             async UniTaskVoid SaveProjectAndJsonAsync()
             {
                 _saveCts.Reset();
-                ProjectAutoSaving?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
+                ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(true));
                 var projSaveTask = SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
                 var chartSaveTask = SaveCurrentProjectChartJsonsAsync(_saveCts.Token);
 
                 await projSaveTask;
                 await chartSaveTask;
 
-                ProjectAutoSaved?.Invoke(new ProjectAutoSaveEventArgs(AutoSave));
+                ProjectSaved?.Invoke(new ProjectAutoSaveEventArgs(true));
             }
         }
 
         public readonly record struct ProjectAutoSaveEventArgs(
-            ProjectAutoSaveOption Option);
+            bool IsAutoSave);
     }
 }

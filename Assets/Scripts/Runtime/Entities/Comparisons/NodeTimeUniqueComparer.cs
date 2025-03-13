@@ -14,9 +14,7 @@ namespace Deenote.Entities.Comparisons
         {
             var cmp = NodeTimeComparer.Instance.Compare(x, y);
             if (cmp != 0) return cmp;
-            cmp = Comparer<float>.Default.Compare(x.Speed, y.Speed);
-            if (cmp != 0) return cmp;
-            cmp = Comparer<uint>.Default.Compare(x.Uid, y.Uid);
+            cmp = NodeUniqueComparer.Instance.Compare(x, y);
             Debug.Assert(cmp != 0);
             return cmp;
         }

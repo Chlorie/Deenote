@@ -6,15 +6,15 @@ using Deenote.GamePlay.UI;
 using Deenote.Library;
 using Deenote.Library.Components;
 using Deenote.Library.Numerics;
+using Deenote.Library.Unity.UI;
 using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 namespace Deenote.UI.Views
 {
-    public sealed partial class PerspectiveViewPanelView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public sealed partial class PerspectiveViewPanelView : MonoBehaviour
     {
         [SerializeField] AspectRatioFitter _aspectRatioFitter = default!;
         [SerializeField] RawImage _viewRawImage = default!;
@@ -23,6 +23,7 @@ namespace Deenote.UI.Views
         [SerializeField] Transform _windowScreenParentTransform = default!;
         [SerializeField] Transform _fullScreenParentTransform = default!;
         [SerializeField] RectTransform _contentTransform = default!;
+        [SerializeField] PointerHoveringTrigger _contentHoveringTrigger = default!;
 
         [SerializeField] GraphicRaycaster _raycaster = default!;
 
@@ -55,28 +56,19 @@ namespace Deenote.UI.Views
         public void SetIsFullScreen(bool full)
         {
             if (Utils.SetField(ref _isFullScreen_bf, full)) {
-                _contentTransform.parent = full ? _fullScreenParentTransform : _windowScreenParentTransform;
-                _fullScreenParentTransform.gameObject.SetActive(full);
-                _windowScreenParentTransform.gameObject.SetActive(!full);
                 if (full)
                     ApplicationManager.SetAspectRatio(AspectRatio, true);
                 else
                     ApplicationManager.RecoverResolution();
+                _contentTransform.SetParent(full ? _fullScreenParentTransform : _windowScreenParentTransform, false);
+                _fullScreenParentTransform.gameObject.SetActive(full);
+                _windowScreenParentTransform.gameObject.SetActive(!full);
             }
         }
 
         private void Awake()
         {
             InitAspectRatioController();
-
-            MainSystem.SaveSystem.SavingConfigurations += configs =>
-            {
-                configs.Add("ui/perspective_aspect_ratio", AspectRatio);
-            };
-            MainSystem.SaveSystem.LoadedConfigurations += configs =>
-            {
-                AspectRatio = configs.GetSingle("ui/perspective_aspect_ratio", 4f / 3f);
-            };
 
             MainSystem.GamePlayManager.StageLoaded += _OnStageLoaded;
 
@@ -138,11 +130,7 @@ namespace Deenote.UI.Views
         /// <summary>
         /// InputManager requires this to judge if mouse actions should be enabled.
         /// </summary>
-        public bool IsHovering { get; private set; }
-        void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
-            => IsHovering = true;
-        void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
-            => IsHovering = false;
+        public bool IsHovering => _contentHoveringTrigger.IsHovering;
 
         #endregion
     }

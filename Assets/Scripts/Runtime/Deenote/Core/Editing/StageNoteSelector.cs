@@ -279,8 +279,9 @@ namespace Deenote.Core.Editing
                         && pos - halfSize <= endCoord.Position;
                 }
 
-                // TODO: 目前如果note按时间顺序出现的话，在往下框选并倒退时间，可能导致一些在提前显示模式下能出现的note的选择情况怪怪的，
-                // 理论上应该做个_game.EarlyDisplaySlowNotes的判断，但是在按时间顺序的模式下的选择判断太怪了，没想好怎么写
+                // TODO: Currently, select by drag down, and play stage backward, may make some note in EarlyDisplay mode have strange selection state
+                // Theoretically I should judge if _game.EarlyDisplaySlowNotes, but its weird selecting in TimeOrder mode,
+                // still considering how to implement t
 
                 // The note is on stage
                 if (time < currentTime + _game.GetStageNoteAppearAheadTime(speed)) {

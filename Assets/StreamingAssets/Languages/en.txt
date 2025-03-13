@@ -392,6 +392,7 @@ Dialog_AboutTurorials_Page_Shortcuts_Content="""
     <Ctrl+Shift+Z> Redo
     <Delete> Delete select notes
     <Ctrl+A> Select all notes
+    <Tab> Toggle if place sound note by default
     <G> Toggle whether or not to snap to grid
     <L> Link selected notes (Change to slide notes)
     <;/U> Unlink selected notes (Change back to click notes)
@@ -421,138 +422,182 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content=Completely refactored. Support DEEMO II chart edit.
 
-AboutDialog_Versions_Dnt_0_7_3=Deenote 0.7.3
-AboutDialog_Versions_Dnt_0_7_3_Content=Added function of saving selected resolution.<br/>Replace the font of song title, now numbers and some punctuations look official.
-
-AboutDialog_Versions_Dnt_0_7_2=Deenote 0.7.2
-AboutDialog_Versions_Dnt_0_7_2_Content=Fixed the issue in version checker.<br/>Added settings for auto-saving json charts.
-
-AboutDialog_Versions_Dnt_0_7_1=Deenote 0.7.1
-AboutDialog_Versions_Dnt_0_7_1_Content=Fixed a bug in the new feature in version 0.7.
-
 AboutDialog_Versions_Dnt_0_7=Deenote 0.7
-AboutDialog_Versions_Dnt_0_7_Content=Added chart concatenating function for medley making.
+AboutDialog_Versions_Dnt_0_7_Content="""
+    <b>Deenote 0.7.3</b>
+    
+    Added function of saving selected resolution.
+    Replace the font of song title, now numbers and some punctuations look official.
 
-AboutDialog_Versions_Dnt_0_6_12=Deenote 0.6.12
-AboutDialog_Versions_Dnt_0_6_12_Content="""
+    <b>Deenote 0.7.2</b>
+    
+    Fixed the issue in version checker.
+    Added settings for auto-saving json charts.
+
+    <b>Deenote 0.7.1</b>
+    
+    Fixed a bug in the new feature in version 0.7.
+
+    <b>Deenote 0.7.1</b>
+    
+    Added chart concatenating function for medley making.
+    """
+
+AboutDialog_Versions_Dnt_0_6=Deenote 0.6
+AboutDialog_Versions_Dnt_0_6_Content="""
+    <b>Deenote 0.6.12</b>
+
     Changed the color of the charming glow effects. Now it is more of an orange color instead of yellow.
     Now exception messages are shown and saved to file whenever an unhandled exception is caught.
     Bug reporting should be simpler.
     Removed support for .ogg audio files.
     If exception is caught during audio file loading, the user is forced to select another audio file.
-    """
 
-AboutDialog_Versions_Dnt_0_6_11=Deenote 0.6.11
-AboutDialog_Versions_Dnt_0_6_11_Content=Final changed the shader used for charming glow effects. Now the glows should be much prettier than before.
+    <b>Deenote 0.6.11</b>
 
-AboutDialog_Versions_Dnt_0_6_10=Deenote 0.6.10
-AboutDialog_Versions_Dnt_0_6_10_Content=Now the lost frame of mp3 audio is partially "fixed" by adding an empty frame before the samples. There won't be a weird 26ms offset between Deenote and the correct value(from Audition).
+    Final changed the shader used for charming glow effects. Now the glows should be much prettier than before.
 
-AboutDialog_Versions_Dnt_0_6_9=Deenote 0.6.9
-AboutDialog_Versions_Dnt_0_6_9_Content=Fixed the issue that projects cannot be loaded.<br/>Fixed update checker.
+    <b>Deenote 0.6.10</b>
 
-AboutDialog_Versions_Dnt_0_6_8=Deenote 0.6.8
-AboutDialog_Versions_Dnt_0_6_8_Content="""
+    Now the lost frame of mp3 audio is partially "fixed" by adding an empty frame before the samples. There won't be a weird 26ms offset between Deenote and the correct value(from Audition).
+
+    <b>Deenote 0.6.9</b>
+
+    Fixed the issue that projects cannot be loaded.
+    Fixed update checker.
+
+    <b>Deenote 0.6.8</b>
+
     Fixed the problem of beat lines disappearing when importing charts from JSON files.
     Fixed the problem where inserting notes in a large project may cause stack overflow.
-    """
 
-AboutDialog_Versions_Dnt_0_6_7=Deenote 0.6.7
-AboutDialog_Versions_Dnt_0_6_7_Content="""
+    <b>Deenote 0.6.7</b>
+
     Added localization support for Chinese.
     Fixed some minor bugs.
     Collided notes are tinted red now.
-    """
 
-AboutDialog_Versions_Dnt_0_6_6=Deenote 0.6.6
-AboutDialog_Versions_Dnt_0_6_6_Content=Optimized the file format so that the project file won't take much space.
+    <b>Deenote 0.6.6</b>
 
-AboutDialog_Versions_Dnt_0_6_5=Deenote 0.6.5
-AboutDialog_Versions_Dnt_0_6_5_Content="""
+    Optimized the file format so that the project file won't take much space.
+
+    <b>Deenote 0.6.5</b>
+
     Added "mirror" function.
     Added shortcut for adjusting note size.
     Now when you paste while Shift key is held, the notes will stay in the exact horizontal position as the copied notes.
-    """
 
-AboutDialog_Versions_Dnt_0_6_4=Deenote 0.6.4
-AboutDialog_Versions_Dnt_0_6_4_Content="""
+    <b>Deenote 0.6.4</b>
+
     Added "Note ID" field in selected note info panel.
     Bug fix: Slide notes not exported correctly.
     Bug fix: Export file name is not correct.
+
+    <b>Deenote 0.6.3</b>
+
+    Now the app should not have problem closing itself.
+    Added options for resizing the window.
+
+    <b>Deenote 0.6.2</b>
+
+    Bug fix: After opening the tutorial all the inputs are ignored.
+
+    <b>Deenote 0.6.1</b>
+
+    Added Chinese tutorial to this app. English tutorial coming soon.
+
+    <b>Deenote 0.6</b>
+
+    Added curve forming function.
     """
 
-AboutDialog_Versions_Dnt_0_6_3=Deenote 0.6.3
-AboutDialog_Versions_Dnt_0_6_3_Content=Now the app should not have problem closing itself.<br/>Added options for resizing the window.
+AboutDialog_Versions_Dnt_0_5=Deenote 0.5
+AboutDialog_Versions_Dnt_0_5_Content="""
+    <b>Deenote 0.5.10</b>
 
-AboutDialog_Versions_Dnt_0_6_2=Deenote 0.6.2
-AboutDialog_Versions_Dnt_0_6_2_Content=Bug fix: After opening the tutorial all the inputs are ignored.
-
-AboutDialog_Versions_Dnt_0_6_1=Deenote 0.6.1
-AboutDialog_Versions_Dnt_0_6_1_Content=Added Chinese tutorial to this app. English tutorial coming soon.
-
-AboutDialog_Versions_Dnt_0_6=Deenote 0.6
-AboutDialog_Versions_Dnt_0_6_Content=Added curve forming function.
-
-AboutDialog_Versions_Dnt_0_5_10=Deenote 0.5.10
-AboutDialog_Versions_Dnt_0_5_10_Content="""
     Now saving and loading files won't block the main thread.
     Fixed the serious bug about music playback repositioning.
-    """
 
-AboutDialog_Versions_Dnt_0_5_9=Deenote 0.5.9
-AboutDialog_Versions_Dnt_0_5_9_Content=Separated update history from about.<br/>Added update checker.<br/>Minor bug fixes about UI.
+    <b>Deenote 0.5.9</b>
 
-AboutDialog_Versions_Dnt_0_5_8=Deenote 0.5.8
-AboutDialog_Versions_Dnt_0_5_8_Content="""
+    Separated update history from about.
+    Added update checker.
+    Minor bug fixes about UI.
+
+    <b>Deenote 0.5.8</b>
+
     Now you can change the music file used in the project.
     When creating a new file in the file selector, files with the target extension will appear.
-    """
 
-AboutDialog_Versions_Dnt_0_5_7=Deenote 0.5.7
-AboutDialog_Versions_Dnt_0_5_7_Content="""
+    <b>Deenote 0.5.7</b>
+
     Bug fix: File cannot be opened.
     Bug fix: Link lines cannot be toggled off.
     Deleted Schwarzer  s famous words because I don  t want to die. XD
+
+    <b>Deenote 0.5.6</b>
+
+    Added drag-and-drop file opener. (Thanks to Schwarzer!)
+
+    <b>Deenote 0.5.5</b>
+
+    Added support for mp3 music files.
+
+    <b>Deenote 0.5.4</b>
+
+    Completely reworked on the code of line displaying.
+
+    <b>Deenote 0.5.3</b>
+
+    Added toggle for VSync.
+    Now editor settings are saved as well.
+
+    <b>Deenote 0.5.2</b>
+
+    Changed default volume of piano sounds from 127 to 0.
+    Now you can import ogg music files.
+
+    <b>Deenote 0.5.1</b>
+
+    Fixed the bug when deleting slide notes the remaining slide notes are incorrectly linked.
+
+    <b>Deenote 0.5</b>
+
+    Copy/Paste functions.
+    Quantize notes.
     """
-
-AboutDialog_Versions_Dnt_0_5_6=Deenote 0.5.6
-AboutDialog_Versions_Dnt_0_5_6_Content=Added drag-and-drop file opener. (Thanks to Schwarzer!)
-
-AboutDialog_Versions_Dnt_0_5_5=Deenote 0.5.5
-AboutDialog_Versions_Dnt_0_5_5_Content=Added support for mp3 music files.
-
-AboutDialog_Versions_Dnt_0_5_4=Deenote 0.5.4
-AboutDialog_Versions_Dnt_0_5_4_Content=Completely reworked on the code of line displaying.
-
-AboutDialog_Versions_Dnt_0_5_3=Deenote 0.5.3
-AboutDialog_Versions_Dnt_0_5_3_Content=Added toggle for VSync.<br/>Now editor settings are saved as well.
-
-AboutDialog_Versions_Dnt_0_5_2=Deenote 0.5.2
-AboutDialog_Versions_Dnt_0_5_2_Content=Changed default volume of piano sounds from 127 to 0.<br/>Now you can import ogg music files.
-
-AboutDialog_Versions_Dnt_0_5_1=Deenote 0.5.1
-AboutDialog_Versions_Dnt_0_5_1_Content=Fixed the bug when deleting slide notes the remaining slide notes are incorrectly linked.
-
-AboutDialog_Versions_Dnt_0_5=Deenote 0.5
-AboutDialog_Versions_Dnt_0_5_Content=Copy/Paste functions.<br/>Quantize notes.
 
 AboutDialog_Versions_Dnt_0_4=Deenote 0.4
 AboutDialog_Versions_Dnt_0_4_Content=Full edit function of note properties.
 
-AboutDialog_Versions_Dnt_0_3_1=Deenote 0.3.1
-AboutDialog_Versions_Dnt_0_3_1_Content=File extension association.
+AboutDialog_Versions_Dnt_0_3=Deenote 0.3
+AboutDialog_Versions_Dnt_0_3_Content="""
+    <b>Deenote 0.3.1</b>
+    
+    File extension association.
 
-AboutDialog_Versions_Dnt_0_3_0_2=Deenote 0.3 build 2
-AboutDialog_Versions_Dnt_0_3_0_2_Content=Minor changes to beat line saving.<br/>Edit panel UI redesigned.
+    <b>Deenote 0.3 build 2</b>
 
-AboutDialog_Versions_Dnt_0_3_0_1=Deenote 0.3 build 1
-AboutDialog_Versions_Dnt_0_3_0_1_Content=Bug fixes.
+    Minor changes to beat line saving.
+    Edit panel UI redesigned.
 
-AboutDialog_Versions_Dnt_0_2_1=Deenote 0.2.1
-AboutDialog_Versions_Dnt_0_2_1_Content=Add new notes.<br/>Link/Unlink selected notes.<br/>Note placement indicator.
+    <b>Deenote 0.3 build 1</b>
+
+    Bug fixes.
+    """
 
 AboutDialog_Versions_Dnt_0_2=Deenote 0.2
-AboutDialog_Versions_Dnt_0_2_Content=Added color tint for selected notes.<br/>Remove notes.<br/>Beat line filling field auto-fill.
+AboutDialog_Versions_Dnt_0_2_Content="""
+    <b>Deenote 0.2.1</b>
+    
+    Add new notes.
+    Link/Unlink selected notes.
+    Note placement indicator.
+
+    <b>Deenote 0.2</b>
+
+    Added color tint for selected notes.<br/>Remove notes.<br/>Beat line filling field auto-fill.
+    """
 
 AboutDialog_Versions_Dnt_0_1=Deenote 0.1
 AboutDialog_Versions_Dnt_0_1_Content="""
@@ -567,14 +612,17 @@ AboutDialog_Versions_Dnt_0_1_Content="""
     (Hidden feature: Convert Cytus v2 charts into Deemo charts. In my opinion no one would like to use this or even care about this.)
     """
 
-AboutDialog_Versions_DCE_0_2=Deemo Chart Editor 0.2
-AboutDialog_Versions_DCE_0_2_Content="""
+AboutDialog_Versions_DCE=Deemo Chart Editor
+AboutDialog_Versions_DCE_Content=
+    <b>Deemo Chart Editor 0.2</b>
+
     Added some shortcuts.
     JSON file exporting.
     "Save as" feature.
     Added some visual effects (Lowered alpha values for the notes that are far away, added frame-by-frame disappearing animation and shock wave/circle animation for notes that hit the judge line).
     Fixed a few bugs.
-    """
+    
+    <b>Deemo Chart Editor 0.1</b>
 
-AboutDialog_Versions_DCE_0_1=Deemo Chart Editor 0.1
-AboutDialog_Versions_DCE_0_1_Content=Chart viewing function finished. No effects yet.
+    Chart viewing function finished. No effects yet.
+    """

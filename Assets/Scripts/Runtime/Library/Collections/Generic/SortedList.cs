@@ -219,7 +219,7 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         Guard.IsLessThan((uint)index, (uint)_count);
 
         Array.Copy(_array, index + 1, _array, index, _count - index - 1);
-        ArrayGrowHelper.FreeManaged(_array, _count, 1);
+        ArrayGrowHelper.FreeManaged(_array, _count - 1, 1);
         _count--;
         _version++;
     }

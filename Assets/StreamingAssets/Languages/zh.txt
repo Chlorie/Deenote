@@ -372,7 +372,8 @@ Dialog_AboutTurorials_Page_Shortcuts_Content="""
     <Ctrl+Shift+Z> 重做
     <Delete> 删除选中音符
     <Ctrl+A> 选择所有音符
-    <G> 反转是否吸附到格线
+    <Tab> 切换是否默认放置钢琴键
+    <G> 切换是否吸附到格线
     <L> 转换为Slide音符并连接
     <;/U> 转换为Click音符
     <O> 转换为Swipe/Flick音符
@@ -402,137 +403,183 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content=完全重构，支持Deemo II谱面编辑。
 
-AboutDialog_Versions_Dnt_0_7_3=Deenote 0.7.3
-AboutDialog_Versions_Dnt_0_7_3_Content=增加了保存选定分辨率的功能。<br/>换掉了歌曲标题的字体，现在数字和部分标点跟官方一样了。
-
-AboutDialog_Versions_Dnt_0_7_2=Deenote 0.7.2
-AboutDialog_Versions_Dnt_0_7_2_Content=修复了更新检查的问题。<br/>加入了自动保存Json谱面的功能。
-
-AboutDialog_Versions_Dnt_0_7_1=Deenote 0.7.1
-AboutDialog_Versions_Dnt_0_7_1_Content=修复了版本0.7新功能中的一个bug。
-
 AboutDialog_Versions_Dnt_0_7=Deenote 0.7
-AboutDialog_Versions_Dnt_0_7_Content=为组曲制作添加了谱面连接功能。
+AboutDialog_Versions_Dnt_0_7_Content="""
+    <b>Deenote 0.7.3</b>
+    
+    增加了保存选定分辨率的功能。
+    换掉了歌曲标题的字体，现在数字和部分标点跟官方一样了。
 
-AboutDialog_Versions_Dnt_0_6_12=Deenote 0.6.12
-AboutDialog_Versions_Dnt_0_6_12_Content="""
+    <b>Deenote 0.7.2</b>
+    
+    修复了更新检查的问题。
+    加入了自动保存Json谱面的功能。
+
+    <b>Deenote 0.7.1</b>
+    
+    修复了版本0.7新功能中的一个bug。
+
+    <b>Deenote 0.7.1</b>
+    
+    为组曲制作添加了谱面连接功能。
+    """
+
+AboutDialog_Versions_Dnt_0_6=Deenote 0.6
+AboutDialog_Versions_Dnt_0_6_Content="""
+    <b>Deenote 0.6.12</b>
+
     修改了charming光效的颜色。现在光效应该更偏橙色而不是黄色。
     现在若发现未经处理的异常则会弹出对话框提醒并保存到文件，反馈bug会更容易一些。
     取消了对.ogg文件的支持。
     若在读取音频时捕获到异常, 用户会被强制重新选择音频文件。
-    """
 
-AboutDialog_Versions_Dnt_0_6_11=Deenote 0.6.11
-AboutDialog_Versions_Dnt_0_6_11_Content=终于修改了charming光效的着色器。现在光效要比以前好看多了。
+    <b>Deenote 0.6.11</b>
 
-AboutDialog_Versions_Dnt_0_6_10=Deenote 0.6.10
-AboutDialog_Versions_Dnt_0_6_10_Content=部分地“修复”了mp3文件丢失第一帧的问题 (在所有采样前面增加一个空帧), 现在Deenote不会有奇怪的26毫秒offset了。
+    终于修改了charming光效的着色器。现在光效要比以前好看多了。
 
-AboutDialog_Versions_Dnt_0_6_9=Deenote 0.6.9
-AboutDialog_Versions_Dnt_0_6_9_Content=修复了不能打开文件的问题。<br/>修复了更新检查。
+    <b>Deenote 0.6.10</b>
 
-AboutDialog_Versions_Dnt_0_6_8=Deenote 0.6.8
-AboutDialog_Versions_Dnt_0_6_8_Content="""
+    部分地“修复”了mp3文件丢失第一帧的问题 (在所有采样前面增加一个空帧), 现在Deenote不会有奇怪的26毫秒offset了。
+
+    <b>Deenote 0.6.9</b>
+
+    修复了不能打开文件的问题。
+    修复了更新检查。
+
+    <b>Deenote 0.6.8</b>
+
     解决了导入JSON谱面会导致拍线消失的问题。
     解决了谱面中note很多时插入新note导致栈溢出的问题。
-    """
 
-AboutDialog_Versions_Dnt_0_6_7=Deenote 0.6.7
-AboutDialog_Versions_Dnt_0_6_7_Content="""
+    <b>Deenote 0.6.7</b>
+
     增加了中文的本地化支持。
     修复了一些小漏洞。
     重叠note现在会显示红色。
-    """
 
-AboutDialog_Versions_Dnt_0_6_6=Deenote 0.6.6
-AboutDialog_Versions_Dnt_0_6_6_Content=优化了文件格式，项目文件将占用更少空间。
+    <b>Deenote 0.6.6</b>
 
-AboutDialog_Versions_Dnt_0_6_5=Deenote 0.6.5
-AboutDialog_Versions_Dnt_0_6_5_Content="""
+    优化了文件格式，项目文件将占用更少空间。
+
+    <b>Deenote 0.6.5</b>
+
     增加了镜像功能。
     为调整note宽度添加了快捷键。
     现在粘贴时按住Shift键，粘贴的note会保持被复制的note的横向位置。
-    """
 
-AboutDialog_Versions_Dnt_0_6_4=Deenote 0.6.4
-AboutDialog_Versions_Dnt_0_6_4_Content="""
+    <b>Deenote 0.6.4</b>
+
     在选中note信息中添加了note编号域。
     修复漏洞：滑键导出格式不正确。
     修复漏洞：导出文件名不正确。
+
+    <b>Deenote 0.6.3</b>
+
+    现在关闭app应该不会出现问题了。
+    增加了调整窗口大小的设置项。
+
+    <b>Deenote 0.6.2</b>
+
+    修复漏洞：打开教程后所有输入都被忽略。
+
+    <b>Deenote 0.6.1</b>
+
+    添加了中文教程。英文教程即将更新。
+
+    <b>Deenote 0.6</b>
+
+    添加了曲线生成功能。
     """
 
-AboutDialog_Versions_Dnt_0_6_3=Deenote 0.6.3
-AboutDialog_Versions_Dnt_0_6_3_Content=现在关闭app应该不会出现问题了。<br/>增加了调整窗口大小的设置项。
+AboutDialog_Versions_Dnt_0_5=Deenote 0.5
+AboutDialog_Versions_Dnt_0_5_Content="""
+    <b>Deenote 0.5.10</b>
 
-AboutDialog_Versions_Dnt_0_6_2=Deenote 0.6.2
-AboutDialog_Versions_Dnt_0_6_2_Content=修复漏洞：打开教程后所有输入都被忽略。
-
-AboutDialog_Versions_Dnt_0_6_1=Deenote 0.6.1
-AboutDialog_Versions_Dnt_0_6_1_Content=添加了中文教程。英文教程即将更新。
-
-AboutDialog_Versions_Dnt_0_6=Deenote 0.6
-AboutDialog_Versions_Dnt_0_6_Content=添加了曲线生成功能。
-
-AboutDialog_Versions_Dnt_0_5_10=Deenote 0.5.10
-AboutDialog_Versions_Dnt_0_5_10_Content="""
     现在保存和读入文件不会再阻塞主线程了。
     修复了关于音乐回放位置的严重漏洞。
-    """
 
-AboutDialog_Versions_Dnt_0_5_9=Deenote 0.5.9
-AboutDialog_Versions_Dnt_0_5_9_Content=将更新历史从关于中分离出来。<br/>添加了更新检测。<br/>修复用户界面的一些小漏洞。
+    <b>Deenote 0.5.9</b>
 
-AboutDialog_Versions_Dnt_0_5_8=Deenote 0.5.8
-AboutDialog_Versions_Dnt_0_5_8_Content="""
+    将更新历史从关于中分离出来。
+    添加了更新检测。
+    修复用户界面的一些小漏洞。
+
+    <b>Deenote 0.5.8</b>
+
     现在你可以替换项目中使用的音乐文件了。
     创建新文件时同后缀名的已有文件也会在文件选择窗口中显示。
-    """
 
-AboutDialog_Versions_Dnt_0_5_7=Deenote 0.5.7
-AboutDialog_Versions_Dnt_0_5_7_Content="""
+    <b>Deenote 0.5.7</b>
+
     修复漏洞：不能打开文件。
     修复漏洞：滑键连线不能关闭。
     删除了Schwarzer的名言，我还不想死（
+
+    <b>Deenote 0.5.6</b>
+
+    添加了拖动文件到窗口打开文件的功能。（感谢Schwarzer！）
+
+    <b>Deenote 0.5.5</b>
+
+    添加了对MP3音乐文件的支持。
+
+    <b>Deenote 0.5.4</b>
+
+    彻底重写了连线显示的代码。
+
+    <b>Deenote 0.5.3</b>
+
+    添加了垂直同步的开关。
+    现在编辑器设置也会被自动保存。
+
+    <b>Deenote 0.5.2</b>
+
+    将钢琴音的默认音量从127调整为0。
+    现在你可以导入OGG音乐文件了。
+
+    <b>Deenote 0.5.1</b>
+
+    修复了删除滑键时剩余的滑键会连接错误的漏洞。
+
+    <b>Deenote 0.5</b>
+
+    复制/粘贴功能。
+    量化note功能。
     """
-
-AboutDialog_Versions_Dnt_0_5_6=Deenote 0.5.6
-AboutDialog_Versions_Dnt_0_5_6_Content=添加了拖动文件到窗口打开文件的功能。（感谢Schwarzer！）
-
-AboutDialog_Versions_Dnt_0_5_5=Deenote 0.5.5
-AboutDialog_Versions_Dnt_0_5_5_Content=添加了对MP3音乐文件的支持。
-
-AboutDialog_Versions_Dnt_0_5_4=Deenote 0.5.4
-AboutDialog_Versions_Dnt_0_5_4_Content=彻底重写了连线显示的代码。
-
-AboutDialog_Versions_Dnt_0_5_3=Deenote 0.5.3
-AboutDialog_Versions_Dnt_0_5_3_Content=添加了垂直同步的开关。<br/>现在编辑器设置也会被自动保存。
-
-AboutDialog_Versions_Dnt_0_5_2=Deenote 0.5.2
-AboutDialog_Versions_Dnt_0_5_2_Content=将钢琴音的默认音量从127调整为0。<br/>现在你可以导入OGG音乐文件了。
-
-AboutDialog_Versions_Dnt_0_5_1=Deenote 0.5.1
-AboutDialog_Versions_Dnt_0_5_1_Content=修复了删除滑键时剩余的滑键会连接错误的漏洞。
-
-AboutDialog_Versions_Dnt_0_5=Deenote 0.5
-AboutDialog_Versions_Dnt_0_5_Content=复制/粘贴功能。<br/>量化note功能。
 
 AboutDialog_Versions_Dnt_0_4=Deenote 0.4
 AboutDialog_Versions_Dnt_0_4_Content=全部note属性编辑功能。
 
-AboutDialog_Versions_Dnt_0_3_1=Deenote 0.3.1
-AboutDialog_Versions_Dnt_0_3_1_Content=文件后缀名关联。
+AboutDialog_Versions_Dnt_0_3=Deenote 0.3
+AboutDialog_Versions_Dnt_0_3_Content="""
+    <b>Deenote 0.3.1</b>
+    
+    文件后缀名关联。
 
-AboutDialog_Versions_Dnt_0_3_0_2=Deenote 0.3 build 2
-AboutDialog_Versions_Dnt_0_3_0_2_Content=稍微更改了拍线存储方式。<br/>重新设计了编辑板块的UI。
+    <b>Deenote 0.3 build 2</b>
 
-AboutDialog_Versions_Dnt_0_3_0_1=Deenote 0.3 build 1
-AboutDialog_Versions_Dnt_0_3_0_1_Content=漏洞修复。
+    稍微更改了拍线存储方式。
+    重新设计了编辑板块的UI。
 
-AboutDialog_Versions_Dnt_0_2_1=Deenote 0.2.1
-AboutDialog_Versions_Dnt_0_2_1_Content=添加新note。<br/>连接/断开选中note。<br/>Note摆放位置指示。
+    <b>Deenote 0.3 build 1</b>
+
+    漏洞修复。
+    """
 
 AboutDialog_Versions_Dnt_0_2=Deenote 0.2
-AboutDialog_Versions_Dnt_0_2_Content=选中note染色。<br/>删除note。<br/>拍线填充域自动填充。
+AboutDialog_Versions_Dnt_0_2_Content="""
+    <b>Deenote 0.2.1</b>
+    
+    添加新note。
+    连接/断开选中note。
+    Note摆放位置指示。
+
+    <b>Deenote 0.2</b>
+
+    选中note染色。
+    删除note。
+    拍线填充域自动填充。
+    """
 
 AboutDialog_Versions_Dnt_0_1=Deenote 0.1
 AboutDialog_Versions_Dnt_0_1_Content="""
@@ -547,14 +594,17 @@ AboutDialog_Versions_Dnt_0_1_Content="""
     （隐藏功能：Cytus v2谱面直转。我觉得没人会用到这个功能，甚至都没人关心这个。）
     """
 
-AboutDialog_Versions_DCE_0_2=Deemo Chart Editor 0.2
-AboutDialog_Versions_DCE_0_2_Content="""
+AboutDialog_Versions_DCE=Deemo Chart Editor
+AboutDialog_Versions_DCE_Content=
+    <b>Deemo Chart Editor 0.2</b>
+
     添加了一些快捷键。
     导出JSON格式谱面。
     另存为功能。
     添加了一些视觉效果（远处的note降低不透明度，添加note消失的逐帧动画及冲击波和圆形特效）
     修复了一些漏洞。
-    """
+    
+    <b>Deemo Chart Editor 0.1</b>
 
-AboutDialog_Versions_DCE_0_1=Deemo Chart Editor 0.1
-AboutDialog_Versions_DCE_0_1_Content=完成了谱面预览功能。目前还没有特效。
+    完成了谱面预览功能。目前还没有特效。
+    """

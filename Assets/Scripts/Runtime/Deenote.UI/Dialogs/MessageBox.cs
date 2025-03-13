@@ -20,7 +20,7 @@ namespace Deenote.UI.Dialogs
 
         [Header("Prefabs")]
         [SerializeField] Button _buttonPrefab = default!;
-        private PooledObjectListView<Button> _buttons;
+        private PooledObjectListView<Button> _buttons = default!;
         private readonly List<UniTask> _buttonClickTasks = new();
         private Button? _prevHightlightButton;
 

@@ -1,21 +1,20 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
-using Deenote.Localization;
+using Deenote.Core.GamePlay;
+using Deenote.Core.Project;
 using Deenote.Entities;
 using Deenote.Entities.Models;
-using Deenote.GamePlay;
 using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
-using Deenote.UIFramework.Controls;
+using Deenote.Localization;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
+using Deenote.UIFramework.Controls;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Deenote.Core.Project;
-using Deenote.Core.GamePlay;
 
 namespace Deenote.UI.Views
 {
@@ -41,7 +40,7 @@ namespace Deenote.UI.Views
 
         [Header("Prefabs")]
         [SerializeField] ProjectInfoChartListItem _chartListItemPrefab = default!;
-        private PooledObjectListView<ProjectInfoChartListItem> _chartItems;
+        private PooledObjectListView<ProjectInfoChartListItem> _chartItems = default!;
 
         #region MessageBoxArgs
 
