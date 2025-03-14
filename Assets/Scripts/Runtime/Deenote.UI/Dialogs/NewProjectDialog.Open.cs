@@ -52,10 +52,11 @@ namespace Deenote.UI.Dialogs
                     // TODO: Lazy Load Audio
                     using var audioFs = File.OpenRead(audioFilePath);
                     AudioClip? clip;
-                    _contentRaycastBlocker.SetActive(true);
+                    SetBlockInput(true);
                     clip = await AudioUtils.TryLoadAsync(audioFs, Path.GetExtension(audioFilePath), _cts.Token);
                     if (clip is null) {
                         await MainWindow.DialogManager.OpenMessageBoxAsync(_audioLoadFailedMsgBoxArgs);
+                        SetBlockInput(false);
                         goto ReAwaitButtonClick;
                     }
 
@@ -78,7 +79,7 @@ namespace Deenote.UI.Dialogs
                 Debug.Log("Creating new project cancalled");
                 return null;
             } finally {
-                _contentRaycastBlocker.SetActive(false);
+                SetBlockInput(false);
                 CloseSelfModalDialog();
             }
         }

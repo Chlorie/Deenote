@@ -43,9 +43,12 @@ namespace Deenote.UI.Views.Elements
 
                 var projFilePath = MainSystem.ProjectManager.CurrentProject.ProjectFilePath;
 
+                var suffix = string.IsNullOrEmpty(ChartModel.Name)
+                    ? ChartModel.Difficulty.ToLowerCaseString()
+                    : ChartModel.Name;
                 var res = await MainWindow.DialogManager.OpenFileExplorerInputFileAsync(
                     LocalizableText.Localized(ExportFileExplorerTitleKey),
-                    defaultInput: $"{Path.GetFileNameWithoutExtension(projFilePath)}.{ChartModel.Name ?? ChartModel.Difficulty.ToLowerCaseString()}",
+                    defaultInput: $"{Path.GetFileNameWithoutExtension(projFilePath)}.{suffix}",
                     fileExtension: MainSystem.Args.DeenotePreferChartExtension,
                     initialDirectory: Path.GetDirectoryName(projFilePath));
                 if (res.IsCancelled)

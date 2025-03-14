@@ -117,10 +117,21 @@ namespace Deenote.Entities.Storage
 
             var noteCount = reader.ReadInt32();
             using var so_notes = SpanOwner<NoteModel>.Allocate(noteCount);
+            using var so_links = SpanOwner<int>.Allocate(noteCount);
             var notes = so_notes.Span;
-            int index = 0;
+            var links = so_links.Span;
             for (int i = 0; i < notes.Length; i++) {
-                notes[index++] = ReadNote(reader, notes);
+                notes[i] = ReadNote(reader, out var prev);
+                links[i] = prev;
+            }
+            for (int i = 0; i < notes.Length; i++) {
+                var prevLink = links[i];
+                if (prevLink != -1) {
+                    var note = notes[i];
+                    var prevNote = notes[prevLink];
+                    prevNote._nextLink = note;
+                    note._prevLink = prevNote;
+                }
             }
             ChartModel.Marshal.SetNoteModels(chart, notes);
 
@@ -166,7 +177,7 @@ namespace Deenote.Entities.Storage
                 writer.Write(-1);
         }
 
-        private static NoteModel ReadNote(BinaryReader reader, ReadOnlySpan<NoteModel> readedNotes)
+        private static NoteModel ReadNote(BinaryReader reader, out int prevLinkIndex)
         {
             var note = new NoteModel();
             note.Position = reader.ReadSingle();
@@ -183,13 +194,7 @@ namespace Deenote.Entities.Storage
             note.EventId = reader.ReadString();
             note.WarningType = reader.Read<WarningType>();
             note.Vibrate = reader.ReadBoolean();
-            var prev = reader.ReadInt32();
-            if (prev != -1) {
-                var prevNote = readedNotes[prev];
-                Debug.Assert(prevNote.IsSlide);
-                prevNote._nextLink = note;
-                note._prevLink = prevNote;
-            }
+            prevLinkIndex = reader.ReadInt32();
             return note;
         }
 

@@ -213,6 +213,11 @@ namespace Deenote.UI.Dialogs
             _createButton.IsInteractable = false;
         }
 
+        private void SetBlockInput(bool block)
+        {
+            _contentRaycastBlocker.gameObject.SetActive(block);
+        }
+
         private void OnValidate()
         {
             _dialog ??= GetComponent<Dialog>();
