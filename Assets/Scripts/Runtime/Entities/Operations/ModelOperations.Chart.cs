@@ -19,7 +19,6 @@ namespace Deenote.Entities.Operations
 
         public static AddMultipleNotesOperation AddMultipleNotes(this ChartModel chart, ImmutableArray<NoteModel> notes)
         {
-            NodeTimeComparer.AssertInOrder(notes);
             return new AddMultipleNotesOperation(chart, notes);
         }
 

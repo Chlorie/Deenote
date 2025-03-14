@@ -64,8 +64,8 @@ namespace Deenote.Core.GameStage
                 (l, r) =>
                 {
                     _game.AssertStageLoaded();
-                    var ltime = _game.GetStageNoteAppearTime(l.NoteModel);
-                    var rtime = _game.GetStageNoteAppearTime(r.NoteModel);
+                    var ltime = _game.GetStageNoteActiveTime(l.NoteModel);
+                    var rtime = _game.GetStageNoteActiveTime(r.NoteModel);
                     var cmp = Comparer<float>.Default.Compare(ltime, rtime);
                     if (cmp != 0) return cmp;
                     cmp = NodeUniqueComparer.Instance.Compare(l.NoteModel, r.NoteModel);
@@ -94,8 +94,8 @@ namespace Deenote.Core.GameStage
                 _stageNoteNodesInAppearOrder = new SortedList<IStageNoteNode>(Comparer<IStageNoteNode>.Create((l, r) =>
                 {
                     _game.AssertStageLoaded();
-                    var ltime = _game.GetStageNoteAppearTime(l);
-                    var rtime = _game.GetStageNoteAppearTime(r);
+                    var ltime = _game.GetStageNoteActiveTime(l);
+                    var rtime = _game.GetStageNoteActiveTime(r);
                     var cmp = Comparer<float>.Default.Compare(ltime, rtime);
                     if (cmp != 0) return cmp;
                     cmp = NodeUniqueComparer.Instance.Compare(l, r);
@@ -465,7 +465,7 @@ namespace Deenote.Core.GameStage
             }
 
             public int CompareTo(IStageNoteNode other)
-                => Comparer<float>.Default.Compare(_time, _manager._game.GetStageNoteAppearTime(other));
+                => Comparer<float>.Default.Compare(_time, _manager._game.GetStageNoteActiveTime(other));
         }
     }
 }

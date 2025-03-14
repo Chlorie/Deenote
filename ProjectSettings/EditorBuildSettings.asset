@@ -11,9 +11,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameStages/DeemoStage.unity
     guid: d4a89fd2d46a2b146a998daa8bc966c6
-  - enabled: 0
-    path: Assets/Scenes/MainScene_Leg.unity
-    guid: 7cda1641d32c39b44b293388e36620d1
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: f3f55b95dff20064faa7cf8f6080c2fe,
       type: 2}

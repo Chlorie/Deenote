@@ -19,7 +19,9 @@ MonoBehaviour:
   PositionGridLineColor: {r: 0.16470589, g: 0.16470589, b: 0.16470589, a: 0.75}
   CurveLineColor: {r: 0.33333334, g: 0.7529412, b: 1, a: 1}
   LinkLineWidth: 2
-  TimeGridWidth: 2
+  TimeGridLineWidth: 2
+  TimeGridBeatLineWidth: 3
+  TimeGridTempoLineWidth: 4
   PositionGridLineWidth: 2
   PositionGridBorderWidth: 4
   CurveLineWidth: 2

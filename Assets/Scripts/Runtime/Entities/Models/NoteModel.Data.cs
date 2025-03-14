@@ -100,6 +100,10 @@ namespace Deenote.Entities.Models
         /// <summary>
         /// Insert <paramref name="note"/> into another link after <paramref name="prevLink"/>,
         /// this method auto calls <see cref="UnlinkWithoutCutLinkChain(NoteData)"/> first
+        /// <br/>
+        /// A-B-C-D-E F-G-H-I<br/>
+        /// C.InsertAfter(G) makes<br/>
+        /// A-B-D-E F-G-C-H-I
         /// </summary>
         public void InsertAsLinkAfter(NoteModel other)
         {
@@ -133,6 +137,28 @@ namespace Deenote.Entities.Models
             other._prevLink = this;
         }
 
+        /// <summary>
+        /// A-B-C-D E-F-G-H<br/>
+        /// C.AppendAfter(F) makes<br/>
+        /// A-B E-F-C-D G-H
+        /// </summary>
+        /// <param name="other"></param>
+        public void AppendAsLinkAfter(NoteModel other)
+        {
+            if (IsSlide) {
+                if (PrevLink is not null)
+                    PrevLink._nextLink = null;
+            }
+
+            _kind = NoteKind.Slide;
+            other.Kind = NoteKind.Slide;
+
+            if (other.NextLink is not null)
+                other.NextLink._prevLink = null;
+            other._nextLink = this;
+            _prevLink = other;
+        }
+
         public static void CloneLinkDatas(ReadOnlySpan<NoteModel> from, ReadOnlySpan<NoteModel> to)
         {
             Guard.HasSizeEqualTo(to, from.Length);
@@ -142,11 +168,16 @@ namespace Deenote.Entities.Models
             for (int i = 0; i < from.Length; i++) {
                 var fromNote = from[i];
                 var toNote = to[i];
-
-                toNote.UnlinkWithoutCutChain(true);
                 if (fromNote.IsSlide) {
                     slideLookup.Add(fromNote, toNote);
+                }
+            }
 
+            for (int i = 0; i < from.Length; i++) {
+                var fromNote = from[i];
+                var toNote = to[i];
+
+                if (fromNote.IsSlide) {
                     // GetPrevLink in from
                     var prevLink = fromNote.PrevLink;
                     NoteModel copiedPrev = default!;
@@ -156,7 +187,10 @@ namespace Deenote.Entities.Models
 
                     if (prevLink is not null) {
                         Debug.Assert(copiedPrev is not null);
-                        toNote.InsertAsLinkAfter(copiedPrev!);
+                        toNote.AppendAsLinkAfter(copiedPrev!);
+                    }
+                    else {
+                        toNote.Kind = NoteKind.Slide;
                     }
                 }
             }

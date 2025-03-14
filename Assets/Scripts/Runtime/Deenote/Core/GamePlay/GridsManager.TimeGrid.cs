@@ -60,14 +60,14 @@ namespace Deenote.Core.GamePlay
 
             var args = _game.Stage.GridLineArgs;
             foreach (var (time, kind) in _timeGridLines) {
-                var color = kind switch {
-                    TimeGridLineKind.SubBeatLine => args.SubBeatLineColor,
-                    TimeGridLineKind.BeatLine => args.BeatLineColor,
-                    TimeGridLineKind.TempoLine => args.TempoLineColor,
+                var (color, width) = kind switch {
+                    TimeGridLineKind.SubBeatLine => (args.SubBeatLineColor, args.TimeGridLineWidth),
+                    TimeGridLineKind.BeatLine => (args.BeatLineColor, args.TimeGridBeatLineWidth),
+                    TimeGridLineKind.TempoLine => (args.TempoLineColor, args.TimeGridTempoLineWidth),
                     _ => throw new System.NotImplementedException(),
                 };
                 var z = _game.ConvertNoteCoordTimeToWorldZ(time, _editor.Placer.PlacingNoteSpeed);
-                collector.AddLine(new Vector2(minx, z), new Vector2(maxx, z), color, args.TimeGridWidth);
+                collector.AddLine(new Vector2(minx, z), new Vector2(maxx, z), color, width);
             }
         }
 
@@ -189,7 +189,7 @@ namespace Deenote.Core.GamePlay
         // Optimize: Floor/CeilToNext...里有几个处理note与格线过近时的递归调用，疑似可以写成非递归，建议后续看看
 
         /// <returns><see langword="null"/> if given time is earlier than first tempo</returns>
-        public float? FloorToNextNearestTimeGridTime(float time)
+        public float? FloorToNearestNextTimeGridTime(float time)
         {
             if (TimeGridSubBeatCount == 0)
                 return null;
@@ -205,7 +205,7 @@ namespace Deenote.Core.GamePlay
                 return null;
 
             if (time - tempo.StartTime <= TimeGridMinEqualityThreshold)
-                return FloorToNextNearestTimeGridTime(tempo.StartTime);
+                return FloorToNearestNextTimeGridTime(tempo.StartTime);
 
             Debug.Assert(tempo.GetCeilingBeatIndex(time) > 0);
 
@@ -214,14 +214,14 @@ namespace Deenote.Core.GamePlay
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
             if (time - prevBeatTime <= TimeGridMinEqualityThreshold)
-                return FloorToNextNearestTimeGridTime(prevBeatTime);
+                return FloorToNearestNextTimeGridTime(prevBeatTime);
 
             float prevBeatDelta = time - prevBeatTime;
             int prevSubBeatIndex = Mathf.CeilToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval - TimeGridMinEqualityThreshold) - 1;
             float prevSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)prevSubBeatIndex / TimeGridSubBeatCount);
 
             if (time - prevSubBeatTime <= TimeGridMinEqualityThreshold)
-                return FloorToNextNearestTimeGridTime(prevSubBeatTime);
+                return FloorToNearestNextTimeGridTime(prevSubBeatTime);
 
             if (prevSubBeatTime > nextTempoTime - Tempo.MinBeatLineInterval / TimeGridSubBeatCount) {
                 // the diff of old and new prevSubBeatIndex should be minSubBeatLineInterval,
@@ -234,7 +234,7 @@ namespace Deenote.Core.GamePlay
         }
 
         /// <returns><see langword="null"/> if given time is later than last line</returns>
-        public float? CeilToNextNearestTimeGridTime(float time)
+        public float? CeilToNearestNextTimeGridTime(float time)
         {
             if (TimeGridSubBeatCount == 0)
                 return null;
@@ -253,20 +253,20 @@ namespace Deenote.Core.GamePlay
             float nextTempoTime = project.GetNonOverflowTempoTime(tempoIndex + 1);
             // time is really near next tempo, we should ignore the next tempo time and ceil to the first subbeatline of next tempo
             if (time >= nextTempoTime - TimeGridMinEqualityThreshold)
-                return CeilToNextNearestTimeGridTime(nextTempoTime);
+                return CeilToNearestNextTimeGridTime(nextTempoTime);
 
             int prevBeatIndex = tempo.GetBeatIndex(time);
             float nextBeatTime = tempo.GetBeatTime(prevBeatIndex + 1);
             // time is really near 
             if (time >= nextBeatTime - TimeGridMinEqualityThreshold)
-                return CeilToNextNearestTimeGridTime(nextBeatTime);
+                return CeilToNearestNextTimeGridTime(nextBeatTime);
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
             float prevBeatDelta = time - prevBeatTime;
-            int nextSubBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval+TimeGridMinEqualityThreshold) + 1;
+            int nextSubBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval + TimeGridMinEqualityThreshold) + 1;
             float nextSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)nextSubBeatIndex / TimeGridSubBeatCount);
             if (time >= nextSubBeatTime - TimeGridMinEqualityThreshold)
-                return CeilToNextNearestTimeGridTime(nextSubBeatTime);
+                return CeilToNearestNextTimeGridTime(nextSubBeatTime);
 
             if (nextSubBeatTime > nextTempoTime - (Tempo.MinBeatLineInterval / TimeGridSubBeatCount)) {
                 // `time` is between an unrendered beatTime and nextTempoTime,

@@ -179,14 +179,8 @@ namespace Deenote.UI.Views
                 _curveApplySizeButton.Clicked += () => MainSystem.StageChartEditor.ApplySelectedNotesWithCurveTranform(GridsManager.CurveApplyProperty.Size);
                 _curveApplySpeedButton.Clicked += () => MainSystem.StageChartEditor.ApplySelectedNotesWithCurveTranform(GridsManager.CurveApplyProperty.Speed);
 
-                MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector =>
-                {
-                    var fillable = false; // selector.SelectedNotes.Length >= 2;
-                    _fillCurveButton.IsInteractable = fillable;
-                    var appliable = false; // selector.SelectedNotes.Length > 2;
-                    _curveApplySizeButton.IsInteractable = appliable;
-                    _curveApplySpeedButton.IsInteractable = appliable;
-                };
+                MainSystem.StageChartEditor.Selector.SelectedNotesChanged += _OnSelectedNotesChanged;
+                _OnSelectedNotesChanged(MainSystem.StageChartEditor.Selector);
                 MainSystem.GamePlayManager.Grids.RegisterNotificationAndInvoke(
                     GridsManager.NotificationFlag.IsCurveOnChanged,
                     grids =>
@@ -198,6 +192,15 @@ namespace Deenote.UI.Views
                             _fillCurveButton.IsInteractable = false;
                         }
                     });
+            
+                void _OnSelectedNotesChanged(StageNoteSelector selector)
+                {
+                    var generatable = selector.SelectedNotes.Length >= 2;
+                    _generateCurveButton.IsInteractable= generatable;
+                    var appliable = selector.SelectedNotes.Length > 2;
+                    _curveApplySizeButton.IsInteractable = appliable;
+                    _curveApplySpeedButton.IsInteractable = appliable;
+                }
             }
 
             // BPM
@@ -233,7 +236,18 @@ namespace Deenote.UI.Views
                     MainSystem.StageChartEditor.InsertTempo(new Entities.TempoRange(_bpmValue, _bpmStartTime, _bpmEndTime));
                 };
 
-                MainSystem.StageChartEditor.Selector.SelectedNotesChanged += selector =>
+                MainSystem.StageChartEditor.Selector.SelectedNotesChanged += _OnSelectedNotesChanaged;
+                _OnSelectedNotesChanaged(MainSystem.StageChartEditor.Selector);
+
+                MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                    GamePlayManager.NotificationFlag.CurrentChart,
+                    manager =>
+                    {
+                        var chartLoaded = manager.IsChartLoaded();
+                        _bpmFillButton.IsInteractable = chartLoaded;
+                    });
+
+                void _OnSelectedNotesChanaged(StageNoteSelector selector)
                 {
                     var selectedNotes = selector.SelectedNotes;
                     if (selectedNotes.IsEmpty)
@@ -254,15 +268,7 @@ namespace Deenote.UI.Views
                         return;
                     _bpmValue = 60f / interval;
                     SyncFloatInput(_bpmValueInput, _bpmValue);
-                };
-
-                MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
-                    GamePlayManager.NotificationFlag.CurrentChart,
-                    manager =>
-                    {
-                        var chartLoaded = manager.IsChartLoaded();
-                        _bpmFillButton.IsInteractable = chartLoaded;
-                    });
+                }
             }
         }
     }

@@ -63,7 +63,7 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _CullMaxY: 19.67
-    - _CullMaxZ: 19.571062
+    - _CullMaxZ: 65.274734
     - _CullMinZ: 0
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1

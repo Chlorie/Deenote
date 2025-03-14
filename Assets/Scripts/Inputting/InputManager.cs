@@ -204,8 +204,8 @@ namespace Deenote.Inputting
             actions.TimeInc.started += _ => _editor.EditSelectedNotesTime(t => t + TimeDelta);
             actions.TimeDecLarge.started += _ => _editor.EditSelectedNotesTime(t => t - TimeDeltaLarge);
             actions.TimeIncLarge.started += _ => _editor.EditSelectedNotesTime(t => t + TimeDeltaLarge);
-            actions.TimeDecByGrid.started += _ => _editor.EditSelectedNotesTime(t => _game.Grids.FloorToNextNearestTimeGridTime(t) ?? t);
-            actions.TimeIncByGrid.started += _ => _editor.EditSelectedNotesTime(t => _game.Grids.CeilToNextNearestTimeGridTime(t) ?? t);
+            actions.TimeDecByGrid.started += _ => _editor.EditSelectedNotesTime(t => _game.Grids.FloorToNearestNextTimeGridTime(t) ?? t);
+            actions.TimeIncByGrid.started += _ => _editor.EditSelectedNotesTime(t => _game.Grids.CeilToNearestNextTimeGridTime(t) ?? t);
             actions.PositionLeft.started += _ => _editor.EditSelectedNotesPosition(p => p - PositionDelta);
             actions.PositionRight.started += _ => _editor.EditSelectedNotesPosition(p => p + PositionDelta);
             actions.PositionLeftLarge.started += _ => _editor.EditSelectedNotesPosition(p => p - PositionDeltaLarge);
@@ -238,10 +238,10 @@ namespace Deenote.Inputting
                 var val = !(placer.SnapToPositionGrid && placer.SnapToTimeGrid);
                 placer.SnapToPositionGrid = placer.SnapToTimeGrid = val;
             };
-            actions.PasteRememberPosition.started += _ => _editor.Placer.Options |= StageNotePlacer.PlacementOptions.PastingRememberPosition;
-            actions.PasteRememberPosition.canceled += _ => _editor.Placer.Options &= ~StageNotePlacer.PlacementOptions.PastingRememberPosition;
-            actions.PlaceNoteSlideFlag.started += _ => _editor.Placer.Options |= StageNotePlacer.PlacementOptions.PlaceSlide;
-            actions.PlaceNoteSlideFlag.canceled += _ => _editor.Placer.Options &= ~StageNotePlacer.PlacementOptions.PlaceSlide;
+            actions.PasteRememberPosition.started += _ => _editor.Placer.PasteRememberPositionModifier = true;
+            actions.PasteRememberPosition.canceled += _ => _editor.Placer.PasteRememberPositionModifier = false;
+            actions.PlaceNoteSlideFlag.started += _ => _editor.Placer.PlaceSlideModifier = true;
+            actions.PlaceNoteSlideFlag.canceled += _ => _editor.Placer.PlaceSlideModifier = false;
             actions.PlaceSoundNote.started += _ => _editor.Placer.PlaceSoundNoteByDefault = !_editor.Placer.PlaceSoundNoteByDefault;
         }
 
@@ -301,10 +301,10 @@ namespace Deenote.Inputting
             }
             else {
                 if (TryConvertScreenPointToNoteCoord(mousePosition, true, out var coord)) {
-                    _editor.Placer.UpdateMovePlace(coord, mousePosition);
+                    _editor.Placer.UpdatePlaceNote(coord, mousePosition);
                 }
                 else {
-                    _editor.Placer.HideIndicators();
+                    _editor.Placer.DisablePlaceNote();
                 }
             }
         }
@@ -319,7 +319,7 @@ namespace Deenote.Inputting
         private void OnRightMouseUp(Vector2 mousePosition)
         {
             if (TryConvertScreenPointToNoteCoord(mousePosition, true, out var coord)) {
-                _editor.Placer.EndPlaceNote(coord);
+                _editor.Placer.EndPlaceNote(coord,mousePosition);
             }
             else {
                 _editor.Placer.CancelPlaceNote();

@@ -17,7 +17,9 @@ namespace Deenote.Core.GameStage.Args
         public Color CurveLineColor = new(85f / 255, 192f / 255, 1f);
 
         public float LinkLineWidth = 2f;
-        public float TimeGridWidth = 2f;
+        public float TimeGridLineWidth = 2f;
+        public float TimeGridBeatLineWidth = 3f;
+        public float TimeGridTempoLineWidth = 4f;
         public float PositionGridLineWidth = 2f;
         public float PositionGridBorderWidth = 4f;
         public float CurveLineWidth = 2f;

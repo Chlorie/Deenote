@@ -14,9 +14,9 @@ using UnityEngine.Pool;
 
 namespace Deenote.Core.Editing
 {
-    public sealed class StageNotePlacer : FlagNotifiable<StageNotePlacer, StageNotePlacer.NotificationFlag>
+    public sealed partial class StageNotePlacer : FlagNotifiable<StageNotePlacer, StageNotePlacer.NotificationFlag>
     {
-        private const float PlacementAreaMaxPosition = 4f;
+        private const float PlacementAreaMaxPosition = 6f;
 
         /// <summary>
         /// Press and drag mouse horizontal, the note will change to a swipe
@@ -34,587 +34,340 @@ namespace Deenote.Core.Editing
         /// </summary>
         private const float SwipeDragAngleCotangent = 1.7320508076f;
 
-        private Transform _indicatorPanelTransform = default!;
-        private NoteModel _defaultPlaceNote;
+        internal StageChartEditor _editor;
+
+        private NoteModel _metaPrototype;
         private PooledObjectListView<PlacementNoteIndicatorController> _indicators;
-        private PooledObjectListView<NoteModel> _notePrototypes;
+        private PooledObjectListView<NoteModel> _prototypes;
 
-        // Placement
-        //private NoteModel _placeNotePrototype = default!;
-        private Vector2 _freezeMouseScreenPosition;
-        private Vector2 _placingMouseScreenPosition;
-        private NoteCoord _freezeNoteCoord;
-        private NoteCoord _placingNoteCoord;
-        private NoteCoord _linkDragPrevCoord;
-
-        internal StageChartEditor _editor = default!;
-
-        private PlacementState _state;
-
-        private PlacementOptions _options_bf;
-        private bool _placeSoundNoteByDefault_bf;
-        private bool _isIndicatorOn_bf;
-        private bool _snapToPositionGrid_bf;
-        private bool _snapToTimeGrid_bf;
-        /// <summary>
-        /// Access use <see cref="PlacingNoteSpeed"/>, use <see cref="GamePlayManager.HighlightedNoteSpeed"/> when null
-        /// </summary>
-        private float? _placingNoteSpeed;
-
-        public bool IsPlacing => _state is PlacementState.Placing or PlacementState.PlacingLinks;
-
-        public PlacementOptions Options
-        {
-            get => _options_bf;
-            set {
-                if (Utils.SetField(ref _options_bf, value, out var old)) {
-                    var diff = old ^ value;
-
-                    if (diff.HasFlag(PlacementOptions.PlaceSlide)) {
-                        switch (_state) {
-                            case PlacementState.Idle or PlacementState.Placing:
-                                Debug.Assert(_notePrototypes.Count == 1);
-                                _notePrototypes[0].Kind = _defaultPlaceNote.Kind = IsPlacingSlide
-                                    ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
-                                RefreshIndicators();
-                                break;
-                            case PlacementState.PlacingLinks:
-                                break;
-                            case PlacementState.Pasting:
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-
-        private bool IsPlacingSlide => Options.HasFlag(PlacementOptions.PlaceSlide);
-
-        public bool PlaceSoundNoteByDefault
-        {
-            get => _placeSoundNoteByDefault_bf;
-            set {
-                if (Utils.SetField(ref _placeSoundNoteByDefault_bf, value)) {
-                    if (value) {
-                        _defaultPlaceNote.Sounds.Replace(StageChartEditor._defaultNoteSounds);
-                        if (_state is PlacementState.Idle) {
-                            _notePrototypes[0].Sounds.Replace(StageChartEditor._defaultNoteSounds);
-                            _indicators[0].Refresh();
-                        }
-                    }
-                    else {
-                        _defaultPlaceNote.Sounds.Clear();
-                        if (_state is PlacementState.Idle) {
-                            _notePrototypes[0].Sounds.Clear();
-                            _indicators[0].Refresh();
-                        }
-                    }
-                    NotifyFlag(NotificationFlag.PlaceSoundNoteByDefault);
-                }
-            }
-        }
-
-        public bool IsIndicatorOn
-        {
-            get => _isIndicatorOn_bf;
-            set {
-                if (Utils.SetField(ref _isIndicatorOn_bf, value)) {
-                    SetIndicatorsVisibility(value);
-                    NotifyFlag(NotificationFlag.IsIndicatorOn);
-                }
-            }
-        }
-
-        public bool SnapToPositionGrid
-        {
-            get => _snapToPositionGrid_bf;
-            set {
-                if (Utils.SetField(ref _snapToPositionGrid_bf, value)) {
-                    NotifyFlag(NotificationFlag.SnapToPositionGrid);
-                }
-            }
-        }
-
-        public bool SnapToTimeGrid
-        {
-            get => _snapToTimeGrid_bf;
-            set {
-                if (Utils.SetField(ref _snapToTimeGrid_bf, value)) {
-                    NotifyFlag(NotificationFlag.SnapToTimeGrid);
-                }
-            }
-        }
-
-        public float PlacingNoteSpeed
-        {
-            get => _placingNoteSpeed ?? _editor._game.HighlightedNoteSpeed;
-        }
-
-        private void SetPlacingNoteSpeed(float? value, bool forceUpdate = false)
-        {
-            if (Utils.SetField(ref _placingNoteSpeed, value)) {
-                SetIndicatorsNoteSpeed();
-                NotifyFlag(NotificationFlag.PlacingNoteSpeed);
-            }
-            else if (forceUpdate) {
-                SetIndicatorsNoteSpeed();
-                NotifyFlag(NotificationFlag.PlacingNoteSpeed);
-            }
-
-            void SetIndicatorsNoteSpeed()
-            {
-                if (_state is not PlacementState.Pasting) {
-                    var speed = PlacingNoteSpeed;
-                    _defaultPlaceNote.Speed = speed;
-                    if (_indicators is not null) {
-                        foreach (var indicator in _indicators) {
-                            indicator.NotePrototype.Speed = speed;
-                            indicator.Refresh();
-                        }
-                    }
-                }
-            }
-        }
-
-        internal StageNotePlacer(StageChartEditor editor)
+        public StageNotePlacer(StageChartEditor editor)
         {
             _editor = editor;
-            _defaultPlaceNote = new NoteModel();
-            _notePrototypes = new PooledObjectListView<NoteModel>(
-                new ObjectPool<NoteModel>(() => new NoteModel()));
-            _notePrototypes.Add(out _);
-
+            _metaPrototype = new NoteModel();
+            _prototypes = new PooledObjectListView<NoteModel>(
+                new ObjectPool<NoteModel>(() => new NoteModel(),
+                    note => _metaPrototype.CloneDataTo(note, true), defaultCapacity: 1));
+            _prototypes.Add(out _);
             _indicators = null!;
 
             _editor._game.RegisterNotification(
                 GamePlayManager.NotificationFlag.CurrentChart,
-                manager => CancelPlaceNote());
+                _ => CancelPlaceNote());
             _editor._game.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.HighlightedNoteSpeed,
-                manager => SetPlacingNoteSpeed(null, forceUpdate: true));
+                _ => SetPlacingNoteSpeed(null, forceUpdateAndNotify: true));
             _editor._game.StageLoaded += args =>
             {
                 _indicatorPanelTransform = args.Stage.NoteIndicatorPanelTransform;
                 _indicators?.Clear();
-
                 var indicators = new PooledObjectListView<PlacementNoteIndicatorController>(
                     UnityUtils.CreateObjectPool(args.Stage.Args.PlacementNoteIndicatorPrefab,
                         _indicatorPanelTransform,
                         item => item.OnInstantiate(this)));
 
-                foreach (var note in _notePrototypes) {
+                foreach (var note in _prototypes) {
                     indicators.Add(out var indicator);
                     indicator.Initialize(note);
                 }
-
                 _indicators = indicators;
             };
             _editor._game.MusicPlayer.TimeChanged += args =>
             {
                 var delta = args.NewTime - args.OldTime;
-                _placingNoteCoord.Time += delta;
-                UpdateMovePlace(_placingNoteCoord, _placingMouseScreenPosition);
+                _updateNoteCoord.Time += delta;
+                UpdateMoveIndicator(_updateNoteCoord, _updateMousePosition);
             };
         }
 
-        public NoteModel ClonePlaceNotePrototype() => _notePrototypes[0].Clone();
+        public NoteModel ClonePlaceNotePrototype() => _metaPrototype.Clone(cloneSounds: true);
 
-        #region Mouse Place
+        #region MoveIndicator
 
-        public void BeginPlaceNote(NoteCoord coord, Vector2 mouseScreenPosition)
+        private partial void UpdateMoveIndicator(NoteCoord coord, Vector2 mousePosition)
         {
-            if (!IsInPlacementArea(coord))
-                return;
-
-            switch (_state) {
-                case PlacementState.Placing:
-                case PlacementState.PlacingLinks:
-                    CancelPlaceNote();
-                    break;
-                case PlacementState.Pasting:
-                    return;
-                case PlacementState.Idle or _:
-                    break;
-            }
-
-            // When pasting, we needn't change the note type when mouse dragging
-            if (_state is PlacementState.Pasting)
-                return;
-
-            _freezeMouseScreenPosition = mouseScreenPosition;
-            _placingMouseScreenPosition = mouseScreenPosition;
-            _freezeNoteCoord = _editor._game.Grids.Quantize(coord, SnapToPositionGrid, SnapToTimeGrid);
-            _placingNoteCoord = _freezeNoteCoord;
-
-            if (Options.HasFlag(PlacementOptions.PlaceSlide)) {
-                _state = PlacementState.PlacingLinks;
-                _linkDragPrevCoord = _freezeNoteCoord;
-            }
-            else {
-                _state = PlacementState.Placing;
-            }
-        }
-
-        public void UpdateMovePlace(NoteCoord coord, Vector2 mouseScreenPosition)
-        {
-            _placingMouseScreenPosition = mouseScreenPosition;
-            _placingNoteCoord = coord;
-
-            switch (_state) {
-                case PlacementState.Placing:
-                    SetIndicatorsVisibility(true);
-                    ChangePlacingNoteKind();
-                    break;
-                case PlacementState.PlacingLinks:
-                    SetIndicatorsVisibility(true);
-                    DragLink();
-                    break;
-                case PlacementState.Pasting when IsInPlacementArea(coord):
-                    SetIndicatorsVisibility(true);
-                    MoveCopied();
-                    break;
-                case PlacementState.Idle when IsInPlacementArea(coord):
-                    SetIndicatorsVisibility(true);
-                    MoveIndicator();
-                    break;
-                default:
-                    SetIndicatorsVisibility(false);
-                    break;
-            }
-
-            void ChangePlacingNoteKind()
-            {
-                Debug.Assert(_notePrototypes.Count == 1);
-                Debug.Assert(_indicators.Count == 1);
-
-                var note = _notePrototypes[0];
-                var indicator = _indicators[0];
-                Debug.Assert(indicator.NotePrototype == note);
-
-                var delta = MathUtils.Abs(_placingMouseScreenPosition - _freezeMouseScreenPosition);
-                // Draw swipe note when the angle between mouse movement direction
-                // and horizontal line is within 30 degree
-                delta.y *= SwipeDragAngleCotangent;
-
-                // Swipe
-                if (delta.x >= SwipeHorizontalDragDeltaThreshold && delta.x > delta.y) {
-                    note.Kind = NoteModel.NoteKind.Swipe;
-                    note.Duration = 0f;
-                    indicator.Refresh();
-                    // Indicator may be moved if create hold by dragging down
-                    indicator.MoveTo(_freezeNoteCoord);
-                }
-                // Hold
-                else if (delta.y >= HoldVerticalDragDeltaThreshold) {
-                    note.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
-                    var dragEndCoordTime = _editor._game.Grids.Quantize(coord, false, SnapToTimeGrid).Time;
-                    if (dragEndCoordTime >= _freezeNoteCoord.Time) {
-                        note.Duration = dragEndCoordTime - _freezeNoteCoord.Time;
-                        indicator.Refresh();
-                        indicator.MoveTo(_freezeNoteCoord);
-                    }
-                    else {
-                        note.Duration = _freezeNoteCoord.Time - dragEndCoordTime;
-                        indicator.Refresh();
-                        indicator.MoveTo(_freezeNoteCoord with { Time = dragEndCoordTime });
-                    }
-                }
-                // Click
-                else {
-                    note.Kind = IsPlacingSlide ? NoteModel.NoteKind.Slide : NoteModel.NoteKind.Click;
-                    note.Duration = 0f;
-                    indicator.Refresh();
-                    indicator.MoveTo(_freezeNoteCoord);
-                }
-            }
-
-            void DragLink()
-            {
-                var startCoordTime = _freezeNoteCoord.Time;
-                var currentCoordTime = coord.Time;
-                var prevCoordTime = _linkDragPrevCoord.Time;
-                // When mouse drag over a time grid, generate an indicator at the position
-                if (currentCoordTime > startCoordTime) {
-                    if (prevCoordTime < startCoordTime) {
-                        // If mouse is below the base note at prev frame, remove all extra notes
-                        _notePrototypes.RemoveRange(..^1);
-                        _indicators.RemoveRange(..^1);
-                        prevCoordTime = startCoordTime;
-                    }
-                    if (currentCoordTime > prevCoordTime)
-                        AtUpMoveUp();
-                    else if (currentCoordTime < prevCoordTime)
-                        AtUpMoveDown();
-                }
-                else if (currentCoordTime < startCoordTime) {
-                    if (prevCoordTime > startCoordTime) {
-                        _notePrototypes.RemoveRange(1..);
-                        _indicators.RemoveRange(1..);
-                        prevCoordTime = startCoordTime;
-                    }
-                    if (currentCoordTime < prevCoordTime)
-                        AtDownMoveDown();
-                    else if (currentCoordTime > prevCoordTime)
-                        AtDownMoveUp();
-                }
-
-
-                void AtUpMoveUp()
-                {
-                    float compareTime = prevCoordTime;
-                    while (true) {
-                        // Optimize: It could be more clear if we have FloorToNearest(currentCoordTime)
-                        var nGridTime = _editor._game.Grids.CeilToNextNearestTimeGridTime(compareTime);
-                        if (nGridTime is not { } gridTime)
-                            return;
-                        if (currentCoordTime >= gridTime) {
-                            // TODO: Modifier _notePrototype
-                            _indicators.Add(out var newIndicator);
-                            InitIndicator(newIndicator, gridTime);
-                            LinkNotes(_indicators[^1].NotePrototype, _indicators[^1].NotePrototype);
-                        }
-                        else
-                            return;
-
-                        compareTime = gridTime;
-                        // If possible, we should get a sequence of grid times between (prevCoordTime, currentCoordTime]
-                        // rather than manually loop, too silly
-                    }
-                }
-
-                void AtUpMoveDown()
-                {
-                    var compareTime = currentCoordTime;
-                    while (true) {
-                        var nGridTime = _editor._game.Grids.CeilToNextNearestTimeGridTime(compareTime);
-                        if (nGridTime is not { } gridTime)
-                            return;
-                        if (prevCoordTime >= gridTime) {
-                            _indicators[^1].NotePrototype.UnlinkWithoutCutChain();
-                            _indicators.RemoveAt(^1);
-                        }
-                        else
-                            return;
-                        compareTime = gridTime;
-                    }
-                }
-
-                void AtDownMoveDown()
-                {
-                    float compareTime = prevCoordTime;
-                    while (true) {
-                        var nGridTime = _editor._game.Grids.FloorToNextNearestTimeGridTime(compareTime);
-                        if (nGridTime is not { } gridTime)
-                            return;
-                        if (currentCoordTime <= gridTime) {
-                            _indicators.Insert(0, out var newIndicator);
-                            InitIndicator(newIndicator, gridTime);
-                            LinkNotes(_indicators[0].NotePrototype, _indicators[1].NotePrototype);
-                        }
-                        else return;
-                        compareTime = gridTime;
-                    }
-                }
-
-                void AtDownMoveUp()
-                {
-                    float compareTime = currentCoordTime;
-                    while (true) {
-                        var nGridTime = _editor._game.Grids.FloorToNextNearestTimeGridTime(compareTime);
-                        if (nGridTime is not { } gridTime)
-                            return;
-                        if (prevCoordTime < gridTime) {
-                            _indicators[0].NotePrototype.UnlinkWithoutCutChain();
-                            _indicators.RemoveAt(0);
-                        }
-                        else break;
-                        compareTime = gridTime;
-                    }
-                }
-
-                void InitIndicator(PlacementNoteIndicatorController indicator, float gridTime)
-                {
-                    var note = indicator.NotePrototype;
-                    _indicators[0].NotePrototype.CloneDataTo(note);
-                    var cloneCoord = new NoteCoord(
-                        MathUtils.MapTo(gridTime, prevCoordTime, currentCoordTime, _linkDragPrevCoord.Position, coord.Position),
-                        gridTime);
-                    cloneCoord = _editor._game.Grids.Quantize(cloneCoord, SnapToPositionGrid, false); // Time already snapped
-                    // Indicator.NotePrototype's coord is relative to _indicators[0]
-                    note.PositionCoord = cloneCoord;
-
-                    indicator.Refresh();
-                    indicator.MoveTo(cloneCoord);
-                }
-
-                void LinkNotes(NoteModel prev, NoteModel next)
-                {
-                    prev.InsertAsLinkBefore(next);
-                }
-            }
-
-            void MoveCopied()
-            {
-                if (Options.HasFlag(PlacementOptions.PastingRememberPosition)) {
-                    coord.Position = _editor.ClipBoard.BaseCoord.Position;
-                    coord = _editor._game.Grids.Quantize(coord, false, SnapToTimeGrid);
-                }
-                else {
-                    coord = _editor._game.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
-                }
-
-                Debug.Assert(_indicators.Count == _editor.ClipBoard.Notes.Length);
-
-                MoveIndicatorsTo(coord);
-
-                //var baseCoord = coord - _editor.ClipBoard.BaseCoord;
-                //for (int i = 0; i < _indicators.Count; i++) {
-                //    var indicator = _indicators[i];
-                //    var note = _editor.ClipBoard.Notes[i];
-                //    indicator.MoveTo(NoteCoord.ClampPosition(coord + note.PositionCoord));
-                //}
-            }
-
-            void MoveIndicator()
-            {
-                Debug.Assert(_indicators.Count == 1);
-                var moveCoord = _editor._game.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
-                MoveIndicatorsTo(moveCoord);
-            }
-        }
-
-        public void EndPlaceNote(NoteCoord coord)
-        {
-            if (_editor._game.CurrentChart is null)
-                return;
-
-            switch (_state) {
-                case PlacementState.Placing:
-                    PlaceNote();
-                    break;
-                case PlacementState.PlacingLinks:
-                    PlaceLink();
-                    break;
-                case PlacementState.Pasting:
-                    PasteNotes();
-                    break;
-                // Already cancelled
-                case PlacementState.Idle or _:
-                    return;
-            }
-
-            CancelPlaceNote(); // Reset states
-
-            return;
-
-            void PlaceNote()
-            {
-                Debug.Assert(_notePrototypes.Count == 1);
-                Debug.Assert(_indicators.Count == 1);
-                Debug.Assert(_indicators[0].NotePrototype == _notePrototypes[0]);
-
-                var note = _notePrototypes[0];
-                NoteCoord placeCoord;
-                if (note.IsHold && coord.Time < _freezeNoteCoord.Time)
-                    // If placing hold by dragging down, the actual time of hold is the end coord's time
-                    placeCoord = _freezeNoteCoord with { Time = coord.Time };
-                else
-                    placeCoord = _freezeNoteCoord;
-                // Optimize: indicator应该是一直在修改note 的位置，只要isindicatorOn，或许这句话多余
-                //placeCoord = _editor._game.Grids.Quantize(placeCoord, SnapToPositionGrid, SnapToTimeGrid);
-                _editor.AddNote(note, placeCoord);
-            }
-
-            void PlaceLink()
-            {
-                var placeCoord = _editor._game.Grids.Quantize(_freezeNoteCoord, SnapToPositionGrid, SnapToTimeGrid);
-
-                _editor.AddMultipleNotes(_notePrototypes.AsSpan(), placeCoord);
-            }
-
-            void PasteNotes()
-            {
-                Debug.Assert(!_editor.ClipBoard.Notes.IsEmpty);
-
-                NoteCoord placeCoord;
-                if (Options.HasFlag(PlacementOptions.PastingRememberPosition)) {
-                    placeCoord = coord with { Position = _editor.ClipBoard.BaseCoord.Position };
-                    placeCoord = _editor._game.Grids.Quantize(placeCoord, false, true);
-                }
-                else {
-                    placeCoord = _editor._game.Grids.Quantize(coord, SnapToPositionGrid, SnapToTimeGrid);
-                }
-
-                _editor.AddMultipleNotes(_editor.ClipBoard.Notes, placeCoord);
-            }
-        }
-
-        public void CancelPlaceNote()
-        {
-            _state = PlacementState.Idle;
-            var note = _notePrototypes[0];
-            _defaultPlaceNote.CloneDataTo(note, true);
-            note.UnlinkWithoutCutChain();
-            _notePrototypes.SetCount(1);
-            RefreshIndicators();
-            SetPlacingNoteSpeed(null);
+            var moveCoord = _editor._game.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
+            MoveIndicatorsTo(moveCoord);
         }
 
         #endregion
 
-        private void SetIndicatorsVisibility(bool visible)
+        #region PlaceSingleNote
+
+        private Vector2 _freezeMousePosition;
+        private NoteCoord _beginNoteCoord;
+
+        private partial StateFlag BeginPlaceSingleNote(NoteCoord coord, Vector2 mousePosition)
         {
-            if (_indicatorPanelTransform != null) {
-                _indicatorPanelTransform.gameObject.SetActive(visible);
-            }
+            _freezeMousePosition = mousePosition;
+            _beginNoteCoord = _editor._game.Grids.Quantize(coord, SnapToPositionGrid, SnapToTimeGrid);
+            return StateFlag.PlacingSingleNote;
         }
 
-        public void HideIndicators()
+        private partial void UpdatePlaceSingleNote(NoteCoord coord, Vector2 mousePosition)
         {
-            _indicatorPanelTransform.gameObject.SetActive(false);
-        }
+            var note = _prototypes[0];
+            var indicator = _indicators[0];
+            Debug.Assert(indicator.NotePrototype == note);
 
-        internal void PreparePasteClipBoard()
-        {
-            switch (_state) {
-                // Block pasting when placing
-                case PlacementState.Placing:
-                case PlacementState.PlacingLinks:
-                    return;
-                case PlacementState.Pasting:
-                case PlacementState.Idle or _:
-                    break;
+            var delta = MathUtils.Abs(mousePosition - _freezeMousePosition);
+            // Draw swipe note when the angle between mouse movement direction
+            // and horizontal line is within 30 degree
+            delta.y *= SwipeDragAngleCotangent;
+
+            // Swipe
+            if (delta.x >= SwipeHorizontalDragDeltaThreshold && delta.x > delta.y) {
+                note.Kind = NoteModel.NoteKind.Swipe;
+                note.Duration = 0f;
+                indicator.Refresh();
+                // Indicator may be moved if create hold by dragging down
+                indicator.MoveTo(_beginNoteCoord);
             }
-
-            if (_editor.ClipBoard.Notes.Length == 0)
-                return;
-
-            _state = PlacementState.Pasting;
-            using (var resetter = _notePrototypes.Resetting(_editor.ClipBoard.Notes.Length)) {
-                var baseCoord = _editor.ClipBoard.BaseCoord;
-                foreach (var cnote in _editor.ClipBoard.Notes) {
-                    resetter.Add(out var note);
-                    cnote.CloneDataTo(note, cloneSounds: true);
+            // Hold
+            else if (delta.y >= HoldVerticalDragDeltaThreshold) {
+                note.Kind = _metaPrototype.Kind;
+                var dragEndCoordTime = _editor._game.Grids.Quantize(coord, false, SnapToTimeGrid).Time;
+                if (dragEndCoordTime >= _beginNoteCoord.Time) {
+                    note.Duration = dragEndCoordTime - _beginNoteCoord.Time;
+                    indicator.Refresh();
+                    indicator.MoveTo(_beginNoteCoord);
+                }
+                else {
+                    note.Duration = _beginNoteCoord.Time - dragEndCoordTime;
+                    indicator.Refresh();
+                    indicator.MoveTo(_beginNoteCoord with { Time = dragEndCoordTime });
                 }
             }
-            RefreshIndicators();
-            SetPlacingNoteSpeed(_indicators[0].NotePrototype.Speed);
+            // Click
+            else {
+                note.Kind = _metaPrototype.Kind;
+                note.Duration = 0f;
+                indicator.Refresh();
+                indicator.MoveTo(_beginNoteCoord);
+            }
         }
 
-        private bool IsInPlacementArea(NoteCoord coord)
+        private partial StateFlag EndPlaceSingleNote(NoteCoord coord, Vector2 mousePosition)
         {
-            var game = _editor._game;
-            game.AssertStageLoaded();
+            var note = _prototypes[0];
+            Debug.Assert(_indicators[0].NotePrototype == note);
+            NoteCoord placeCoord;
+            if (note.IsHold && coord.Time < _beginNoteCoord.Time) {
+                // If placing hold by dragging down, the actual time of hold is the end coord's time
+                placeCoord = _beginNoteCoord;
+                placeCoord.Time -= note.Duration;
+            }
+            else {
+                placeCoord = _beginNoteCoord;
+            }
+            _editor.AddNote(note, placeCoord);
 
-            if (coord.Position is > PlacementAreaMaxPosition or < -PlacementAreaMaxPosition)
-                return false;
-            if (coord.Time > game.MusicPlayer.Time + game.StageNoteAppearAheadTime)
-                return false;
-
-            return true;
+            ResetNotePrototypesToIdle();
+            if (PlaceSlideModifier)
+                return StateFlag.IdlePlacingSlides;
+            else
+                return StateFlag.Idle;
         }
+
+        #endregion
+
+        #region Drag Place Slides
+
+        private NoteCoord _dragPrevCoord;
+        private bool _dragSlideMoveUp;
+
+        private partial StateFlag BeginDragPlaceSlides(NoteCoord coord, Vector2 mousePosition)
+        {
+            _dragPrevCoord = coord;
+            _beginNoteCoord = _editor._game.Grids.Quantize(coord, SnapToPositionGrid, SnapToTimeGrid);
+
+            return StateFlag.PlacingSlides;
+        }
+
+        private partial void UpdateDragPlaceSlides(NoteCoord coord, Vector2 mousePosition)
+        {
+            var startCoord = _beginNoteCoord;
+            var prevCoord = _dragPrevCoord;
+            // When mouse drag over a time grid, generate an indicator at the position
+            if (coord.Time >= startCoord.Time) {
+                _dragSlideMoveUp = true;
+                if (prevCoord.Time < startCoord.Time) {
+                    // If mouse is below the base note at prev frame, remove all extra notes
+                    _prototypes.RemoveRange(1..);
+                    _indicators.RemoveRange(1..);
+                    prevCoord = startCoord;
+                }
+                if (coord.Time > prevCoord.Time)
+                    AtUpMoveUp();
+                else if (coord.Time < prevCoord.Time)
+                    AtUpMoveDown();
+            }
+            else {
+                _dragSlideMoveUp = false;
+                if (prevCoord.Time > startCoord.Time) {
+                    _prototypes.RemoveRange(1..);
+                    _indicators.RemoveRange(1..);
+                    prevCoord.Time = startCoord.Time;
+                }
+                if (coord.Time < prevCoord.Time)
+                    AtDownMoveDown();
+                else if (coord.Time > prevCoord.Time)
+                    AtDownMoveUp();
+            }
+
+            _dragPrevCoord = coord;
+
+            void AtUpMoveUp()
+            {
+                float compareTime = prevCoord.Time;
+                while (true) {
+                    // Optimize: It could be more clear if we have FloorToNearest(currentCoordTime)
+                    var nGrid = _editor._game.Grids.CeilToNearestNextTimeGridTime(compareTime);
+                    Debug.Log($"{compareTime} {nGrid}");
+                    if (nGrid is not { } gridTime)
+                        return;
+                    if (coord.Time >= gridTime) {
+                        _prototypes.Add(out var note);
+                        _prototypes[^1].InsertAsLinkAfter(_prototypes[^2]);
+                        _indicators.Add(out var indicator);
+                        InitIndicator(indicator, note, gridTime);
+                        if (_indicators.Count >= 2)
+                            _indicators[^2].Refresh();
+                    }
+                    else
+                        return;
+                    compareTime = gridTime;
+                    // If possible, we should get a sequence of grid times between (prevCoordTime, currentCoordTime]
+                    // rather than manually loop, too silly
+                }
+            }
+            void AtUpMoveDown()
+            {
+                var compareTime = coord.Time;
+                while (true) {
+                    var nGrid = _editor._game.Grids.CeilToNearestNextTimeGridTime(compareTime);
+                    if (nGrid is not { } gridTime)
+                        return;
+                    if (prevCoord.Time >= gridTime) {
+                        _prototypes[^1].UnlinkWithoutCutChain();
+                        _prototypes.RemoveAt(^1);
+                        _indicators.RemoveAt(^1);
+                        if (_indicators.Count >= 2)
+                            _indicators[^2].Refresh(); // Update Link line
+                    }
+                    else
+                        return;
+                    compareTime = gridTime;
+                }
+            }
+            void AtDownMoveUp()
+            {
+                // When at down, the order in _prototypes is reversed
+                var compareTime = coord.Time;
+                while (true) {
+                    var nGrid = _editor._game.Grids.FloorToNearestNextTimeGridTime(compareTime);
+                    if (nGrid is not { } gridTime)
+                        return;
+                    if (prevCoord.Time < gridTime) {
+                        _prototypes[^1].UnlinkWithoutCutChain();
+                        _prototypes.RemoveAt(^1);
+                        _indicators.RemoveAt(^1);
+                    }
+                    else
+                        return;
+                    compareTime = gridTime;
+                }
+            }
+            void AtDownMoveDown()
+            {
+                float compareTime = prevCoord.Time;
+                while (true) {
+                    var nGrid = _editor._game.Grids.FloorToNearestNextTimeGridTime(compareTime);
+                    if (nGrid is not { } gridTime)
+                        return;
+                    if (coord.Time < gridTime) {
+                        _prototypes.Add(out var note);
+                        _prototypes[^1].InsertAsLinkBefore(_prototypes[^2]);
+                        _indicators.Add(out var indicator);
+                        InitIndicator(indicator, note, gridTime);
+                    }
+                    else
+                        return;
+                    compareTime = gridTime;
+                }
+            }
+
+            void InitIndicator(PlacementNoteIndicatorController indicator, NoteModel prototype, float gridTime)
+            {
+                var cloneCoord = new NoteCoord(
+                    MathUtils.MapTo(gridTime, prevCoord.Time, coord.Time, prevCoord.Position, coord.Position),
+                    gridTime);
+                cloneCoord = _editor._game.Grids.Quantize(cloneCoord, SnapToPositionGrid, false); // Time already quantized
+                prototype.PositionCoord = cloneCoord - _beginNoteCoord;
+
+                indicator.Initialize(prototype);
+                indicator.MoveTo(cloneCoord);
+            }
+        }
+
+        private partial StateFlag EndDragPlaceSlides(NoteCoord coord, Vector2 mousePosition)
+        {
+            var placeCoord = _beginNoteCoord;
+
+            _editor.AddMultipleNotes(_prototypes.AsSpan(), placeCoord);
+
+            ResetNotePrototypesToIdle();
+            if (PlaceSlideModifier)
+                return StateFlag.IdlePlacingSlides;
+            else
+                return StateFlag.Idle;
+        }
+
+        #endregion
+
+        #region Paste Notes
+
+        private partial StateFlag BeginPasteNotes(NoteCoord coord, Vector2 mousePosition)
+        {
+            return StateFlag.PlacingPastedNotes;
+        }
+
+        private partial void UpdatePasteNotes(NoteCoord coord, Vector2 mousePosition)
+        {
+            Debug.Assert(_indicators.Count == _editor.ClipBoard.Notes.Length);
+
+            if (PasteRememberPositionModifier) {
+                coord.Position = _editor.ClipBoard.BaseCoord.Position;
+                coord = _editor._game.Grids.Quantize(coord, false, SnapToTimeGrid);
+            }
+            else {
+                coord = _editor._game.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
+            }
+
+            MoveIndicatorsTo(coord);
+        }
+
+        private partial StateFlag EndPasteNotes(NoteCoord coord, Vector2 mousePosition)
+        {
+            Debug.Assert(!_editor.ClipBoard.Notes.IsEmpty);
+
+            NoteCoord placeCoord;
+            if (PasteRememberPositionModifier) {
+                placeCoord = coord with { Position = _editor.ClipBoard.BaseCoord.Position };
+                placeCoord = _editor._game.Grids.Quantize(placeCoord, false, SnapToPositionGrid);
+            }
+            else {
+                placeCoord = _editor._game.Grids.Quantize(coord, SnapToPositionGrid, SnapToTimeGrid);
+            }
+            _editor.AddMultipleNotes(_editor.ClipBoard.Notes, placeCoord);
+
+            ResetNotePrototypesToIdle();
+            if (PlaceSlideModifier)
+                return StateFlag.IdlePlacingSlides;
+            else
+                return StateFlag.Idle;
+        }
+
+        #endregion
 
         private void MoveIndicatorsTo(NoteCoord coord)
         {
@@ -638,39 +391,25 @@ namespace Deenote.Core.Editing
             if (_indicators is null)
                 return;
 
-            using (var resetter = _indicators.Resetting(_notePrototypes.Count)) {
-                foreach (var note in _notePrototypes) {
+            using (var resetter = _indicators.Resetting(_prototypes.Count)) {
+                foreach (var note in _prototypes) {
                     resetter.Add(out var indicator);
                     indicator.Initialize(note);
                 }
             }
         }
 
-        private enum PlacementState
+        private bool IsInPlacementArea(NoteCoord coord)
         {
-            /// <summary>
-            /// Normal state, the indicator is following the mouse
-            /// </summary>
-            Idle,
-            /// <summary>
-            /// Placing, freeze the indicator's position, and set duration or flick properties
-            /// </summary>
-            Placing,
-            /// <summary>
-            /// Drag mouse and placing links on grid.
-            /// </summary>
-            PlacingLinks,
-            /// <summary>
-            /// Pasting
-            /// </summary>
-            Pasting,
-        }
+            var game = _editor._game;
+            game.AssertStageLoaded();
 
-        public enum PlacementOptions
-        {
-            None = 0,
-            PastingRememberPosition = 1 << 0,
-            PlaceSlide = 1 << 1,
+            if (coord.Position is > PlacementAreaMaxPosition or < -PlacementAreaMaxPosition)
+                return false;
+            if (coord.Time > game.MusicPlayer.Time + game.StageNoteAppearAheadTime)
+                return false;
+
+            return true;
         }
 
         public enum NotificationFlag

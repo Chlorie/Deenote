@@ -16,7 +16,8 @@ namespace Deenote.Core.Editing
         [SerializeField] SpriteRenderer _holdBodySpriteRender = default!;
         private StageNotePlacer _placer = default!;
 
-        private (Vector2 Start, Vector2 Offset)? _linkLine;
+        private Vector2 _localPosition;
+        private Vector2? _linkLineEndOffset;
         private NoteModel _note = default!;
 
         public NoteModel NotePrototype => _note;
@@ -53,10 +54,10 @@ namespace Deenote.Core.Editing
 
             if (_note.NextLink is not null) {
                 var (tox, toz) = game.ConvertNoteCoordToWorldPosition(_note.NextLink.PositionCoord - _note.PositionCoord);
-                _linkLine = (Vector2.zero, new Vector2(tox, toz));
+                _linkLineEndOffset = new Vector2(tox, toz);
             }
             else {
-                _linkLine = null;
+                _linkLineEndOffset = null;
             }
 
             if (_note.IsHold) {
@@ -86,27 +87,29 @@ namespace Deenote.Core.Editing
 
         private void OnDisable()
         {
-            _linkLine = null;
+            _linkLineEndOffset = null;
         }
 
         private void _OnPerspectiveLineCollecting(PerspectiveLinesRenderer.LineCollector collector)
         {
             var showLinkLine = _placer._editor._game.IsShowLinkLines;
-            if (showLinkLine && _linkLine is var (start, offset)) {
+            if (showLinkLine && _linkLineEndOffset is { } offset) {
                 _placer._editor._game.AssertStageLoaded();
 
                 var args = _placer._editor._game.Stage.GridLineArgs;
-                collector.AddLine(start, start + offset,
+                collector.AddLine(_localPosition, _localPosition + offset,
                     args.LinkLineColor with { a = NoteAlpha },
                     args.LinkLineWidth);
             }
         }
+
         public void MoveTo(NoteCoord coord)
         {
             _placer._editor._game.AssertStageLoaded();
 
             var localCoord = coord - new NoteCoord(position: 0, time: _placer._editor._game.MusicPlayer.Time);
             var (x, z) = _placer._editor._game.ConvertNoteCoordToWorldPosition(localCoord, _note.Speed);
+            _localPosition = new Vector2(x, z);
             transform.WithLocalPositionXZ(x, z);
         }
     }
