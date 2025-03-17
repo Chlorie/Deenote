@@ -248,12 +248,14 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         ArrayGrowHelper.Grow(ref _array, capacity, _count);
     }
 
-    public void NotifyEdited(T item)
+    public TrackingScope EnterTrackingScope(T item)
     {
+        if (default(T) != null)
+            ThrowHelper.ThrowInvalidOperationException("Cannot track value type");
         var index = BinarySearch(item);
         if (index < 0)
-            return;
-        NotifyEditedAt(index);
+            ThrowHelper.ThrowInvalidOperationException("Cannot find item in collection");
+        return new TrackingScope(this, index, item);
     }
 
     private void InsertAt(int index, T item)
@@ -280,7 +282,7 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
 
     private void NotifyEditedAt(int index)
     {
-        Debug.Assert(index < _count);
+        Guard.IsLessThan(index, _count);
 
         var editItem = _array[index];
         if (index >= 1 && _comparer.Compare(_array[index - 1], editItem) > 0) {
@@ -319,7 +321,7 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
     {
         private readonly SortedList<T> _list;
         private int _index;
-        private int _version;
+        private readonly int _version;
         private T _current;
 
         internal Enumerator(SortedList<T> list)
@@ -330,7 +332,7 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
             _current = default!;
         }
 
-        public T Current => _current;
+        public readonly T Current => _current;
 
         object IEnumerator.Current => Current!;
 
@@ -365,6 +367,30 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
         {
             if (_version != _list._version)
                 throw new InvalidOperationException("Collection modified after enumerator created");
+        }
+    }
+
+
+    public readonly struct TrackingScope : IDisposable
+    {
+        private readonly SortedList<T> _list;
+        private readonly int _index;
+        private readonly T _item;
+
+        internal TrackingScope(SortedList<T> list, int index, T item)
+        {
+            Debug.Assert(!typeof(T).IsValueType);
+            _list = list;
+            _index = index;
+            _item = item;
+        }
+
+        public void Dispose()
+        {
+            if (!ReferenceEquals(_item, _list[_index])) {
+                ThrowHelper.ThrowInvalidOperationException("The item is moved after tracking scope created");
+            }
+            _list.NotifyEditedAt(_index);
         }
     }
 }

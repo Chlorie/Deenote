@@ -1,6 +1,5 @@
 #nullable enable
 
-using CommunityToolkit.HighPerformance.Buffers;
 using Deenote.Core.GamePlay;
 using Deenote.Entities;
 using Deenote.Entities.Models;
@@ -8,7 +7,6 @@ using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
 using Deenote.Library.Numerics;
-using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -105,6 +103,9 @@ namespace Deenote.Core.Editing
 
         private partial void UpdatePlaceSingleNote(NoteCoord coord, Vector2 mousePosition)
         {
+            if (!IsInPlacementTime(coord))
+                return;
+
             var note = _prototypes[0];
             var indicator = _indicators[0];
             Debug.Assert(indicator.NotePrototype == note);
@@ -185,6 +186,9 @@ namespace Deenote.Core.Editing
 
         private partial void UpdateDragPlaceSlides(NoteCoord coord, Vector2 mousePosition)
         {
+            if (!IsInPlacementTime(coord))
+                return;
+
             var startCoord = _beginNoteCoord;
             var prevCoord = _dragPrevCoord;
             // When mouse drag over a time grid, generate an indicator at the position
@@ -218,80 +222,91 @@ namespace Deenote.Core.Editing
 
             void AtUpMoveUp()
             {
+                var ceil = _editor._game.Grids.CeilToNearestNextTimeGridTime(coord.Time);
                 float compareTime = prevCoord.Time;
                 while (true) {
-                    // Optimize: It could be more clear if we have FloorToNearest(currentCoordTime)
                     var nGrid = _editor._game.Grids.CeilToNearestNextTimeGridTime(compareTime);
-                    Debug.Log($"{compareTime} {nGrid}");
                     if (nGrid is not { } gridTime)
                         return;
-                    if (coord.Time >= gridTime) {
-                        _prototypes.Add(out var note);
-                        _prototypes[^1].InsertAsLinkAfter(_prototypes[^2]);
-                        _indicators.Add(out var indicator);
-                        InitIndicator(indicator, note, gridTime);
-                        if (_indicators.Count >= 2)
-                            _indicators[^2].Refresh();
-                    }
-                    else
+                    Debug.Assert(ceil is not null);
+                    if (gridTime >= ceil!.Value) {
+                        Debug.Assert(gridTime == ceil.Value);
                         return;
+                    }
+
+                    _prototypes.Add(out var note);
+                    note.InsertAsLinkAfter(_prototypes[^2]);
+                    _indicators.Add(out var indicator);
+                    InitIndicator(indicator, note, gridTime);
+                    _indicators[^2].Refresh();
+
                     compareTime = gridTime;
-                    // If possible, we should get a sequence of grid times between (prevCoordTime, currentCoordTime]
-                    // rather than manually loop, too silly
                 }
             }
             void AtUpMoveDown()
             {
+                var ceil = _editor._game.Grids.CeilToNearestNextTimeGridTime(prevCoord.Time);
                 var compareTime = coord.Time;
                 while (true) {
                     var nGrid = _editor._game.Grids.CeilToNearestNextTimeGridTime(compareTime);
                     if (nGrid is not { } gridTime)
                         return;
-                    if (prevCoord.Time >= gridTime) {
-                        _prototypes[^1].UnlinkWithoutCutChain();
-                        _prototypes.RemoveAt(^1);
-                        _indicators.RemoveAt(^1);
-                        if (_indicators.Count >= 2)
-                            _indicators[^2].Refresh(); // Update Link line
-                    }
-                    else
+                    Debug.Assert(ceil is not null);
+                    if (gridTime >= ceil!.Value) {
+                        Debug.Assert(gridTime == ceil.Value);
                         return;
+                    }
+
+                    _prototypes[^1].UnlinkWithoutCutChain();
+                    _prototypes.RemoveAt(^1);
+                    _indicators.RemoveAt(^1);
+                    if (_indicators.Count >= 1)
+                        _indicators[^1].Refresh(); // Update link line
+
                     compareTime = gridTime;
                 }
             }
             void AtDownMoveUp()
             {
+                var floor = _editor._game.Grids.FloorToNearestNextTimeGridTime(prevCoord.Time);
                 // When at down, the order in _prototypes is reversed
                 var compareTime = coord.Time;
                 while (true) {
                     var nGrid = _editor._game.Grids.FloorToNearestNextTimeGridTime(compareTime);
                     if (nGrid is not { } gridTime)
                         return;
-                    if (prevCoord.Time < gridTime) {
-                        _prototypes[^1].UnlinkWithoutCutChain();
-                        _prototypes.RemoveAt(^1);
-                        _indicators.RemoveAt(^1);
-                    }
-                    else
+                    Debug.Assert(floor is not null);
+                    if (gridTime <= floor!.Value) {
+                        Debug.Assert(gridTime == floor.Value);
                         return;
+                    }
+
+                    _prototypes[^1].UnlinkWithoutCutChain();
+                    _prototypes.RemoveAt(^1);
+                    _indicators.RemoveAt(^1);
+
                     compareTime = gridTime;
                 }
             }
             void AtDownMoveDown()
             {
+                var floor = _editor._game.Grids.FloorToNearestNextTimeGridTime(coord.Time);
                 float compareTime = prevCoord.Time;
                 while (true) {
                     var nGrid = _editor._game.Grids.FloorToNearestNextTimeGridTime(compareTime);
                     if (nGrid is not { } gridTime)
                         return;
-                    if (coord.Time < gridTime) {
-                        _prototypes.Add(out var note);
-                        _prototypes[^1].InsertAsLinkBefore(_prototypes[^2]);
-                        _indicators.Add(out var indicator);
-                        InitIndicator(indicator, note, gridTime);
-                    }
-                    else
+                    Debug.Assert(floor is not null);
+                    if (gridTime <= floor!.Value) {
+                        Debug.Assert(gridTime == floor.Value);
                         return;
+                    }
+
+                    _prototypes.Add(out var note);
+                    note.InsertAsLinkBefore(_prototypes[^2]);
+                    _indicators.Add(out var indicator);
+                    InitIndicator(indicator, note, gridTime);
+
                     compareTime = gridTime;
                 }
             }
@@ -406,10 +421,17 @@ namespace Deenote.Core.Editing
 
             if (coord.Position is > PlacementAreaMaxPosition or < -PlacementAreaMaxPosition)
                 return false;
-            if (coord.Time > game.MusicPlayer.Time + game.StageNoteAppearAheadTime)
+            if (!IsInPlacementTime(coord))
                 return false;
 
             return true;
+        }
+
+        private bool IsInPlacementTime(NoteCoord coord)
+        {
+            var game = _editor._game;
+            game.AssertStageLoaded();
+            return coord.Time <= game.MusicPlayer.Time + game.StageNoteAppearAheadTime;
         }
 
         public enum NotificationFlag

@@ -17,6 +17,7 @@ namespace Deenote.UIFramework.Controls
     {
         [SerializeField] TextMeshProUGUI _tmpText = default!;
         [SerializeField] LocalizableText _localizableText;
+        [SerializeField] bool _useCustomFont;
 
         private List<string>? _localizationArgs;
 
@@ -55,6 +56,7 @@ namespace Deenote.UIFramework.Controls
 
         private void Awake()
         {
+            _tmpText.font = UISystem.FontAsset;
             LocalizationSystem.LanguageChanged += _LanguageChanged;
         }
 

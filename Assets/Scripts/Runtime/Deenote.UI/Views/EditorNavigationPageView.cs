@@ -3,7 +3,9 @@
 using Deenote.Core.Editing;
 using Deenote.Core.GamePlay;
 using Deenote.Entities;
+using Deenote.Library.Collections;
 using Deenote.Library.Components;
+using Deenote.Library.Numerics;
 using Deenote.UIFramework.Controls;
 using System;
 using UnityEngine;
@@ -19,6 +21,10 @@ namespace Deenote.UI.Views
         [SerializeField] NumericStepper _musicSpeedNumericStepper = default!;
         [SerializeField] TextBox _horizontalGridCountInput = default!;
         [SerializeField] TextBox _verticalGridCountInput = default!;
+        [SerializeField] Button _horizontalGridCountDecButton = default!;
+        [SerializeField] Button _horizontalGridCountIncButton = default!;
+        [SerializeField] Button _verticalGridCountDecButton = default!;
+        [SerializeField] Button _verticalGridCountIncButton = default!;
         [SerializeField] ToggleButton _horizontalGridSnapToggle = default!;
         [SerializeField] ToggleButton _horizontalGridVisibleToggle = default!;
         [SerializeField] ToggleButton _verticalGridSnapToggle = default!;
@@ -43,6 +49,7 @@ namespace Deenote.UI.Views
 
         private const int MinCurveFillAmount = 0;
         private const int MaxCurveFillAmount = 256;
+        private static readonly int[] _predefinedHorizontalGridCount = { 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64 };
 
         private GridsManager.CurveKind _currentCurveKind;
         private int _curveFillAmount;
@@ -92,8 +99,19 @@ namespace Deenote.UI.Views
 
             // Grids
             {
-                void SyncHorizontal(GridsManager grids) => _horizontalGridCountInput.SetValueWithoutNotify(grids.TimeGridSubBeatCount.ToString());
-                void SyncVertical(GridsManager grids) => _verticalGridCountInput.SetValueWithoutNotify(grids.PositionGridCount.ToString());
+                void SyncHorizontal(GridsManager grids)
+                {
+                    var value = grids.TimeGridSubBeatCount;
+                    _horizontalGridCountInput.SetValueWithoutNotify(value.ToString());
+                    _horizontalGridCountDecButton.gameObject.SetActive(value > _predefinedHorizontalGridCount[0]);
+                    _horizontalGridCountIncButton.gameObject.SetActive(value < _predefinedHorizontalGridCount[^1]);
+                }
+
+                void SyncVertical(GridsManager grids)
+                {
+                    var value = grids.PositionGridCount;
+                    _verticalGridCountInput.SetValueWithoutNotify(value.ToString());
+                }
 
                 _horizontalGridCountInput.EditSubmitted += val =>
                 {
@@ -114,6 +132,19 @@ namespace Deenote.UI.Views
                 MainSystem.GamePlayManager.Grids.RegisterNotificationAndInvoke(
                     GridsManager.NotificationFlag.PositionGridChanged,
                     SyncVertical);
+
+                _horizontalGridCountDecButton.Clicked += () =>
+                {
+                    var index = _predefinedHorizontalGridCount.AsSpan().FindLowerBoundIndex(MainSystem.GamePlayManager.Grids.TimeGridSubBeatCount);
+                    if (index == 0) return;
+                    MainSystem.GamePlayManager.Grids.TimeGridSubBeatCount = _predefinedHorizontalGridCount[index - 1];
+                };
+                _horizontalGridCountIncButton.Clicked += () =>
+                {
+                    var index = _predefinedHorizontalGridCount.AsSpan().FindUpperBoundIndex(MainSystem.GamePlayManager.Grids.TimeGridSubBeatCount);
+                    if (index >= _predefinedHorizontalGridCount.Length) return;
+                    MainSystem.GamePlayManager.Grids.TimeGridSubBeatCount = _predefinedHorizontalGridCount[index];
+                };
 
                 _horizontalGridSnapToggle.IsCheckedChanged += val => MainSystem.StageChartEditor.Placer.SnapToTimeGrid = val;
                 MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
@@ -192,11 +223,11 @@ namespace Deenote.UI.Views
                             _fillCurveButton.IsInteractable = false;
                         }
                     });
-            
+
                 void _OnSelectedNotesChanged(StageNoteSelector selector)
                 {
                     var generatable = selector.SelectedNotes.Length >= 2;
-                    _generateCurveButton.IsInteractable= generatable;
+                    _generateCurveButton.IsInteractable = generatable;
                     var appliable = selector.SelectedNotes.Length > 2;
                     _curveApplySizeButton.IsInteractable = appliable;
                     _curveApplySpeedButton.IsInteractable = appliable;

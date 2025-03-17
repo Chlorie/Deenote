@@ -12,7 +12,6 @@ using Deenote.UI;
 using Deenote.UIFramework;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 namespace Deenote.Inputting
 {
@@ -189,6 +188,8 @@ namespace Deenote.Inputting
         private const float PositionDeltaLarge = 0.1f;
         private const float SizeDelta = 0.01f;
         private const float SizeDeltaLarge = 0.1f;
+        private const float SpeedDelta = 0.01f;
+        private const float SpeedDeltaLarge = 0.1f;
 
         private void RegisterNoteEdit()
         {
@@ -218,11 +219,25 @@ namespace Deenote.Inputting
             actions.SizeInc.started += _ => _editor.EditSelectedNotesSize(s => s + SizeDelta);
             actions.SizeDecLarge.started += _ => _editor.EditSelectedNotesSize(s => s - SizeDeltaLarge);
             actions.SizeIncLarge.started += _ => _editor.EditSelectedNotesSize(s => s + SizeDeltaLarge);
+            actions.SpeedDec.started += _ => _editor.EditSelectedNotesSpeed(s => s -= SpeedDelta);
+            actions.SpeedInc.started += _ => _editor.EditSelectedNotesSpeed(s => s += SpeedDelta);
+            actions.SpeedDecLarge.started += _ => _editor.EditSelectedNotesSpeed(s => s -= SpeedDeltaLarge);
+            actions.SpeedIncLarge.started += _ => _editor.EditSelectedNotesSpeed(s => s += SpeedDeltaLarge);
             actions.KindClick.started += _ => _editor.EditSelectedNotesKind(NoteModel.NoteKind.Click);
             actions.KindSlide.started += _ => _editor.EditSelectedNotesKind(NoteModel.NoteKind.Slide);
             actions.KindSwipe.started += _ => _editor.EditSelectedNotesKind(NoteModel.NoteKind.Swipe);
             actions.SoundAdd.started += _ => _editor.EditSelectedNoteSounds(true);
             actions.SoundRemove.started += _ => _editor.EditSelectedNoteSounds(false);
+            actions.CreateHoldBetween.started += _ =>
+            {
+                if (_editor.Selector.SelectedNotes.Length != 2)
+                    return;
+
+                var prev = _editor.Selector.SelectedNotes[0];
+                var next = _editor.Selector.SelectedNotes[1];
+
+                _editor.CreateHoldBetween(prev, next);
+            };
         }
 
         #endregion
@@ -319,7 +334,7 @@ namespace Deenote.Inputting
         private void OnRightMouseUp(Vector2 mousePosition)
         {
             if (TryConvertScreenPointToNoteCoord(mousePosition, true, out var coord)) {
-                _editor.Placer.EndPlaceNote(coord,mousePosition);
+                _editor.Placer.EndPlaceNote(coord, mousePosition);
             }
             else {
                 _editor.Placer.CancelPlaceNote();

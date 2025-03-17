@@ -209,16 +209,12 @@ namespace Deenote.Entities.Storage
 
         private static SoundNoteModel ReadSoundNote(BinaryReader reader)
         {
-            var note = new NoteModel() {
-                Position = 12,
-            };
             var time = reader.ReadSingle();
             var len = reader.ReadInt32();
-            note.Time = time;
-            note.Sounds.Capacity = len;
+            var sounds = len > 512 ? new PianoSoundValueModel[len] : stackalloc PianoSoundValueModel[len];
             for (var i = 0; i < len; i++)
-                note.Sounds.Add(ReadSound(reader));
-            return new SoundNoteModel(note);
+                sounds[i] = ReadSound(reader);
+            return new SoundNoteModel(time, sounds);
         }
 
         private static void WriteSound(BinaryWriter writer, in PianoSoundValueModel sound)
@@ -246,10 +242,7 @@ namespace Deenote.Entities.Storage
         private static SpeedChangeWarningModel ReadSpeedChangeWarning(BinaryReader reader)
         {
             var time = reader.ReadSingle();
-            return new SpeedChangeWarningModel(new NoteModel() {
-                Position = 4f,
-                Time = time,
-            });
+            return new SpeedChangeWarningModel(time);
         }
 
         private static void WriteSpeedLine(BinaryWriter writer, in SpeedLineValueModel line)

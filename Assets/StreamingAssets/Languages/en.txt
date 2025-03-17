@@ -120,6 +120,7 @@ Dialog_AboutUpdateHistory_Section=Update History
 Dialog_FileExplorer_Title=File Explorer
 Dialog_FileExplorerConfirm_Label=Confirm
 Dialog_FileExplorerCancel_Label=Cancel
+Dialog_FileExplorer_PinList_Label=Pinned
 
 Dialog_NewProject_Title=New Project
 Dialog_NewProjectName_Label=Project Name
@@ -394,21 +395,26 @@ Dialog_AboutTurorials_Page_Shortcuts_Content="""
     <Ctrl+A> Select all notes
     <Tab> Toggle if place sound note by default
     <G> Toggle whether or not to snap to grid
+    <H> Create a hold based on the times of selected 2 notes, will remove the latter note. Has no effect if selected note count is not 2 or the notes have same time
     <L> Link selected notes (Change to slide notes)
-    <;/U> Unlink selected notes (Change back to click notes)
+    <K/U> Unlink selected notes (Change back to click notes)
     <O> Change note to swipe/flick note
     <P> Add empty sound to no-sound selected notes (Change to piano notes)
-    <[> Remove sounds (Change to no sound notes)
+    <;> Remove sounds (Change to no sound notes)
     <Q> Quantize selected notes to the grids
     <W/A/S/D> Adjust selected notes' position/time by 0.01/1ms
     <Shift+W/A/S/D> Adjust selected notes' position/time by 0.1/10ms
     <Z/X> Adjust selected notes' size values by -0.01/0.01
     <Shift+Z/X> Adjust selected notes' size values by -0.1/0.1
+    <C/V> Adjust selected notes' speed values by -0.01/0.01
+    <Shift+C/V> Adjust selected notes' size values by -0.1/0.1
     <M> Reflect selected notes across the middle line (position = 0 line)
     <F> Fill notes on the curve
 
     <L Mouse> Select note/Cancel placing note
     <R Mouse> Press to start place note, move up-down placing hold, move left-right placing swipe
+        <Shift on R Mouse Pressed> Change the pressing note to slide/slide-hold
+    <Shift+R Mouse> Press to start place slide note, drag to create link note on time grids
     """
 
 Dialog_AboutTurorials_Page_UpgradeGuide=Upgrade Guide

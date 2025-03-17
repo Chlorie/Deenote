@@ -10,7 +10,7 @@ namespace Deenote.Core.GamePlay
 {
     partial class GridsManager
     {
-        private const int PositionGridMaxCount = 41;
+        public const int PositionGridMaxCount = 41;
         /// <summary>
         /// If distance from position to grid &lt;= this, treat as equal
         /// </summary>
@@ -59,6 +59,9 @@ namespace Deenote.Core.GamePlay
             }
         }
 
+        /// <summary>
+        /// Range [0,41]
+        /// </summary>
         public int PositionGridCount
         {
             get => _positionGridCount_bf;

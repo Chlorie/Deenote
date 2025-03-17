@@ -134,6 +134,7 @@ namespace Deenote.Entities.Operations
                 for (int i = _notes.Length - 1; i >= 0; i--) {
                     var note = _notes[i];
                     var old = _oldValues[i];
+                    OnUndoingValueChanging(i);
                     SetValue(note, old);
                     OnUndoingValueChanged(i);
                 }
@@ -144,6 +145,7 @@ namespace Deenote.Entities.Operations
             protected abstract void SetValue(NoteModel note, TProperty value);
             protected virtual void OnRedoingValueChanging(bool isFirstRedo, int index, TProperty newValue) { }
             protected virtual void OnRedoingValueChanged(bool isFirstRedo, int index, TProperty newValue) { }
+            protected virtual void OnUndoingValueChanging(int index) { }
             protected virtual void OnUndoingValueChanged(int index) { }
 
             protected virtual void OnRedoing(bool isFirstRedo) { }

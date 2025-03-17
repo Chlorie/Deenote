@@ -632,6 +632,42 @@ namespace Deenote.InputSystem.InputActions
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""SpeedInc"",
+                    ""type"": ""Button"",
+                    ""id"": ""adf6500b-4b47-4492-9ec2-155a2df6cec4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpeedDec"",
+                    ""type"": ""Button"",
+                    ""id"": ""eb909639-afcd-4e11-9b66-8200e96d887b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpeedIncLarge"",
+                    ""type"": ""Button"",
+                    ""id"": ""31356866-79c3-428c-ac2a-6191bcaf048a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpeedDecLarge"",
+                    ""type"": ""Button"",
+                    ""id"": ""d86a6f45-d3d1-452d-97b8-1cf54f597e3d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""KindClick"",
                     ""type"": ""Button"",
                     ""id"": ""e8fc8ec3-bd48-426d-9e25-227047a87730"",
@@ -671,6 +707,15 @@ namespace Deenote.InputSystem.InputActions
                     ""name"": ""SoundRemove"",
                     ""type"": ""Button"",
                     ""id"": ""37147452-2d9a-4314-8558-33b816e9d7ab"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CreateHoldBetween"",
+                    ""type"": ""Button"",
+                    ""id"": ""f33077e3-3ae7-4105-b8c3-66be0588ee2f"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -923,7 +968,7 @@ namespace Deenote.InputSystem.InputActions
                 {
                     ""name"": """",
                     ""id"": ""d541248f-d765-43fc-b48a-841284e51637"",
-                    ""path"": ""<Keyboard>/semicolon"",
+                    ""path"": ""<Keyboard>/k"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -978,7 +1023,7 @@ namespace Deenote.InputSystem.InputActions
                 {
                     ""name"": """",
                     ""id"": ""dfc43bfc-b31e-45dd-9438-6bc210931819"",
-                    ""path"": ""<Keyboard>/leftBracket"",
+                    ""path"": ""<Keyboard>/semicolon"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -1414,6 +1459,105 @@ namespace Deenote.InputSystem.InputActions
                     ""action"": ""SizeIncLarge"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a7f8a743-6b48-45b6-ad60-983e034ee610"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CreateHoldBetween"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fd3ff6e3-b2f6-43a9-be1f-ca8306ecdf5a"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedDec"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""43e652d7-8cfb-4c8c-bb82-3a5f82436dd7"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedIncLarge"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""851cc208-4524-4d60-9f7a-97bdfbbdf6b8"",
+                    ""path"": ""<Keyboard>/alt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedIncLarge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""f6bc8612-fbb5-475b-a13f-438f0c5818a5"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedIncLarge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""a490d385-3342-409b-b9d7-19eae560682f"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedDecLarge"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""e0ecada5-434b-4291-86bc-3a516eacd7e9"",
+                    ""path"": ""<Keyboard>/alt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedDecLarge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""4b0f1d1b-a6e9-422a-b0e4-0d4ff2b5169f"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedDecLarge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""21de08e1-8825-4207-99dd-592b4baa6b85"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpeedInc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1780,11 +1924,16 @@ namespace Deenote.InputSystem.InputActions
             m_NoteEdit_SizeDec = m_NoteEdit.FindAction("SizeDec", throwIfNotFound: true);
             m_NoteEdit_SizeIncLarge = m_NoteEdit.FindAction("SizeIncLarge", throwIfNotFound: true);
             m_NoteEdit_SizeDecLarge = m_NoteEdit.FindAction("SizeDecLarge", throwIfNotFound: true);
+            m_NoteEdit_SpeedInc = m_NoteEdit.FindAction("SpeedInc", throwIfNotFound: true);
+            m_NoteEdit_SpeedDec = m_NoteEdit.FindAction("SpeedDec", throwIfNotFound: true);
+            m_NoteEdit_SpeedIncLarge = m_NoteEdit.FindAction("SpeedIncLarge", throwIfNotFound: true);
+            m_NoteEdit_SpeedDecLarge = m_NoteEdit.FindAction("SpeedDecLarge", throwIfNotFound: true);
             m_NoteEdit_KindClick = m_NoteEdit.FindAction("KindClick", throwIfNotFound: true);
             m_NoteEdit_KindSlide = m_NoteEdit.FindAction("KindSlide", throwIfNotFound: true);
             m_NoteEdit_KindSwipe = m_NoteEdit.FindAction("KindSwipe", throwIfNotFound: true);
             m_NoteEdit_SoundAdd = m_NoteEdit.FindAction("SoundAdd", throwIfNotFound: true);
             m_NoteEdit_SoundRemove = m_NoteEdit.FindAction("SoundRemove", throwIfNotFound: true);
+            m_NoteEdit_CreateHoldBetween = m_NoteEdit.FindAction("CreateHoldBetween", throwIfNotFound: true);
             // EditorSettings
             m_EditorSettings = asset.FindActionMap("EditorSettings", throwIfNotFound: true);
             m_EditorSettings_SnapToGrids = m_EditorSettings.FindAction("SnapToGrids", throwIfNotFound: true);
@@ -2056,11 +2205,16 @@ namespace Deenote.InputSystem.InputActions
         private readonly InputAction m_NoteEdit_SizeDec;
         private readonly InputAction m_NoteEdit_SizeIncLarge;
         private readonly InputAction m_NoteEdit_SizeDecLarge;
+        private readonly InputAction m_NoteEdit_SpeedInc;
+        private readonly InputAction m_NoteEdit_SpeedDec;
+        private readonly InputAction m_NoteEdit_SpeedIncLarge;
+        private readonly InputAction m_NoteEdit_SpeedDecLarge;
         private readonly InputAction m_NoteEdit_KindClick;
         private readonly InputAction m_NoteEdit_KindSlide;
         private readonly InputAction m_NoteEdit_KindSwipe;
         private readonly InputAction m_NoteEdit_SoundAdd;
         private readonly InputAction m_NoteEdit_SoundRemove;
+        private readonly InputAction m_NoteEdit_CreateHoldBetween;
         public struct NoteEditActions
         {
             private @KeyboardShortcutInputActions m_Wrapper;
@@ -2090,11 +2244,16 @@ namespace Deenote.InputSystem.InputActions
             public InputAction @SizeDec => m_Wrapper.m_NoteEdit_SizeDec;
             public InputAction @SizeIncLarge => m_Wrapper.m_NoteEdit_SizeIncLarge;
             public InputAction @SizeDecLarge => m_Wrapper.m_NoteEdit_SizeDecLarge;
+            public InputAction @SpeedInc => m_Wrapper.m_NoteEdit_SpeedInc;
+            public InputAction @SpeedDec => m_Wrapper.m_NoteEdit_SpeedDec;
+            public InputAction @SpeedIncLarge => m_Wrapper.m_NoteEdit_SpeedIncLarge;
+            public InputAction @SpeedDecLarge => m_Wrapper.m_NoteEdit_SpeedDecLarge;
             public InputAction @KindClick => m_Wrapper.m_NoteEdit_KindClick;
             public InputAction @KindSlide => m_Wrapper.m_NoteEdit_KindSlide;
             public InputAction @KindSwipe => m_Wrapper.m_NoteEdit_KindSwipe;
             public InputAction @SoundAdd => m_Wrapper.m_NoteEdit_SoundAdd;
             public InputAction @SoundRemove => m_Wrapper.m_NoteEdit_SoundRemove;
+            public InputAction @CreateHoldBetween => m_Wrapper.m_NoteEdit_CreateHoldBetween;
             public InputActionMap Get() { return m_Wrapper.m_NoteEdit; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -2179,6 +2338,18 @@ namespace Deenote.InputSystem.InputActions
                 @SizeDecLarge.started += instance.OnSizeDecLarge;
                 @SizeDecLarge.performed += instance.OnSizeDecLarge;
                 @SizeDecLarge.canceled += instance.OnSizeDecLarge;
+                @SpeedInc.started += instance.OnSpeedInc;
+                @SpeedInc.performed += instance.OnSpeedInc;
+                @SpeedInc.canceled += instance.OnSpeedInc;
+                @SpeedDec.started += instance.OnSpeedDec;
+                @SpeedDec.performed += instance.OnSpeedDec;
+                @SpeedDec.canceled += instance.OnSpeedDec;
+                @SpeedIncLarge.started += instance.OnSpeedIncLarge;
+                @SpeedIncLarge.performed += instance.OnSpeedIncLarge;
+                @SpeedIncLarge.canceled += instance.OnSpeedIncLarge;
+                @SpeedDecLarge.started += instance.OnSpeedDecLarge;
+                @SpeedDecLarge.performed += instance.OnSpeedDecLarge;
+                @SpeedDecLarge.canceled += instance.OnSpeedDecLarge;
                 @KindClick.started += instance.OnKindClick;
                 @KindClick.performed += instance.OnKindClick;
                 @KindClick.canceled += instance.OnKindClick;
@@ -2194,6 +2365,9 @@ namespace Deenote.InputSystem.InputActions
                 @SoundRemove.started += instance.OnSoundRemove;
                 @SoundRemove.performed += instance.OnSoundRemove;
                 @SoundRemove.canceled += instance.OnSoundRemove;
+                @CreateHoldBetween.started += instance.OnCreateHoldBetween;
+                @CreateHoldBetween.performed += instance.OnCreateHoldBetween;
+                @CreateHoldBetween.canceled += instance.OnCreateHoldBetween;
             }
 
             private void UnregisterCallbacks(INoteEditActions instance)
@@ -2273,6 +2447,18 @@ namespace Deenote.InputSystem.InputActions
                 @SizeDecLarge.started -= instance.OnSizeDecLarge;
                 @SizeDecLarge.performed -= instance.OnSizeDecLarge;
                 @SizeDecLarge.canceled -= instance.OnSizeDecLarge;
+                @SpeedInc.started -= instance.OnSpeedInc;
+                @SpeedInc.performed -= instance.OnSpeedInc;
+                @SpeedInc.canceled -= instance.OnSpeedInc;
+                @SpeedDec.started -= instance.OnSpeedDec;
+                @SpeedDec.performed -= instance.OnSpeedDec;
+                @SpeedDec.canceled -= instance.OnSpeedDec;
+                @SpeedIncLarge.started -= instance.OnSpeedIncLarge;
+                @SpeedIncLarge.performed -= instance.OnSpeedIncLarge;
+                @SpeedIncLarge.canceled -= instance.OnSpeedIncLarge;
+                @SpeedDecLarge.started -= instance.OnSpeedDecLarge;
+                @SpeedDecLarge.performed -= instance.OnSpeedDecLarge;
+                @SpeedDecLarge.canceled -= instance.OnSpeedDecLarge;
                 @KindClick.started -= instance.OnKindClick;
                 @KindClick.performed -= instance.OnKindClick;
                 @KindClick.canceled -= instance.OnKindClick;
@@ -2288,6 +2474,9 @@ namespace Deenote.InputSystem.InputActions
                 @SoundRemove.started -= instance.OnSoundRemove;
                 @SoundRemove.performed -= instance.OnSoundRemove;
                 @SoundRemove.canceled -= instance.OnSoundRemove;
+                @CreateHoldBetween.started -= instance.OnCreateHoldBetween;
+                @CreateHoldBetween.performed -= instance.OnCreateHoldBetween;
+                @CreateHoldBetween.canceled -= instance.OnCreateHoldBetween;
             }
 
             public void RemoveCallbacks(INoteEditActions instance)
@@ -2498,11 +2687,16 @@ namespace Deenote.InputSystem.InputActions
             void OnSizeDec(InputAction.CallbackContext context);
             void OnSizeIncLarge(InputAction.CallbackContext context);
             void OnSizeDecLarge(InputAction.CallbackContext context);
+            void OnSpeedInc(InputAction.CallbackContext context);
+            void OnSpeedDec(InputAction.CallbackContext context);
+            void OnSpeedIncLarge(InputAction.CallbackContext context);
+            void OnSpeedDecLarge(InputAction.CallbackContext context);
             void OnKindClick(InputAction.CallbackContext context);
             void OnKindSlide(InputAction.CallbackContext context);
             void OnKindSwipe(InputAction.CallbackContext context);
             void OnSoundAdd(InputAction.CallbackContext context);
             void OnSoundRemove(InputAction.CallbackContext context);
+            void OnCreateHoldBetween(InputAction.CallbackContext context);
         }
         public interface IEditorSettingsActions
         {

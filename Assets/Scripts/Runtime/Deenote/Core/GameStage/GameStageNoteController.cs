@@ -6,6 +6,7 @@ using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Library;
 using Deenote.Library.Numerics;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Deenote.Core.GameStage
@@ -222,6 +223,19 @@ namespace Deenote.Core.GameStage
             }
         }
 
+        public void RefreshHoldLength()
+        {
+            if (_state is NoteDisplayState.Fall) {
+                SetHoldBodyDisplayLength(NoteModel.GetActualDuration());
+            }
+            else if (_state is NoteDisplayState.Holding) {
+                SetHoldBodyDisplayLength(_stageDeltaTime + NoteModel.GetActualDuration());
+            }
+            else {
+                SetHoldBodyDisplayLength(0f);
+            }
+        }
+
         public void RefreshStageDeltaTime()
         {
             _stageDeltaTime = NoteModel.Time - _game.MusicPlayer.Time;
@@ -242,8 +256,10 @@ namespace Deenote.Core.GameStage
 
             SetNotePositionX();
             SetNoteSprite();
+            SetNoteSize();
             RefreshColoring();
             SetLinkLine();
+            RefreshHoldLength();
         }
 
         public void RefreshColorAlpha()
@@ -285,17 +301,36 @@ namespace Deenote.Core.GameStage
                 _ => _game.Stage.Args.BlackNoteSpritePrefab,
             };
             _noteSpriteRenderer.sprite = prefab.Sprite;
-            _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(NoteModel.Size, 1f, 1f) * prefab.Scale;
             _waveColor = prefab.WaveColor;
 
             if (NoteModel.IsHold) {
-                ref readonly var holdPrefab = ref _game.Stage.Args.HoldSpritePrefab;
                 _holdBodySpriteRenderer.gameObject.SetActive(true);
-                _holdBodySpriteRenderer.transform.WithLocalScaleX(NoteModel.Size * holdPrefab.ScaleX);
-                // Scale.y is set when time changed
             }
             else {
                 _holdBodySpriteRenderer.gameObject.SetActive(false);
+            }
+        }
+
+        private void SetNoteSize()
+        {
+            _game.AssertStageLoaded();
+
+            var prefab = NoteModel switch {
+                { Kind: NoteModel.NoteKind.Swipe } => _game.Stage.Args.SwipeNoteSpritePrefab,
+                { Kind: NoteModel.NoteKind.Slide } => _game.Stage.Args.SlideNoteSpritePrefab,
+                { HasSounds: true } => _game.Stage.Args.BlackNoteSpritePrefab,
+                _ when _game.IsPianoNotesDistinguished => _game.Stage.Args.NoSoundNoteSpritePrefab,
+                _ => _game.Stage.Args.BlackNoteSpritePrefab,
+            };
+            _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(NoteModel.Size, 1f, 1f) * prefab.Scale;
+
+            ref readonly var hiteffectPrefab = ref _game.Stage.Args.HitEffectSpritePrefabs;
+            _explosionEffectSpriteRenderer.transform.localScale = NoteModel.Size * hiteffectPrefab.ExplosionScale * Vector3.one;
+
+            if (NoteModel.IsHold) {
+                ref readonly var holdPrefab = ref _game.Stage.Args.HoldSpritePrefab;
+                _holdBodySpriteRenderer.transform.WithLocalScaleX(NoteModel.Size * holdPrefab.ScaleX);
+                // Scale.y is set when time changed
             }
         }
 

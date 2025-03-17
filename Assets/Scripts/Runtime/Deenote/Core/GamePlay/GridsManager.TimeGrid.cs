@@ -213,12 +213,24 @@ namespace Deenote.Core.GamePlay
             int prevBeatIndex = tempo.GetCeilingBeatIndex(time) - 1;
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
+            // Floating-point error handling
+            if (Mathf.Approximately(prevBeatTime, time)) {
+                prevBeatIndex--;
+                prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
+            }
+
             if (time - prevBeatTime <= TimeGridMinEqualityThreshold)
                 return FloorToNearestNextTimeGridTime(prevBeatTime);
 
             float prevBeatDelta = time - prevBeatTime;
-            int prevSubBeatIndex = Mathf.CeilToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval - TimeGridMinEqualityThreshold) - 1;
+            int prevSubBeatIndex = Mathf.CeilToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval) - 1;
             float prevSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)prevSubBeatIndex / TimeGridSubBeatCount);
+
+            // Floating-point error handling
+            if (Mathf.Approximately(prevSubBeatTime, time)) {
+                prevSubBeatIndex--;
+                prevSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)prevSubBeatIndex / TimeGridSubBeatCount);
+            }
 
             if (time - prevSubBeatTime <= TimeGridMinEqualityThreshold)
                 return FloorToNearestNextTimeGridTime(prevSubBeatTime);
@@ -257,14 +269,29 @@ namespace Deenote.Core.GamePlay
 
             int prevBeatIndex = tempo.GetBeatIndex(time);
             float nextBeatTime = tempo.GetBeatTime(prevBeatIndex + 1);
+
+            // Floating-point error handling
+            if (Mathf.Approximately(nextBeatTime, time)) {
+                prevBeatIndex++;
+                nextBeatTime = tempo.GetBeatTime(prevBeatIndex + 1);
+            }
+
+
             // time is really near 
             if (time >= nextBeatTime - TimeGridMinEqualityThreshold)
                 return CeilToNearestNextTimeGridTime(nextBeatTime);
             float prevBeatTime = tempo.GetBeatTime(prevBeatIndex);
 
             float prevBeatDelta = time - prevBeatTime;
-            int nextSubBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval + TimeGridMinEqualityThreshold) + 1;
+            int nextSubBeatIndex = Mathf.FloorToInt(prevBeatDelta * TimeGridSubBeatCount / tempo.BeatInterval) + 1;
             float nextSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)nextSubBeatIndex / TimeGridSubBeatCount);
+
+            // Floating-point error handling
+            if (Mathf.Approximately(nextSubBeatTime, time)) {
+                nextSubBeatIndex++;
+                nextSubBeatTime = tempo.GetSubBeatTime(prevBeatIndex + (float)nextSubBeatIndex / TimeGridSubBeatCount);
+            }
+
             if (time >= nextSubBeatTime - TimeGridMinEqualityThreshold)
                 return CeilToNearestNextTimeGridTime(nextSubBeatTime);
 

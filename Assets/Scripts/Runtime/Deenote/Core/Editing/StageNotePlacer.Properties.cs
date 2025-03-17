@@ -82,12 +82,11 @@ namespace Deenote.Core.Editing
 
         private void SetPlacingNoteSpeed(float? value, bool forceUpdateAndNotify)
         {
-            var prev = PlacingNoteSpeed;
             if (Utils.SetField(ref _placingNoteSpeed, value) || forceUpdateAndNotify) {
-                if (!IsFreezeNotePrototypeProperties()) {
-                    var speed = PlacingNoteSpeed;
-                    if (speed != prev) {
-                        _metaPrototype.Speed = speed;
+                var speed = PlacingNoteSpeed;
+                if (_metaPrototype.Speed != speed) {
+                    _metaPrototype.Speed = speed;
+                    if (!IsFreezeNotePrototypeProperties()) {
                         if (_indicators is not null) {
                             foreach (var indicator in _indicators) {
                                 indicator.NotePrototype.Speed = speed;

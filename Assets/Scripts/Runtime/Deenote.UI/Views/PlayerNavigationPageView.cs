@@ -122,20 +122,21 @@ namespace Deenote.UI.Views
                 manager => _earlyDisplaySlowNotesToggle.SetIsCheckedWithoutNotify(manager.EarlyDisplaySlowNotes));
         }
 
-        private static readonly string[] _predefinedAspectTexts = { "16:9", "4:3" };
-        private static readonly float[] _predefinedAspectValues = { 16f / 9f, 4f / 3f };
+        private static readonly string[] _predefinedAspectTexts = { "16:9","16:10", "4:3" };
 
         private static float GetAspectRatioDropdownOption(int optionIndex)
             => optionIndex switch {
                 0 => 16f / 9f,
-                1 => 4f / 3f,
+                1 => 16f / 10f,
+                2 => 4f / 3f,
                 _ => ThrowHelper.ThrowInvalidOperationException<float>(),
             };
 
         private static int GetAspectRatioDropdownIndex(float option)
             => option switch {
                 16f / 9f => 0,
-                4f / 3f => 1,
+                16f / 10f => 1,
+                4f / 3f => 2,
                 _ => -1,
             };
     }

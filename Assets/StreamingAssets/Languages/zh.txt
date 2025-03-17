@@ -106,6 +106,7 @@ Dialog_AboutUpdateHistory_Section=更新历史
 Dialog_FileExplorer_Title=文件浏览器
 Dialog_FileExplorerConfirm_Label=确认
 Dialog_FileExplorerCancel_Label=取消
+Dialog_FileExplorer_PinList_Label=收藏文件夹
 
 Dialog_NewProject_Title=新建项目
 Dialog_NewProjectName_Label=项目名称
@@ -327,7 +328,7 @@ Dialog_AboutDevelopers_Page_Trarizon_Content="""
         
         关于这个项目的后续。我也不知道未来还有没有精力来继续优化这个项目。反正如果有的话我尽量，但是请不要报太大期待。。
 
-        PS: 事实上在去年fork这个项目的时候我并不没有完全计划要完成重构，最初只是想看看能做到哪一步。所以事实上前几个月我在重构的消息基本是盐酸发出来的.jpg
+        PS: 事实上在去年fork这个项目的时候我并没有完全计划要完成重构，最初只是想看看能做到哪一步。所以事实上前几个月我在重构的消息基本是盐酸发出来的.jpg
         感谢盐酸几年来孜孜不倦的催更.jpg
 
     - Trarizon
@@ -374,22 +375,27 @@ Dialog_AboutTurorials_Page_Shortcuts_Content="""
     <Ctrl+A> 选择所有音符
     <Tab> 切换是否默认放置钢琴键
     <G> 切换是否吸附到格线
+    <H> 基于选中的两个音符的时间创建Hold，时间较大的音符会被移除。当选中音符数量不为2或两者时间一样时无效
     <L> 转换为Slide音符并连接
-    <;/U> 转换为Click音符
+    <K/U> 转换为Click音符
     <O> 转换为Swipe/Flick音符
     <P> 给无钢琴音的音符添加单个空钢琴音
-    <[> 删除钢琴音
+    <;> 删除钢琴音
     <Q> 将选中音符吸附到格线
     <W/A/S/D> 调整选中音符的位置(0.01)/时间(1ms)
     <Shift+W/A/S/D> 调整选中音符的位置(0.1)/时间(10ms)
     <Alt+W/A/S/D> 将选中音符的位置/时间吸附到下一格线
     <Z/X> 调整选中音符的大小(0.01)
     <Shift+Z/X> 调整选中音符的大小(0.1)
+    <C/V> 调整选中音符的速度(0.01)
+    <Shift+C/V> 调整选中音符的速度(0.1)
     <M> 以Pos=0为线镜像音符位置
     <F> Fill notes on the curve
 
     <鼠标左键> 选择音符/取消放置音符
     <鼠标右键> 按下开始放置音符，上下滑动放置Hold音符，左右滑动放置Swipe音符
+        <右键按下后Shift> 更改放置的音符为slide/slide-hold
+    <Shift+鼠标右键> 按下开始防止slide音符，拖动在横格线上放置slide链
     """
 
 Dialog_AboutTurorials_Page_UpgradeGuide=新版迁移

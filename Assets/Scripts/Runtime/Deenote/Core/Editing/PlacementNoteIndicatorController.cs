@@ -52,7 +52,7 @@ namespace Deenote.Core.Editing
             _noteSpriteRenderer.sprite = prefab.Sprite;
             _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(_note.Size, 1f, 1f) * prefab.Scale;
 
-            if (_note.NextLink is not null) {
+            if (_note.IsSlide && _note.NextLink is not null) {
                 var (tox, toz) = game.ConvertNoteCoordToWorldPosition(_note.NextLink.PositionCoord - _note.PositionCoord);
                 _linkLineEndOffset = new Vector2(tox, toz);
             }

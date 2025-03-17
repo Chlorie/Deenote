@@ -3,12 +3,15 @@
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Library.Collections;
+using Deenote.Library.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using static Deenote.Entities.Storage.DsprojLoader;
 
 namespace Deenote.Entities.Operations
 {
@@ -446,7 +449,9 @@ namespace Deenote.Entities.Operations
             protected override void SetValue(NoteModel note, float value)
                 => note.Duration = value;
 
-            protected override void OnRedoingValueChanged(bool isFirstRedo, int index, float newValue)
+            private SortedList<IStageNoteNode>.TrackingScope _tmpScope;
+
+            protected override void OnRedoingValueChanging(bool isFirstRedo, int index, float newValue)
             {
                 var note = _notes[index];
                 var oldValue = _oldValues[index];
@@ -457,9 +462,9 @@ namespace Deenote.Entities.Operations
 
                 var (tail, kind) = _tails[index];
                 switch (kind) {
-                    case TailModifyKind.Add: _chart.NoteNodes.Add(tail); break;
+                    case TailModifyKind.Add: break;
                     case TailModifyKind.Remove: _chart.NoteNodes.Remove(tail); break;
-                    case TailModifyKind.Move: _chart.NoteNodes.NotifyEdited(tail); break;
+                    case TailModifyKind.Move: _tmpScope = _chart.NoteNodes.EnterTrackingScope(tail); break;
                 }
 
                 void InitializeTailContexts()
@@ -493,13 +498,33 @@ namespace Deenote.Entities.Operations
                 }
             }
 
-            protected override void OnUndoingValueChanged(int index)
+            protected override void OnRedoingValueChanged(bool isFirstRedo, int index, float newValue)
+            {
+                var (tail, kind) = _tails[index];
+                switch (kind) {
+                    case TailModifyKind.Add: _chart.NoteNodes.Add(tail); break;
+                    case TailModifyKind.Remove: break;
+                    case TailModifyKind.Move: _tmpScope.Dispose(); break;
+                }
+            }
+
+            protected override void OnUndoingValueChanging(int index)
             {
                 var (tail, kind) = _tails[index];
                 switch (kind) {
                     case TailModifyKind.Add: _chart.NoteNodes.Remove(tail); break;
+                    case TailModifyKind.Remove: break;
+                    case TailModifyKind.Move: _tmpScope = _chart.NoteNodes.EnterTrackingScope(tail); break;
+                }
+            }
+
+            protected override void OnUndoingValueChanged(int index)
+            {
+                var (tail, kind) = _tails[index];
+                switch (kind) {
+                    case TailModifyKind.Add: break;
                     case TailModifyKind.Remove: _chart.NoteNodes.Add(tail); break;
-                    case TailModifyKind.Move: _chart.NoteNodes.NotifyEdited(tail); break;
+                    case TailModifyKind.Move: _tmpScope.Dispose(); break;
                 }
             }
 
@@ -571,16 +596,17 @@ namespace Deenote.Entities.Operations
                         next._prevLink = note;
                 }
                 else {
-                    //if (note.PrevLink != prev) {
-                    //    note._prevLink = prev;
-                    //    if (prev is not null)
-                    //        prev._nextLink = note;
-                    //}
-                    //if (note.NextLink != next) {
-                    //    note._nextLink = next;
-                    //    if (next is not null)
-                    //        next._prevLink = note;
-                    //}
+                    // Maybe here is setting link to null, but I forgot why I've wrote such a complex segment
+                    if (note._prevLink != prev) {
+                        note._prevLink = prev;
+                        if (prev is not null)
+                            prev._nextLink = note;
+                    }
+                    if (note._nextLink != next) {
+                        note._nextLink = next;
+                        if (next is not null)
+                            next._prevLink = note;
+                    }
                 }
             }
 

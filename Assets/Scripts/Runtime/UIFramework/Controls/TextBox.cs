@@ -47,6 +47,8 @@ namespace Deenote.UIFramework.Controls
         protected override void Awake()
         {
             base.Awake();
+
+            _inputField.fontAsset = UISystem.FontAsset;
             _inputField.onEndEdit.AddListener(val =>
             {
                 Unfocus();

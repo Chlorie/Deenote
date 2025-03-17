@@ -2,6 +2,7 @@
 
 using CommunityToolkit.Diagnostics;
 using CommunityToolkit.HighPerformance.Buffers;
+using Deenote.Core.Editing.Operations;
 using Deenote.Core.GamePlay;
 using Deenote.Entities;
 using Deenote.Entities.Comparisons;
@@ -9,6 +10,7 @@ using Deenote.Entities.Models;
 using Deenote.Entities.Operations;
 using Deenote.Library.Collections;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Deenote.Core.Editing
 {
@@ -162,9 +164,16 @@ namespace Deenote.Core.Editing
             if (Selector.SelectedNotes.IsEmpty)
                 return;
 
-            _operations.Do(_game.CurrentChart
-                .EditNotesDuration(Selector.SelectedNotes, newValue)
-                .OnDone(notes => OnNotePropertyEdited(true, true, NotificationFlag.NoteDuration)));
+            _operations.Do(GetEditNotesDurationOperation(Selector.SelectedNotes, newValue));
+        }
+
+        public IUndoableOperation GetEditNotesDurationOperation(ReadOnlySpan<NoteModel> notes, float newValue)
+        {
+            _game.AssertChartLoaded();
+
+            return _game.CurrentChart
+                .EditNotesDuration(notes, newValue)
+                .OnDone(notes => OnNotePropertyEdited(true, true, NotificationFlag.NoteDuration));
         }
 
         public void EditSelectedNotesVibrate(bool newValue)
@@ -269,6 +278,20 @@ namespace Deenote.Core.Editing
                     ThrowHelper.ThrowInvalidOperationException("Unknown curve apply property");
                     break;
             }
+        }
+
+        public void CreateHoldBetween(NoteModel head, NoteModel tail)
+        {
+            if (tail.Time == head.Time)
+                return;
+
+            if (tail.Time < head.Time)
+                (head, tail) = (tail, head);
+
+            var duration = tail.Time - head.Time;
+            var rmv = GetRemoveNotesOperation(MemoryMarshal.CreateReadOnlySpan(ref tail, 1));
+            var duredit = GetEditNotesDurationOperation(MemoryMarshal.CreateReadOnlySpan(ref head, 1), duration);
+            OperationMemento.Do(new CombinedPairOperation(rmv, duredit));
         }
 
         public void InsertTempo(TempoRange range)

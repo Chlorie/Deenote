@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LinkLineColor: {r: 1, g: 0.9137255, b: 0.5294118, a: 1}
   SubBeatLineColor: {r: 0.16470589, g: 0.16470589, b: 0.16470589, a: 0.75}
-  BeatLineColor: {r: 0.90300006, g: 0, b: 0, a: 1}
-  TempoLineColor: {r: 0, g: 0.90300006, b: 0.90300006, a: 1}
+  BeatLineColor: {r: 0.608, g: 0, b: 0, a: 1}
+  TempoLineColor: {r: 0, g: 0.693, b: 0.693, a: 1}
   PositionGridLineColor: {r: 0.16470589, g: 0.16470589, b: 0.16470589, a: 0.75}
   CurveLineColor: {r: 0.33333334, g: 0.7529412, b: 1, a: 1}
   LinkLineWidth: 2

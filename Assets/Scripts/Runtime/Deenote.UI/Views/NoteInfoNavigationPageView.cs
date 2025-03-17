@@ -1,17 +1,15 @@
 #nullable enable
 
 using CommunityToolkit.Diagnostics;
-using Deenote.Localization;
-using Deenote.Entities;
+using Deenote.Core.Editing;
 using Deenote.Entities.Models;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
-using Deenote.UIFramework.Controls;
+using Deenote.Localization;
 using Deenote.UI.Views.Panels;
+using Deenote.UIFramework.Controls;
 using System;
-using System.Linq;
 using UnityEngine;
-using Deenote.Core.Editing;
 
 namespace Deenote.UI.Views
 {
@@ -22,6 +20,7 @@ namespace Deenote.UI.Views
         [SerializeField] TextBox _timeInput = default!;
         [SerializeField] TextBox _sizeInput = default!;
         [SerializeField] TextBox _durationInput = default!;
+        [SerializeField] Button _linkAsHoldButton = default!;
         [SerializeField] ToggleButtonGroup _noteKindToggleGroup = default!;
         [SerializeField] ToggleButton _clickNoteKindToggle = default!;
         [SerializeField] ToggleButton _slideNoteKindToggle = default!;
@@ -120,6 +119,15 @@ namespace Deenote.UI.Views
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteDuration,
                 editor => NotifyMultiFloatValueChanged(_durationInput, editor.Selector.SelectedNotes, n => n.Duration));
+            _linkAsHoldButton.Clicked += () =>
+            {
+                var editor = MainSystem.StageChartEditor;
+                Debug.Assert(editor.Selector.SelectedNotes.Length == 2);
+                var prev = editor.Selector.SelectedNotes[0];
+                var next = editor.Selector.SelectedNotes[1];
+
+                editor.CreateHoldBetween(prev, next);
+            };
 
             #endregion
 
@@ -228,6 +236,9 @@ namespace Deenote.UI.Views
             void _OnSelectedNotesChanged(StageNoteSelector selector)
             {
                 var notes = selector.SelectedNotes;
+
+                _linkAsHoldButton.IsInteractable = notes.Length == 2;
+
                 switch (notes.Length) {
                     case 0:
                         _noteHeaderText.SetLocalizedText(NoteNonSelectedHeader);

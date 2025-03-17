@@ -135,6 +135,8 @@ namespace Deenote.Core.Editing
                 }));
         }
 
+        public void RemoveNote(NoteModel note) => RemoveNotes(MemoryMarshal.CreateReadOnlySpan(ref note, 1));
+
         public void RemoveNotes(ReadOnlySpan<NoteModel> notes)
         {
             if (!_game.IsChartLoaded())
@@ -142,7 +144,14 @@ namespace Deenote.Core.Editing
             if (notes.IsEmpty)
                 return;
 
-            _operations.Do(_game.CurrentChart.RemoveOrderedNotes(notes.ToImmutableArray())
+            _operations.Do(GetRemoveNotesOperation(notes));
+        }
+
+        public IUndoableOperation GetRemoveNotesOperation(ReadOnlySpan<NoteModel> notes)
+        {
+            _game.AssertChartLoaded();
+
+            return _game.CurrentChart.RemoveOrderedNotes(notes.ToImmutableArray())
                 .OnRedone(notes =>
                 {
                     this.Selector.Clear();
@@ -152,7 +161,7 @@ namespace Deenote.Core.Editing
                 {
                     this.Selector.AddSelectMultiple(notes);
                     OnNoteCollectionChanged();
-                }));
+                });
         }
 
         public void RemoveSelectedNotes() => RemoveNotes(Selector.SelectedNotes);

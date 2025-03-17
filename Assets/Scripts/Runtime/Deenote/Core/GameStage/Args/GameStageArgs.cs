@@ -12,7 +12,7 @@ namespace Deenote.Core.GameStage.Args
         public float NotePanelWidth;
         public float NotePanelBaseLengthTime;
         /// <summary>
-        /// Multiplier when note speed is 1(0.5 on display)
+        /// Multiplier when note speed is 1
         /// </summary>
         public float NoteTimeToZBaseMultiplier;
         [Range(0f, 1f)] public float NoteFadeInRangePercent;

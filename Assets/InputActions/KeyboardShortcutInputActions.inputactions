@@ -608,6 +608,42 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "SpeedInc",
+                    "type": "Button",
+                    "id": "adf6500b-4b47-4492-9ec2-155a2df6cec4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SpeedDec",
+                    "type": "Button",
+                    "id": "eb909639-afcd-4e11-9b66-8200e96d887b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SpeedIncLarge",
+                    "type": "Button",
+                    "id": "31356866-79c3-428c-ac2a-6191bcaf048a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SpeedDecLarge",
+                    "type": "Button",
+                    "id": "d86a6f45-d3d1-452d-97b8-1cf54f597e3d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "KindClick",
                     "type": "Button",
                     "id": "e8fc8ec3-bd48-426d-9e25-227047a87730",
@@ -647,6 +683,15 @@
                     "name": "SoundRemove",
                     "type": "Button",
                     "id": "37147452-2d9a-4314-8558-33b816e9d7ab",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CreateHoldBetween",
+                    "type": "Button",
+                    "id": "f33077e3-3ae7-4105-b8c3-66be0588ee2f",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -899,7 +944,7 @@
                 {
                     "name": "",
                     "id": "d541248f-d765-43fc-b48a-841284e51637",
-                    "path": "<Keyboard>/semicolon",
+                    "path": "<Keyboard>/k",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -954,7 +999,7 @@
                 {
                     "name": "",
                     "id": "dfc43bfc-b31e-45dd-9438-6bc210931819",
-                    "path": "<Keyboard>/leftBracket",
+                    "path": "<Keyboard>/semicolon",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1390,6 +1435,105 @@
                     "action": "SizeIncLarge",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "a7f8a743-6b48-45b6-ad60-983e034ee610",
+                    "path": "<Keyboard>/h",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CreateHoldBetween",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fd3ff6e3-b2f6-43a9-be1f-ca8306ecdf5a",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedDec",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "One Modifier",
+                    "id": "43e652d7-8cfb-4c8c-bb82-3a5f82436dd7",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedIncLarge",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "851cc208-4524-4d60-9f7a-97bdfbbdf6b8",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedIncLarge",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "f6bc8612-fbb5-475b-a13f-438f0c5818a5",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedIncLarge",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "One Modifier",
+                    "id": "a490d385-3342-409b-b9d7-19eae560682f",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedDecLarge",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "e0ecada5-434b-4291-86bc-3a516eacd7e9",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedDecLarge",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "4b0f1d1b-a6e9-422a-b0e4-0d4ff2b5169f",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedDecLarge",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "21de08e1-8825-4207-99dd-592b4baa6b85",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpeedInc",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

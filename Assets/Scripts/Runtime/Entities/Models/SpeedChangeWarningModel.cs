@@ -18,6 +18,10 @@ namespace Deenote.Entities.Models
             _noteModel = note;
         }
 
+        public SpeedChangeWarningModel(float time) :
+            this(new NoteModel() { Time = time, Position = 4f, WarningType = WarningType.SpeedChange })
+        { }
+
         public SpeedChangeWarningModel Clone()
             => new(_noteModel.Clone(cloneSounds: false));
     }
