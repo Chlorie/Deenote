@@ -117,22 +117,22 @@ namespace Deenote.Core.GamePlay
                         return;
                     }
 
-                    // TODO: try out streaming clip provider
-                    _musicPlayer.ReplaceClip(new DecodedClipProvider(proj.AudioClip));
-
                     if (proj.Charts.Count == 0) {
                         UnloadChart();
                     }
                     else {
                         LoadChartInCurrentProject(proj.Charts[0]);
                     }
+
+                    // TODO: try out streaming clip provider
+                    _musicPlayer.ReplaceClip(new DecodedClipProvider(manager.AudioClip!));
                 });
             MainSystem.ProjectManager.RegisterNotification(
                 ProjectManager.NotificationFlag.ProjectAudio,
                 manager =>
                 {
                     manager.AssertProjectLoaded();
-                    _musicPlayer.ReplaceClip(new DecodedClipProvider(manager.CurrentProject.AudioClip));
+                    _musicPlayer.ReplaceClip(new DecodedClipProvider(manager.AudioClip!));
                 });
         }
 

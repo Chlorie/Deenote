@@ -30,7 +30,7 @@ namespace Deenote.Entities.Models
 
         public string ProjectFilePath { get; internal set; }
 
-        public AudioClip AudioClip { get; set; }
+        public float? AudioLength { get; set; }
 
         public ProjectModel(string projectFilePath, byte[] audioFileData, string audioFileRelativePath)
         {

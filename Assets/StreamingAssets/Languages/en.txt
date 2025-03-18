@@ -202,7 +202,9 @@ PinDirNotFound_MsgBox_N=Cancel
 #### New Project
 
 NewProject_MsgBox_Title=Create new project
+NewProject_Status_Creating=Creating new project.
 NewProject_Status_Created=New project created.
+NewProject_Status_CreateCancelled=Cancelled creating new project.
 NewProject_FileExplorer_SelectAudio_Title=Select Audio.
 NewProject_FileExplorer_SelectDirectory_Title=Select Directory.
 

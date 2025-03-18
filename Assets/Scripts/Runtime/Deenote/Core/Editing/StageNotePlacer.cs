@@ -375,7 +375,7 @@ namespace Deenote.Core.Editing
             }
             _editor.AddMultipleNotes(_editor.ClipBoard.Notes, placeCoord);
 
-            ResetNotePrototypesToIdle();
+            //ResetNotePrototypesToIdle(); Do this in StateMachine, as in current state indicator property edit are not allowed
             if (PlaceSlideModifier)
                 return StateFlag.IdlePlacingSlides;
             else

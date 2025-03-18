@@ -188,7 +188,9 @@ PinDirNotFound_MsgBox_N=取消
 #### New Project
 
 NewProject_MsgBox_Title=新建项目
+NewProject_Status_Creating=项目创建中
 NewProject_Status_Created=项目已新建。
+NewProject_Status_CreateCancelled=已取消项目创建。
 NewProject_FileExplorer_SelectAudio_Title=选择音频文件
 NewProject_FileExplorer_SelectDirectory_Title=选择目录
 

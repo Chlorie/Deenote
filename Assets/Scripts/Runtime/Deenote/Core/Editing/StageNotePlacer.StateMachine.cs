@@ -67,6 +67,7 @@ namespace Deenote.Core.Editing
                     break;
                 case StateFlag.PlacingPastedNotes:
                     _currentState = EndPasteNotes(coord, mousePosition);
+                    ResetNotePrototypesToIdle();
                     break;
             }
             RefreshIndicatorVisibility();

@@ -6,9 +6,11 @@ using Deenote.Entities.Models;
 using Deenote.Entities.Storage;
 using Deenote.Library;
 using Deenote.Library.Components;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,42 +24,53 @@ namespace Deenote.Core.Project
         public ProjectModel? CurrentProject
         {
             get => _currentProject_bf;
-            set {
-                if (Utils.SetField(ref _currentProject_bf, value)) {
-                    NotifyFlag(NotificationFlag.CurrentProject);
-                }
-            }
         }
 
-        private bool _isLoading;
+        private AudioClip? _audioClip;
+        public AudioClip? AudioClip => _audioClip;
+
+        private bool _isLoading_bf;
+        private bool _isSaving_bf;
         private ResetableCancellationTokenSource _saveCts = new();
+        private ResetableCancellationTokenSource _saveChartsCts = new();
 
         public bool IsLoading
         {
-            get => _isLoading;
-            set {
-                if (Utils.SetField(ref _isLoading, value)) {
+            get => _isLoading_bf;
+            private set {
+                if (Utils.SetField(ref _isLoading_bf, value)) {
                     NotifyFlag(NotificationFlag.IsLoading);
                 }
             }
         }
 
-        private void Awake()
+        public bool IsSaving
         {
-            MainSystem.Instance.AutoSaveTrigger.AutoSaving += AutoSaveHandler;
-        }
-
-        private void OnDestroy()
-        {
-            MainSystem.Instance.AutoSaveTrigger.AutoSaving -= AutoSaveHandler;
+            get => _isSaving_bf;
+            private set {
+                if (Utils.SetField(ref _isSaving_bf, value)) {
+                    NotifyFlag(NotificationFlag.IsSaving);
+                }
+            }
         }
 
 #if  UNITY_EDITOR
         private void Start()
         {
-            CurrentProject = Fake.GetProject();
+            var (proj, clip) = Fake.GetProject();
+            SetCurrentProject(proj, clip);
         }
 #endif
+
+        public void SetCurrentProject(ProjectModel project, AudioClip audio)
+        {
+            if (Utils.SetField(ref _currentProject_bf, project)) {
+                _audioClip = audio;
+                if (project is not null)
+                    project.AudioLength = audio.length;
+                NotifyFlag(NotificationFlag.CurrentProject);
+            }
+        }
 
         public async UniTask<bool> OpenLoadProjectFileAsync(string filePath)
         {
@@ -71,42 +84,58 @@ namespace Deenote.Core.Project
             var clip = await AudioUtils.TryLoadAsync(ms, Path.GetExtension(proj.AudioFileRelativePath));
             if (clip is null)
                 return false;
-            // HACK: should set audioclip in entity.csproj
-            proj.AudioClip = clip;
 
-            CurrentProject = proj;
+            SetCurrentProject(proj, clip);
             return true;
+        }
+
+        public void UnloadCurrentProject()
+        {
+            SetCurrentProject(null!, null!);
         }
 
         public async UniTask SaveCurrentProjectAsync()
         {
-            if (!IsProjectLoaded())
-                return;
+            ValidateProject();
+
             _saveCts.Reset();
-            ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(false));
             await SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
-            ProjectSaved?.Invoke(new ProjectAutoSaveEventArgs(false));
         }
 
         public async UniTask SaveCurrentProjectToAsync(string targetFilePath)
         {
-            if (!IsProjectLoaded())
-                return;
+            ValidateProject();
+
             _saveCts.Reset();
-            ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(false));
             await SaveCurrentProjectToAsyncInternal(targetFilePath, _saveCts.Token);
-            ProjectSaved?.Invoke(new ProjectAutoSaveEventArgs(false));
+            ProjectSaved?.Invoke(new ProjectSaveEventArgs());
         }
 
         private async UniTask SaveCurrentProjectToAsyncInternal(string targetFilePath, CancellationToken cancellationToken)
         {
+            using var scope = new SavingScope(this);
+
             AssertProjectLoaded();
             await ProjectIO.SaveAsync(CurrentProject, targetFilePath, cancellationToken);
         }
 
-        private async UniTask SaveCurrentProjectChartJsonsAsync(CancellationToken cancellationToken)
+        public UniTask SaveCurrentProjectChartJsonsAsync()
+        {
+            ValidateProject();
+            return SaveCurrentProjectChartJsonsToAsyncInternal(Path.GetDirectoryName(CurrentProject.ProjectFilePath));
+        }
+
+        public UniTask SaveCurrentProjectChartJsonsToAsync(string targetDirectory)
+        {
+            ValidateProject();
+            return SaveCurrentProjectChartJsonsToAsyncInternal(targetDirectory);
+        }
+
+        private async UniTask SaveCurrentProjectChartJsonsToAsyncInternal(string targetDirectory)
         {
             AssertProjectLoaded();
+
+            _saveChartsCts.Reset();
 
             var time = DateTime.Now;
             string dir = Path.Combine(Path.GetDirectoryName(CurrentProject.ProjectFilePath), AutoSaveJsonDirName);
@@ -121,7 +150,7 @@ namespace Deenote.Core.Project
 
                 tasks[i] = File.WriteAllTextAsync(
                     Path.Combine(dir, $"{filename}.{chartname}.{time:yyMMddHHmmss}.json"),
-                    chart.ToJsonString(), cancellationToken);
+                    chart.ToJsonString(), _saveChartsCts.Token);
             }
 
             await Task.WhenAll(tasks);
@@ -155,6 +184,8 @@ namespace Deenote.Core.Project
         public enum NotificationFlag
         {
             IsLoading,
+            IsSaving,
+
             AutoSave,
 
             CurrentProject,
@@ -178,6 +209,22 @@ namespace Deenote.Core.Project
             public void Dispose()
             {
                 _self.IsLoading = false;
+            }
+        }
+
+        private readonly struct SavingScope : IDisposable
+        {
+            private readonly ProjectManager _self;
+
+            public SavingScope(ProjectManager self)
+            {
+                _self = self;
+                _self.IsSaving = true;
+            }
+
+            public void Dispose()
+            {
+                _self.IsSaving = false;
             }
         }
     }

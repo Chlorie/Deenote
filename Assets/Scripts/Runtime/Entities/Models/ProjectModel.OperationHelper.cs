@@ -12,8 +12,15 @@ namespace Deenote.Entities.Models
         /// </returns>
         public float GetNonOverflowTempoTime(int index)
         {
-            if (index >= _tempos.Count)
-                return AudioClip.length;
+            if (index >= _tempos.Count) {
+                if (AudioLength is { } len)
+                    return len;
+                else if (_tempos.Count > 0)
+                    return _tempos[^1].StartTime + 3f;
+                else
+                    return 3f;
+                    
+            }
             if (index < 0)
                 return 0f;
             return _tempos[index].StartTime;

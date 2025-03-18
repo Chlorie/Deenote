@@ -1,7 +1,6 @@
 #nullable enable
 
 using Deenote.Audio;
-using Deenote.Components;
 using Deenote.Core;
 using Deenote.Core.Editing;
 using Deenote.Core.GamePlay;
@@ -33,14 +32,9 @@ namespace Deenote
         public static GamePlayManager GamePlayManager => Instance._gamePlayManager;
         public static StageChartEditor StageChartEditor => Instance._stageChartEditor;
 
-        internal AutoSaveTrigger AutoSaveTrigger { get; private set; } = default!;
-
         protected override void Awake()
         {
             base.Awake();
-
-            AutoSaveTrigger = gameObject.AddComponent<AutoSaveTrigger>();
-            AutoSaveTrigger.IsEnabled = false;
 
             _unhandledExceptionHandler = new();
 

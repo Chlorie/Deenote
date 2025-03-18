@@ -13,7 +13,11 @@ namespace Deenote.UI.Dialogs
 {
     partial class NewProjectDialog
     {
-        public async UniTask<ProjectModel?> OpenCreateNewAsync()
+        private const string NewProjectCreatingStatusKey = "NewProject_Status_Creating";
+        private const string NewProjectCreatedStatusKey = "NewProject_Status_Created";
+        private const string NewProjectCreateCancelledStatusKey = "NewProject_Status_CreateCancelled";
+
+        public async UniTask<Result?> OpenCreateNewAsync()
         {
             OpenSelfModalDialog();
             ResetDialog();
@@ -47,6 +51,8 @@ namespace Deenote.UI.Dialogs
 
                 // Project creation
 
+                MainWindow.StatusBar.SetLocalizedStatusMessage(NewProjectCreatingStatusKey);
+
                 {
                     // LoadAudio
                     // TODO: Lazy Load Audio
@@ -66,22 +72,28 @@ namespace Deenote.UI.Dialogs
                     audioFs.Seek(0, SeekOrigin.Begin);
                     audioFs.Read(audioBytes);
                     var proj = new ProjectModel(_projectResultPath, audioBytes, Path.GetRelativePath(_projectResultPath, audioFilePath)) {
-                        AudioClip = clip,
+                        AudioLength = clip.length,
                         MusicName = _projectName.Text
                     };
                     proj.Charts.Add(new ChartModel(new()) {
                         Difficulty = Difficulty.Hard,
                         Level = "10",
                     });
-                    return proj;
+
+                    MainWindow.StatusBar.SetLocalizedStatusMessage(NewProjectCreatedStatusKey);
+                    return new Result(proj, clip);
                 }
             } catch (OperationCanceledException) {
-                Debug.Log("Creating new project cancalled");
+                MainWindow.StatusBar.SetLocalizedStatusMessage(NewProjectCreateCancelledStatusKey);
                 return null;
             } finally {
                 SetBlockInput(false);
                 CloseSelfModalDialog();
             }
         }
+
+        public readonly record struct Result(
+            ProjectModel Project,
+            AudioClip AudioClip);
     }
 }

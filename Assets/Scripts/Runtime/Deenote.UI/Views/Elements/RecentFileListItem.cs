@@ -18,9 +18,16 @@ namespace Deenote.UI.Views.Elements
 
         public string FilePath { get; private set; } = default!;
 
+        #region MessageBoxArgs
+
         private static readonly MessageBoxArgs _openProjOnOpenMsgBoxArgs = new(
             LocalizableText.Localized("OpenRecentProject_MsgBox_Title"),
             LocalizableText.Localized("OpenProjectOnOpen_MsgBox_Content"),
+            LocalizableText.Localized("OpenProjectOnOpen_MsgBox_Y"),
+            LocalizableText.Localized("OpenProjectOnOpen_MsgBox_N"));
+        private static readonly MessageBoxArgs _openProjOnUnsavedOpenMsgBoxArgs = new(
+            LocalizableText.Localized("OpenRecentProject_MsgBox_Title"),
+            LocalizableText.Localized("OpenProjectOnUnsavedOpen_MsgBox_Content"),
             LocalizableText.Localized("OpenProjectOnOpen_MsgBox_Y"),
             LocalizableText.Localized("OpenProjectOnOpen_MsgBox_N"));
 
@@ -37,20 +44,39 @@ namespace Deenote.UI.Views.Elements
             LocalizableText.Localized("OpenRecentProjectFileNotFound_MsgBox_X"),
             LocalizableText.Localized("OpenRecentProjectFileNotFound_MsgBox_N"));
 
+        #endregion
+
+        #region Localized Keys
+
+        private const string OpenProjectLoadingStatusKey = "OpenProject_Status_Loading";
+        private const string OpenProjectLoadedStatusKey = "OpenProject_Status_Loaded";
+        private const string OpenProjectFailedStatusKey = "OpenProject_Status_LoadFailed";
+
+        #endregion
+
         private void Awake()
         {
             _button.Clicked += UniTask.Action(async () =>
             {
                 if (MainSystem.ProjectManager.IsProjectLoaded()) {
-                    var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_openProjOnOpenMsgBoxArgs);
+                    var res = await MainWindow.DialogManager.OpenMessageBoxAsync(
+                        MainSystem.StageChartEditor.OperationMemento.HasUnsavedChange
+                            ? _openProjOnUnsavedOpenMsgBoxArgs
+                            : _openProjOnOpenMsgBoxArgs);
                     if (res != 0)
                         return;
                 }
 
                 // Load project
                 if (File.Exists(FilePath)) {
+                    MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectLoadingStatusKey);
+                    MainSystem.ProjectManager.UnloadCurrentProject();
                     bool res = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(FilePath);
-                    if (!res) {
+                    if (res) {
+                        MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectLoadedStatusKey);
+                    }
+                    else {
+                        MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectFailedStatusKey);
                         MainWindow.DialogManager.OpenMessageBoxAsync(_loadProjFailedMsgBoxArgs)
                             .Forget();
                     }

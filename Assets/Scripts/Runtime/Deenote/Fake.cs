@@ -10,12 +10,13 @@ namespace Deenote
     public static class Fake
     {
         private static ProjectModel? _project;
+        private static AudioClip? _audio;
 
         private const string TestMusic = "finale";
 
-        public static ProjectModel GetProject()
+        public static (ProjectModel, AudioClip) GetProject()
         {
-            if (_project is not null) return _project;
+            if (_project is not null) return (_project, _audio!);
 
             //await using var fs = File.OpenRead(Path.Combine(Application.streamingAssetsPath, "Magnolia.mp3"));
             //var clip = await AudioUtils.LoadAsync(fs, ".mp3");
@@ -23,8 +24,9 @@ namespace Deenote
             if (clip is null) {
                 Debug.LogError("Load audio failed");
             }
+            _audio = clip;
 
-            _project = new ProjectModel("D:/", null!, "Fake.mp3") { AudioClip = clip! };
+            _project = new ProjectModel("D:/", null!, "Fake.mp3");
             if (ChartModel.TryParse(Resources.Load<TextAsset>($"Test/{TestMusic}.hard").text, out var chart)) {
                 // chart.Name = "<cht> name";
                 chart.Level = "10";
@@ -35,7 +37,7 @@ namespace Deenote
             else {
                 Debug.LogError("Load test chart failed");
             }
-            return _project;
+            return (_project, _audio!);
         }
     }
 }

@@ -95,12 +95,13 @@ namespace Deenote.UI.Views
 
         #region LocalizedTextKeys
 
-        private const string NewProjectCreatedStatusKey = "NewProject_Status_Created";
         private const string OpenProjectFileExplorerTitleKey = "OpenProject_FileExplorer_Title";
         private const string OpenProjectLoadingStatusKey = "OpenProject_Status_Loading";
         private const string OpenProjectLoadedStatusKey = "OpenProject_Status_Loaded";
         private const string OpenProjectFailedStatusKey = "OpenProject_Status_LoadFailed";
         private const string SaveAsFileExplorerTitleKey = "SaveAsProject_FileExplorer_Title";
+        private const string SaveProjectSavingStatusKey = "SaveProject_Status_Saving";
+        private const string SaveProjectSavedStatusKey = "SaveProject_Status_Saved";
 
         private const string VersionCheckNoInternetToastKey = "Version_NoInternet_Toast";
         private const string VersionCheckUpdateToDateToastKey = "Version_UpdateToDate_Toast";
@@ -190,10 +191,9 @@ namespace Deenote.UI.Views
                 if (res != 0)
                     return;
             }
-            var result = await MainWindow.DialogManager.NewProjectDialog.OpenCreateNewAsync();
-            if (result is not null) {
-                MainSystem.ProjectManager.CurrentProject = result;
-                MainWindow.StatusBar.SetLocalizedStatusMessage(NewProjectCreatedStatusKey);
+            var nresult = await MainWindow.DialogManager.NewProjectDialog.OpenCreateNewAsync();
+            if (nresult is { } result) {
+                MainSystem.ProjectManager.SetCurrentProject(result.Project, result.AudioClip);
             }
         }
 
@@ -215,7 +215,7 @@ namespace Deenote.UI.Views
                 return;
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectLoadingStatusKey);
-            MainSystem.ProjectManager.CurrentProject = null;
+            MainSystem.ProjectManager.UnloadCurrentProject();
             bool isLoaded = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(feRes.Path);
             if (isLoaded) {
                 AddPathToRecentFiles(feRes.Path);
@@ -236,8 +236,9 @@ namespace Deenote.UI.Views
             MainSystem.ProjectManager.AssertProjectLoaded("Unexpected interactable save button when current project is null");
             var proj = MainSystem.ProjectManager.CurrentProject;
 
+            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectAsync();
-            await UniTask.SwitchToMainThread();
+            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
             AddPathToRecentFiles(proj.ProjectFilePath);
         }
 
@@ -261,8 +262,10 @@ namespace Deenote.UI.Views
                 if (res != 0) return;
             }
 
+            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectToAsync(feRes.Path);
-            await UniTask.SwitchToMainThread();
+            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
+            AddPathToRecentFiles(MainSystem.ProjectManager.CurrentProject.ProjectFilePath);
         }
 
         #endregion

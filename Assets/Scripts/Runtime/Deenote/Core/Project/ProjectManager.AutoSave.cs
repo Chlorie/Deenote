@@ -1,8 +1,8 @@
 #nullable enable
 
-using Cysharp.Threading.Tasks;
 using Deenote.Library;
 using System;
+using UnityEngine.Profiling;
 
 namespace Deenote.Core.Project
 {
@@ -21,47 +21,8 @@ namespace Deenote.Core.Project
             }
         }
 
-        public event Action<ProjectAutoSaveEventArgs>? ProjectSaving;
-        public event Action<ProjectAutoSaveEventArgs>? ProjectSaved;
+        public event Action<ProjectSaveEventArgs>? ProjectSaved;
 
-        private void AutoSaveHandler()
-        {
-            if (IsProjectLoaded()) {
-                switch (AutoSave) {
-                    case ProjectAutoSaveOption.On:
-                        _ = SaveProjectAsync();
-                        break;
-                    case ProjectAutoSaveOption.OnAndSaveJson:
-                        _ = SaveProjectAndJsonAsync();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            async UniTaskVoid SaveProjectAsync()
-            {
-                _saveCts.Reset();
-                ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(true));
-                await SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
-                ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(true));
-            }
-
-            async UniTaskVoid SaveProjectAndJsonAsync()
-            {
-                _saveCts.Reset();
-                ProjectSaving?.Invoke(new ProjectAutoSaveEventArgs(true));
-                var projSaveTask = SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
-                var chartSaveTask = SaveCurrentProjectChartJsonsAsync(_saveCts.Token);
-
-                await projSaveTask;
-                await chartSaveTask;
-
-                ProjectSaved?.Invoke(new ProjectAutoSaveEventArgs(true));
-            }
-        }
-
-        public readonly record struct ProjectAutoSaveEventArgs(
-            bool IsAutoSave);
+        public readonly record struct ProjectSaveEventArgs();
     }
 }

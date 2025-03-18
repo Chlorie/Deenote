@@ -14,7 +14,8 @@ namespace Deenote.Core.Project
 
             CurrentProject.AudioFileRelativePath = Path.GetRelativePath(CurrentProject.ProjectFilePath, filePath);
             CurrentProject.AudioFileData = bytes;
-            CurrentProject.AudioClip = clip;
+            _audioClip = clip;
+            CurrentProject.AudioLength = clip.length;
             NotifyFlag(NotificationFlag.ProjectAudio);
         }
 

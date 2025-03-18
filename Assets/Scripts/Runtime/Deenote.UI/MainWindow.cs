@@ -66,10 +66,6 @@ namespace Deenote.UI
 
         private const string UnhandledExceptionToastKey = "UnhandledException_Toast";
 
-        private const string SaveProjectSavingStatusKey = "SaveProject_Status_Saving";
-        private const string SaveProjectSavedStatusKey = "SaveProject_Status_Saved";
-        private const string AutoSaveSavingStatusKey = "AutoSaveProject_Status_Saving";
-        private const string AutoSaveSavedStatusKey = "AutoSaveProject_Status_Saved";
 
         #endregion
 
@@ -108,20 +104,6 @@ namespace Deenote.UI
             UnhandledExceptionHandler.UnhandledExceptionOccurred += args =>
             {
                 ToastManager.ShowLocalizedToastAsync(UnhandledExceptionToastKey, 3f);
-            };
-            MainSystem.ProjectManager.ProjectSaving += args =>
-            {
-                if (args.IsAutoSave)
-                    StatusBar.SetLocalizedStatusMessage(AutoSaveSavingStatusKey);
-                else
-                    StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
-            };
-            MainSystem.ProjectManager.ProjectSaved += args =>
-            {
-                if (args.IsAutoSave)
-                    StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey);
-                else
-                    StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
             };
         }
 
