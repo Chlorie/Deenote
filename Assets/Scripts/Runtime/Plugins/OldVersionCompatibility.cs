@@ -41,7 +41,7 @@ namespace Deenote.Runtime.Plugins
 
             Plugins = ImmutableArray.Create(
                 ImmutableArray.Create<IDeenotePlugin>(new LoadLegacyDeenoteConfigurations()),
-                ImmutableArray.Create<IDeenotePlugin>(new DelegatePlugin("Export As Deemo I Chart", new[] { ("cn", "导出为Deemo1谱面") }, async (context, args) =>
+                ImmutableArray.Create<IDeenotePlugin>(new DelegatePlugin("Export As Deemo I Chart", new[] { ("zh", "导出为Deemo1谱面") }, async (context, args) =>
                 {
                     var texts = _texts[args.CurrentLanguage.LanguageCode];
                     if (!context.GameManager.IsChartLoaded()) {

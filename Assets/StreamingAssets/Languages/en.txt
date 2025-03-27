@@ -1,4 +1,4 @@
-en
+锘縠n
 English
 
 # Grammar of this file:
@@ -88,7 +88,6 @@ NavPanel_Editor_Header=EDITOR
 NavPanel_EditorPlaceNoteSpeed=Place Speed
 NavPanel_EditorMusicSpeed_Label=Music Speed
 NavPanel_EditorGrids_SubHeader=Grids
-NavPanel_EditorGridSnap_Label=Snap
 NavPanel_EditorCurve_SubHeader=Curve
 NavPanel_EditorCurveLinear_Label=Linear
 NavPanel_EditorCurveCubic_Label=Cubic
@@ -345,12 +344,8 @@ Dialog_AboutDevelopers_Page_NachtgeistW_Content="""
 Dialog_AboutDevelopers_Page_Trarizon=Trarizon
 Dialog_AboutDevelopers_Page_Trarizon_Title=Trarizon
 Dialog_AboutDevelopers_Page_Trarizon_Content="""
-        Trarizonです。我在做完本科毕业设计后开始了这个项目的重构，期间因为各种事情各种拖拖拉拉到现在才差不多完成。
-        
-        关于这个项目的后续。我也不知道未来还有没有精力来继续优化这个项目。反正如果有的话我尽量，但是请不要报太大期待。。
-
-        PS: 事实上在去年fork这个项目的时候我并不没有完全计划要完成重构，最初只是想看看能做到哪一步。所以事实上前几个月我在重构的消息基本是盐酸发出来的.jpg
-        感谢盐酸几年来孜孜不倦的催更.jpg
+        This is Trarizon. I started refactoring this project after finishing my undergraduate project, and for many reasons I just about to finish it now.
+        I don't know if I will have time to continue optimizing this project. Anyway, I will if I can, but please don't expect too much...
 
     - Trarizon
     - 9 Mar 2025
@@ -428,7 +423,9 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 ## Update History
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
-AboutDialog_Versions_Dnt_1_0_Content=Completely refactored. Support DEEMO II chart edit.
+AboutDialog_Versions_Dnt_1_0_Content="""
+    Completely refactored, support editing DEEMO II charts (note speed, hold, flick)
+    """
 
 AboutDialog_Versions_Dnt_0_7=Deenote 0.7
 AboutDialog_Versions_Dnt_0_7_Content="""
