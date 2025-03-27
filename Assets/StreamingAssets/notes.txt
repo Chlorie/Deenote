@@ -1,28 +1,3 @@
-# Structure
-
-- GlobalSettings
-- System
-  - LocalizationSystem
-  - ProjectManager
-  - GameStage
-    - Grids
-  - Editor
-  - PianoSoundManager
-- UI
-  - MenuBar
-  - StatusBar
-  - Windows
-    - About [Not in Menu View]
-    - EditorProperties
-    - PerspectiveView
-    - PianoSoundEdit
-    - Preferences
-    - Properties
-  - Dialogs
-    - FileExplorer
-    - MessageBox
-    - ProjectProperties
-
 # Code comments
 // Note
 // Optimizable

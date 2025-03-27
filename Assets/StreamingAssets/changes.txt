@@ -6,26 +6,9 @@
 
 # Project
 
-- [ ] AutoSaveAndJson的json保存到同目录的文件夹ProjectName_$autosave中
 - [ ] Tools菜单：导出为dsproj
 - [ ] 谱面复制
   - ProjectProperties页，添加Copy按钮，按下时，更改为Cancel，其他谱面的该按钮更改为Paste。
-
-# Stage
-
-- [B] 修复了按空格播放到音乐结束后松开，再次播放时音乐会从头开始的Bug
-- [B] 修复多个note相距过近时，部分note不会染红的Bug
-  - 实际上是找茬.jpg, (time,pos) = (0,0), (0.0009,0.009), (0.0009,-0.009)时只会染前两个
-- [N] 全屏
-- [ ] 参考Deemo 3.x调整Perspective View
-- [ ] 支持DEEMO II
-  - [ ] Flick与Hold的兼容情况未知，目前选择hold强制置0
-  - [ ] Speed设置方式未知，待定
-  - [ ] 引入PseudoTime，表示换算为Speed=1时同一个位置的Note的Time，基于PseudoTime计算位置
-    - TimeToPseudoTime(offsetTime, speed) => offsetTime * speed;
-  - [ ] Note选择时，对于线下Note，基于Time进行选择；对于未出现Note，基于其刚出现时的PseudoTime选择
-    - 设置保证在Note出现时选中的Note在Note消失后依然被选中。
-  - [N] Hold实现：对于一个Hold，List<INote>中存放NoteHead和NoteTail两个元素，对于NoteHead超出界限但NoteTail未超出的额外设置一个List<Note>做临时存放
 
 # Info Panel
 
@@ -34,22 +17,12 @@
 
 # Editor
 
-- [B] 修复了撤销粘贴操作时，会更改已选中Note的Bug
-- [B] 修复了Shift+S可能会直接把Note设为Time=0的Bug（吧？
-- [C] 添加了一些下键的快捷方式
-  - 右键单击放置click
-  - 右键按住左右拖动放置flick
-  - 右键按住上下拖动放置hold
-    - 右键按住时按住shift放置slide-hold
-  - 按住Shift后拖动，将以横格线为基准放置slide note串。
-  - 右键按住时，单击左键取消放置note
 - [?] 单击选中Note时：
   - 选中该处重叠的所有Note
   - 选中单个Note
 - [?] 允许在判定线以下放置Note
-- [C] 即使背景Note靠近边界，也无法选中背景Note
 - [ ] 提供背景Note的编辑
-- [C] 取消了多选时选框的横向位置限制
+
 
 - [C] 钢琴音编辑面板不再阻止其他操作
   - [N] 钢琴音编辑面板提供音高数值(0-127)直接输入的功能
@@ -58,27 +31,9 @@
     - 如果不应用，是否需要添加另一个单独的音量设置？
 - [ ] 钢琴音编辑面板添加将钢琴音移至背景的按钮（需要钢琴音总览，不然移了就回不来了）
 
-- [N] 快捷键P：切换音符钢琴音状态
-  - 目前切换方式为
-    - 添加时，为空音添加一个钢琴音(音高C4/72，其他值为0)
-    - 删除时，直接删除钢琴音
-
-
 # Player Settings
 
-- [ ] Basic Commands移至工具栏
-  - [ ] View菜单中提供工具栏的开关
-
-- [N] 允许手动输入音乐速度
-- [N] 添加了Half和Reset的快捷音乐速度调整
-- [N] 加入上隐
-- [C] 取消了Show Links对Curve显示效果的开关，现在若Curve存在将始终显示
-
-- [N] 快捷键Num Enter：播放/暂停音乐
-
 - [ ] 线性渐变BPM
-- [N] 现在一个BPM段落的起止拍线为强调为蓝色
-- [B] 修复了部分情况bpm编辑时End处拍线不能正常添加的Bug
 
 - [ ] 谱面连接功能移至菜单栏
 
@@ -86,23 +41,4 @@
 
 - [C] 简化了Vertical Grid的设置
   - [ ] 在设置中恢复旧版设置方式
-- [B] 修复了设置纵格线>25时，重设格线有残留显示的Bug（Magic number打咩
-- [C] 当横格线设置为0时，更改“吸附到格线”为有效。
-- [C] 拆分了Snap To Grid，现在可以分别设置是否吸附到横纵格线
-- [C] 关闭纵格线Border时，不再吸附到场景边界
-- [C] 在两个bpm段落衔接时，最后一拍的子拍线的位置将不再按照与下一个bpm段落的起始时间的距离平分。
-  - [?] 在设置中恢复？
-
 - [ ] 按横格线间距填充Curve
-- [ ] 修改Curve使用操作
-  - 选中note后生成曲线后，单击Fill生成曲线
-  - 对note的size/speed等属性，额外提供按钮对选中的note进行变换。
-
-# Settings
-
-- [N] 允许设置滚轮灵敏度为负，效果为滚轮反向
-- [N] Preference: 隐藏无效果属性（部分ChartData、NoteData的属性没有任何实际效果，仅用于提供编辑操作。
-- [N] Preference: 区分钢琴note
-
-- [C] About、Update History、Tutorials合并入About页
-  - [?] 盐酸把About里的Deemo's Note Memory名字打错了.jpg

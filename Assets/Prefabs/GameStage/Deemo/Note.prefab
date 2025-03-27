@@ -93,7 +93,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4606028882190009843}
-  - component: {fileID: 8003899357211349317}
+  - component: {fileID: 3873625400187784241}
   m_Layer: 0
   m_Name: Note
   m_TagString: Untagged
@@ -120,7 +120,7 @@ Transform:
   - {fileID: 4829416683468112956}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8003899357211349317
+--- !u!114 &3873625400187784241
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -129,7 +129,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2331926903447275262}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa2c553e4792fb64ab6f06eff43b383a, type: 3}
+  m_Script: {fileID: 11500000, guid: 7c7f47d91b1912c4e97c566a45697e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _noteSpriteRenderer: {fileID: 5040793046721004696}

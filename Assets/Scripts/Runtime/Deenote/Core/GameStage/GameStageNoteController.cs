@@ -10,26 +10,17 @@ using UnityEngine;
 
 namespace Deenote.Core.GameStage
 {
-    internal sealed class GameStageNoteController : MonoBehaviour
+    internal abstract class GameStageNoteController : MonoBehaviour
     {
-        [SerializeField] SpriteRenderer _noteSpriteRenderer = default!;
-        [SerializeField] SpriteRenderer _holdBodySpriteRenderer = default!;
-
-        [SerializeField] SpriteRenderer _explosionEffectSpriteRenderer = default!;
-        [SerializeField] SpriteRenderer _circleEffectSpriteRenderer = default!;
-        [SerializeField] SpriteRenderer _waveEffectSpriteRenderer = default!;
-        [SerializeField] SpriteRenderer _glowEffectSpriteRenderer = default!;
-
-        private GamePlayManager _game = default!;
+        protected GamePlayManager _game = default!;
 
         public NoteModel NoteModel { get; private set; } = default!;
 
         private (Vector2, Vector2)? _linkLine;
-        private Color _waveColor;
         private float _noteColorAlpha;
 
         [SerializeField]
-        internal NoteDisplayState _state;
+        private NoteDisplayState _state;
 
         // Appear ahead time of note when sudden+ is 0,
         // The value may be affected if the note is following a high-speed note
@@ -112,85 +103,19 @@ namespace Deenote.Core.GameStage
                     SetNotePositionZ(_stageDeltaTime);
                     SetNoteSpriteAlpha();
                     SetLinkLine();
-                    SetHoldBodyDisplayLength(NoteModel.GetActualDuration());
+                    SetHoldBodyDisplayLength();
                     break;
                 case NoteDisplayState.Holding:
-                    OnHolding();
+                    SetNotePositionZ(0f);
+                    SetLinkLine();
+                    SetHoldBodyDisplayLength();
+                    SetHoldingHitEffect();
                     break;
                 case NoteDisplayState.HitEffect:
-                    OnHitEffect();
+                    SetNotePositionZ(0f);
+                    SetLinkLine();
+                    SetHitEffect(-_stageDeltaTime - NoteModel.GetActualDuration());
                     break;
-            }
-
-            void OnHolding()
-            {
-                SetNotePositionZ(0f);
-                SetLinkLine();
-                SetHoldBodyDisplayLength(_stageDeltaTime + NoteModel.GetActualDuration());
-
-                _game.AssertStageLoaded();
-
-                var stage = _game.Stage;
-
-                ref readonly var prefabs = ref stage.Args.HoldSpritePrefab;
-                // TODO: hold's hit effect on judgeline
-                ref readonly var effectPrefab = ref stage.Args.HitEffectSpritePrefabs;
-                _explosionEffectSpriteRenderer.transform.localScale = NoteModel.Size * effectPrefab.ExplosionScale * Vector3.one;
-                _explosionEffectSpriteRenderer.sprite = effectPrefab.Explosions[8];
-            }
-
-            void OnHitEffect()
-            {
-                SetNotePositionZ(0f);
-                SetLinkLine();
-                SetHoldBodyDisplayLength(0f);
-
-                _game.AssertStageLoaded();
-                var stage = _game.Stage;
-
-                ref readonly var prefabs = ref stage.Args.HitEffectSpritePrefabs;
-                _explosionEffectSpriteRenderer.transform.localScale = NoteModel.Size * prefabs.ExplosionScale * Vector3.one;
-
-                var time = -_stageDeltaTime - NoteModel.GetActualDuration();
-
-                // Explosion
-                {
-                    int frame = Mathf.FloorToInt(time / prefabs.ExplosionTime * (prefabs.Explosions.Length + 1));
-                    _explosionEffectSpriteRenderer.sprite =
-                        frame < prefabs.Explosions.Length ? prefabs.Explosions[frame] : null;
-                }
-                // Circle
-                {
-                    float ratio = time / prefabs.CircleTime;
-                    // Note: magic number?
-                    float size = Mathf.Pow(ratio, 0.6f) * prefabs.CircleScale;
-                    float alpha = Mathf.Pow(1 - ratio, 0.33f);
-                    _circleEffectSpriteRenderer.transform.localScale = new Vector3(size, size, size);
-                    _circleEffectSpriteRenderer.WithColorAlpha(alpha);
-                }
-                // Wave
-                {
-                    float ratio = time <= prefabs.WaveGrowTime
-                        ? time / prefabs.WaveGrowTime
-                        : 1 - (time - prefabs.WaveGrowTime) / prefabs.WaveFadeTime;
-                    float alpha = Mathf.Pow(ratio, 0.5f);
-                    _waveEffectSpriteRenderer.transform.localScale
-                        = NoteModel.Size * new Vector3(prefabs.WaveScale.x, ratio * prefabs.WaveScale.y, 1f);
-                    _waveEffectSpriteRenderer.color
-                        = _waveColor with { a = Mathf.Lerp(0, prefabs.WaveMaxAlpha, alpha) };
-                }
-                // Glow
-                {
-                    const float GlowHeight = 1f;
-
-                    float ratio = time <= prefabs.GlowGrowTime
-                        ? time / prefabs.GlowGrowTime
-                        : 1 - (time - prefabs.GlowGrowTime) / prefabs.GlowFadeTime;
-                    float height = ratio * GlowHeight;
-                    _glowEffectSpriteRenderer.transform.localScale =
-                        new Vector3(prefabs.GlowScale.x, height * prefabs.GlowScale.y, 1f);
-                    _glowEffectSpriteRenderer.color = prefabs.GlowColor with { a = ratio };
-                }
             }
         }
 
@@ -224,15 +149,7 @@ namespace Deenote.Core.GameStage
 
         public void RefreshHoldLength()
         {
-            if (_state is NoteDisplayState.Fall) {
-                SetHoldBodyDisplayLength(NoteModel.GetActualDuration());
-            }
-            else if (_state is NoteDisplayState.Holding) {
-                SetHoldBodyDisplayLength(_stageDeltaTime + NoteModel.GetActualDuration());
-            }
-            else {
-                SetHoldBodyDisplayLength(0f);
-            }
+            SetHoldBodyDisplayLength();
         }
 
         public void RefreshStageDeltaTime()
@@ -283,55 +200,18 @@ namespace Deenote.Core.GameStage
 
         #region Setters
 
+        protected abstract void SetHoldingHitEffect();
+
+        protected abstract void SetHitEffect(float timeAfterHit);
+
         private void SetNotePositionX()
         {
             transform.WithLocalPositionX(_game.ConvertNoteCoordPositionToWorldX(NoteModel.Position));
         }
 
-        private void SetNoteSprite()
-        {
-            _game.AssertStageLoaded();
+        protected abstract void SetNoteSprite();
 
-            var prefab = NoteModel switch {
-                { Kind: NoteModel.NoteKind.Swipe } => _game.Stage.Args.SwipeNoteSpritePrefab,
-                { Kind: NoteModel.NoteKind.Slide } => _game.Stage.Args.SlideNoteSpritePrefab,
-                { HasSounds: true } => _game.Stage.Args.BlackNoteSpritePrefab,
-                _ when _game.IsPianoNotesDistinguished => _game.Stage.Args.NoSoundNoteSpritePrefab,
-                _ => _game.Stage.Args.BlackNoteSpritePrefab,
-            };
-            _noteSpriteRenderer.sprite = prefab.Sprite;
-            _waveColor = prefab.WaveColor;
-
-            if (NoteModel.IsHold) {
-                _holdBodySpriteRenderer.gameObject.SetActive(true);
-            }
-            else {
-                _holdBodySpriteRenderer.gameObject.SetActive(false);
-            }
-        }
-
-        private void SetNoteSize()
-        {
-            _game.AssertStageLoaded();
-
-            var prefab = NoteModel switch {
-                { Kind: NoteModel.NoteKind.Swipe } => _game.Stage.Args.SwipeNoteSpritePrefab,
-                { Kind: NoteModel.NoteKind.Slide } => _game.Stage.Args.SlideNoteSpritePrefab,
-                { HasSounds: true } => _game.Stage.Args.BlackNoteSpritePrefab,
-                _ when _game.IsPianoNotesDistinguished => _game.Stage.Args.NoSoundNoteSpritePrefab,
-                _ => _game.Stage.Args.BlackNoteSpritePrefab,
-            };
-            _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(NoteModel.Size, 1f, 1f) * prefab.Scale;
-
-            ref readonly var hiteffectPrefab = ref _game.Stage.Args.HitEffectSpritePrefabs;
-            _explosionEffectSpriteRenderer.transform.localScale = NoteModel.Size * hiteffectPrefab.ExplosionScale * Vector3.one;
-
-            if (NoteModel.IsHold) {
-                ref readonly var holdPrefab = ref _game.Stage.Args.HoldSpritePrefab;
-                _holdBodySpriteRenderer.transform.WithLocalScaleX(NoteModel.Size * holdPrefab.ScaleX);
-                // Scale.y is set when time changed
-            }
-        }
+        protected abstract void SetNoteSize();
 
         private void SetNotePositionZ(float time)
         {
@@ -341,7 +221,7 @@ namespace Deenote.Core.GameStage
             transform.WithLocalPositionZ(z);
         }
 
-        private void SetNoteSpriteAlpha()
+        protected void SetNoteSpriteAlpha()
         {
             _game.AssertStageLoaded();
             Debug.Assert(_state is NoteDisplayState.Fall);
@@ -354,8 +234,10 @@ namespace Deenote.Core.GameStage
                 : 1f;
             _noteColorAlpha = MathUtils.MapTo(_stageDeltaTime, appearAheadTime, noteFadeInEndTime, 0, maxAlpha);
 
-            _noteSpriteRenderer.WithColorAlpha(_noteColorAlpha);
+            SetNoteSpriteRendererAlpha(_noteColorAlpha);
         }
+
+        protected abstract void SetNoteSpriteRendererAlpha(float alpha);
 
         private void SetLinkLine()
         {
@@ -376,26 +258,47 @@ namespace Deenote.Core.GameStage
             }
         }
 
-        private void SetHoldBodyDisplayLength(float time)
+        private void SetHoldBodyDisplayLength()
         {
+            float time;
+            bool isHolding;
+            if (_state is NoteDisplayState.Fall) {
+                time = NoteModel.GetActualDuration();
+                isHolding = false;
+            }
+            else if (_state is NoteDisplayState.Holding) {
+                time = _stageDeltaTime + NoteModel.GetActualDuration();
+                isHolding = true;
+            }
+            else {
+                time = 0f;
+                isHolding = false;
+            }
+
             _game.AssertStageLoaded();
 
             var scaleY = _game.ConvertNoteCoordTimeToHoldScaleY(time, NoteModel.Speed);
-            _holdBodySpriteRenderer.transform.WithLocalScaleY(scaleY);
+            SetHoldScaleY(scaleY, isHolding);
         }
+
+        protected abstract void SetHoldScaleY(float scaleY, bool isHolding);
 
         private void SetNoteSpriteColor()
         {
             _game.AssertStageLoaded();
             var stage = _game.Stage;
 
+            Color color;
             if (NoteModel.IsSelected)
-                _noteSpriteRenderer.WithColorRGB(stage.Args.NoteSelectedColor);
+                color = stage.Args.NoteSelectedColor;
             else if (NoteModel.IsCollided)
-                _noteSpriteRenderer.WithColorRGB(stage.Args.NoteCollidedColor);
+                color = stage.Args.NoteCollidedColor;
             else
-                _noteSpriteRenderer.WithColorRGB(Color.white);
+                color = Color.white;
+            SetNoteSpriteColorRGB(color);
         }
+
+        protected abstract void SetNoteSpriteColorRGB(Color color);
 
         private void SetAppearAheadTime0SuddenPlus(GameStageNoteController? previousStageNote)
         {
@@ -421,48 +324,15 @@ namespace Deenote.Core.GameStage
         {
             var state = GetState();
             if (Utils.SetField(ref _state, state)) {
-                switch (state) {
-                    case NoteDisplayState.Invisible:
-                        _noteSpriteRenderer.gameObject.SetActive(false);
-                        _holdBodySpriteRenderer.gameObject.SetActive(false);
-                        _explosionEffectSpriteRenderer.gameObject.SetActive(false);
-                        _explosionEffectSpriteRenderer.gameObject.SetActive(false);
-                        _circleEffectSpriteRenderer.gameObject.SetActive(false);
-                        _waveEffectSpriteRenderer.gameObject.SetActive(false);
-                        _glowEffectSpriteRenderer.gameObject.SetActive(false);
-                        break;
-                    case NoteDisplayState.Fall:
-                        _noteSpriteRenderer.gameObject.SetActive(true);
-                        _holdBodySpriteRenderer.gameObject.SetActive(true);
-                        _explosionEffectSpriteRenderer.gameObject.SetActive(false);
-                        _circleEffectSpriteRenderer.gameObject.SetActive(false);
-                        _waveEffectSpriteRenderer.gameObject.SetActive(false);
-                        _glowEffectSpriteRenderer.gameObject.SetActive(false);
-                        RefreshColoring();
-                        break;
-                    case NoteDisplayState.Holding:
-                        _noteSpriteRenderer.gameObject.SetActive(false);
-                        _holdBodySpriteRenderer.gameObject.SetActive(true);
-                        _explosionEffectSpriteRenderer.gameObject.SetActive(true);
-                        _circleEffectSpriteRenderer.gameObject.SetActive(false);
-                        _waveEffectSpriteRenderer.gameObject.SetActive(false);
-                        _glowEffectSpriteRenderer.gameObject.SetActive(false);
-                        break;
-                    case NoteDisplayState.HitEffect:
-                        _noteSpriteRenderer.gameObject.SetActive(false);
-                        _holdBodySpriteRenderer.gameObject.SetActive(false);
-                        _explosionEffectSpriteRenderer.gameObject.SetActive(true);
-                        _circleEffectSpriteRenderer.gameObject.SetActive(true);
-                        _waveEffectSpriteRenderer.gameObject.SetActive(true);
-                        _glowEffectSpriteRenderer.gameObject.SetActive(true);
-                        break;
-                }
+                OnStateChanged(state);
             }
         }
 
+        protected abstract void OnStateChanged(NoteDisplayState state);
+
         #endregion
 
-        public enum NoteDisplayState
+        protected enum NoteDisplayState
         {
             Inactive,
             Invisible,

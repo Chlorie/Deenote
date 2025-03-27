@@ -16,10 +16,9 @@ MonoBehaviour:
   NotePanelBaseLengthTime: 9.5
   NoteTimeToZBaseMultiplier: 8.91
   NoteFadeInRangePercent: 0.6556875
-  GamePlayNotePrefab: {fileID: 8003899357211349317, guid: 160a09d6b531cb34d876b0226dae8742,
+  GamePlayNotePrefab: {fileID: 3873625400187784241, guid: 160a09d6b531cb34d876b0226dae8742,
     type: 3}
-  PlacementNoteIndicatorPrefab: {fileID: 1012780103174288295, guid: d258ceafb7b62de4ba218040a2b6f8eb,
-    type: 3}
+  PlacementNoteIndicatorPrefab: {fileID: 0}
   EffectSoundAudioClip: {fileID: 8300000, guid: 13a0e647201f5094880b4da85ec719ee,
     type: 3}
   BlackNoteSpritePrefab:
