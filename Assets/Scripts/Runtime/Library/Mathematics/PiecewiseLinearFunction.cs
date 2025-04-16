@@ -8,12 +8,13 @@ namespace Deenote.Library.Mathematics
     public class PiecewiseLinearFunction
     {
         private readonly (float X, float Y)[] _nodes;
-        private bool _fillHorizontalBothSide;
+        private readonly bool _fillHorizontalBothSide;
 
         public PiecewiseLinearFunction(ReadOnlySpan<(float X, float Y)> nodes, bool fillHorizontalBothSide)
         {
             _nodes = new (float, float)[nodes.Length];
             nodes.CopyTo(_nodes);
+            _fillHorizontalBothSide = fillHorizontalBothSide;
         }
 
         public float GetY(float x)

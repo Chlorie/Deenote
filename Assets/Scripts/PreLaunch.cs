@@ -32,7 +32,7 @@ namespace Deenote
         }
 
         [RuntimeInitializeOnLoadMethod]
-        private static void UnregisterBuiltinPlugins()
+        private static void QuitRegisteration()
         {
             ApplicationManager.Quitting += QuitRegistration;
 

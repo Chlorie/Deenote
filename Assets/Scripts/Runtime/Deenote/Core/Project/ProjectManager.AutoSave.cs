@@ -23,6 +23,18 @@ namespace Deenote.Core.Project
 
         public event Action<ProjectSaveEventArgs>? ProjectSaved;
 
-        public readonly record struct ProjectSaveEventArgs();
+        public readonly record struct ProjectSaveEventArgs(ProjectSaveContents Contents)
+        {
+            public bool IsProjectSaved => Contents.HasFlag(ProjectSaveContents.Project);
+            public bool IsChartJsonsSaved => Contents.HasFlag(ProjectSaveContents.ChartJsons);
+        }
+
+        [Flags]
+        public enum ProjectSaveContents
+        {
+            None,
+            Project,
+            ChartJsons,
+        }
     }
 }

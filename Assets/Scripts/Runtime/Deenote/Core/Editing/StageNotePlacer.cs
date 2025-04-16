@@ -22,10 +22,20 @@ namespace Deenote.Core.Editing
         /// </summary>
         private const float SwipeHorizontalDragDeltaThreshold = 30f;
         /// <summary>
+        /// If music time changed, after enter note-placing state, if music time delta is greater
+        /// than the value, we never place a swipe note, and always place hold
+        /// </summary>
+        private const float SwipeVerticalDragDeltaTimeThreshold = 60f / 160f * 4;
+        /// <summary>
         /// Press and drag mouse vertical, the note will change to a hold
         /// when drag vertical delta value is greater than this
         /// </summary>
         private const float HoldVerticalDragDeltaThreshold = 30f;
+        /// <summary>
+        /// If music time changed after enter note-placing state, if music time delta is greater
+        /// than the value, we still placing a hold
+        /// </summary>
+        private const float HoldVerticalDragDeltaTimeThreshold = 60f / 160f / 4;
         /// <summary>
         /// If the cotangent of angle of drag direction and horizontal line is less than this
         /// The note is a swipe, otherwise, a hold
@@ -73,7 +83,7 @@ namespace Deenote.Core.Editing
             {
                 var delta = args.NewTime - args.OldTime;
                 _updateNoteCoord.Time += delta;
-                UpdateMoveIndicator(_updateNoteCoord, _updateMousePosition);
+                UpdatePlaceNote(_updateNoteCoord, _updateMousePosition);
             };
         }
 
@@ -115,36 +125,56 @@ namespace Deenote.Core.Editing
             // and horizontal line is within 30 degree
             delta.y *= SwipeDragAngleCotangent;
 
-            // Swipe
+            // Drag horizontal
             if (delta.x >= SwipeHorizontalDragDeltaThreshold && delta.x > delta.y) {
-                note.Kind = NoteModel.NoteKind.Swipe;
-                note.Duration = 0f;
-                indicator.Refresh();
-                // Indicator may be moved if create hold by dragging down
-                indicator.MoveTo(_beginNoteCoord);
+                // When music time changed to much, place hold
+                if (Mathf.Abs(_beginNoteCoord.Time - coord.Time) >= SwipeVerticalDragDeltaTimeThreshold)
+                    goto PlaceHold;
+                else
+                    goto PlaceSwipe;
             }
-            // Hold
+            // Drag vertical
             else if (delta.y >= HoldVerticalDragDeltaThreshold) {
-                note.Kind = _metaPrototype.Kind;
-                var dragEndCoordTime = _editor._game.Grids.Quantize(coord, false, SnapToTimeGrid).Time;
-                if (dragEndCoordTime >= _beginNoteCoord.Time) {
-                    note.Duration = dragEndCoordTime - _beginNoteCoord.Time;
-                    indicator.Refresh();
-                    indicator.MoveTo(_beginNoteCoord);
-                }
-                else {
-                    note.Duration = _beginNoteCoord.Time - dragEndCoordTime;
-                    indicator.Refresh();
-                    indicator.MoveTo(_beginNoteCoord with { Time = dragEndCoordTime });
-                }
+                goto PlaceHold;
             }
-            // Click
+            // No drag, but music changed to much, place hold
+            else if (Mathf.Abs(_beginNoteCoord.Time - coord.Time) >= HoldVerticalDragDeltaTimeThreshold) {
+                goto PlaceHold;
+            }
+            // No drag
             else {
-                note.Kind = _metaPrototype.Kind;
-                note.Duration = 0f;
+                goto PlaceClick;
+            }
+
+        PlaceSwipe:
+            note.Kind = NoteModel.NoteKind.Swipe;
+            note.Duration = 0f;
+            indicator.Refresh();
+            // Indicator may be moved if create hold by dragging down
+            indicator.MoveTo(_beginNoteCoord);
+            return;
+
+        PlaceHold:
+            note.Kind = _metaPrototype.Kind;
+            var dragEndCoordTime = _editor._game.Grids.Quantize(coord, false, SnapToTimeGrid).Time;
+            if (dragEndCoordTime >= _beginNoteCoord.Time) {
+                note.Duration = dragEndCoordTime - _beginNoteCoord.Time;
                 indicator.Refresh();
                 indicator.MoveTo(_beginNoteCoord);
             }
+            else {
+                note.Duration = _beginNoteCoord.Time - dragEndCoordTime;
+                indicator.Refresh();
+                indicator.MoveTo(_beginNoteCoord with { Time = dragEndCoordTime });
+            }
+            return;
+
+        PlaceClick:
+            note.Kind = _metaPrototype.Kind;
+            note.Duration = 0f;
+            indicator.Refresh();
+            indicator.MoveTo(_beginNoteCoord);
+            return;
         }
 
         private partial StateFlag EndPlaceSingleNote(NoteCoord coord, Vector2 mousePosition)

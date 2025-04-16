@@ -291,9 +291,9 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
             MoveTo(index, destIndex);
         }
         else if (index < _count - 1 && _comparer.Compare(editItem, _array[index + 1]) > 0) {
-            var destIndex = _array.AsSpan(index, _count - 1 - index).BinarySearch(editItem, _comparer);
+            var destIndex = _array.AsSpan(index + 1, _count - 1 - index).BinarySearch(editItem, _comparer);
             NumberUtils.FlipNegative(ref destIndex);
-            MoveTo(index, destIndex - 1);
+            MoveTo(index, index + destIndex);
         }
         else {
             // No Move

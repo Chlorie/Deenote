@@ -100,6 +100,7 @@ namespace Deenote.Core.Project
 
             _saveCts.Reset();
             await SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
+            ProjectSaved?.Invoke(new ProjectSaveEventArgs(ProjectSaveContents.Project));
         }
 
         public async UniTask SaveCurrentProjectToAsync(string targetFilePath)
@@ -108,7 +109,7 @@ namespace Deenote.Core.Project
 
             _saveCts.Reset();
             await SaveCurrentProjectToAsyncInternal(targetFilePath, _saveCts.Token);
-            ProjectSaved?.Invoke(new ProjectSaveEventArgs());
+            ProjectSaved?.Invoke(new ProjectSaveEventArgs(ProjectSaveContents.Project));
         }
 
         private async UniTask SaveCurrentProjectToAsyncInternal(string targetFilePath, CancellationToken cancellationToken)
@@ -119,16 +120,18 @@ namespace Deenote.Core.Project
             await ProjectIO.SaveAsync(CurrentProject, targetFilePath, cancellationToken);
         }
 
-        public UniTask SaveCurrentProjectChartJsonsAsync()
+        public async UniTask SaveCurrentProjectChartJsonsAsync()
         {
             ValidateProject();
-            return SaveCurrentProjectChartJsonsToAsyncInternal(Path.GetDirectoryName(CurrentProject.ProjectFilePath));
+            await SaveCurrentProjectChartJsonsToAsyncInternal(Path.GetDirectoryName(CurrentProject.ProjectFilePath));
+            ProjectSaved?.Invoke(new ProjectSaveEventArgs(ProjectSaveContents.ChartJsons));
         }
 
-        public UniTask SaveCurrentProjectChartJsonsToAsync(string targetDirectory)
+        public async UniTask SaveCurrentProjectChartJsonsToAsync(string targetDirectory)
         {
             ValidateProject();
-            return SaveCurrentProjectChartJsonsToAsyncInternal(targetDirectory);
+            await SaveCurrentProjectChartJsonsToAsyncInternal(targetDirectory);
+            ProjectSaved?.Invoke(new ProjectSaveEventArgs(ProjectSaveContents.ChartJsons));
         }
 
         private async UniTask SaveCurrentProjectChartJsonsToAsyncInternal(string targetDirectory)
