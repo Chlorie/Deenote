@@ -7,7 +7,7 @@ using Deenote.Entities.Models;
 using Deenote.Library;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
-using Deenote.Library.Numerics;
+using Deenote.Library.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;

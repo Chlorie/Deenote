@@ -1496,7 +1496,7 @@ namespace Deenote.InputSystem.InputActions
                 {
                     ""name"": ""modifier"",
                     ""id"": ""851cc208-4524-4d60-9f7a-97bdfbbdf6b8"",
-                    ""path"": ""<Keyboard>/alt"",
+                    ""path"": ""<Keyboard>/shift"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -1529,7 +1529,7 @@ namespace Deenote.InputSystem.InputActions
                 {
                     ""name"": ""modifier"",
                     ""id"": ""e0ecada5-434b-4291-86bc-3a516eacd7e9"",
-                    ""path"": ""<Keyboard>/alt"",
+                    ""path"": ""<Keyboard>/shift"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

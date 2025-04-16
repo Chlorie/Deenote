@@ -9,6 +9,7 @@ using Deenote.Localization;
 using Deenote.UI.Views.Panels;
 using Deenote.UIFramework.Controls;
 using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace Deenote.UI.Views
@@ -26,6 +27,7 @@ namespace Deenote.UI.Views
         [SerializeField] ToggleButton _slideNoteKindToggle = default!;
         [SerializeField] ToggleButton _swipeNoteKindToggle = default!;
         [SerializeField] TextBox _speedInput = default!;
+        [SerializeField] Button _speedToPlaceSpeedButton = default!;
         [SerializeField] Button _soundsButton = default!;
         [SerializeField] Button _soundsQuickAddRemoveButton = default!;
         [SerializeField] NoteInfoPianoSoundEditPanel _soundEditPanel = default!;
@@ -47,6 +49,7 @@ namespace Deenote.UI.Views
 
         private const string NoSoundButtonText = "-";
 
+        private float? _selectedNotesSpeed;
         private bool _isSoundQuickAdd;
 
         private void Awake()
@@ -76,9 +79,10 @@ namespace Deenote.UI.Views
 
             _positionInput.EditSubmitted += text =>
             {
-                if (float.TryParse(text, out var value))
+                if (float.TryParse(text, out var value)) 
                     MainSystem.StageChartEditor.EditSelectedNotesPosition(value);
-                SyncFloatInput(_positionInput, value);
+                // Re-sync value, as StageChartEditor may clamp value
+                NotifyMultiFloatValueChanged(_positionInput, MainSystem.StageChartEditor.Selector.SelectedNotes, n => n.Position);
             };
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NotePosition,
@@ -87,7 +91,7 @@ namespace Deenote.UI.Views
             {
                 if (float.TryParse(text, out var value))
                     MainSystem.StageChartEditor.EditSelectedNotesTime(value);
-                SyncFloatInput(_timeInput, value);
+                NotifyMultiFloatValueChanged(_timeInput, MainSystem.StageChartEditor.Selector.SelectedNotes, n => n.Time);
             };
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteTime,
@@ -104,7 +108,7 @@ namespace Deenote.UI.Views
             {
                 if (float.TryParse(text, out var value))
                     MainSystem.StageChartEditor.EditSelectedNotesSize(value);
-                SyncFloatInput(_sizeInput, value);
+                NotifyMultiFloatValueChanged(_sizeInput, MainSystem.StageChartEditor.Selector.SelectedNotes, n => n.Size);
             };
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteSize,
@@ -114,6 +118,7 @@ namespace Deenote.UI.Views
             {
                 if (float.TryParse(text, out var value))
                     MainSystem.StageChartEditor.EditSelectedNotesDuration(value);
+                NotifyMultiFloatValueChanged(_durationInput, MainSystem.StageChartEditor.Selector.SelectedNotes, n => n.Duration);
                 SyncFloatInput(_durationInput, value);
             };
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
@@ -156,11 +161,17 @@ namespace Deenote.UI.Views
             {
                 if (float.TryParse(text, out var value))
                     MainSystem.StageChartEditor.EditSelectedNotesSpeed(value);
-                SyncFloatInput(_speedInput, value);
+                NotifyMultiSpeedValueChanged(MainSystem.StageChartEditor.Selector.SelectedNotes);
+            };
+            _speedToPlaceSpeedButton.Clicked += () =>
+            {
+                if (_selectedNotesSpeed is { } speed)
+                    MainSystem.GamePlayManager.HighlightedNoteSpeed = speed;
             };
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteSpeed,
-                editor => NotifyMultiFloatValueChanged(_speedInput, editor.Selector.SelectedNotes, n => n.Speed));
+                editor => NotifyMultiSpeedValueChanged(editor.Selector.SelectedNotes));
+
 
             _soundsButton.Clicked += () =>
             {
@@ -193,7 +204,7 @@ namespace Deenote.UI.Views
             {
                 if (float.TryParse(text, out var value))
                     MainSystem.StageChartEditor.EditSelectedNotesShift(value);
-                SyncFloatInput(_shiftInput, value);
+                NotifyMultiFloatValueChanged(_shiftInput, MainSystem.StageChartEditor.Selector.SelectedNotes, n => n.Shift);
             };
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteShift,
@@ -243,6 +254,7 @@ namespace Deenote.UI.Views
                     case 0:
                         _noteHeaderText.SetLocalizedText(NoteNonSelectedHeader);
                         SetControlsActive(false);
+                        _speedToPlaceSpeedButton.IsInteractable = false;
                         NotifyMultiSoundsChanged(notes);
                         break;
                     case 1:
@@ -267,6 +279,8 @@ namespace Deenote.UI.Views
                                 break;
                         }
                         SyncFloatInput(_speedInput, note.Speed);
+                        _selectedNotesSpeed = note.Speed;
+                        _speedToPlaceSpeedButton.IsInteractable = true;
                         NotifyMultiSoundsChanged(notes);
                         SyncFloatInput(_shiftInput, note.Shift);
                         _eventIdInput.SetValueWithoutNotify(note.EventId);
@@ -281,7 +295,7 @@ namespace Deenote.UI.Views
                         NotifyMultiFloatValueChanged(_sizeInput, notes, n => n.Size);
                         NotifyMultiFloatValueChanged(_durationInput, notes, n => n.Duration);
                         NotifyMultiKindChanged(notes);
-                        NotifyMultiFloatValueChanged(_speedInput, notes, n => n.Speed);
+                        NotifyMultiSpeedValueChanged(notes);
                         NotifyMultiSoundsChanged(notes);
                         NotifyMultiFloatValueChanged(_shiftInput, notes, n => n.Shift);
                         NotifyMultiEventIdChanged(notes);
@@ -329,6 +343,20 @@ namespace Deenote.UI.Views
         private void NotifyMultiFloatValueChanged(TextBox textBox, ReadOnlySpan<NoteModel> notes, Func<NoteModel, float> selector)
             => textBox.SetValueWithoutNotify(notes.IsSameForAll(selector, out var value) ? value.ToString("F3") : "");
 
+        private bool NotifyMultiFloatValueChanged(TextBox textBox, ReadOnlySpan<NoteModel> notes, Func<NoteModel, float> selector, out float sameValue)
+        {
+            bool ret;
+            if (notes.IsSameForAll(selector, out sameValue)) {
+                ret = true;
+                textBox.SetValueWithoutNotify(sameValue.ToString("F3"));
+            }
+            else {
+                ret = false;
+                textBox.SetValueWithoutNotify("");
+            }
+            return ret;
+        }
+
         private void NotifyMultiBoolValueChanged(CheckBox checkBox, ReadOnlySpan<NoteModel> notes, Func<NoteModel, bool> selector)
         {
             if (notes.IsSameForAll(selector, out var value))
@@ -350,6 +378,18 @@ namespace Deenote.UI.Views
             }
             else {
                 _noteKindToggleGroup.ForceToggleOff();
+            }
+        }
+
+        private void NotifyMultiSpeedValueChanged(ReadOnlySpan<NoteModel> notes)
+        {
+            if (NotifyMultiFloatValueChanged(_speedInput, notes, n => n.Speed, out var speed)) {
+                _selectedNotesSpeed = speed;
+                _speedToPlaceSpeedButton.IsInteractable = true;
+            }
+            else {
+                _selectedNotesSpeed = null;
+                _speedToPlaceSpeedButton.IsInteractable = false;
             }
         }
 

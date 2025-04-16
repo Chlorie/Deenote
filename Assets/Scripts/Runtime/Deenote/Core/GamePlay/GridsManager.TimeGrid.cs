@@ -3,7 +3,7 @@
 using Deenote.Core.GameStage;
 using Deenote.Entities;
 using Deenote.Library;
-using Deenote.Library.Numerics;
+using Deenote.Library.Mathematics;
 using System.Collections.Generic;
 using UnityEngine;
 

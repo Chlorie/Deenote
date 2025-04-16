@@ -5,7 +5,7 @@ using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Library;
-using Deenote.Library.Numerics;
+using Deenote.Library.Mathematics;
 using UnityEngine;
 
 namespace Deenote.Core.GameStage

@@ -5,6 +5,7 @@ using Deenote.Core.Project;
 using Deenote.Entities;
 using Deenote.Library;
 using Deenote.Library.Components;
+using Deenote.Library.Mathematics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -204,19 +205,22 @@ namespace Deenote.GamePlay.UI
             {
                 float alpha;
                 float scale;
-                if (deltaTime <= _args.ComboCircleStartTime) {
-                    scale = alpha = 0f;
-                }
-                else if (deltaTime <= _args.ComboCircleStartTime + _args.ComboCircleScaleIncTime) {
-                    float ratio = (deltaTime - _args.ComboCircleStartTime) / _args.ComboCircleScaleIncTime;
-                    scale = Mathf.Lerp(0f, _args.ComboCircleMaxScale, ratio);
+                if (deltaTime <= _args.ComboCircleScaleStartTime)
+                    scale = 0f;
+                else if (deltaTime <= _args.ComboCircleScaleEndTime)
+                    scale = MathUtils.MapTo(deltaTime, _args.ComboCircleScaleStartTime, _args.ComboCircleScaleEndTime, 0f, _args.ComboCircleMaxScale);
+                else
+                    scale = 0f;
 
-                    float endTime = _args.ComboCircleStartTime + _args.ComboCircleScaleIncTime;
-                    alpha = Mathf.InverseLerp(endTime, _args.ComboCircleFadeOutStartTime, deltaTime);
-                }
-                else {
-                    scale = alpha = 0f;
-                }
+                if (deltaTime <= _args.ComboCircleFadeInStartTime)
+                    alpha = 0f;
+                else if (deltaTime <= _args.ComboCircleFadeInEndTime)
+                    alpha = Mathf.InverseLerp(_args.ComboCircleScaleStartTime, _args.ComboCircleScaleEndTime, deltaTime);
+                else if (deltaTime <= _args.ComboCircleFadeOutStartTime)
+                    alpha = 1f;
+                else
+                    alpha = Mathf.InverseLerp(_args.ComboCircleScaleEndTime, _args.ComboCircleFadeOutStartTime, deltaTime);
+
                 _shockWaveCircleImage.transform.localScale = new Vector3(scale, scale, scale);
                 _shockWaveCircleImage.color = Color.white with { a = alpha };
             }

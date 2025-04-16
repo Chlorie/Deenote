@@ -13,8 +13,27 @@ MonoBehaviour:
   m_Name: GameStageArgs
   m_EditorClassIdentifier: 
   NotePanelWidth: 6.52
-  NotePanelBaseLengthTime: 9.5
-  NoteTimeToZBaseMultiplier: 8.91
+  NotePanelBaseLength: 63.4
+  NoteTimeToZBaseMultiplier: 17.4
+  NoteTimeToZBaseMultipliers:
+  - 8.91
+  - 7
+  - 6.39
+  - 5.86
+  - 5.86
+  - 5.86
+  - 6.1
+  - 6.6
+  - 6.8
+  - 7.45
+  - 8
+  - 9
+  - 10
+  - 11.1
+  - 13
+  - 14
+  - 15
+  - 17.4
   NoteFadeInRangePercent: 0.6556875
   GamePlayNotePrefab: {fileID: 3873625400187784241, guid: 160a09d6b531cb34d876b0226dae8742,
     type: 3}
@@ -39,10 +58,11 @@ MonoBehaviour:
     Sprite: {fileID: 21300000, guid: 2bdb7fff29c7188438a4ef92b22bc594, type: 3}
     WaveColor: {r: 0.41320753, g: 0.5556929, b: 1, a: 1}
   HoldSpritePrefab:
-    ScaleX: 1.37
-    Sprite: {fileID: 21300000, guid: ebababda2d10551409fb9f670cc9d09a, type: 3}
+    ScaleX: 4
+    Sprite: {fileID: 21300000, guid: a37196797a6ee5f4d9b122c0420fe70e, type: 3}
   HitEffectSpritePrefabs:
     HitEffectTime: 0.8
+    HoldingExplosion: {fileID: 21300000, guid: 90bd11e1397b2664ab9cb01a43eaed22, type: 3}
     Explosions:
     - {fileID: 0}
     - {fileID: 21300000, guid: ed9068d14eb67ad4f821824556344b7e, type: 3}

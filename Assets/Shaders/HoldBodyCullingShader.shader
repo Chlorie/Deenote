@@ -1,4 +1,4 @@
-Shader "Custom/HoldBodyCullingShader"
+﻿Shader "Custom/HoldBodyCullingShader"
 {
     Properties
     {
@@ -13,6 +13,7 @@ Shader "Custom/HoldBodyCullingShader"
 
 		Lighting Off
 		ZWrite Off
+        Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
@@ -26,6 +27,7 @@ Shader "Custom/HoldBodyCullingShader"
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                float4 color : COLOR;
             };
 
             struct v2f
@@ -33,6 +35,7 @@ Shader "Custom/HoldBodyCullingShader"
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float4 worldPos : TEXCOORD1;
+                float4 color : COLOR;
             };
 
             sampler2D _MainTex;
@@ -46,6 +49,7 @@ Shader "Custom/HoldBodyCullingShader"
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+                o.color = v.color;
                 return o;
             }
 
@@ -59,6 +63,7 @@ Shader "Custom/HoldBodyCullingShader"
                 }
 
                 fixed4 col = tex2D(_MainTex, i.uv);
+                col *= i.color;
                 return col;
             }
             ENDCG

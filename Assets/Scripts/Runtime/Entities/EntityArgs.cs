@@ -14,7 +14,7 @@ namespace Deenote.Entities
         private const float NotePositionCollisionThreshold = 0.01f;
 
         private const float MinNoteSize = 0.1f;
-        private const float MaxNoteSize = 5f;
+        //private const float MaxNoteSize = 5f;
         private const float MinNoteSpeed = 0.1f;
         private const float MaxNoteSpeed = 20f;
 
@@ -22,7 +22,7 @@ namespace Deenote.Entities
 
         public static float ClampPosition(float position) => Mathf.Clamp(position, -StageMaxPosition, StageMaxPosition);
 
-        public static float ClampSize(float size) => Mathf.Clamp(size, MinNoteSize, MaxNoteSize);
+        public static float ClampSize(float size) => Mathf.Max(size, MinNoteSize);
 
         public static float ClampNoteSpeed(float speed) => Mathf.Clamp(speed, MinNoteSpeed, MaxNoteSpeed);
 

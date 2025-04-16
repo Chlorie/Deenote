@@ -17,3 +17,5 @@ MonoBehaviour:
   BackgroundMaskMaxAlpha: 1
   BackgroundMaskPeriod: 2
   JudgeLineHitEffectAlphaDecTime: 0.5
+  HoldingBodyColor: {r: 0.99355346, g: 1, b: 0.76792455, a: 1}
+  HoldingExplosionScaleY: 1.5

@@ -5,7 +5,7 @@ using Deenote.Core.GamePlay;
 using Deenote.Entities;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
-using Deenote.Library.Numerics;
+using Deenote.Library.Mathematics;
 using Deenote.UIFramework.Controls;
 using System;
 using UnityEngine;

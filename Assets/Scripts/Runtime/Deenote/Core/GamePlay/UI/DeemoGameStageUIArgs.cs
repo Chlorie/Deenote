@@ -20,9 +20,11 @@ namespace Deenote.GamePlay.UI
         public float ComboShadowMinAlpha;
         public float ComboShadowMaxScale;
         [Header("Combo Wave")]
-        public float ComboCircleStartTime;
-        public float ComboCircleScaleIncTime;
+        public float ComboCircleScaleStartTime;
+        public float ComboCircleScaleEndTime;
         public float ComboCircleMaxScale;
+        public float ComboCircleFadeInStartTime;
+        public float ComboCircleFadeInEndTime;
         public float ComboCircleFadeOutStartTime;
         [Header("Combo ShockWave")]
         public float ComboShockWaveAlphaIncTime;

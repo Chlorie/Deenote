@@ -18,9 +18,11 @@ MonoBehaviour:
   ComboShadowDuration: 0.25
   ComboShadowMinAlpha: 0.1
   ComboShadowMaxScale: 1.6
-  ComboCircleStartTime: 0.04
-  ComboCircleScaleIncTime: 0.18
+  ComboCircleScaleStartTime: 0.04
+  ComboCircleScaleEndTime: 0.22
   ComboCircleMaxScale: 2.5
+  ComboCircleFadeInStartTime: 0.04
+  ComboCircleFadeInEndTime: 0.07
   ComboCircleFadeOutStartTime: 0.15
   ComboShockWaveAlphaIncTime: 0
   ComboShockWaveMoveTime: 0.12

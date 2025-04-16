@@ -11,6 +11,7 @@ namespace Deenote.Core.GameStage
         [SerializeField] SpriteRenderer _noteSpriteRenderer = default!;
         [SerializeField] SpriteRenderer _holdBodySpriteRenderer = default!;
 
+        [SerializeField] SpriteRenderer _holdingExplosionSpriteRenderer = default!;
         [SerializeField] SpriteRenderer _explosionEffectSpriteRenderer = default!;
         [SerializeField] SpriteRenderer _circleEffectSpriteRenderer = default!;
         [SerializeField] SpriteRenderer _waveEffectSpriteRenderer = default!;
@@ -18,16 +19,18 @@ namespace Deenote.Core.GameStage
 
         private Color _waveColor;
 
+        private DeemoGameStageController? _deemoStage;
+        private DeemoGameStageController Stage => _deemoStage ??= (DeemoGameStageController)_game.Stage!;
+
         protected override void SetHoldingHitEffect()
         {
             _game.AssertStageLoaded();
 
             var stage = _game.Stage;
 
-            ref readonly var prefabs = ref stage.Args.HoldSpritePrefab;
-            // TODO: hold's hit effect on judgeline
-            ref readonly var effectPrefab = ref stage.Args.HitEffectSpritePrefabs;
-            _explosionEffectSpriteRenderer.sprite = effectPrefab.Explosions[8];
+            //ref readonly var prefabs = ref stage.Args.HoldSpritePrefab;
+            //ref readonly var effectPrefab = ref stage.Args.HitEffectSpritePrefabs;
+            //_holdingExplosionSpriteRenderer.sprite = effectPrefab.HoldingExplosion;
         }
 
         protected override void SetHitEffect(float time)
@@ -113,7 +116,10 @@ namespace Deenote.Core.GameStage
             _noteSpriteRenderer.gameObject.transform.localScale = new Vector3(NoteModel.Size, 1f, 1f) * prefab.Scale;
 
             ref readonly var hiteffectPrefab = ref _game.Stage.Args.HitEffectSpritePrefabs;
-            _explosionEffectSpriteRenderer.transform.localScale = NoteModel.Size * hiteffectPrefab.ExplosionScale * Vector3.one;
+            var explosionEffectScale = NoteModel.Size * hiteffectPrefab.ExplosionScale * Vector3.one;
+            _explosionEffectSpriteRenderer.transform.localScale = explosionEffectScale;
+            explosionEffectScale.y *= Stage.DeemoArgs.HoldingExplosionScaleY;
+            _holdingExplosionSpriteRenderer.transform.localScale = explosionEffectScale;
 
             if (NoteModel.IsHold) {
                 ref readonly var holdPrefab = ref _game.Stage.Args.HoldSpritePrefab;
@@ -130,6 +136,9 @@ namespace Deenote.Core.GameStage
         protected override void SetHoldScaleY(float scaleY, bool isHolding)
         {
             _holdBodySpriteRenderer.transform.WithLocalScaleY(scaleY);
+            _holdBodySpriteRenderer.color = isHolding
+                ? Stage.DeemoArgs.HoldingBodyColor
+                : Color.white;
         }
 
         protected override void SetNoteSpriteColorRGB(Color color)
@@ -143,7 +152,7 @@ namespace Deenote.Core.GameStage
                 case NoteDisplayState.Invisible:
                     _noteSpriteRenderer.gameObject.SetActive(false);
                     _holdBodySpriteRenderer.gameObject.SetActive(false);
-                    _explosionEffectSpriteRenderer.gameObject.SetActive(false);
+                    _holdingExplosionSpriteRenderer.gameObject.SetActive(false);
                     _explosionEffectSpriteRenderer.gameObject.SetActive(false);
                     _circleEffectSpriteRenderer.gameObject.SetActive(false);
                     _waveEffectSpriteRenderer.gameObject.SetActive(false);
@@ -152,6 +161,7 @@ namespace Deenote.Core.GameStage
                 case NoteDisplayState.Fall:
                     _noteSpriteRenderer.gameObject.SetActive(true);
                     _holdBodySpriteRenderer.gameObject.SetActive(true);
+                    _holdingExplosionSpriteRenderer.gameObject.SetActive(false);
                     _explosionEffectSpriteRenderer.gameObject.SetActive(false);
                     _circleEffectSpriteRenderer.gameObject.SetActive(false);
                     _waveEffectSpriteRenderer.gameObject.SetActive(false);
@@ -161,7 +171,8 @@ namespace Deenote.Core.GameStage
                 case NoteDisplayState.Holding:
                     _noteSpriteRenderer.gameObject.SetActive(false);
                     _holdBodySpriteRenderer.gameObject.SetActive(true);
-                    _explosionEffectSpriteRenderer.gameObject.SetActive(true);
+                    _holdingExplosionSpriteRenderer.gameObject.SetActive(true);
+                    _explosionEffectSpriteRenderer.gameObject.SetActive(false);
                     _circleEffectSpriteRenderer.gameObject.SetActive(false);
                     _waveEffectSpriteRenderer.gameObject.SetActive(false);
                     _glowEffectSpriteRenderer.gameObject.SetActive(false);
@@ -169,6 +180,7 @@ namespace Deenote.Core.GameStage
                 case NoteDisplayState.HitEffect:
                     _noteSpriteRenderer.gameObject.SetActive(false);
                     _holdBodySpriteRenderer.gameObject.SetActive(false);
+                    _holdingExplosionSpriteRenderer.gameObject.SetActive(false);
                     _explosionEffectSpriteRenderer.gameObject.SetActive(true);
                     _circleEffectSpriteRenderer.gameObject.SetActive(true);
                     _waveEffectSpriteRenderer.gameObject.SetActive(true);

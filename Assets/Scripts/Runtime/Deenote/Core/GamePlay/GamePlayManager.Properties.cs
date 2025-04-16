@@ -60,6 +60,8 @@ namespace Deenote.Core.GamePlay
             };
         }
 
+        private const float ZeroAvoidHighlightedSpeed = 0.1f;
+
         private float _highlightedNoteSpeed_bf;
         private bool _applySpeedDifference_bf;
         private bool _filterNoteSpeed_bf;
@@ -74,6 +76,8 @@ namespace Deenote.Core.GamePlay
         {
             get => _highlightedNoteSpeed_bf;
             set {
+                if (value <= 0f)
+                    value = ZeroAvoidHighlightedSpeed;
                 if (Utils.SetField(ref _highlightedNoteSpeed_bf, value)) {
                     if (IsChartLoaded() && IsStageLoaded()) {
                         foreach (var note in NotesManager.OnStageNotes) {

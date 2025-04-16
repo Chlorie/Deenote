@@ -1,6 +1,7 @@
 #nullable enable
 
 using Deenote.Core.Editing;
+using Deenote.Library.Mathematics;
 using System;
 using UnityEngine;
 
@@ -10,11 +11,29 @@ namespace Deenote.Core.GameStage.Args
     public sealed class GameStageArgs : ScriptableObject
     {
         public float NotePanelWidth;
-        public float NotePanelBaseLengthTime;
+        public float NotePanelBaseLength;
         /// <summary>
         /// Multiplier when note speed is 1
         /// </summary>
         public float NoteTimeToZBaseMultiplier;
+        [SerializeField, Tooltip("Actual multipliers for every speed from 1.0 ~ 9.5, with interval 0.5")]
+        private float[] NoteTimeToZBaseMultipliers = default!;
+
+        private PiecewiseLinearFunction? _noteTimeToZBaseMultiplierFunc;
+        public PiecewiseLinearFunction NoteTimeToZBaseMultiplierFunction
+        {
+            get {
+                if (_noteTimeToZBaseMultiplierFunc is null) {
+                    var nodes = (stackalloc (float Speed, float Multiplier)[NoteTimeToZBaseMultipliers.Length]);
+                    for (int i = 0; i < NoteTimeToZBaseMultipliers.Length; i++) {
+                        nodes[i] = (i * 0.5f + 1.0f, NoteTimeToZBaseMultipliers[i]);
+                    }
+                    _noteTimeToZBaseMultiplierFunc = new PiecewiseLinearFunction(nodes, fillHorizontalBothSide: true);
+                }
+                return _noteTimeToZBaseMultiplierFunc;
+            }
+        }
+
         [Range(0f, 1f)] public float NoteFadeInRangePercent;
         //public float NoteFadeInZRange;=42.8
         // Note: Use ZRange will cause low alpha notes when adjust sudden +,
@@ -63,6 +82,7 @@ namespace Deenote.Core.GameStage.Args
             public float HitEffectTime;
 
             [Header("Explosion")]
+            public Sprite HoldingExplosion;
             public Sprite[] Explosions;
             public float ExplosionScale;
             public float ExplosionTime;

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Deenote.Library.Numerics
+namespace Deenote.Library.Mathematics
 {
     public static class NumberUtils
     {

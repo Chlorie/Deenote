@@ -49,15 +49,7 @@ namespace Deenote.UIFramework.Controls
         public int Value
         {
             get => _value;
-            set {
-                value = Mathf.Clamp(value, MinValue, MaxValue);
-                if (Utils.SetField(ref _value, value)) {
-                    SetButtonActive();
-                    ValueChanged?.Invoke(value);
-                }
-                // Text may still be different after clamp
-                _textBox.SetValueWithoutNotify(FormatDisplayText(value));
-            }
+            set => SetValue(value, true);
         }
 
         public void SetInputParser(Func<string, int?> parser)
@@ -71,9 +63,18 @@ namespace Deenote.UIFramework.Controls
         }
 
         public void SetValueWithoutNotify(int value)
+            => SetValue(value, false);
+
+        private void SetValue(int value, bool notify)
         {
-            _value = value;
-            SetButtonActive();
+            value = Mathf.Clamp(value, MinValue, MaxValue);
+            if (Utils.SetField(ref _value, value)) {
+                SetButtonActive();
+                if (notify) {
+                    ValueChanged?.Invoke(value);
+                }
+            }
+            // Text may still be different after clamp
             _textBox.SetValueWithoutNotify(FormatDisplayText(value));
         }
 
@@ -103,6 +104,7 @@ namespace Deenote.UIFramework.Controls
         private void Start()
         {
             _value = Mathf.Clamp(_value, MinValue, MaxValue);
+            SetButtonActive();
         }
 
         public void Initialize(int minValue, int maxValue)

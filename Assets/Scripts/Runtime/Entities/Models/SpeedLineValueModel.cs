@@ -16,7 +16,7 @@ namespace Deenote.Entities.Models
         public float StartTime;
         public WarningType WarningType;
 
-        public SpeedLineValueModel(float speed, float startTime, WarningType warningType)
+        public SpeedLineValueModel(float speed, float startTime, WarningType warningType = WarningType.Default)
         {
             Speed = speed;
             StartTime = startTime;

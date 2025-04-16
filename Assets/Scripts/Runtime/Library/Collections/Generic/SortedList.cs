@@ -2,7 +2,7 @@
 
 using CommunityToolkit.Diagnostics;
 using Deenote.Library.Collections;
-using Deenote.Library.Numerics;
+using Deenote.Library.Mathematics;
 using System;
 using System.Collections;
 using System.Collections.Generic;

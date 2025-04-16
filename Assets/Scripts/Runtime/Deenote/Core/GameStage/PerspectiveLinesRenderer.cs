@@ -85,7 +85,7 @@ namespace Deenote.Core.GameStage
 
             var args = manager.Stage.Args;
             float percent = manager.VisibleRangePercentage;
-            float cutoff = args.NotePanelBaseLengthTime * args.NoteTimeToZBaseMultiplier * percent;
+            float cutoff = args.NotePanelBaseLength * percent;
             _props.SetFloat(CutOffZ, cutoff);
             _props.SetFloat(FadeInZ, cutoff * args.NoteFadeInRangePercent);
         }

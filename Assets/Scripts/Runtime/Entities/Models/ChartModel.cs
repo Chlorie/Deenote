@@ -4,7 +4,6 @@ using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models.Serialization;
 using Deenote.Library.Collections.Generic;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -78,6 +77,7 @@ namespace Deenote.Entities.Models
                 ChartSerializationVersion.DeemoIIV2 => ChartSerializationVersions.DeemoIIV2,
                 _ => throw new NotImplementedException(),
             };
+            this.GenerateSpeedLines();
             return ChartSerializer.Serialize(this, versions);
         }
     }

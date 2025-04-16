@@ -5,7 +5,7 @@ using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Library.Collections;
 using Deenote.Library.Collections.Generic;
-using Deenote.Library.Numerics;
+using Deenote.Library.Mathematics;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

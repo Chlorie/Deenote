@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace Deenote.Library.Numerics
+namespace Deenote.Library.Mathematics
 {
     public static class MathUtils
     {

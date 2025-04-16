@@ -345,17 +345,19 @@ Dialog_AboutDevelopers_Page_Trarizon=Trarizon
 Dialog_AboutDevelopers_Page_Trarizon_Title=Trarizon
 Dialog_AboutDevelopers_Page_Trarizon_Content="""
         This is Trarizon. I started refactoring this project after finishing my undergraduate project, and for many reasons I just about to finish it now.
-        I don't know if I will have time to continue optimizing this project. Anyway, I will if I can, but please don't expect too much...
+        I don't know if I will have time to continue optimizing this project, so don't expect too much...
 
     - Trarizon
-    - 9 Mar 2025
+    - 16 Apr 2025
     """
 
 ## Tutorials
 
 Dialog_AboutTurorials_Page_Tutorial=Tutorial
 Dialog_AboutTurorials_Page_Tutorial_Title=Tutorial
-Dialog_AboutTurorials_Page_Tutorial_Content=<color=#800000ff>Full English tutorial coming soon</color>
+Dialog_AboutTurorials_Page_Tutorial_Content="""
+    <color=#800000ff>Full English tutorial coming soon</color>
+    """
 
 Dialog_AboutTurorials_Page_Shortcuts=Shortcuts
 Dialog_AboutTurorials_Page_Shortcuts_Title=Shortcuts
@@ -424,7 +426,7 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
-    Completely refactored, support editing DEEMO II charts (note speed, hold, flick)
+    Completely refactored, partially support editing DEEMO II charts (note speed, hold, flick)
     """
 
 AboutDialog_Versions_Dnt_0_7=Deenote 0.7

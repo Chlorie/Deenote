@@ -21,6 +21,8 @@ namespace Deenote.Core.GameStage
         [Header("Args")]
         [SerializeField] DeemoGameStageArgs _deemoArgs = default!;
 
+        public DeemoGameStageArgs DeemoArgs => _deemoArgs;
+
         protected internal override void OnInstantiate(GamePlayManager manager)
         {
             base.OnInstantiate(manager);

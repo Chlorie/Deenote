@@ -6,6 +6,7 @@ using Deenote.Library.Collections;
 using Deenote.Library.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Deenote.Entities.Models
@@ -15,10 +16,6 @@ namespace Deenote.Entities.Models
         // `_visibleNotes` stores all visible `NoteModel`s and their `NoteTailNode`s if is hold
         // and `_holdCount` is ensured to be equal to count of `NoteTailNode` in `_visibleNotes`
         internal int _holdCount;
-        //private List<IStageNoteNode> _visibleNoteNodes;
-        //internal List<SoundNoteModel> _backgroundNotes;
-        //internal List<SpeedChangeWarningModel> _speedChangeWarnings;
-        //internal List<SpeedLineValueModel> _speedLines;
 
         /// <summary>
         /// Notes that will be displayed on stage.
@@ -35,6 +32,26 @@ namespace Deenote.Entities.Models
 
         public SpanUtils.OfTypeIterator<IStageNoteNode, NoteModel> EnumerateNoteModels()
             => NoteNodes.AsSpan().OfType<IStageNoteNode, NoteModel>();
+
+        /// <summary>
+        /// Generate SpeedLines according to notes in chart, call it before save to json
+        /// </summary>
+        /// <remarks>
+        /// Currently Deenote does not support any way to edit speed lines directly
+        /// (because it looks like a duplicated property)
+        /// </remarks>
+        private void GenerateSpeedLines()
+        {
+            var speedDiffNotes = NoteNodes
+                .OfType<NoteModel>()
+                .Adjacent()
+                .Where(tpl => tpl.Item1.Speed != tpl.Item2.Speed);
+
+            SpeedLines.Clear();
+            foreach (var (prev,next) in speedDiffNotes) {
+                SpeedLines.AddFromEnd(new SpeedLineValueModel(next.Speed, next.Time));
+            }
+        }
 
         internal CollisionResult GetCollidedNotesTo(NoteModel note)
         {

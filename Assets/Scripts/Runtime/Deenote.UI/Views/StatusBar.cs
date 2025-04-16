@@ -2,7 +2,7 @@
 
 using Deenote.Library;
 using Deenote.Library.Components;
-using Deenote.Library.Numerics;
+using Deenote.Library.Mathematics;
 using Deenote.Localization;
 using Deenote.UIFramework.Controls;
 using System;

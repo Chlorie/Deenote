@@ -13,5 +13,8 @@ namespace Deenote.Core.GameStage.Args
         public float BackgroundMaskMaxAlpha;
         public float BackgroundMaskPeriod;
         public float JudgeLineHitEffectAlphaDecTime;
+        [Header("Note")]
+        public Color HoldingBodyColor;
+        public float HoldingExplosionScaleY;
     }
 }

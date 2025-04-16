@@ -15,7 +15,15 @@ namespace Deenote.Core.GamePlay
         /// We start to track note when note appears as if sudden+ is 0, and sets its
         /// visibility according to <see cref="StageNoteAppearAheadTime"/>
         /// </remarks>
-        public float StageNoteActiveAheadTime => Stage!.Args.NotePanelBaseLengthTime / ActualNoteFallSpeed;
+        public float StageNoteActiveAheadTime
+        {
+            get {
+                var args = Stage!.Args;
+                var fallSpeed = ActualNoteFallSpeed;
+                return args.NotePanelBaseLength / args.NoteTimeToZBaseMultiplierFunction.GetY(fallSpeed) / fallSpeed;
+            }
+        }
+
         public float GetStageNoteActiveAheadTime(float noteSpeed) => StageNoteActiveAheadTime / GetDisplayNoteSpeed(noteSpeed);
         public float GetStageNoteActiveTime(IStageNoteNode node) => node.Time - GetStageNoteActiveAheadTime(node.Speed);
 
@@ -33,7 +41,7 @@ namespace Deenote.Core.GamePlay
         /// <br/>
         /// The return value may be useless if note is not active on stage
         /// </summary>
-        internal float GetNotePseudoTime(float time,float noteSpeed)
+        internal float GetNotePseudoTime(float time, float noteSpeed)
         {
             var currentTime = MusicPlayer.Time;
             return currentTime + (time - currentTime) * GetDisplayNoteSpeed(noteSpeed);
@@ -82,10 +90,10 @@ namespace Deenote.Core.GamePlay
         }
 
         private float ConvertNoteCoordTimeToWorldZBase(float time)
-            => time * Stage!.Args.NoteTimeToZBaseMultiplier;
+            => time * Stage!.Args.NoteTimeToZBaseMultiplierFunction.GetY(ActualNoteFallSpeed);
 
         private float ConvertWorldZToNoteCoordTimeBase(float z)
-            => z / Stage!.Args.NoteTimeToZBaseMultiplier;
+            => z / Stage!.Args.NoteTimeToZBaseMultiplierFunction.GetY(ActualNoteFallSpeed);
 
         #endregion
     }

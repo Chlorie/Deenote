@@ -61,11 +61,11 @@ MonoBehaviour:
   m_Content: {fileID: 7757128051012120691}
   m_Horizontal: 0
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 12
   m_Viewport: {fileID: 6854254262323782888}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 0}
@@ -323,10 +323,10 @@ RectTransform:
   - {fileID: 5369831007566672953}
   m_Father: {fileID: 7757128051012120691}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 126, y: -15}
+  m_SizeDelta: {x: 252, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2877285421996412071
 MonoBehaviour:
@@ -860,10 +860,10 @@ RectTransform:
   - {fileID: 5466683901973057027}
   m_Father: {fileID: 7757128051012120691}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 126, y: -38}
+  m_SizeDelta: {x: 252, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1817326836322510781
 MonoBehaviour:
@@ -1066,7 +1066,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 12
   m_Viewport: {fileID: 5888131038333523291}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 0}
@@ -3496,6 +3496,11 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 7257949920264679021, guid: 635c81a2bfb94164eb7f652f1a1aab4b,
+        type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 7257949920264679021, guid: 635c81a2bfb94164eb7f652f1a1aab4b,
         type: 3}
       propertyPath: m_HorizontalAlignment
