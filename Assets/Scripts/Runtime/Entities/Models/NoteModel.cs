@@ -82,8 +82,7 @@ namespace Deenote.Entities.Models
 
             if (cloneSounds) {
                 if (Sounds.Count > 0) {
-                    note.Sounds.EnsureCapacity(Sounds.Count);
-                    note.Sounds.AddRange(Sounds.AsSpan());
+                    note.Sounds.Replace(Sounds.AsSpan());
                 }
                 else {
                     note.Sounds.Clear();

@@ -85,7 +85,7 @@ namespace Deenote.UI.Dialogs
                     if (inputBar.InputText is { } it) {
                         _fileNameInput.Value = it;
                     }
-                    _confirmButton.IsInteractable = false;
+                    _confirmButton.IsInteractable = PathUtils.IsValidFileName(inputBar.InputText);
                     break;
             }
         }
