@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f23e918e15ccd440bb5fb9ecdfb41b3, type: 3}
+  m_Name: DeemoGameStageArgs
+  m_EditorClassIdentifier: 
+  JudgeLinePeriod: 3.5
+  BackgroundMaskMinAlpha: 0.3333333
+  BackgroundMaskMaxAlpha: 1
+  BackgroundMaskPeriod: 2
+  JudgeLineHitEffectAlphaDecTime: 0.5
+  HoldingBodyColor: {r: 0.99355346, g: 1, b: 0.76792455, a: 1}
+  HoldingExplosionScaleY: 1.5

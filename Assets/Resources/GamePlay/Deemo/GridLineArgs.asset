@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b14a6464fed2f3441883a637d78a2c14, type: 3}
+  m_Name: GridLineArgs
+  m_EditorClassIdentifier: 
+  LinkLineColor: {r: 1, g: 0.9137255, b: 0.5294118, a: 1}
+  SubBeatLineColor: {r: 0.16470589, g: 0.16470589, b: 0.16470589, a: 0.75}
+  BeatLineColor: {r: 0.608, g: 0, b: 0, a: 1}
+  TempoLineColor: {r: 0, g: 0.693, b: 0.693, a: 1}
+  PositionGridLineColor: {r: 0.16470589, g: 0.16470589, b: 0.16470589, a: 0.75}
+  CurveLineColor: {r: 0.33333334, g: 0.7529412, b: 1, a: 1}
+  LinkLineWidth: 2
+  TimeGridLineWidth: 2
+  TimeGridBeatLineWidth: 3
+  TimeGridTempoLineWidth: 4
+  PositionGridLineWidth: 2
+  PositionGridBorderWidth: 4
+  CurveLineWidth: 2

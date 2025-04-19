@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 926accf531732324598018cadb683452, type: 3}
+  m_Name: DeemoGameStageUIArgs
+  m_EditorClassIdentifier: 
+  MinDisplayCombo: 5
+  ComboNumberGreyIncTime: 0.125
+  ComboNumberGreyDecTime: 0.375
+  ComboShadowDuration: 0.25
+  ComboShadowMinAlpha: 0.1
+  ComboShadowMaxScale: 1.6
+  ComboCircleScaleStartTime: 0.04
+  ComboCircleScaleEndTime: 0.22
+  ComboCircleMaxScale: 2.5
+  ComboCircleFadeInStartTime: 0.04
+  ComboCircleFadeInEndTime: 0.07
+  ComboCircleFadeOutStartTime: 0.15
+  ComboShockWaveAlphaIncTime: 0
+  ComboShockWaveMoveTime: 0.12
+  ComboShockWaveAlphaDecTime: 0.1
+  ComboShockWaveStartX: 72
+  ComboShockWaveEndX: -72
+  ComboCharmingGrowTime: 0.075
+  ComboCharmingFadeTime: 0.225
+  ComboCharmingAlphaIncTime: 0.05
+  ComboCharmingAlphaDecStartTime: 0.25
+  ComboCharmingAlphaDecTime: 0
+  ComboCharmingMaxScaleY: 1.25

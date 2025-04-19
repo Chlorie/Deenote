@@ -1,0 +1,792 @@
+﻿zh
+中文
+
+# 关于该文件的格式
+# 第一行是语言代码
+# 第二行是应用中显示的语言名称。
+#
+# 格式 'key=value' 定义了一个本地化文本，更改右侧以更改显示文本
+# 使用 <br/> 转义换行
+# 使用 {0} 定义参数
+# 使用 'key="""' 开始一个多行文本，多行文本应该以 '"""' 结束
+#     如果结束行标记有前导空格，则所有行将删除前导空格，最大数量为结束行的前导空格
+#     (实际上类似于c#原始字符串 https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/raw-string
+#
+# 空行或只包含空格的行将被忽略
+# 以 '#' 开头的行将被忽略。 (看起来像markdown但实际上不是 xD
+
+# Static
+
+UITheme_Dark=暗色
+UITheme_Light=亮色
+
+## Menu
+
+Nav_Menu=菜单
+NavPanel_NewProject=新建
+NavPanel_OpenProject=打开
+NavPanel_SaveProject=保存
+NavPanel_SaveProjectAs=另存为...
+NavPanel_RecentFiles=最近打开文件
+NavPanel_Preferences=首选项
+NavPanel_About=关于
+NavPanel_UpdateHistory=更新历史
+NavPanel_Tutorials=教程
+NavPanel_CheckUpdate=检查更新
+
+Nav_Project=项目
+NavPanel_Project_Header=项目
+NavPanel_ProjectAudio_Label=音频
+NavPanel_ProjectName_Label=名称
+NavPanel_ProjectComposer_Label=作曲家
+NavPanel_ProjectChartDesigner_Label=谱面设计
+NavPanel_ProjectCharts_Label=谱面
+NavPanel_ProjectAddChart=新建
+NavPanel_ProjectLoadChart=加载
+NavPanel_Chart_Header=谱面
+NavPanel_ChartName_Label=标记名称
+NavPanel_ChartDifficulty_Label=难度
+NavPanel_ChartLevel_Label=等级
+NavPanel_ChartSpeed_Label=Speed
+NavPanel_ChartRemapVolume_Label=重映射音量
+
+Nav_Player=播放器
+NavPanel_Player_Header=播放器
+NavPanel_View_Label=预览视图
+NavPanel_PlayerNoteFallSpeed_Label=音符下落速度
+NavPanel_MusicVolume_Label=音乐音量
+NavPanel_EffectVolume_Label=音效音量
+NavPanel_PianoVolume_Label=钢琴音量
+NavPanel_SuddenPlus_Label=上隐
+NavPanel_LinksIndicator_Label=滑键连线
+NavPanel_PlacementIndicator_Label=显示摆放位置预览
+NavPanel_EarlyShowSlowNotes=慢速音符提前显示
+
+Nav_Toolkit=工具
+
+Nav_Editor=编辑
+NavPanel_Note_Header=音符
+NavPanel_NoteSelected_Header=音符 (已选中{0}个)
+NavPanel_NotePosition_Label=位置
+NavPanel_NoteTime_Label=时间
+NavPanel_NoteSize_Label=宽度
+NavPanel_NoteDuration_Label=Hold时长
+NavPanel_NoteKindClick_Label=Click
+NavPanel_NoteKindSlide_Label=Slide
+NavPanel_NoteKindSwipe_Label=Swipe
+NavPanel_NoteSpeed_Label=速度
+NavPanel_NoteSounds_Label=钢琴音
+NavPanel_NoteSoundsEdit=编辑
+NavPanel_NotePiano_Play=播放
+NavPanel_NotePiano_Revert=撤销修改
+NavPanel_NoteShift_Label=Shift
+NavPanel_NoteEventId_Label=Event Id
+NavPanel_NoteWarningType_Label=Warning Type
+NavPanel_NoteVibrate_Label=Vibrate
+NavPanel_NotePropertyMultipleValue_PlaceHolder=多个不同值
+NavPanel_Editor_Header=编辑器
+NavPanel_EditorPlaceNoteSpeed=默认放置音符速度
+NavPanel_EditorMusicSpeed_Label=音乐速度
+NavPanel_EditorGrids_SubHeader=格线
+NavPanel_EditorCurve_SubHeader=曲线
+NavPanel_EditorCurveLinear_Label=直线
+NavPanel_EditorCurveCubic_Label=曲线
+NavPanel_EditorCurveGenerate_Label=生成
+NavPanel_EditorCurveDisable_Label=取消格线
+NavPanel_EditorCurveFillAmount_PlaceHolder=填充数量
+NavPanel_EditorCurveFill_Label=填充
+NavPanel_EditorCurveAutoApply_SubHeader=属性应用插值
+NavPanel_EditorCurveAutoApplyApply_Label=应用
+NavPanel_EditorBpm_SubHeader=BPM
+NavPanel_EditorBpmTime_Label=时间
+NavPanel_EditorBpmTimeStart_PlaceHolder=起始
+NavPanel_EditorBpmTimeEnd_PlaceHolder=结束
+NavPanel_EditorBpmBpm_Label=BPM
+NavPanel_EditorBpmFill_Label=填充
+
+
+## Status Bar
+StatusBar_Fps=FPS: {0}
+
+
+## Dialogs
+
+Dialog_About_Title=关于
+Dialog_AboutDevelopers_Section=开发者
+Dialog_AboutTutorials_Section=教程
+Dialog_AboutUpdateHistory_Section=更新历史
+
+Dialog_FileExplorer_Title=文件浏览器
+Dialog_FileExplorerConfirm_Label=确认
+Dialog_FileExplorerCancel_Label=取消
+Dialog_FileExplorer_PinList_Label=收藏文件夹
+
+Dialog_NewProject_Title=新建项目
+Dialog_NewProjectName_Label=项目名称
+Dialog_NewProjectName_PlaceHolder=输入项目名称...
+Dialog_NewProjectAudioFile_Label=音频文件
+Dialog_NewProjectAudioFile_PlaceHolder=输入或选择音频文件路径...
+Dialog_NewProjectDirectory_Label=项目位置
+Dialog_NewProjectDirectory_PlaceHolder=输入或选择项目保存文件夹路径...
+Dialog_NewProjectSameDir_Label=将项目放在音频文件同一目录下
+Dialog_NewProjectResultPath=项目将新建为 "{0}".
+Dialog_NewProject_Create_Button=创建
+Dialog_NewProject_Cancel_Button=取消
+
+Dialog_Preferences_Title=首选项
+Dialog_PreferencesGameStage_Header=游戏场景
+Dialog_PreferencesGameStageEffect_Label=场景动效
+Dialog_PreferencesMouseSensitivity_Label=鼠标滚轮灵敏度
+Dialog_PreferencesMouseSensitivityInvert_Button=反转
+Dialog_PreferencesDistinguishPianoNotes_Label=区分钢琴音符
+Dialog_PreferencesPauseGamePlayWhenLoseFocus_Label=应用失去焦点时暂停
+Dialog_PreferencesSystem_Header=系统
+Dialog_PreferencesResolution_Label=分辨率
+Dialog_PreferencesVSync_Label=垂直同步
+Dialog_PreferencesLanguage_Label=语言
+Dialog_PreferencesAutoSave_Label=自动保存
+Dialog_PreferencesAutoSaveOff_Option=关闭
+Dialog_PreferencesAutoSaveOn_Option=打开
+Dialog_PreferencesAutoSaveOnAndSaveJson_Option=打开并保存Json
+Dialog_PreferencesEmbedProjectAudio_Label=嵌入音频文件到项目中
+Dialog_PreferencesUI_Header=UI
+Dialog_PreferencesTheme_Label=主题
+Dialog_PreferencesShowFps_Label=显示FPS
+Dialog_PreferencesShowIneffectiveProp_Label=显示无效音符属性
+
+NewProjectDialog_ProjectName_Invalid=无效项目名称.
+NewProjectDialog_AudioFile_Invalid=无效音频文件路径.
+NewProjectDialog_Directory_Invalid=无效文件夹路径.
+
+# Dynamic / MessageBox
+
+## System
+
+Quit_MsgBox_Title=退出
+QuitUnsaved_MsgBox_Content=项目未保存，是否确定退出？
+Quit_MsgBox_Y=退出
+Quit_MsgBox_N=取消
+
+Version_NoInternet_Toast=网络未连接
+Version_UpToDate_Toast=Deenote已是最新版本。
+NewVersion_MsgBox_Title=发现新版本。
+NewVersion_MsgBox_Content=当前版本：{0}，最新版本：{1}
+NewVersion_MsgBox_1=前往发布页
+NewVersion_MsgBox_2=前往下载页
+NewVersion_MsgBox_N=稍后更新
+
+UnhandledException_Toast="""
+    检测到未处理的异常
+    完整的错误信息已被保存到exceptions.log
+    """
+
+## Menu
+
+### File
+
+DirExists_MsgBox_Content=该路径存在同名文件夹，请重新选择路径。
+DirExists_MsgBox_Y=OK
+
+FileExistsOverwrite_MsgBox_Content=该路径存在同名文件，是否选择覆盖该文件？
+FileExistsOverwrite_MsgBox_Y=覆盖
+FileExistsOverwrite_MsgBox_N=取消
+
+#### FileExplorer Pin
+
+DirNotFound_MsgBox_Title=未找到指定目录
+PinDirNotFound_MsgBox_Content=未找到指定目录，是否在固定列表中移除该目录？
+PinDirNotFound_MsgBox_Y=移除
+PinDirNotFound_MsgBox_N=取消
+
+#### New Project
+
+NewProject_MsgBox_Title=新建项目
+NewProject_Status_Creating=项目创建中
+NewProject_Status_Created=项目已新建。
+NewProject_Status_CreateCancelled=已取消项目创建。
+NewProject_FileExplorer_SelectAudio_Title=选择音频文件
+NewProject_FileExplorer_SelectDirectory_Title=选择目录
+
+NewProjectOnOpen_MsgBox_Content="""
+    新建项目后当前项目会被关闭
+    """
+NewProjectOnUnsavedOpen_MsgBox_Content="""
+    当前项目有未保存的更改
+    新建项目会<color=#ff5555>丢失未保存的更改</color>
+    """
+
+NewProjectOnOpen_MsgBox_Y=创建
+NewProjectOnOpen_MsgBox_N=取消
+
+NewProjectAudioLoadFailed_MsgBox_Content=无法加载音频文件，请重新选择文件。
+NewProjectAudioLoadFailed_MsgBox_Y=OK
+
+NewProjectAudioNotExists_MsgBox_Content=未找到指定音频文件。
+NewProjectAudioNotExists_MsgBox_Y=OK
+
+#### Open Project
+
+OpenProject_MsgBox_Title=打开项目
+OpenProject_Status_Loaded=项目已加载。
+OpenProject_Status_Loading=项目加载中...
+OpenProject_Status_LoadFailed=项目加载失败。
+OpenProject_FileExplorer_Title=打开项目
+
+OpenProjectOnOpen_MsgBox_Content="""
+    打开新项目后当前项目会被关闭.
+    """
+OpenProjectOnUnsavedOpen_MsgBox_Content="""
+    当前项目有未保存的更改
+    打开新项目会<color=#ff5555>丢失未保存的更改</color>
+    """
+OpenProjectOnOpen_MsgBox_Y=打开
+OpenProjectOnOpen_MsgBox_N=取消
+
+LoadProjectFailed_MsgBox_Content="""
+    项目文件加载失败，该文件可能非Deenote项目文件或已损坏，
+    请重新选择。
+    """
+LoadProjectFailed_MsgBox_Y=OK
+LoadProjectFailed_MsgBox_N=取消
+
+#### Save Project
+
+SaveProject_MsgBox_Title=保存项目
+SaveProject_Status_Saving=项目保存中...
+SaveProject_Status_Saved=项目已保存。
+SaveProject_FileExplorer_Title=保存项目
+SaveAsProject_FileExplorer_Title=另存为...
+
+AutoSaveProject_Status_Saving=项目自动保存中...
+AutoSaveProject_Status_Saved=项目已自动保存。
+
+#### Open Recent project
+
+OpenRecentProject_MsgBox_Title=打开最近项目
+
+OpenRecentProjectFileNotFound_MsgBox_Content=未找到文件。是否从最近项目中移除该路径？
+OpenRecentProjectFileNotFound_MsgBox_Y=移除
+OpenRecentProjectFileNotFound_MsgBox_X=重新选择
+OpenRecentProjectFileNotFound_MsgBox_N=取消
+
+### Project
+
+LoadAudio_MsgBox_Title=加载音频文件
+LoadAudioFailed_MsgBox_Content=音频文件加载失败，请尝试选择其他文件。
+LoadAudioFailed_MsgBox_Y=OK
+SelectAudio_FileExplorer_Title=选择音频文件
+
+LoadChart_MsgBox_Title=加载谱面
+LoadChart_Status_Loaded=谱面已加载。
+SelectChart_FileExplorer_Title=选择谱面文件
+LoadChartFailed_MsgBox_Content=谱面文件加载失败，请尝试选择其他文件。
+LoadChartFailed_MsgBox_Y=OK
+
+ExportChart_Status_Exporting=谱面文件导出中...
+ExportChart_Status_Exported=谱面文件已导出。
+ExportChart_FileExplorer_Title=导出谱面到...
+
+# About contents
+
+## Developers
+
+Dialog_AboutDevelopers_Page_HCl=HCl
+Dialog_AboutDevelopers_Page_HCl_Title=HCl
+Dialog_AboutDevelopers_Page_HCl_Content="""
+    大家好，我是 Chlorie，可以叫我盐酸或者 HCl 都没问题。我是 Deenote 最初版的开发者，在写初版的时候还在上本科，一转眼现在研究生都要毕业了，Deemo 也早变成时代眼泪了，不得不感叹时光流逝之迅速。
+    最早写 Deenote 的时候完全就是个编程小白，一边学 C♯、Unity 一边 hack 出来个这么一个工具。毕竟还是无知者无畏，虽说代码结构一团糟但是还是勉强实现完了想实现的东西。之后曾经动过不少次念头想要继续维护 Deenote、优化代码架构、整改 UI、增加新功能之类的，但是虽然我编程能力有一些提高，却是走向了另一个极端——每次重构了不到一半就感觉又不太对再推倒重来，结果到最后也做不出一个成品。
+    孔子有一句话说得好：“己所不欲，勿施于人。”于是我自己不想重构了就把活推给 Trarizon 了（这对吗？）……总之非常感谢 Trarizon 接手项目之后的付出！
+    
+    - Chlorie, 2025-4-19
+    """
+
+Dialog_AboutDevelopers_Page_NachtgeistW=NachtgeistW
+Dialog_AboutDevelopers_Page_NachtgeistW_Title=NachtgeistW
+Dialog_AboutDevelopers_Page_NachtgeistW_Content="""
+        这里夜轮。我出于某种原因捡起了这个项目，开始边学 C# 边试图修 Deenote。
+        我今年大三，而盐酸已经以优异的成绩大学毕业，他今年研一。
+        0.7.3 是在残像的帮助下写的。一并感谢。
+        我也不知道我会给这个项目带来什么，所以走一步算一步吧。
+        感谢你使用 Deenote。
+
+    - 夜轮
+    - 2020-1-31
+    """
+
+Dialog_AboutDevelopers_Page_Trarizon=Trarizon
+Dialog_AboutDevelopers_Page_Trarizon_Title=Trarizon
+Dialog_AboutDevelopers_Page_Trarizon_Content="""
+        Trarizonです。我在做完本科毕业设计后开始了这个项目的重构，期间因为各种事情各种拖拖拉拉到现在才差不多完成。
+        Deenote v1.0的主要功能大约是在3月底左右完成的，然后因为没什么精力又鸽了一段时间，于是在群友的催促下将1.0打包出来了。
+
+        关于这个项目的后续，我很难保证未来有多少精力来继续优化这个项目，所以不要报太大期待。。
+
+        老登群友都毕业了，该交接棒了（迫
+
+        PS: 事实上在去年fork这个项目的时候我并没有完全计划要完成重构，最初只是想看看能做到哪一步。所以事实上前几个月我在重构的消息基本是盐酸发出来的.jpg
+        感谢盐酸几年来孜孜不倦的催更.jpg
+
+    - Trarizon
+    - 2025-4-16
+    """
+
+## Tutorials
+
+Dialog_AboutTurorials_Page_Tutorial=教程
+Dialog_AboutTurorials_Page_Tutorial_Title=教程
+Dialog_AboutTurorials_Page_Tutorial_Content="""
+    感谢您使用新版Deenote。本文会尽量详细地介绍该软件的使用方法。
+    如果您有使用旧版Deenote的经验，可以前往<color=#606080ff>新版迁移</color>版块查看新版的一些变化，大部分操作逻辑会与旧版类似。
+
+    1 左侧菜单面板
+    1.1 菜单
+    菜单页提供了项目的新建、打开、保存等功能，以及首选项、关于等内容。
+
+    1.1.1 项目打开与保存
+    - 点击[新建]按钮，输入项目名称、选择音频文件、保存位置。内容输入正确后界面上会显示预计创建的文件的完整路径，点击创建即可新建项目。
+    小贴士：可以先选择音频文件，会自动使用音频文件名填充项目名称。
+    - 点击[打开]按钮，选择项目文件即可打开项目。
+    - 点击[保存]按钮，保存当前项目
+    - 点击[另存为...]按钮，选择保存位置保存项目。
+
+    1.1.2 最近打开文件
+    这里会显示最近打开的项目文件，点击即可打开。
+
+    1.1.3 其他
+    - 首选项：设置游戏场景、系统、UI等参数。
+    - 关于/更新历史/教程：查看该软件的相关信息、教程等。
+    - 检查更新：检查是否有新版本。
+
+    1.2 项目
+    在打开了新项目后，该面板会显示项目和谱面的相关信息。
+
+    1.2.1 项目信息
+    包含音频文件、曲目名称、作曲家、谱面设计者等信息。点击输入或替换内容。
+
+    1.2.2 谱面列表
+    显示当前项目中的所有谱面，点击[新建]创建新谱面，点击[加载]加载已有谱面，支持.json与.txt格式。
+    将鼠标悬停在谱面控件上会显示导出与删除按钮。点击即可切换当前加载的谱面。
+
+    1.2.3 谱面信息
+    包含谱面名称、难度、等级、Speed等信息。
+    谱面名称仅用于标记，会显示在谱面列表中，留空则采用当前难度名称。谱面导出时会使用该名称作为后缀，如留空则采用全小写难度名称。
+
+    1.3 播放器
+    包含播放器的相关设置。
+
+    - 预览视图：设置预览视图的长宽比以及是否全屏显示，（按[Esc]退出全屏）
+    - 音符下落速度：调整音符下落速度，范围[0.5-9.5]，左右按钮可以以0.5为基础调整速度。
+    - 音乐音量：调整音乐音量。
+    - 音效音量：调整音效音量。
+    - 钢琴音量：调整音符钢琴音音量。
+    - 上隐：设置音符上隐百分比。
+    - 滑键连线：设置是否显示Slide连线，打开后同一组Slide之间会显示连线。
+    - 显示摆放位置预览：设置是否显示音符摆放位置预览。
+    - 慢速音符提前显示：设置慢速音符提前显示时间。DEEMO II谱面中慢速音符不会提前显示，该设置为预览方便设置。
+
+    1.4 工具
+    包含复制、粘贴等基础命令，以及其他工具和扩展。
+
+    1.4.1 旧版本兼容
+    新版Deenote的配置文件位置与旧版不同，若您有使用过旧版Deenote，可以点击[载入旧版Deenote配置]载入旧版配置；
+    旧版Deenote不支持导入DEEMO II谱面，若有需要可以点击[导出为Deemo I谱面]导出旧版谱面，请注意DEEMO II新增的特性会丢失。
+
+    2 预览界面与编辑界面
+    中间为谱面的预览界面，右侧[编辑]菜单包含了谱面的常用编辑功能。
+
+    2.1 预览界面
+
+    2.1.1 进度调整
+    - 拖动预览界面上方的进度条可以调整音乐播放进度，此外通过滚轮、上下键、Shift+上下键等方式也可以调整音乐播放进度。按[Home]、[End]键跳转到音乐开头或结尾。若滚轮方向与您的习惯不同，可以在首选项中调整。
+    - 点击游戏界面中的暂停按钮或按[Enter]键可以暂停/播放音乐；按住[空格]键同样可以播放音乐，松开后音乐进度会回到按空格键之前的位置。
+    
+    2.1.2 谱面编辑
+    - 通过鼠标左键框选选择音符，按住Ctrl可以多选。
+    - 按下鼠标右键放置音符，通过上下/左右滑动切换Hold/Swipe音符，按住Shift会切换为Slide/Slide-Hold音符
+    - 按下Shift后，按下鼠标右键拖动可以基于横格线快速放置多个Slide音符。
+    - 粘贴模式下按住Shift可以固定粘贴的横向位置
+    - 按[Tab]切换默认音符是否带有钢琴音
+
+    2.2 基础快捷键
+    - [Ctrl+X] [Ctrl+C] [Ctrl+V] 剪切/复制/粘贴
+    - [Ctrl+Z] [Ctrl+Y / Ctrl+Shift+Z] 撤销/重做
+    - [K] [L] [O] 转换为Click/Slide/Swipe音符
+    - [P] [;] 添加/删除钢琴音，只会给无钢琴音的音符添加一个音量为0的钢琴音
+    - [H] 基于选中的两个音符的时间创建Hold，时间较大的音符会被移除。当选中音符数量不为2或两者时间一样时无效
+    - [Q] 将选中音符吸附到格线
+    - [M] 以Pos=0为线镜像音符位置
+    - [Z] [X] 以0.01为单位调整音符的大小，按住[Shift]以更大幅度调整
+    - [W] [A] [S] [D] 调整音符的时间/位置，按住[Shift]吸附到下一格线，按住[Alt]以更大幅度调整
+    - [C] [V] 调整音符的速度，按住[Shift]以更大幅度调整
+
+    2.3 编辑面板
+
+    2.3.1 音符属性编辑
+    此处显示被选中音符的基本属性。
+    - 位置(Pos)：音符的横向位置，限定在[-2, 2]之间
+    - 时间(Time)：音符的时间，单位为秒
+    - 宽度(Size)：音符的大小，基础为1，为观赏/游玩体验建议不要小于0.6，且不要滥用超过2的音符
+    - Hold时长(Duration)：Hold音符的持续时间，单位为秒。选中2个note时，右侧按钮可以基于选中的两个note的时间创建Hold音符（同快捷键[H]）
+    - 音符类型：Click/Slide/Swipe，Swipe音符的Hold时长无效
+    - 速度(Speed)：音符的下落速度乘区。右侧按钮可以将当前值应用到默认放置音符速度
+    - 钢琴音：点击显示钢琴音编辑面板。右侧按钮可以快捷添加或删除钢琴音（同快捷键[P/;]）
+    - 无效属性：在首选项中打开[显示无效音符属性]后会显示。该属性存在于谱面文件中，但是效果未知，在Deenote中编辑不会有任何效果，但会被保存。
+
+    2.3.1.1 钢琴音编辑面板
+    面板由上至下依次为：[播放][撤销]按钮、钢琴面板、钢琴音属性。
+    - [播放]按钮可以试听当前钢琴音，[撤销修改]会撤销当前对钢琴音的编辑。
+    - 在钢琴面板中，点击钢琴键可以添加钢琴音，点击下方的[-2]~[8]的按钮可以快速跳转至对应的八度。
+    - 最下方显示钢琴音属性。空间左侧显示钢琴的音高，右侧提供音量、时长、延迟的编辑，以及删除按钮。
+    编辑钢琴音后，关闭钢琴音面板或重新选择音符后会自动保存当前钢琴音。
+
+    2.3.2 编辑器
+    此处提供了编辑器的一些设置。
+    - 默认放置音符速度：在编辑面板中放置音符时的默认速度，右侧两个按钮分别用于筛选速度（速度不一致的音符会半透明）、应用速度（关闭后，预览界面所有音符的下落速度会按1处理）
+    - 音乐速度：音乐的播放速度
+
+    2.3.2.1 格线
+    该面板设置格线的显示与吸附。
+    - 通过输入数字调整格线数量，横格可以通过按钮快速切换常规划分与3连音（即8分/12分/16分/24分）
+      - 横格线基于BPM的一拍时长计算，将一拍平均分为指定数量。例如若要设置为16分音符，该值填4。
+      - 纵格线在[-2, 2]之间均匀分布，例如若要设置为早期DEEMO谱面使用的9Key，在纵格线填9即可
+    - 右侧两个按钮分别表示是否吸附到格线、是否显示格线
+
+    2.3.2.2 曲线
+    该面板设置曲线的生成与填充。
+    - 选中音符后，点击[生成]按钮可以基于指定曲线类型生成一条连接选中音符的曲线，生成后可以通过[取消格线]按钮取消格线
+    - 生成格线后，输入数字后点击[填充]可以在曲线中间均匀放置指定数量的音符
+    - 属性应用插值面板中，可以打开对音符关于与速度的自动应用，这样在填充音符时，同样会应用选中音符的属性。也可以点击[应用]按钮手动修改选中音符的中间音符的属性，手动应用不需要提前生成格线。
+
+    2.3.2.3 BPM
+    输入起止时间与BPM后，点击[填充]可以在指定时间段内BPM。
+
+    3 对话框
+
+    3.1 文件浏览器
+    文件浏览器左侧提供了收藏文件夹功能，在文件列表中点击文件夹右侧的按钮即可添加文件夹到收藏列表，点击收藏列表中的文件夹即可快速打开，点击收藏项的右侧按钮取消收藏。
+    Windows系统下，文件浏览器地址栏右侧按钮可以在系统文件资源管理器中打开当前目录
+
+    2025-3-27
+    """
+
+Dialog_AboutTurorials_Page_Shortcuts=快捷键列表
+Dialog_AboutTurorials_Page_Shortcuts_Title=快捷键列表
+Dialog_AboutTurorials_Page_Shortcuts_Content="""
+    -项目-
+
+    <Ctrl+N> 新建项目
+    <Ctrl+O> 打开项目文件
+    <Ctrl+S> 保存当前项目
+    <Ctrl+Shift+S> 项目另存为
+    <Ctrl+E> 导出该项目的所有谱面文件为json
+
+    -场景-
+
+    <Enter> 播放/暂停
+    <Space> 按住播放，松开时回到原位
+    <Home> 跳转到音乐开始位置
+    <End> 跳转到音乐结束位置
+    <Esc> 退出全屏
+    <Ctrl+Up/Down> 调整音符下落速度
+    <Alt+Up/Down> 调整音乐播放速度
+    <Up/Down/鼠标滚轮> 调整音乐播放位置
+    <Shift+Up/Down> 快速调整音乐播放位置
+
+    -编辑-
+
+    <Ctrl+X> 剪切
+    <Ctrl+C> 复制
+    <Ctrl+V> 粘贴
+    <Ctrl+Z> 撤销 (最大撤销数: 100)
+    <Ctrl+Shift+Z> 重做
+    <Delete> 删除选中音符
+    <Ctrl+A> 选择所有音符
+    <Tab> 切换是否默认放置钢琴键
+    <G> 切换是否吸附到格线
+    <H> 基于选中的两个音符的时间创建Hold，时间较大的音符会被移除。当选中音符数量不为2或两者时间一样时无效
+    <L> 转换为Slide音符并连接
+    <K/U> 转换为Click音符
+    <O> 转换为Swipe/Flick音符
+    <P> 给无钢琴音的音符添加单个空钢琴音
+    <;> 删除钢琴音
+    <Q> 将选中音符吸附到格线
+    <W/A/S/D> 调整选中音符的位置(0.01)/时间(1ms)
+    <Shift+W/A/S/D> 调整选中音符的位置(0.1)/时间(10ms)
+    <Alt+W/A/S/D> 将选中音符的位置/时间吸附到下一格线
+    <Z/X> 调整选中音符的大小(0.01)
+    <Shift+Z/X> 调整选中音符的大小(0.1)
+    <C/V> 调整选中音符的速度(0.01)
+    <Shift+C/V> 调整选中音符的速度(0.1)
+    <M> 以Pos=0为线镜像音符位置
+    <F> Fill notes on the curve
+
+    <鼠标左键> 选择音符/取消放置音符
+    <鼠标右键> 按下开始放置音符，上下滑动放置Hold音符，左右滑动放置Swipe音符
+        <右键按下后Shift> 更改放置的音符为slide/slide-hold
+    <Shift+鼠标右键> 按下开始防止slide音符，拖动在横格线上放置slide链
+    """
+
+Dialog_AboutTurorials_Page_UpgradeGuide=新版迁移
+Dialog_AboutTurorials_Page_UpgradeGuide_Title=新版迁移
+Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
+    新版Deenote尽量保留了旧版的操作逻辑，此处仅说明v1.0与v0.7.3的一些不同之处。
+    如果您未使用过旧版Deenote，建议在<color=#606080ff>教程</color>页查看完整的使用说明。
+    
+    1. 基础设置
+    
+    UI拆分: 新版Deenote将旧版的右侧面板进行了拆分，将制谱中常用的功能放在了右侧，其他功能如项目打开、项目属性、播放器设置等放在了左侧菜单中。
+    最近打开项目: 新增了[最近打开项目]，点击即可直接打开最近项目
+    鼠标滚轮翻转: 首选项中提供了鼠标滚轮方向的翻转，可以根据您的习惯调整。
+    取消谱面数量限制: 取消了项目的4难度设计，一个项目中可以有任意多的谱面。并提供了谱面的标记名称，谱面导出时会以标记名称为后缀，若为空则以难度名称为后缀。
+    文件夹收藏: 提供了文件浏览器的收藏功能，点击指针悬停时出现的按钮即可添加/删除收藏文件夹，点击左侧列表中的文件可以快速跳转。
+    文件夹跳转: Windows下，文件浏览器右侧右上角提供了在系统文件资源管理器中打开目录的功能
+    多比例预览与全屏: 新增了预览视图的长宽比修改与全屏显示功能，按[Esc]退出全屏。
+    上隐: 新增了上隐。
+
+    2. 谱面编辑
+
+    2.1 预览界面编辑
+    鼠标右键放置音符时，可以通过上下左右滑动切换Hold或Swipe，按住Shift切换为Slide
+    按住Shift后按下鼠标右键滑动，可以基于横格线快速放置Slide音符
+
+    2.2 编辑面板与快捷键
+    - 取消了音符Size的上限。
+    - 简化了Note类型修改: 现在可以通过[K][L][O]键快速切换为Click/Slide/Swipe音符，通过[P][;]键快速添加/删除钢琴音。音符面板有对应按钮
+    - 优化了钢琴音编辑: 现在钢琴音面板不会影响谱面编辑，在关闭面板或重新选择音符后会自动保存当前钢琴音。
+      钢琴音右侧+/-按钮或快捷键[P][;]可用于快捷添加/删除钢琴音，
+      按[Tab]键切换默认放置音符是否带有琴音
+    - 细分了格线的吸附、显示功能，提供了快速切换横格线的按钮
+    - 细分了曲线应用属性的效果，现在可以关闭曲线对音符宽度的效果，也可以手动应用
+
+    3. DEEMO II新功能
+
+    - 慢速音符提前显示：DEEMO II按音符的实际时间显示音符，因此提供了这个设置，可以使音符按出现时间显示
+    - Flick音符(Swipe): 添加Flick音符，单音符种类为Click/Slide/Flick之一
+    - Hold时长(Duration)：提供Hold时长的编辑，Duration编辑框右侧按钮或[H]键快速基于两个音符的时间生成hold
+    - 速度(Speed)：可以使用(Shift+)C/V调整音符速度，Speed编辑框右侧按钮将当前速度应用为默认编辑速度。
+      提供了默认音符放置速度的设置，并提供了两个按钮用于筛选当前指定速度的音符，应用音符差速效果。音符速度也可以应用于曲线填充
+    
+    4. 删除的旧功能
+
+    Deenote v1.0未实现旧版Deenote的部分功能。这些功能有可能会在未来重新加入（也可能咕了
+
+    - 基于Note Id跳转
+    - 纵格线偏移
+    - 手动BPM测定器
+    - 谱面连接
+
+    2025-3-27
+    """
+
+## Update History
+
+AboutDialog_Versions_Dnt_1_0=Deenote 1.0
+AboutDialog_Versions_Dnt_1_0_Content="""
+    完全重构。支持DEEMO II谱面的部分属性的编辑（音符速度、hold、flick）
+    """
+
+AboutDialog_Versions_Dnt_0_7=Deenote 0.7
+AboutDialog_Versions_Dnt_0_7_Content="""
+    <b>Deenote 0.7.3</b>
+    
+    增加了保存选定分辨率的功能。
+    换掉了歌曲标题的字体，现在数字和部分标点跟官方一样了。
+
+    <b>Deenote 0.7.2</b>
+    
+    修复了更新检查的问题。
+    加入了自动保存Json谱面的功能。
+
+    <b>Deenote 0.7.1</b>
+    
+    修复了版本0.7新功能中的一个bug。
+
+    <b>Deenote 0.7.1</b>
+    
+    为组曲制作添加了谱面连接功能。
+    """
+
+AboutDialog_Versions_Dnt_0_6=Deenote 0.6
+AboutDialog_Versions_Dnt_0_6_Content="""
+    <b>Deenote 0.6.12</b>
+
+    修改了charming光效的颜色。现在光效应该更偏橙色而不是黄色。
+    现在若发现未经处理的异常则会弹出对话框提醒并保存到文件，反馈bug会更容易一些。
+    取消了对.ogg文件的支持。
+    若在读取音频时捕获到异常, 用户会被强制重新选择音频文件。
+
+    <b>Deenote 0.6.11</b>
+
+    终于修改了charming光效的着色器。现在光效要比以前好看多了。
+
+    <b>Deenote 0.6.10</b>
+
+    部分地“修复”了mp3文件丢失第一帧的问题 (在所有采样前面增加一个空帧), 现在Deenote不会有奇怪的26毫秒offset了。
+
+    <b>Deenote 0.6.9</b>
+
+    修复了不能打开文件的问题。
+    修复了更新检查。
+
+    <b>Deenote 0.6.8</b>
+
+    解决了导入JSON谱面会导致拍线消失的问题。
+    解决了谱面中note很多时插入新note导致栈溢出的问题。
+
+    <b>Deenote 0.6.7</b>
+
+    增加了中文的本地化支持。
+    修复了一些小漏洞。
+    重叠note现在会显示红色。
+
+    <b>Deenote 0.6.6</b>
+
+    优化了文件格式，项目文件将占用更少空间。
+
+    <b>Deenote 0.6.5</b>
+
+    增加了镜像功能。
+    为调整note宽度添加了快捷键。
+    现在粘贴时按住Shift键，粘贴的note会保持被复制的note的横向位置。
+
+    <b>Deenote 0.6.4</b>
+
+    在选中note信息中添加了note编号域。
+    修复漏洞：滑键导出格式不正确。
+    修复漏洞：导出文件名不正确。
+
+    <b>Deenote 0.6.3</b>
+
+    现在关闭app应该不会出现问题了。
+    增加了调整窗口大小的设置项。
+
+    <b>Deenote 0.6.2</b>
+
+    修复漏洞：打开教程后所有输入都被忽略。
+
+    <b>Deenote 0.6.1</b>
+
+    添加了中文教程。英文教程即将更新。
+
+    <b>Deenote 0.6</b>
+
+    添加了曲线生成功能。
+    """
+
+AboutDialog_Versions_Dnt_0_5=Deenote 0.5
+AboutDialog_Versions_Dnt_0_5_Content="""
+    <b>Deenote 0.5.10</b>
+
+    现在保存和读入文件不会再阻塞主线程了。
+    修复了关于音乐回放位置的严重漏洞。
+
+    <b>Deenote 0.5.9</b>
+
+    将更新历史从关于中分离出来。
+    添加了更新检测。
+    修复用户界面的一些小漏洞。
+
+    <b>Deenote 0.5.8</b>
+
+    现在你可以替换项目中使用的音乐文件了。
+    创建新文件时同后缀名的已有文件也会在文件选择窗口中显示。
+
+    <b>Deenote 0.5.7</b>
+
+    修复漏洞：不能打开文件。
+    修复漏洞：滑键连线不能关闭。
+    删除了Schwarzer的名言，我还不想死（
+
+    <b>Deenote 0.5.6</b>
+
+    添加了拖动文件到窗口打开文件的功能。（感谢Schwarzer！）
+
+    <b>Deenote 0.5.5</b>
+
+    添加了对MP3音乐文件的支持。
+
+    <b>Deenote 0.5.4</b>
+
+    彻底重写了连线显示的代码。
+
+    <b>Deenote 0.5.3</b>
+
+    添加了垂直同步的开关。
+    现在编辑器设置也会被自动保存。
+
+    <b>Deenote 0.5.2</b>
+
+    将钢琴音的默认音量从127调整为0。
+    现在你可以导入OGG音乐文件了。
+
+    <b>Deenote 0.5.1</b>
+
+    修复了删除滑键时剩余的滑键会连接错误的漏洞。
+
+    <b>Deenote 0.5</b>
+
+    复制/粘贴功能。
+    量化note功能。
+    """
+
+AboutDialog_Versions_Dnt_0_4=Deenote 0.4
+AboutDialog_Versions_Dnt_0_4_Content=全部note属性编辑功能。
+
+AboutDialog_Versions_Dnt_0_3=Deenote 0.3
+AboutDialog_Versions_Dnt_0_3_Content="""
+    <b>Deenote 0.3.1</b>
+    
+    文件后缀名关联。
+
+    <b>Deenote 0.3 build 2</b>
+
+    稍微更改了拍线存储方式。
+    重新设计了编辑板块的UI。
+
+    <b>Deenote 0.3 build 1</b>
+
+    漏洞修复。
+    """
+
+AboutDialog_Versions_Dnt_0_2=Deenote 0.2
+AboutDialog_Versions_Dnt_0_2_Content="""
+    <b>Deenote 0.2.1</b>
+    
+    添加新note。
+    连接/断开选中note。
+    Note摆放位置指示。
+
+    <b>Deenote 0.2</b>
+
+    选中note染色。
+    删除note。
+    拍线填充域自动填充。
+    """
+
+AboutDialog_Versions_Dnt_0_1=Deenote 0.1
+AboutDialog_Versions_Dnt_0_1_Content="""
+    添加了谱面预览功能的所有特效。
+    添加了一个手动BPM计算器。
+    音效的音量控制。
+    拍线填充及显示。
+    滑键间连线。
+    撤销/重做功能。
+    修复了一些漏洞。
+    选择note。
+    （隐藏功能：Cytus v2谱面直转。我觉得没人会用到这个功能，甚至都没人关心这个。）
+    """
+
+AboutDialog_Versions_DCE=Deemo Chart Editor
+AboutDialog_Versions_DCE_Content=
+    <b>Deemo Chart Editor 0.2</b>
+
+    添加了一些快捷键。
+    导出JSON格式谱面。
+    另存为功能。
+    添加了一些视觉效果（远处的note降低不透明度，添加note消失的逐帧动画及冲击波和圆形特效）
+    修复了一些漏洞。
+    
+    <b>Deemo Chart Editor 0.1</b>
+
+    完成了谱面预览功能。目前还没有特效。
+    """

@@ -1,0 +1,20 @@
+{
+    "name": "Deenote.Plugin",
+    "rootNamespace": "Deenote.Plugin",
+    "references": [
+        "Deenote",
+        "Deenote.UI",
+        "UniTask",
+        "Deenote.UIFramework",
+        "Deenote.Localization"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

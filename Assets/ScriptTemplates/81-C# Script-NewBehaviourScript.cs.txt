@@ -1,0 +1,23 @@
+﻿#nullable enable
+﻿
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace #NAMESPACE#
+{
+    public sealed class #SCRIPTNAME# : MonoBehaviour
+    {
+        // Start is called before the first frame update
+        private void Start()
+        {
+            #NOTRIM#
+        }
+
+        // Update is called once per frame
+        private void Update()
+        {
+            #NOTRIM#
+        }
+    }
+}
