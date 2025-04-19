@@ -1,12 +1,18 @@
 #nullable enable
 
+using Cysharp.Threading.Tasks;
 using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.Entities.Operations;
+using Deenote.Library;
+using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Deenote
 {
+#if UNITY_EDITOR
+
     public static class Fake
     {
         private static ProjectModel? _project;
@@ -14,20 +20,25 @@ namespace Deenote
 
         private const string TestMusic = "finale";
 
-        public static (ProjectModel, AudioClip) GetProject()
+        private static string GetDevPath(string relativePathToAssets)
+            => Path.Combine(Application.dataPath, "Dev", relativePathToAssets);
+
+        public static async Task<(ProjectModel, AudioClip)> GetProject()
         {
             if (_project is not null) return (_project, _audio!);
 
             //await using var fs = File.OpenRead(Path.Combine(Application.streamingAssetsPath, "Magnolia.mp3"));
             //var clip = await AudioUtils.LoadAsync(fs, ".mp3");
-            var clip = Resources.Load<AudioClip>($"Test/{TestMusic}");
+            using var fs = File.OpenRead(GetDevPath($"TestCharts/{TestMusic}.mp3"));
+            var clip = await AudioUtils.TryLoadAsync(fs, ".mp3");
             if (clip is null) {
                 Debug.LogError("Load audio failed");
             }
             _audio = clip;
 
             _project = new ProjectModel("D:/", null!, "Fake.mp3");
-            if (ChartModel.TryParse(Resources.Load<TextAsset>($"Test/{TestMusic}.hard").text, out var chart)) {
+            //Resources.Load<TextAsset>($"Test/{TestMusic}.hard").text
+            if (ChartModel.TryParse(File.ReadAllText(GetDevPath($"TestCharts/{TestMusic}.hard.json")), out var chart)) {
                 // chart.Name = "<cht> name";
                 chart.Level = "10";
                 chart.Difficulty = Difficulty.Hard;
@@ -40,4 +51,6 @@ namespace Deenote
             return (_project, _audio!);
         }
     }
+
+#endif
 }

@@ -55,9 +55,9 @@ namespace Deenote.Core.Project
         }
 
 #if  UNITY_EDITOR
-        private void Start()
+        private async void Start()
         {
-            var (proj, clip) = Fake.GetProject();
+            var (proj, clip) = await Fake.GetProject();
             SetCurrentProject(proj, clip);
         }
 #endif

@@ -293,37 +293,13 @@ ExportChart_FileExplorer_Title=Export chart to...
 Dialog_AboutDevelopers_Page_HCl=HCl
 Dialog_AboutDevelopers_Page_HCl_Title=HCl
 Dialog_AboutDevelopers_Page_HCl_Content="""
-    Deenote By HCl
+    Hello everyone, I'm Chlorie. Feel free to call me HCl if you'd like. I'm the original developer of the first version of Deenote. When I started working on it, I was still an undergrad student, and now, in the blink of an eye, I'm about to graduate from my Ph.D. program, and Deemo has long since become a relic of the past. What I mean to say is that time truly flies.
 
-    *Bad English Alert*
+    Back when I first created Deenote, I was a complete novice in programming. I learned C♯ and Unity as I went along, hacking together the tool bit by bit. Looking back, ignorance really was bliss — the code structure was messy, but somehow, I managed to get the core features working. Since then, I've often thought about continuing to maintain Deenote — improving the codebase, redesigning the UI, adding new features, and such. However, while my programming skills have grown, I've gone to the other extreme: each time I tried to refactor the project, I'd get halfway through, feel something being “off”, and start all over from scratch. In the end, I was never able to produce a finished product.
 
-    -Things that must be mentioned-
-        Thank you for using my app!
-        Something I must mention in the beginning: This application can only be used to make fan made charts of Deemo, and it is strictly prohibited to use this app for any commercial purposes. This app is only for making fan made charts for fun, if you somehow know methods to import fan made charts into the game, DO NOT distribute the cracked/modified game to others (or even make it public). You  ll probably have a bad time if you do so.
+    As Confucius once said, “What you do not want done to yourself, do not do to others”. Well, since I no longer had the drive to get the refactor done, I just imposed the task onto Trarizon (wait, what?)... In any case, I'm deeply grateful to Trarizon for taking over the project and for all the hard work that followed!
 
-    -Random things-
-        [Self-introduction?]
-        I'm a rhythm game player known as HCl on the Internet. I'm 17 years old and currently studying Computational Mathematics in USTC (University of Science and Technology of China) for the third year.
-        [About this app?]
-        I'm making this app just for fun. Still a C#/Unity3D newbie so there may be tons of bugs in my code, but who cares? (No, everyone cares.) Since I'm still a student, and as you all know everyone is pretty busy in the third year in university, so I don't have much time to develop this thing. Don't push me please.
-        About the drag-and-drop file opener added in 0.5.6, I  m using a dll coded and compiled by my friend Schwarzer (The one working on Lanotalium, an easy-to-use Lanota chart editor. That guy does awesome works, you really should check him out.) You know who to blame and what to do if that specific thing goes wrong. XD
-        [Anything else?]
-        Just enjoy yourself making some fun charts with this app. Hope you love it.
-
-    -Known bugs-
-        Many bugs about UI and shortcut keys (for example if you try to open another project while you're still in the piano sound editing screen, the piano would probably stay there and it may cause some problems). It's not that I don't know how to fix but it's really a tedious job and it will take much time... Please give me enough time...
-        Some buttons may not work cause the functions are not yet implemented. Please wait...
-
-    -If you've found more bugs or want to suggest some new features-
-        Feel free to start an issue on Deenote's github repository, the link is: https://github.com/Chlorie/Deenote/issues . You'd better not to contact me by QQ or E-mail or something...
-     
-    -Special thanks-
-        Thanks to the developers of Cytunity and Deemo Note Memory for inspiration.
-        Thanks to Schwarzer for the drag-and-drop library he made!
-        Millions of thanks to rkevin and     for technical support! 
-
-    - HCl
-    - 2 Dec 2017
+    - Chlorie, Apr 19, 2025.
     """
 
 Dialog_AboutDevelopers_Page_NachtgeistW=NachtgeistW
@@ -345,8 +321,14 @@ Dialog_AboutDevelopers_Page_Trarizon=Trarizon
 Dialog_AboutDevelopers_Page_Trarizon_Title=Trarizon
 Dialog_AboutDevelopers_Page_Trarizon_Content="""
         This is Trarizon. I started refactoring this project after finishing my undergraduate project, and for many reasons I just about to finish it now.
+        
+        I completed main features of Deenote v1.0 on late March, and was tired so had a rest. And now build version 1.0 under push of qq group friends
+
         I don't know if I will have time to continue optimizing this project, so don't expect too much...
 
+        PS: Actually I didn't planed to complete the project when i forked the repository last year, I just want to see how far I could go. So the news about me working on the project past few months was mostly spread by Chlorie.jpg
+        Thanks to Chlorie for years of relentless nagging.jpg
+    
     - Trarizon
     - 16 Apr 2025
     """
