@@ -57,14 +57,14 @@ namespace Deenote.Core.GameStage
             }
             // Wave
             {
-                float ratio = time <= prefabs.WaveGrowTime
+                float linearRatio = Mathf.Clamp01(time <= prefabs.WaveGrowTime
                     ? time / prefabs.WaveGrowTime
-                    : 1 - (time - prefabs.WaveGrowTime) / prefabs.WaveFadeTime;
-                float alpha = Mathf.Pow(ratio, 0.5f);
+                    : 1 - (time - prefabs.WaveGrowTime) / prefabs.WaveFadeTime);
+                float ratio = Mathf.Pow(linearRatio, 0.5f);
                 _waveEffectSpriteRenderer.transform.localScale
                     = NoteModel.Size * new Vector3(prefabs.WaveScale.x, ratio * prefabs.WaveScale.y, 1f);
-                _waveEffectSpriteRenderer.color
-                    = _waveColor with { a = Mathf.Lerp(0, prefabs.WaveMaxAlpha, alpha) };
+                //_waveEffectSpriteRenderer.color
+                //    = _waveColor with { a = Mathf.Lerp(0, _waveColor.a, ratio) };
             }
             // Glow
             {
@@ -76,7 +76,7 @@ namespace Deenote.Core.GameStage
                 float height = ratio * GlowHeight;
                 _glowEffectSpriteRenderer.transform.localScale =
                     new Vector3(prefabs.GlowScale.x, height * prefabs.GlowScale.y, 1f);
-                _glowEffectSpriteRenderer.color = prefabs.GlowColor with { a = ratio };
+                _glowEffectSpriteRenderer.color = prefabs.GlowColor with { a = ratio * prefabs.GlowColor.a };
             }
         }
 
@@ -93,6 +93,7 @@ namespace Deenote.Core.GameStage
             };
             _noteSpriteRenderer.sprite = prefab.Sprite;
             _waveColor = prefab.WaveColor;
+            _waveEffectSpriteRenderer.color = _waveColor;
 
             if (NoteModel.IsHold) {
                 _holdBodySpriteRenderer.gameObject.SetActive(true);

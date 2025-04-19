@@ -44,15 +44,15 @@ MonoBehaviour:
   BlackNoteSpritePrefab:
     Scale: 1.5
     Sprite: {fileID: 21300000, guid: 6224246386e406342bc4fa979f9aa700, type: 3}
-    WaveColor: {r: 0, g: 0, b: 0, a: 1}
+    WaveColor: {r: 0, g: 0, b: 0, a: 0.6}
   NoSoundNoteSpritePrefab:
     Scale: 1
     Sprite: {fileID: 21300000, guid: ec582d6d056eb65498a1162688fc5381, type: 3}
-    WaveColor: {r: 0, g: 0, b: 0, a: 1}
+    WaveColor: {r: 0, g: 0, b: 0, a: 0.6}
   SlideNoteSpritePrefab:
     Scale: 0.975
     Sprite: {fileID: 21300000, guid: 89abba366329a32459d2e62fb3726c36, type: 3}
-    WaveColor: {r: 0.9058824, g: 0.882353, b: 0.5686275, a: 1}
+    WaveColor: {r: 0.9058824, g: 0.882353, b: 0.5686275, a: 0.79607844}
   SwipeNoteSpritePrefab:
     Scale: 0.7
     Sprite: {fileID: 21300000, guid: 2bdb7fff29c7188438a4ef92b22bc594, type: 3}
@@ -81,15 +81,14 @@ MonoBehaviour:
     - {fileID: 21300000, guid: d75f2082d9800c248b37e6ce95e7e329, type: 3}
     - {fileID: 21300000, guid: 974f5c36021e1e0418986fe694e4dc8a, type: 3}
     ExplosionScale: 1.6
-    ExplosionTime: 0.4
+    ExplosionTime: 0.45
     CircleScale: 2
     CircleTime: 0.5
-    WaveScale: {x: 0.8, y: 1.2}
-    WaveMaxAlpha: 0.8
-    WaveGrowTime: 0.05
-    WaveFadeTime: 0.5
+    WaveScale: {x: 0.8, y: 1.5}
+    WaveGrowTime: 0.1
+    WaveFadeTime: 0.25
     GlowColor: {r: 1, g: 1, b: 1, a: 1}
-    GlowScale: {x: 6, y: 12}
+    GlowScale: {x: 6.5, y: 13}
     GlowGrowTime: 0.1333333
     GlowFadeTime: 0.6666667
   NoteSelectedColor: {r: 0.33333334, g: 0.7529412, b: 1, a: 1}

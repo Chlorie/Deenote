@@ -93,7 +93,6 @@ namespace Deenote.Core.GameStage.Args
 
             [Header("Wave")]
             public Vector2 WaveScale;
-            public float WaveMaxAlpha;
             public float WaveGrowTime;
             public float WaveFadeTime;
 
