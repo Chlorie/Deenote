@@ -76,7 +76,7 @@ namespace Deenote.Library.Mathematics
 
             ToStr(color.r, ref chars[0]);
             ToStr(color.g, ref chars[2]);
-            ToStr(color.g, ref chars[4]);
+            ToStr(color.b, ref chars[4]);
             ToStr(color.a, ref chars[6]);
             return chars.ToString();
 
