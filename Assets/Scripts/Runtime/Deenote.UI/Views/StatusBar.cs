@@ -6,6 +6,7 @@ using Deenote.Library.Mathematics;
 using Deenote.Localization;
 using Deenote.UIFramework.Controls;
 using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Deenote.UI.Views
@@ -30,6 +31,9 @@ namespace Deenote.UI.Views
 
         public void SetLocalizedStatusMessage(string key, ReadOnlySpan<string> args = default)
             => SetStatusMessage(LocalizableText.Localized(key), args);
+
+        public void SetLocalizedStatusMessage(string key, string arg)
+            => SetLocalizedStatusMessage(key, MemoryMarshal.CreateReadOnlySpan(ref arg, 1));
 
         public void SetRawTextStatusMessage(string text) => SetStatusMessage(LocalizableText.Raw(text));
 

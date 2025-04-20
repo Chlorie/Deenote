@@ -2,15 +2,12 @@
 
 using CommunityToolkit.Diagnostics;
 using Deenote.Library;
-using Deenote.Library.Collections;
 using Deenote.UIFramework.Font;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using TMPro;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 namespace Deenote.UIFramework
 {
@@ -37,10 +34,7 @@ namespace Deenote.UIFramework
             get => _themeArgs[_currentThemeIndex];
             set {
                 var index = Array.IndexOf(_themeArgs, value);
-                Guard.IsGreaterThanOrEqualTo(index, 0);
-                if (Utils.SetField(ref _currentThemeIndex, index)) {
-                    ThemeChanged?.Invoke(_themeArgs[index]);
-                }
+                SetTheme(index);
             }
         }
 
@@ -48,8 +42,10 @@ namespace Deenote.UIFramework
 
         public static event Action<UIThemeArgs>? ThemeChanged;
 
-        public static bool SetTheme(string name)
+        public static bool SetTheme([AllowNull]string name)
         {
+            if (name is null)
+                return false;
             for (int i = 0; i < _themeArgs.Length; i++) {
                 UIThemeArgs? theme = _themeArgs[i];
                 if (theme.ThemeName == name) {
@@ -59,7 +55,6 @@ namespace Deenote.UIFramework
             }
             return false;
         }
-
 
         public static void SetTheme(int index)
         {

@@ -23,6 +23,18 @@ namespace Deenote.Core.Project
 
         public event Action<ProjectSaveEventArgs>? ProjectSaved;
 
+        private void RegisterAutoSaveConfigurations()
+        {
+            MainSystem.SaveSystem.SavingConfigurations += configs =>
+            {
+                configs.Add("project/autosave", (int)AutoSave);
+            };
+            MainSystem.SaveSystem.LoadedConfigurations += configs =>
+            {
+                AutoSave = (ProjectAutoSaveOption)configs.GetInt32("project/autosave", (int)ProjectAutoSaveOption.Off);
+            };
+        }
+
         public readonly record struct ProjectSaveEventArgs(ProjectSaveContents Contents)
         {
             public bool IsProjectSaved => Contents.HasFlag(ProjectSaveContents.Project);

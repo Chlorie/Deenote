@@ -1,5 +1,6 @@
 using Deenote.Library;
 using Deenote.Library.Components;
+using Deenote.Localization;
 using UnityEngine;
 
 namespace Deenote
@@ -15,6 +16,7 @@ namespace Deenote
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
+                configs.Add("language", LocalizationSystem.CurrentLanguage.LanguageCode);
                 configs.Add("vsync", IsVSyncOn);
                 configs.Add("ineffective_prop_visible", IsIneffectivePropertiesVisible);
                 configs.Add("fps_shown", IsFpsShown);
@@ -22,6 +24,10 @@ namespace Deenote
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
+                if (!LocalizationSystem.TrySetLanguage(configs.GetString("language", LocalizationSystem.DefaultLanguageCode))) {
+                    var res = LocalizationSystem.TrySetLanguage(LocalizationSystem.DefaultLanguageCode);
+                    Debug.Assert(res, "Failed to set default langeuage");
+                }
                 IsVSyncOn = configs.GetBoolean("vsync");
                 IsIneffectivePropertiesVisible = configs.GetBoolean("ineffective_prop_visible");
                 IsFpsShown = configs.GetBoolean("fps_shown");

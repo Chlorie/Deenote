@@ -258,7 +258,7 @@ SaveProject_FileExplorer_Title=Save Project.
 SaveAsProject_FileExplorer_Title=Save as...
 
 AutoSaveProject_Status_Saving=Auto saving project...
-AutoSaveProject_Status_Saved=Project auto saved.
+AutoSaveProject_Status_Saved=Project auto saved at {0}.
 
 #### Open Recent project
 
@@ -408,6 +408,16 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.1</b>
+
+    - Added Resolution 2056x1440
+    - Optimized project save, now the original file won't be overwrited if saving occurs error
+    - Adjusted status bar infomation of auto save
+    - Adjusted max undo count to 200
+    - Fixed bugs on preference saving(Stage effect, language, theme, auto save)
+
+    <b>Deenote 1.0.0</b>
+
     Completely refactored, partially support editing DEEMO II charts (note speed, hold, flick)
     """
 

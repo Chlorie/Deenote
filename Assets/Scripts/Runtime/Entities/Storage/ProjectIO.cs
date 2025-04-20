@@ -47,12 +47,18 @@ namespace Deenote.Entities.Storage
 
         private static void Save(ProjectModel project, string saveFilePath)
         {
-            using var fs = File.OpenWrite(saveFilePath);
-            using var bw = new BinaryWriter(fs);
-            bw.Write(DeenoteProjectFileHeader);
-            bw.Write(DeenoteProjectFileVersionMark);
-            WriteProject(bw, project);
-            project.ProjectFilePath = saveFilePath;
+            var tmpPath = $"{saveFilePath}.tmp";
+            using (var fs = File.OpenWrite(tmpPath)) {
+                using var bw = new BinaryWriter(fs);
+                bw.Write(DeenoteProjectFileHeader);
+                bw.Write(DeenoteProjectFileVersionMark);
+                WriteProject(bw, project);
+                project.ProjectFilePath = saveFilePath;
+            }
+
+            if (File.Exists(saveFilePath))
+                File.Delete(saveFilePath);
+            File.Move(tmpPath, saveFilePath);
         }
     }
 }

@@ -151,7 +151,7 @@ namespace Deenote.UI.Dialogs
         #region Resolutions
 
         private static readonly ImmutableArray<string> _resolutionDropdownOptions = ImmutableArray.Create(
-            "960x540", "1280x720", "1600x900", "1920x1080");
+            "960x540", "1280x720", "1600x900", "1920x1080", "2560x1440");
 
         private static Vector2Int GetResolutionDropdownOption(int optionIndex)
             => optionIndex switch {
@@ -159,6 +159,7 @@ namespace Deenote.UI.Dialogs
                 1 => new(1280, 720),
                 2 => new(1600, 900),
                 3 => new(1920, 1080),
+                4 => new(2560, 1440),
                 _ => ThrowHelper.ThrowInvalidOperationException<Vector2Int>(),
             };
 
@@ -169,6 +170,7 @@ namespace Deenote.UI.Dialogs
                 (1280, 720) => 1,
                 (1600, 900) => 2,
                 (1920, 1080) => 3,
+                (2560, 1440) => 4,
                 _ => -1,
             };
         }

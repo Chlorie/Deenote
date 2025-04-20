@@ -5,6 +5,7 @@ using Deenote.Localization;
 using Deenote.UI.Dialogs;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views;
+using Deenote.UIFramework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -94,11 +95,15 @@ namespace Deenote.UI
             {
                 configs.Add("ui/perspective_aspect_ratio", Views.PerspectiveViewPanelView.AspectRatio);
                 configs.AddList("ui/recent_files", Views.MenuNavigationPageView.GetRecentFiles() ?? _configtmpRecentFiles);
+                configs.Add("ui/theme", UISystem.CurrentTheme.ThemeName);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
                 Views.PerspectiveViewPanelView.AspectRatio = configs.GetSingle("ui/perspective_aspect_ratio", 4f / 3f);
                 _configtmpRecentFiles = configs.GetStringList("ui/recent_files");
+                if (!UISystem.SetTheme(configs.GetString("ui/theme"))) {
+                    UISystem.SetTheme(0);
+                }
             };
 
             UnhandledExceptionHandler.UnhandledExceptionOccurred += args =>

@@ -258,7 +258,7 @@ SaveProject_FileExplorer_Title=保存项目
 SaveAsProject_FileExplorer_Title=另存为...
 
 AutoSaveProject_Status_Saving=项目自动保存中...
-AutoSaveProject_Status_Saved=项目已自动保存。
+AutoSaveProject_Status_Saved=项目已于{0}自动保存。
 
 #### Open Recent project
 
@@ -582,6 +582,16 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.1</b>
+
+    - 增加了2K分辨率(2560*1440)
+    - 优化了项目保存，避免保存出错丢失原文件
+    - 调整了自动保存的状态栏信息
+    - 调整了最大撤销数量，目前可撤销操作数为200
+    - 修复了数个首选项不会保存的问题（场景特效、语言、主题、自动保存）
+
+    <b>Deenote 1.0.0</b>
+
     完全重构。支持DEEMO II谱面的部分属性的编辑（音符速度、hold、flick）
     """
 

@@ -47,7 +47,7 @@ namespace Deenote.Core.GamePlay
                 NoteFallSpeed = configs.GetInt32("stage/note_speed", 40);
                 IsShowLinkLines = configs.GetBoolean("stage/show_link_lines", true);
                 IsPianoNotesDistinguished = configs.GetBoolean("stage/piano_note_distinguish", true);
-                IsStageEffectOn = configs.GetBoolean("stage/sudden_plus", true);
+                IsStageEffectOn = configs.GetBoolean("stage/effect", true);
                 SuddenPlus = configs.GetSingle("stage/sudden_plus", 0f);
                 EarlyDisplaySlowNotes = configs.GetBoolean("stage/early_display_slow_notes", false);
                 IgnoreNoteSpeed = configs.GetBoolean("stage/ignore_note_speed_property", false);

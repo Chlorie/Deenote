@@ -105,12 +105,12 @@ namespace Deenote.UIFramework.Controls
             _selectedIndex_bf = -1;
         }
 
-        private void Start()
-        {
-            if (_selectedIndex_bf < 0 && _options.Count > 0) {
-                SelectedIndex = 0;
-            }
-        }
+        //private void Start()
+        //{
+        //    if (_selectedIndex_bf < 0 && _options.Count > 0) {
+        //        SelectedIndex = 0;
+        //    }
+        //}
 
         private void OnValidate()
         {
