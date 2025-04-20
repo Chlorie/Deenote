@@ -140,6 +140,10 @@ Dialog_PreferencesMouseSensitivity_Label=鼠标滚轮灵敏度
 Dialog_PreferencesMouseSensitivityInvert_Button=反转
 Dialog_PreferencesDistinguishPianoNotes_Label=区分钢琴音符
 Dialog_PreferencesPauseGamePlayWhenLoseFocus_Label=应用失去焦点时暂停
+Dialog_PreferencesGridLineColor=格线颜色
+Dialog_PreferencesGridLineColorTempo=BPM切换线
+Dialog_PreferencesGridLineColorBeat=拍线
+Dialog_PreferencesGridLineColorSubBeat=子拍线
 Dialog_PreferencesSystem_Header=系统
 Dialog_PreferencesResolution_Label=分辨率
 Dialog_PreferencesVSync_Label=垂直同步
@@ -585,6 +589,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.1</b>
 
     - 增加了2K分辨率(2560*1440)
+    - 提供了格线颜色自定义功能（首选项）
     - 优化了项目保存，避免保存出错丢失原文件
     - 调整了自动保存的状态栏信息
     - 调整了最大撤销数量，目前可撤销操作数为200

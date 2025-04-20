@@ -8,8 +8,10 @@ using Deenote.Library.Components;
 using Deenote.Localization;
 using Deenote.UIFramework;
 using Deenote.UIFramework.Controls;
+using System;
 using System.Collections.Immutable;
 using UnityEngine;
+using Deenote.Library.Mathematics;
 
 namespace Deenote.UI.Dialogs
 {
@@ -24,6 +26,9 @@ namespace Deenote.UI.Dialogs
         [SerializeField] Button _mouseSensitivityInvertButton = default!;
         [SerializeField] ToggleSwitch _distinguishPianoNotesToggle = default!;
         [SerializeField] ToggleSwitch _pauseStageWhenLoseFocusToggle = default!;
+        [SerializeField] TextBox _tempoLineColorInput = default!;
+        [SerializeField] TextBox _beatLineColorInput = default!;
+        [SerializeField] TextBox _subbeatLineColorInput = default!;
 
         [SerializeField] Dropdown _resolutionDropdown = default!;
         [SerializeField] ToggleSwitch _vSyncToggle = default!;
@@ -65,6 +70,62 @@ namespace Deenote.UI.Dialogs
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
                 GlobalSettings.NotificationFlag.GameViewScrollSensitivity,
                 settings => _mouseSensitivityInput.SetValueWithoutNotify(settings.GameViewScrollSensitivity.ToString("F1")));
+
+            _tempoLineColorInput.EditSubmitted += val =>
+            {
+                var span = val.AsSpan();
+                if (span.Length < 1) {
+                    MainSystem.GamePlayManager.CustomTempoLineColor = null;
+                    return;
+                }
+                if (span[0] is '#')
+                    span = span[1..];
+
+                if (ColorUtils.TryParse(span, out var color)) {
+                    MainSystem.GamePlayManager.CustomTempoLineColor = color;
+                }
+                SyncColorValue(_tempoLineColorInput, MainSystem.GamePlayManager.CustomTempoLineColor);
+            };
+            _beatLineColorInput.EditSubmitted += val =>
+            {
+                var span = val.AsSpan();
+                if (span.Length < 1) {
+                    MainSystem.GamePlayManager.CustomBeatLineColor = null;
+                    return;
+                }
+                if (span[0] is '#')
+                    span = span[1..];
+
+                if (ColorUtils.TryParse(span, out var color)) {
+                    MainSystem.GamePlayManager.CustomBeatLineColor = color;
+                }
+                SyncColorValue(_beatLineColorInput, MainSystem.GamePlayManager.CustomBeatLineColor);
+            };
+            _subbeatLineColorInput.EditSubmitted += val =>
+            {
+                var span = val.AsSpan();
+                if (span.Length < 1) {
+                    MainSystem.GamePlayManager.CustomSubBeatLineColor = null;
+                    return;
+                }
+                if (span[0] is '#')
+                    span = span[1..];
+
+
+                if (ColorUtils.TryParse(span, out var color)) {
+                    MainSystem.GamePlayManager.CustomSubBeatLineColor = color;
+                }
+                SyncColorValue(_subbeatLineColorInput, MainSystem.GamePlayManager.CustomSubBeatLineColor);
+            };
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.CustomTempoLineColor,
+                manager => SyncColorValue(_tempoLineColorInput, manager.CustomTempoLineColor));
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.CustomBeatLineColor,
+                manager => SyncColorValue(_beatLineColorInput, manager.CustomBeatLineColor));
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.CustomSubBeatLineColor,
+                manager => SyncColorValue(_subbeatLineColorInput, manager.CustomSubBeatLineColor));
 
             // System
 
@@ -114,6 +175,15 @@ namespace Deenote.UI.Dialogs
             MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.DistinguishPianoNotes,
                 manager => _distinguishPianoNotesToggle.IsChecked = manager.IsPianoNotesDistinguished);
+
+            void SyncColorValue(TextBox textBox, Color? color)
+            {
+                var str = color?.ToRGBAString();
+                if (str is null)
+                    textBox.SetValueWithoutNotify("");
+                else
+                    textBox.SetValueWithoutNotify($"#{str}");
+            }
         }
 
         public void Open() => OpenSelfModalDialog();

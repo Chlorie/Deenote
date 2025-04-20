@@ -73,6 +73,7 @@ namespace Deenote.Core.GamePlay
             _notesManager = new NotesManager(this);
 
             RegisterConfigurations();
+            RegisterCustomPropertiesConfigurations();
 
             GameStageSceneLoader.StageLoaded += loader =>
             {
@@ -283,6 +284,10 @@ namespace Deenote.Core.GamePlay
             ChartSpeed,
             ChartRemapMinVolume,
             ChartRemapMaxVolume,
+
+            CustomSubBeatLineColor,
+            CustomBeatLineColor,
+            CustomTempoLineColor,
         }
 
         public readonly record struct StageLoadedEventArgs(

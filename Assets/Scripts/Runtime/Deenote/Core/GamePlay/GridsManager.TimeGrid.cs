@@ -61,9 +61,9 @@ namespace Deenote.Core.GamePlay
             var args = _game.Stage.GridLineArgs;
             foreach (var (time, kind) in _timeGridLines) {
                 var (color, width) = kind switch {
-                    TimeGridLineKind.SubBeatLine => (args.SubBeatLineColor, args.TimeGridLineWidth),
-                    TimeGridLineKind.BeatLine => (args.BeatLineColor, args.TimeGridBeatLineWidth),
-                    TimeGridLineKind.TempoLine => (args.TempoLineColor, args.TimeGridTempoLineWidth),
+                    TimeGridLineKind.SubBeatLine => (_game.CustomSubBeatLineColor ?? args.SubBeatLineColor, args.TimeGridLineWidth),
+                    TimeGridLineKind.BeatLine => (_game.CustomBeatLineColor ?? args.BeatLineColor, args.TimeGridBeatLineWidth),
+                    TimeGridLineKind.TempoLine => (_game.CustomTempoLineColor ?? args.TempoLineColor, args.TimeGridTempoLineWidth),
                     _ => throw new System.NotImplementedException(),
                 };
                 var z = _game.ConvertNoteCoordTimeToWorldZ(time, _editor.Placer.PlacingNoteSpeed);

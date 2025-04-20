@@ -143,6 +143,10 @@ Dialog_PreferencesMouseSensitivity_Label=Mouse Scroll Sensitivity
 Dialog_PreferencesMouseSensitivityInvert_Button=Invert
 Dialog_PreferencesDistinguishPianoNotes_Label=Distinguish Piano Notes
 Dialog_PreferencesPauseGamePlayWhenLoseFocus_Label=Pause Game Play When Lose Focus
+Dialog_PreferencesGridLineColor=Grid Line Colors
+Dialog_PreferencesGridLineColorTempo=Tempo lines
+Dialog_PreferencesGridLineColorBeat=Beat lines
+Dialog_PreferencesGridLineColorSubBeat=Sub-beat lines
 Dialog_PreferencesSystem_Header=System
 Dialog_PreferencesResolution_Label=Resolution
 Dialog_PreferencesVSync_Label=VSync
@@ -410,7 +414,8 @@ AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.1</b>
 
-    - Added Resolution 2056x1440
+    - Added Resolution 2560x1440
+    - Added custom grid line colors in Preferences
     - Optimized project save, now the original file won't be overwrited if saving occurs error
     - Adjusted status bar infomation of auto save
     - Adjusted max undo count to 200

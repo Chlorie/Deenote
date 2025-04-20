@@ -100,7 +100,7 @@ namespace Deenote.Systems.Configurations
                     if (token?.Type == tokenType)
                         return token;
                     else {
-                        Debug.LogWarning($"Try read a json token with type {tokenType}, but get {tokenType}");
+                        Debug.LogWarning($"Try read a json token with type {tokenType}, but get {token?.Type}");
                         return null;
                     }
 
@@ -122,7 +122,7 @@ namespace Deenote.Systems.Configurations
             public void Add(string key, int value) => AddInternal(key, value);
             public void Add(string key, float value) => AddInternal(key, value);
             public void Add(string key, bool value) => AddInternal(key, value);
-            public void Add(string key, string value) => AddInternal(key, value);
+            public void Add(string key, string? value) => AddInternal(key, value);
             public void AddDictionary<TValue>(string key, IReadOnlyDictionary<string, TValue> dictionary) => AddInternal(key, dictionary);
             public void AddObject(string key, object obj) => AddInternal(key, obj);
 
