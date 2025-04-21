@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 namespace Deenote.Systems.Configurations
 {
@@ -64,6 +65,9 @@ namespace Deenote.Systems.Configurations
             public bool GetBoolean(string key, bool defaultValue = default)
                 => GetToken(key, JTokenType.Boolean) is { } token ? (bool)token : defaultValue;
 
+            public string? GetString(string key, string? defaultValue = null)
+                => GetToken(key, JTokenType.String) is { } token ? (string?)token : defaultValue;
+
             public T? GetObject<T>(string key, T? defaultValue = default!)
             {
                 if (_configs is null)
@@ -95,6 +99,11 @@ namespace Deenote.Systems.Configurations
                 if (_configs.TryGetValue(key, out var token)) {
                     if (token?.Type == tokenType)
                         return token;
+                    else {
+                        Debug.LogWarning($"Try read a json token with type {tokenType}, but get {token?.Type}");
+                        return null;
+                    }
+
                 }
                 return null;
             }
@@ -113,6 +122,7 @@ namespace Deenote.Systems.Configurations
             public void Add(string key, int value) => AddInternal(key, value);
             public void Add(string key, float value) => AddInternal(key, value);
             public void Add(string key, bool value) => AddInternal(key, value);
+            public void Add(string key, string? value) => AddInternal(key, value);
             public void AddDictionary<TValue>(string key, IReadOnlyDictionary<string, TValue> dictionary) => AddInternal(key, dictionary);
             public void AddObject(string key, object obj) => AddInternal(key, obj);
 

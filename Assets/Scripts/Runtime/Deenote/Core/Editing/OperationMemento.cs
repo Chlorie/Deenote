@@ -7,7 +7,7 @@ namespace Deenote.Core.Editing
 {
     public sealed class OperationMemento
     {
-        private const int MaxOperationUndoCount = 100;
+        private const int MaxOperationUndoCount = 200;
 
         private readonly Memento<IUndoableOperation> _memento;
         private int _saveOffset;

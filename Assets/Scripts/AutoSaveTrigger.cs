@@ -5,6 +5,7 @@ using Deenote.Core.Project;
 using Deenote.Library.Components;
 using Deenote.Library.Mathematics;
 using Deenote.UI;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -63,7 +64,7 @@ namespace Deenote
                 case Core.Project.ProjectAutoSaveOption.On:
                     MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavingStatusKey);
                     await MainSystem.ProjectManager.SaveCurrentProjectAsync();
-                    MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey);
+                    MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey, DateTime.Now.ToString("HH:mm"));
                     return;
                 case Core.Project.ProjectAutoSaveOption.OnAndSaveJson:
                     MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavingStatusKey);
@@ -72,7 +73,7 @@ namespace Deenote
                     var charts = MainSystem.ProjectManager.SaveCurrentProjectChartJsonsToAsync(dir);
                     await proj;
                     await charts;
-                    MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey);
+                    MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey, DateTime.Now.ToString("HH:mm"));
                     return;
                 default:
                     break;

@@ -11,7 +11,7 @@ namespace Deenote.Localization
 {
     public static class LocalizationSystem
     {
-        internal const string DefaultLanguageCode = "en";
+        public const string DefaultLanguageCode = "en";
         internal const string DefaultLanguageName = "English";
         private static readonly Dictionary<string, LanguagePack> _languageDict = new();
 

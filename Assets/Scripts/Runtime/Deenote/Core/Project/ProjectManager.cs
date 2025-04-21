@@ -54,6 +54,11 @@ namespace Deenote.Core.Project
             }
         }
 
+        private void Awake()
+        {
+            RegisterAutoSaveConfigurations();
+        }
+
 #if  UNITY_EDITOR
         private async void Start()
         {
