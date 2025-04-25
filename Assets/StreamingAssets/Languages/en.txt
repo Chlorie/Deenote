@@ -155,6 +155,7 @@ Dialog_PreferencesAutoSave_Label=Auto Save
 Dialog_PreferencesAutoSaveOff_Option=Off
 Dialog_PreferencesAutoSaveOn_Option=On
 Dialog_PreferencesAutoSaveOnAndSaveJson_Option=On And Save Json
+Dialog_PreferencesCheckUpdate_Label=Check update on startup
 Dialog_PreferencesEmbedProjectAudio_Label=Embed Audio Data In Project
 Dialog_PreferencesUI_Header=UI
 Dialog_PreferencesTheme_Label=Theme
@@ -416,6 +417,8 @@ AboutDialog_Versions_Dnt_1_0_Content="""
 
     - Fix bug on save color code
     - Fix bug on saving chart that has no sound
+    - Fix some visual bugs on check update, provide preference setting of checking update on startup
+    - Allow open project by pass file path to command line args. (Allow open project on starup when open project file)
 
     <b>Deenote 1.0.1</b>
 

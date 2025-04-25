@@ -34,6 +34,7 @@ namespace Deenote.UI.Dialogs
         [SerializeField] ToggleSwitch _vSyncToggle = default!;
         [SerializeField] Dropdown _languageDropdown = default!;
         [SerializeField] Dropdown _autoSaveDropdown = default!;
+        [SerializeField] ToggleSwitch _checkUpdateToggle = default!;
         //[SerializeField] ToggleSwitch _embedAudioDataToggle = default!;
 
         [SerializeField] Dropdown _uiThemeDropdown = default!;
@@ -150,6 +151,11 @@ namespace Deenote.UI.Dialogs
             MainSystem.ProjectManager.RegisterNotificationAndInvoke(
                 ProjectManager.NotificationFlag.AutoSave,
                 manager => _autoSaveDropdown.SetValueWithoutNotify(GetAutoSaveDropdownIndex(manager.AutoSave)));
+
+            _checkUpdateToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.CheckUpdateOnStartup = val;
+            MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
+                GlobalSettings.NotificationFlag.CheckUpdateOnStartup,
+                settings => _checkUpdateToggle.IsChecked = settings.CheckUpdateOnStartup);
 
             //_embedAudioDataToggle.IsCheckedChanged+=MainSystem.ProjectManager.
 
