@@ -7478,6 +7478,16 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 5577988929620054275, guid: 01db18d5879dbc7479a709512ba67056,
+        type: 3}
+      propertyPath: _localizableText._textOrKey
+      value: Dialog_PreferencesCheckUpdate_Label
+      objectReference: {fileID: 0}
+    - target: {fileID: 5577988929620054275, guid: 01db18d5879dbc7479a709512ba67056,
+        type: 3}
+      propertyPath: _localizableText._isLocalized
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7983796330476838019, guid: 01db18d5879dbc7479a709512ba67056,
         type: 3}
       propertyPath: m_Name

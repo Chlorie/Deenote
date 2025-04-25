@@ -105,6 +105,7 @@ namespace Deenote.UI.Views
 
         private const string VersionCheckNoInternetToastKey = "Version_NoInternet_Toast";
         private const string VersionCheckUpdateToDateToastKey = "Version_UpToDate_Toast";
+        private const string VersionCheckingStatusKey = "NewVersion_Status_Checking";
 
         #endregion
 
@@ -147,21 +148,27 @@ namespace Deenote.UI.Views
 
                 _checkUpdateButton.Clicked += UniTask.Action(async () =>
                 {
-                    var res = await VersionManager.CheckUpdateAsync();
-                    switch (res.Kind) {
-                        case VersionManager.UpdateCheckResultKind.NoInternet:
-                            _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckNoInternetToastKey, 3f);
-                            break;
-                        case VersionManager.UpdateCheckResultKind.UpToDate:
-                            _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckUpdateToDateToastKey, 3f);
-                            break;
-                        case VersionManager.UpdateCheckResultKind.UpdateAvailable:
-                            var clicked = await MainWindow.DialogManager.OpenMessageBoxAsync(_verUpdMsgBoxArgs, VersionManager.CurrentVersion.ToString(), res.LatestVersion.ToString());
-                            switch (clicked) {
-                                case 0: VersionManager.OpenReleasePage(); break;
-                                case 1: VersionManager.OpenDownloadPage(res.LatestVersion); break;
-                            }
-                            break;
+                    MainWindow.StatusBar.SetLocalizedStatusMessage(VersionCheckingStatusKey);
+
+                    try {
+                        var res = await VersionManager.CheckUpdateAsync();
+                        switch (res.Kind) {
+                            case VersionManager.UpdateCheckResultKind.NoInternet:
+                                _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckNoInternetToastKey, 3f);
+                                break;
+                            case VersionManager.UpdateCheckResultKind.UpToDate:
+                                _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckUpdateToDateToastKey, 3f);
+                                break;
+                            case VersionManager.UpdateCheckResultKind.UpdateAvailable:
+                                var clicked = await MainWindow.DialogManager.OpenMessageBoxAsync(_verUpdMsgBoxArgs, VersionManager.CurrentVersion.ToString(), res.LatestVersion.ToString());
+                                switch (clicked) {
+                                    case 0: VersionManager.OpenReleasePage(); break;
+                                    case 1: VersionManager.OpenDownloadPage(res.LatestVersion); break;
+                                }
+                                break;
+                        }
+                    } finally {
+                        MainWindow.StatusBar.SetReadyStatusMessage();
                     }
                 });
 

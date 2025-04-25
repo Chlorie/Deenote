@@ -106,6 +106,8 @@ NavPanel_EditorBpmFill_Label=Fill
 
 
 ## Status Bar
+
+StatusBar_ReadyText=Ready.
 StatusBar_Fps=FPS: {0}
 
 
@@ -179,6 +181,7 @@ NewVersion_MsgBox_Content=Current version: {0}<br/>Latest version: {1}
 NewVersion_MsgBox_1=Go to release page
 NewVersion_MsgBox_2=Go to download page
 NewVersion_MsgBox_N=Update later
+NewVersion_Status_Checking=Checking update...
 
 UnhandledException_Toast="""
     Unhandled exception detected.

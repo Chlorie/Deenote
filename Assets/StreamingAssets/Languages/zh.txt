@@ -106,6 +106,8 @@ NavPanel_EditorBpmFill_Label=填充
 
 
 ## Status Bar
+
+StatusBar_ReadyText=就绪。
 StatusBar_Fps=FPS: {0}
 
 
@@ -179,6 +181,7 @@ NewVersion_MsgBox_Content=当前版本：{0}，最新版本：{1}
 NewVersion_MsgBox_1=前往发布页
 NewVersion_MsgBox_2=前往下载页
 NewVersion_MsgBox_N=稍后更新
+NewVersion_Status_Checking=正在检查更新...
 
 UnhandledException_Toast="""
     检测到未处理的异常

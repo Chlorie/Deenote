@@ -22,6 +22,7 @@ namespace Deenote.UI.Views
 
         #region LocalizedTextKeys
 
+        private const string ReadyTextKey = "StatusBar_ReadyText";
         private const string FpsStatusFormatKey = "StatusBar_Fps";
 
         #endregion
@@ -37,11 +38,19 @@ namespace Deenote.UI.Views
 
         public void SetRawTextStatusMessage(string text) => SetStatusMessage(LocalizableText.Raw(text));
 
+        public void SetReadyStatusMessage()
+            => SetLocalizedStatusMessage(ReadyTextKey);
+
         private void Awake()
         {
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
                 GlobalSettings.NotificationFlag.FpsShown,
                 settings => _fpsText.gameObject.SetActive(_isFpsUpdate = settings.IsFpsShown));
+        }
+
+        private void Start()
+        {
+            SetReadyStatusMessage();
         }
 
         private void Update()
