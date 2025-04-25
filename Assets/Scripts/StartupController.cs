@@ -41,7 +41,7 @@ namespace Deenote
         private async UniTaskVoid CheckUpdateAsync()
         {
             var res = await VersionManager.CheckUpdateAsync();
-            if (res.Type is VersionManager.UpdateCheckResultType.UpdateAvailable) {
+            if (res.Kind is VersionManager.UpdateCheckResultKind.UpdateAvailable) {
                 var clicked = await MainWindow.DialogManager.OpenMessageBoxAsync(_verUpdMsgBoxArgs,
                     VersionManager.CurrentVersion.ToString(),
                     res.LatestVersion.ToString());

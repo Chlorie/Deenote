@@ -148,14 +148,14 @@ namespace Deenote.UI.Views
                 _checkUpdateButton.Clicked += UniTask.Action(async () =>
                 {
                     var res = await VersionManager.CheckUpdateAsync();
-                    switch (res.Type) {
-                        case VersionManager.UpdateCheckResultType.NoInternet:
+                    switch (res.Kind) {
+                        case VersionManager.UpdateCheckResultKind.NoInternet:
                             _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckNoInternetToastKey, 3f);
                             break;
-                        case VersionManager.UpdateCheckResultType.UpToDate:
+                        case VersionManager.UpdateCheckResultKind.UpToDate:
                             _ = MainWindow.ToastManager.ShowLocalizedToastAsync(VersionCheckUpdateToDateToastKey, 3f);
                             break;
-                        case VersionManager.UpdateCheckResultType.UpdateAvailable:
+                        case VersionManager.UpdateCheckResultKind.UpdateAvailable:
                             var clicked = await MainWindow.DialogManager.OpenMessageBoxAsync(_verUpdMsgBoxArgs, VersionManager.CurrentVersion.ToString(), res.LatestVersion.ToString());
                             switch (clicked) {
                                 case 0: VersionManager.OpenReleasePage(); break;
