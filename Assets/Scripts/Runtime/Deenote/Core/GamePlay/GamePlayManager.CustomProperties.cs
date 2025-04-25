@@ -12,9 +12,9 @@ namespace Deenote.Core.GamePlay
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.Add("stage/line-color-subbeat", CustomSubBeatLineColor?.ToRGBAString());
-                configs.Add("stage/line-color-beat", CustomBeatLineColor?.ToRGBAString());
-                configs.Add("stage/line-color-tempo", CustomTempoLineColor?.ToRGBAString());
+                configs.Set("stage/line-color-subbeat", CustomSubBeatLineColor?.ToRGBAString());
+                configs.Set("stage/line-color-beat", CustomBeatLineColor?.ToRGBAString());
+                configs.Set("stage/line-color-tempo", CustomTempoLineColor?.ToRGBAString());
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {

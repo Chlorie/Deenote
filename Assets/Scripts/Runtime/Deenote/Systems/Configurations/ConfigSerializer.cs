@@ -25,7 +25,12 @@ namespace Deenote.Systems.Configurations
 
         public void Save()
         {
-            var configs = new ConfigRegistration();
+            Dictionary<string, object?>? configDict = null;
+            if (File.Exists(_configFilePath)) {
+                configDict = JsonConvert.DeserializeObject<Dictionary<string, object?>>(File.ReadAllText(_configFilePath));
+            }
+
+            var configs = new ConfigRegistration(configDict);
             Saving?.Invoke(configs);
 
             var json = JsonConvert.SerializeObject(configs.Configs, Formatting.Indented);
@@ -111,26 +116,27 @@ namespace Deenote.Systems.Configurations
 
         public readonly struct ConfigRegistration
         {
-            private readonly Dictionary<string, object?> _configs = new();
+            private readonly Dictionary<string, object?> _configs;
 
-            public ConfigRegistration()
+            public ConfigRegistration(Dictionary<string, object?>? configs)
             {
+                _configs = configs ?? new();
             }
 
             internal IDictionary<string, object?> Configs => _configs;
 
-            public void Add(string key, int value) => AddInternal(key, value);
-            public void Add(string key, float value) => AddInternal(key, value);
-            public void Add(string key, bool value) => AddInternal(key, value);
-            public void Add(string key, string? value) => AddInternal(key, value);
-            public void AddDictionary<TValue>(string key, IReadOnlyDictionary<string, TValue> dictionary) => AddInternal(key, dictionary);
-            public void AddObject(string key, object obj) => AddInternal(key, obj);
+            public void Set(string key, int value) => SetInternal(key, value);
+            public void Set(string key, float value) => SetInternal(key, value);
+            public void Set(string key, bool value) => SetInternal(key, value);
+            public void Set(string key, string? value) => SetInternal(key, value);
+            public void SetDictionary<TValue>(string key, IReadOnlyDictionary<string, TValue> dictionary) => SetInternal(key, dictionary);
+            public void SetObject(string key, object obj) => SetInternal(key, obj);
 
-            public void AddList(string key, IEnumerable<string>? list) => AddInternal(key, list);
+            public void SetList(string key, IEnumerable<string>? list) => SetInternal(key, list);
 
-            private void AddInternal(string key, object? value)
+            private void SetInternal(string key, object? value)
             {
-                Configs.Add(key, value);
+                Configs[key] = value;
             }
         }
     }

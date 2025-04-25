@@ -17,12 +17,12 @@ namespace Deenote
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.Add("language", LocalizationSystem.CurrentLanguage.LanguageCode);
-                configs.Add("vsync", IsVSyncOn);
-                configs.Add("ineffective_prop_visible", IsIneffectivePropertiesVisible);
-                configs.Add("fps_shown", IsFpsShown);
-                configs.Add("scroll_sensitivity", GameViewScrollSensitivity);
-                configs.Add("check_update", CheckUpdateOnStartup);
+                configs.Set("language", LocalizationSystem.CurrentLanguage.LanguageCode);
+                configs.Set("vsync", IsVSyncOn);
+                configs.Set("ineffective_prop_visible", IsIneffectivePropertiesVisible);
+                configs.Set("fps_shown", IsFpsShown);
+                configs.Set("scroll_sensitivity", GameViewScrollSensitivity);
+                configs.Set("check_update", CheckUpdateOnStartup);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {

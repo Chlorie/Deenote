@@ -20,23 +20,23 @@ namespace Deenote.Core.GamePlay
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.Add("stage/highlight_note_speed", HighlightedNoteSpeed);
-                configs.Add("stage/apply_speed_diff", IsApplySpeedDifference);
-                configs.Add("stage/filter_note_speed", IsFilterNoteSpeed);
+                configs.Set("stage/highlight_note_speed", HighlightedNoteSpeed);
+                configs.Set("stage/apply_speed_diff", IsApplySpeedDifference);
+                configs.Set("stage/filter_note_speed", IsFilterNoteSpeed);
 
-                configs.Add("stage/note_speed", NoteFallSpeed);
-                configs.Add("stage/show_link_lines", IsShowLinkLines);
-                configs.Add("stage/piano_note_distinguish", IsPianoNotesDistinguished);
-                configs.Add("stage/effect", IsStageEffectOn);
-                configs.Add("stage/sudden_plus", SuddenPlus);
-                configs.Add("stage/early_display_slow_notes", EarlyDisplaySlowNotes);
-                configs.Add("stage/ignore_note_speed_property", IgnoreNoteSpeed);
-                configs.Add("stage/pause_when_lose_focus", PauseWhenLoseFocus);
+                configs.Set("stage/note_speed", NoteFallSpeed);
+                configs.Set("stage/show_link_lines", IsShowLinkLines);
+                configs.Set("stage/piano_note_distinguish", IsPianoNotesDistinguished);
+                configs.Set("stage/effect", IsStageEffectOn);
+                configs.Set("stage/sudden_plus", SuddenPlus);
+                configs.Set("stage/early_display_slow_notes", EarlyDisplaySlowNotes);
+                configs.Set("stage/ignore_note_speed_property", IgnoreNoteSpeed);
+                configs.Set("stage/pause_when_lose_focus", PauseWhenLoseFocus);
 
-                configs.Add("stage/music_speed", MusicSpeed);
-                configs.Add("stage/hitsound_volume", HitSoundVolume);
-                configs.Add("stage/music_volume", MusicVolume);
-                configs.Add("stage/piano_volume", PianoVolume);
+                configs.Set("stage/music_speed", MusicSpeed);
+                configs.Set("stage/hitsound_volume", HitSoundVolume);
+                configs.Set("stage/music_volume", MusicVolume);
+                configs.Set("stage/piano_volume", PianoVolume);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {

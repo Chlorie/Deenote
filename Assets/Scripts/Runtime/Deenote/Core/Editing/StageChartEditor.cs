@@ -36,9 +36,9 @@ namespace Deenote.Core.Editing
 
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.Add("editor/indicator", Placer.IsIndicatorOn);
-                configs.Add("editor/snap_pos", Placer.SnapToPositionGrid);
-                configs.Add("editor/snap_time", Placer.SnapToTimeGrid);
+                configs.Set("editor/indicator", Placer.IsIndicatorOn);
+                configs.Set("editor/snap_pos", Placer.SnapToPositionGrid);
+                configs.Set("editor/snap_time", Placer.SnapToTimeGrid);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
