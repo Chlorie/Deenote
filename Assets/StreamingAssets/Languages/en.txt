@@ -412,6 +412,11 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.2</b>
+
+    - Fix bug on save color code
+    - Fix bug on saving chart that has no sound
+
     <b>Deenote 1.0.1</b>
 
     - Added Resolution 2560x1440

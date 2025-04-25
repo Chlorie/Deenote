@@ -586,6 +586,11 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.2</b>
+
+    - 修复颜色代码保存的bug
+    - 修复谱面无钢琴音时，导出谱面报错的bug
+
     <b>Deenote 1.0.1</b>
 
     - 增加了2K分辨率(2560*1440)
