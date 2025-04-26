@@ -419,6 +419,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.2</b>
 
     - Fix bug on save color code
+    - Fix bug of shortcut z/x
     - Fix bug on saving chart that has no sound
     - Fix some visual bugs on check update, provide preference setting of checking update on startup
     - Allow open project by pass file path to command line args. (Allow open project on starup when open project file)
