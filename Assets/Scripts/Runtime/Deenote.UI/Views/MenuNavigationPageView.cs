@@ -230,11 +230,11 @@ namespace Deenote.UI.Views
             MainSystem.ProjectManager.UnloadCurrentProject();
             bool isLoaded = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(feRes.Path);
             if (isLoaded) {
-                AddPathToRecentFiles(feRes.Path);
+                AddOrTouchRecentFiles(feRes.Path);
                 MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectLoadedStatusKey);
             }
             else {
-                MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectFailedStatusKey);
+                MainWindow.StatusBar.SetReadyStatusMessage();
                 var res = await MainWindow.DialogManager.OpenMessageBoxAsync(_loadProjFailedMsgBoxArgs);
                 if (res == 0)
                     goto SelectFile;
@@ -251,7 +251,7 @@ namespace Deenote.UI.Views
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectAsync();
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
-            AddPathToRecentFiles(proj.ProjectFilePath);
+            AddOrTouchRecentFiles(proj.ProjectFilePath);
         }
 
         public async UniTask MenuSaveProjectAsAsync()
@@ -277,14 +277,14 @@ namespace Deenote.UI.Views
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectToAsync(feRes.Path);
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
-            AddPathToRecentFiles(MainSystem.ProjectManager.CurrentProject.ProjectFilePath);
+            AddOrTouchRecentFiles(MainSystem.ProjectManager.CurrentProject.ProjectFilePath);
         }
 
         #endregion
 
         #region Recent Files
 
-        private void AddPathToRecentFiles(string filePath)
+        public void AddOrTouchRecentFiles(string filePath)
         {
             int findIndex = _recentFiles.FindIndex(filePath, static (item, fp) => item.FilePath == fp);
             if (findIndex >= 0) {

@@ -74,13 +74,13 @@ namespace Deenote.UI.Views.Elements
                     bool res = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(FilePath);
                     if (res) {
                         MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectLoadedStatusKey);
+                        Parent.TouchRecentFile(this);
                     }
                     else {
                         MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectFailedStatusKey);
                         MainWindow.DialogManager.OpenMessageBoxAsync(_loadProjFailedMsgBoxArgs)
                             .Forget();
                     }
-                    Parent.TouchRecentFile(this);
                     return;
                 }
 

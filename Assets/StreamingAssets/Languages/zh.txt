@@ -590,6 +590,10 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.3</b>
+
+    - 修正了上个版本有人忘了测的命令行参数功能
+
     <b>Deenote 1.0.2</b>
 
     - 修复颜色代码保存的bug

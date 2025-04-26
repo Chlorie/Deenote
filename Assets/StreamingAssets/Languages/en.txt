@@ -416,6 +416,10 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.3</b>
+
+    - Fix the totally wrong behaviour of opening project from cli arg, I forgot to test it
+    
     <b>Deenote 1.0.2</b>
 
     - Fix bug on save color code
