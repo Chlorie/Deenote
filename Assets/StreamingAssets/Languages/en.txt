@@ -106,6 +106,8 @@ NavPanel_EditorBpmFill_Label=Fill
 
 
 ## Status Bar
+
+StatusBar_ReadyText=Ready.
 StatusBar_Fps=FPS: {0}
 
 
@@ -155,6 +157,7 @@ Dialog_PreferencesAutoSave_Label=Auto Save
 Dialog_PreferencesAutoSaveOff_Option=Off
 Dialog_PreferencesAutoSaveOn_Option=On
 Dialog_PreferencesAutoSaveOnAndSaveJson_Option=On And Save Json
+Dialog_PreferencesCheckUpdate_Label=Check update on startup
 Dialog_PreferencesEmbedProjectAudio_Label=Embed Audio Data In Project
 Dialog_PreferencesUI_Header=UI
 Dialog_PreferencesTheme_Label=Theme
@@ -178,6 +181,7 @@ NewVersion_MsgBox_Content=Current version: {0}<br/>Latest version: {1}
 NewVersion_MsgBox_1=Go to release page
 NewVersion_MsgBox_2=Go to download page
 NewVersion_MsgBox_N=Update later
+NewVersion_Status_Checking=Checking update...
 
 UnhandledException_Toast="""
     Unhandled exception detected.
@@ -412,6 +416,15 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.2</b>
+
+    - Fix bug on save color code
+    - Fix bug of shortcut z/x
+    - Fix bug on saving chart that has no sound
+    - Fix some visual bugs on check update, provide preference setting of checking update on startup
+    - Allow open project by pass file path to command line args. (Allow open project on starup when open project file)
+    - Optimize configuration save logic
+
     <b>Deenote 1.0.1</b>
 
     - Added Resolution 2560x1440

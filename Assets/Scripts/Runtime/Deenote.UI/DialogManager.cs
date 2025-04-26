@@ -36,8 +36,8 @@ namespace Deenote.UI
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.AddList("ui/file_exploer/pinned", _fileExplorerDialog.GetPinnedItems() ?? _configtmpFileExplorerPinned);
-                configs.Add("ui/new_proj/same_dir", _newProjectDialog._saveToAudioDirectory);
+                configs.SetList("ui/file_exploer/pinned", _fileExplorerDialog.GetPinnedItems() ?? _configtmpFileExplorerPinned);
+                configs.Set("ui/new_proj/same_dir", _newProjectDialog._saveToAudioDirectory);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {

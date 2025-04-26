@@ -93,9 +93,9 @@ namespace Deenote.UI
 
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.Add("ui/perspective_aspect_ratio", Views.PerspectiveViewPanelView.AspectRatio);
-                configs.AddList("ui/recent_files", Views.MenuNavigationPageView.GetRecentFiles() ?? _configtmpRecentFiles);
-                configs.Add("ui/theme", UISystem.CurrentTheme.ThemeName);
+                configs.Set("ui/perspective_aspect_ratio", Views.PerspectiveViewPanelView.AspectRatio);
+                configs.SetList("ui/recent_files", Views.MenuNavigationPageView.GetRecentFiles() ?? _configtmpRecentFiles);
+                configs.Set("ui/theme", UISystem.CurrentTheme.ThemeName);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {

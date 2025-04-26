@@ -106,6 +106,8 @@ NavPanel_EditorBpmFill_Label=填充
 
 
 ## Status Bar
+
+StatusBar_ReadyText=就绪。
 StatusBar_Fps=FPS: {0}
 
 
@@ -152,6 +154,7 @@ Dialog_PreferencesAutoSave_Label=自动保存
 Dialog_PreferencesAutoSaveOff_Option=关闭
 Dialog_PreferencesAutoSaveOn_Option=打开
 Dialog_PreferencesAutoSaveOnAndSaveJson_Option=打开并保存Json
+Dialog_PreferencesCheckUpdate_Label=启动时检查更新
 Dialog_PreferencesEmbedProjectAudio_Label=嵌入音频文件到项目中
 Dialog_PreferencesUI_Header=UI
 Dialog_PreferencesTheme_Label=主题
@@ -178,6 +181,7 @@ NewVersion_MsgBox_Content=当前版本：{0}，最新版本：{1}
 NewVersion_MsgBox_1=前往发布页
 NewVersion_MsgBox_2=前往下载页
 NewVersion_MsgBox_N=稍后更新
+NewVersion_Status_Checking=正在检查更新...
 
 UnhandledException_Toast="""
     检测到未处理的异常
@@ -586,6 +590,15 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.2</b>
+
+    - 修复颜色代码保存的bug
+    - 修复快捷键z/x的问题
+    - 修复谱面无钢琴音时，导出谱面报错的bug
+    - 修正检查更新时的数个显示错误，提供了启动时检查更新的首选项设置。
+    - 提供了通过命令行参数启动程序时打开项目的功能（即双击项目文件打开）
+    - 优化配置文件保存逻辑
+
     <b>Deenote 1.0.1</b>
 
     - 增加了2K分辨率(2560*1440)

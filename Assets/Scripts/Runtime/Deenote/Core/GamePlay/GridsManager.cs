@@ -39,10 +39,10 @@ namespace Deenote.Core.GamePlay
 
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.Add("stage/grids/pos_grid_count", PositionGridCount);
-                configs.Add("stage/grids/pos_grid_visible", PositionGridVisible);
-                configs.Add("stage/grids/time_grid_count", TimeGridSubBeatCount);
-                configs.Add("stage/grids/time_grid_visible", TimeGridVisible);
+                configs.Set("stage/grids/pos_grid_count", PositionGridCount);
+                configs.Set("stage/grids/pos_grid_visible", PositionGridVisible);
+                configs.Set("stage/grids/time_grid_count", TimeGridSubBeatCount);
+                configs.Set("stage/grids/time_grid_visible", TimeGridVisible);
             };
 
             MainSystem.SaveSystem.LoadedConfigurations += configs =>

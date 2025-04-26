@@ -21,11 +21,11 @@ namespace Deenote.Entities.Models
 
         [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("oriVMin", Order = 1), Obsolete("For serialzation only")]
-        private int _SerializeMinVolume => _SerializeNotes.SelectMany(n => n.Sounds, (n, s) => s.Velocity).Min();
+        private int _SerializeMinVolume => _SerializeNotes.SelectMany(n => n.Sounds, (n, s) => s.Velocity).MinMaxOrNull()?.Min ?? 0;
 
         [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("oriVMax", Order = 2), Obsolete("For serialzation only")]
-        private int _SerializeMaxVolume => _SerializeNotes.SelectMany(n => n.Sounds, (n, s) => s.Velocity).Max();
+        private int _SerializeMaxVolume => _SerializeNotes.SelectMany(n => n.Sounds, (n, s) => s.Velocity).MinMaxOrNull()?.Max ?? 0;
 
         [ChartSerializationVersion(ChartSerializationVersions.DeemoIIV2)]
         [JsonProperty("remapVMin", Order = 3)]

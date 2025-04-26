@@ -27,7 +27,7 @@ namespace Deenote.Core.Project
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.Add("project/autosave", (int)AutoSave);
+                configs.Set("project/autosave", (int)AutoSave);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {

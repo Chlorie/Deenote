@@ -11,16 +11,18 @@ namespace Deenote
         private bool _isIneffectivePropertiesVisible;
         private bool _isFpsShown;
         private float _gameViewScrollSensitivity_bf;
+        private bool _checkUpdateOnStartup;
 
         public GlobalSettings()
         {
             MainSystem.SaveSystem.SavingConfigurations += configs =>
             {
-                configs.Add("language", LocalizationSystem.CurrentLanguage.LanguageCode);
-                configs.Add("vsync", IsVSyncOn);
-                configs.Add("ineffective_prop_visible", IsIneffectivePropertiesVisible);
-                configs.Add("fps_shown", IsFpsShown);
-                configs.Add("scroll_sensitivity", GameViewScrollSensitivity);
+                configs.Set("language", LocalizationSystem.CurrentLanguage.LanguageCode);
+                configs.Set("vsync", IsVSyncOn);
+                configs.Set("ineffective_prop_visible", IsIneffectivePropertiesVisible);
+                configs.Set("fps_shown", IsFpsShown);
+                configs.Set("scroll_sensitivity", GameViewScrollSensitivity);
+                configs.Set("check_update", CheckUpdateOnStartup);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
@@ -32,6 +34,7 @@ namespace Deenote
                 IsIneffectivePropertiesVisible = configs.GetBoolean("ineffective_prop_visible");
                 IsFpsShown = configs.GetBoolean("fps_shown");
                 GameViewScrollSensitivity = configs.GetSingle("scroll_sensitivity", 1f);
+                CheckUpdateOnStartup = configs.GetBoolean("check_update", true);
             };
         }
 
@@ -81,12 +84,25 @@ namespace Deenote
             }
         }
 
+        public bool CheckUpdateOnStartup
+        {
+            get => _checkUpdateOnStartup;
+            set {
+                if (_checkUpdateOnStartup == value)
+                    return;
+
+                _checkUpdateOnStartup = value;
+                NotifyFlag(NotificationFlag.CheckUpdateOnStartup);
+            }
+        }
+
         public enum NotificationFlag
         {
             VSync,
             IneffectivePropertiesVisible,
             FpsShown,
             GameViewScrollSensitivity,
+            CheckUpdateOnStartup,
         }
 
     }

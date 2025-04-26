@@ -902,7 +902,7 @@ namespace Deenote.InputSystem.InputActions
                 {
                     ""name"": """",
                     ""id"": ""8d7f0d50-d1a2-4bbd-9cdf-ad10e6a3d8d9"",
-                    ""path"": ""<Keyboard>/z"",
+                    ""path"": ""<Keyboard>/x"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -913,7 +913,7 @@ namespace Deenote.InputSystem.InputActions
                 {
                     ""name"": """",
                     ""id"": ""476276bc-3478-4721-938d-8207d9762d99"",
-                    ""path"": ""<Keyboard>/x"",
+                    ""path"": ""<Keyboard>/z"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
