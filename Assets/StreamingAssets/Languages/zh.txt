@@ -519,14 +519,16 @@ Dialog_AboutTurorials_Page_Shortcuts_Content="""
     <;> 删除钢琴音
     <Q> 将选中音符吸附到格线
     <W/A/S/D> 调整选中音符的位置(0.01)/时间(1ms)
-    <Shift+W/A/S/D> 调整选中音符的位置(0.1)/时间(10ms)
-    <Alt+W/A/S/D> 将选中音符的位置/时间吸附到下一格线
+    <Alt+W/A/S/D> 调整选中音符的位置(0.1)/时间(10ms)
+    <Shift+W/A/S/D> 将选中音符的位置/时间吸附到下一格线
+    <R/F> 调整选中音符的时长(1ms)
+    <Alt+R/F> 调整选中音符的时长(10ms)
+    <Shift+R/F> 将选中音符的结束时间吸附到下一格线
     <Z/X> 调整选中音符的大小(0.01)
     <Shift+Z/X> 调整选中音符的大小(0.1)
     <C/V> 调整选中音符的速度(0.01)
     <Shift+C/V> 调整选中音符的速度(0.1)
     <M> 以Pos=0为线镜像音符位置
-    <F> Fill notes on the curve
 
     <鼠标左键> 选择音符/取消放置音符
     <鼠标右键> 按下开始放置音符，上下滑动放置Hold音符，左右滑动放置Swipe音符
@@ -593,6 +595,8 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.3</b>
 
     - 修正了上个版本有人忘了测的命令行参数功能
+    - 新增了调整Note时长的快捷键(R/F或Shift/Alt + R/F)
+    - 修正快捷键列表的文本错误
 
     <b>Deenote 1.0.2</b>
 

@@ -190,6 +190,8 @@ namespace Deenote.Inputting
         private const float SizeDeltaLarge = 0.1f;
         private const float SpeedDelta = 0.01f;
         private const float SpeedDeltaLarge = 0.1f;
+        private const float DurationDelta = 0.001f;
+        private const float DurationDeltaLarge = 0.01f;
 
         private void RegisterNoteEdit()
         {
@@ -228,6 +230,12 @@ namespace Deenote.Inputting
             actions.KindSwipe.started += _ => _editor.EditSelectedNotesKind(NoteModel.NoteKind.Swipe);
             actions.SoundAdd.started += _ => _editor.EditSelectedNoteSounds(true);
             actions.SoundRemove.started += _ => _editor.EditSelectedNoteSounds(false);
+            actions.DurationDec.started += _ => _editor.EditSelectedNotesDuration(d => d - DurationDelta);
+            actions.DurationInc.started += _ => _editor.EditSelectedNotesDuration(d => d + DurationDelta);
+            actions.DurationDecLarge.started += _ => _editor.EditSelectedNotesDuration(d => d - DurationDeltaLarge);
+            actions.DurationIncLarge.started += _ => _editor.EditSelectedNotesDuration(d => d + DurationDeltaLarge);
+            actions.DurationDecByGrid.started += _ => _editor.EditSelectedNotesEndTime(t => _game.Grids.FloorToNearestNextTimeGridTime(t) ?? t);
+            actions.DurationIncByGrid.started += _ => _editor.EditSelectedNotesEndTime(t => _game.Grids.CeilToNearestNextTimeGridTime(t) ?? t);
             actions.CreateHoldBetween.started += _ =>
             {
                 if (_editor.Selector.SelectedNotes.Length != 2)

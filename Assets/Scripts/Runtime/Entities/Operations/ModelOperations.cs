@@ -64,36 +64,31 @@ namespace Deenote.Entities.Operations
             protected readonly ImmutableArray<NoteModel> _notes;
             protected readonly ImmutableArray<TProperty> _oldValues;
 
-            private readonly TProperty? _newValue;
-            private readonly Func<TProperty, TProperty>? _newValueSelector;
+            private readonly ValueProvider _newValueProvider;
 
             private bool _firstRedo = true;
 
             protected EditNotesPropertyOperationBase(ChartModel chart,
                 ImmutableArray<NoteModel> notes,
                 ImmutableArray<TProperty> oldValues,
-                TProperty? newValue, Func<TProperty, TProperty>? newValueSelector)
+                ValueProvider valueProvider)
             {
                 Debug.Assert(notes.Length == oldValues.Length, "Note count should match value count");
-                Debug.Assert(newValueSelector is not null || newValue is not null, "One of newValue or newValueSelector should not be null");
                 _chart = chart;
                 _notes = notes;
                 _oldValues = oldValues;
-                _newValue = newValue;
-                _newValueSelector = newValueSelector;
+                _newValueProvider = valueProvider;
             }
 
             protected EditNotesPropertyOperationBase(ChartModel chart,
                 ImmutableArray<NoteModel> notes,
                 Func<NoteModel, TProperty> oldValuesSelector,
-                TProperty? newValue, Func<TProperty, TProperty>? newValueSelector)
+                ValueProvider valueProvider)
             {
-                Debug.Assert(newValueSelector is not null || newValue is not null, "One of newValue or newValueSelector should not be null");
                 _chart = chart;
                 _notes = notes;
                 _oldValues = notes.Select(oldValuesSelector).ToImmutableArray();
-                _newValue = newValue;
-                _newValueSelector = newValueSelector;
+                _newValueProvider = valueProvider;
             }
 
             private Action<ImmutableArray<NoteModel>>? _onDone;
@@ -103,24 +98,14 @@ namespace Deenote.Entities.Operations
                 return this;
             }
 
-            private TProperty GetNewValue(TProperty oldValue)
-            {
-                if (_newValueSelector is null) {
-                    Debug.Assert(_newValue is not null);
-                    return _newValue!;
-                }
-                else {
-                    return _newValueSelector.Invoke(oldValue);
-                }
-            }
-
             protected override void Redo()
             {
                 OnRedoing(_firstRedo);
+                _firstRedo = false;
                 for (int i = 0; i < _notes.Length; i++) {
                     var note = _notes[i];
                     var old = _oldValues[i];
-                    var newv = GetNewValue(old);
+                    var newv = _newValueProvider.GetNewValue(old);
                     OnRedoingValueChanging(_firstRedo, i, newv);
                     SetValue(note, newv);
                     OnRedoingValueChanged(_firstRedo, i, newv);
@@ -151,6 +136,38 @@ namespace Deenote.Entities.Operations
             protected virtual void OnRedoing(bool isFirstRedo) { }
             protected virtual void OnRedone(bool isFirstRedo) { }
             protected virtual void OnUndone() { }
+
+            protected internal readonly struct ValueProvider
+            {
+                private readonly TProperty? _value;
+                private readonly Func<TProperty, TProperty>? _valueSelector;
+
+                public ValueProvider(TProperty value)
+                {
+                    _value = value;
+                    _valueSelector = null;
+                }
+
+                public ValueProvider(Func<TProperty, TProperty> valueSelector)
+                {
+                    _value = default;
+                    _valueSelector = valueSelector;
+                }
+
+                public TProperty GetNewValue(TProperty oldValue)
+                {
+                    if (_valueSelector is null) {
+                        Debug.Assert(_value is not null);
+                        return _value!;
+                    }
+                    else {
+                        return _valueSelector.Invoke(oldValue);
+                    }
+                }
+
+                public static implicit operator ValueProvider(TProperty value) => new(value);
+                public static implicit operator ValueProvider(Func<TProperty, TProperty> valueSelector) => new(valueSelector);
+            }
         }
     }
 }

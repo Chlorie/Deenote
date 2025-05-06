@@ -10,6 +10,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 using static Deenote.Entities.Storage.DsprojLoader;
 
@@ -46,16 +47,16 @@ namespace Deenote.Entities.Operations
             => new EditNotesPropertyOperation<T>(chart, notes.ToImmutableArray(), valueSelector, getter, setter);
 
         public static EditNotesPropertyOperationBase<NoteCoord> EditNotesTime(this ChartModel chart, ReadOnlySpan<NoteModel> notes, float value)
-            => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), old => old with { Time = value }, true);
+            => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), new(old => old with { Time = value }), true);
 
         public static EditNotesPropertyOperationBase<NoteCoord> EditNotesTime(this ChartModel chart, ReadOnlySpan<NoteModel> notes, Func<float, float> valueSelector)
-            => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), old => old with { Time = valueSelector(old.Time) }, true);
+            => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), new(old => old with { Time = valueSelector(old.Time) }), true);
 
         public static EditNotesPropertyOperationBase<NoteCoord> EditNotesPosition(this ChartModel chart, ReadOnlySpan<NoteModel> notes, float value)
-            => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), old => old with { Position = value }, false);
+            => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), new(old => old with { Position = value }), false);
 
         public static EditNotesPropertyOperationBase<NoteCoord> EditNotesPosition(this ChartModel chart, ReadOnlySpan<NoteModel> notes, Func<float, float> valueSelector)
-            => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), old => old with { Position = valueSelector(old.Position) }, false);
+            => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), new(old => old with { Position = valueSelector(old.Position) }), false);
 
         public static EditNotesPropertyOperationBase<NoteCoord> EditNotesCoord(this ChartModel chart, ReadOnlySpan<NoteModel> notes, NoteCoord value)
             => new EditNotesCoordPropertyOperation(chart, notes.ToImmutableArray(), value);
@@ -65,6 +66,12 @@ namespace Deenote.Entities.Operations
 
         public static EditNotesPropertyOperationBase<float> EditNotesDuration(this ChartModel chart, ReadOnlySpan<NoteModel> notes, float value)
             => new EditNotesDurationPropertyOperation(chart, notes.ToImmutableArray(), value);
+
+        public static EditNotesPropertyOperationBase<float> EditNotesDuration(this ChartModel chart, ReadOnlySpan<NoteModel> notes, Func<float, float> valueSelector)
+            => new EditNotesDurationPropertyOperation(chart, notes.ToImmutableArray(), valueSelector);
+
+        public static EditNotesPropertyOperationBase<float> EditNotesEndTime(this ChartModel chart, ReadOnlySpan<NoteModel> notes, Func<float, float> valueSelector)
+            => new EditNotesEndTimePropertyOperation(chart, notes.ToImmutableArray(), valueSelector);
 
         public static EditNotesPropertyOperationBase<NoteModel.NoteKind> EditNotesKind(this ChartModel chart, ReadOnlySpan<NoteModel> notes, NoteModel.NoteKind value)
             => new EditNotesKindPropertyOperation(chart, notes.ToImmutableArray(), value);
@@ -261,17 +268,9 @@ namespace Deenote.Entities.Operations
             private readonly Action<NoteModel, T> _valueSetter;
 
             internal EditNotesPropertyOperation(ChartModel chart,
-                ImmutableArray<NoteModel> notes, T newValue,
+                ImmutableArray<NoteModel> notes, ValueProvider newValue,
                 Func<NoteModel, T> getter, Action<NoteModel, T> setter) :
-                base(chart, notes, getter, newValue, null)
-            {
-                _valueSetter = setter;
-            }
-
-            internal EditNotesPropertyOperation(ChartModel chart,
-                ImmutableArray<NoteModel> notes, Func<T, T> valueSelector,
-                Func<NoteModel, T> getter, Action<NoteModel, T> setter) :
-                base(chart, notes, getter, default, valueSelector)
+                base(chart, notes, getter, newValue)
             {
                 _valueSetter = setter;
             }
@@ -291,15 +290,8 @@ namespace Deenote.Entities.Operations
             private List<ChartModel.CollisionResult>? _collisionsAfter;
 
             internal EditNotesCoordPropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes,
-                NoteCoord newValue) :
-                base(chart, notes, n => n.PositionCoord, newValue, null)
-            {
-                IsEditTime = true;
-            }
-
-            internal EditNotesCoordPropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes,
-                Func<NoteCoord, NoteCoord> valueSelector, bool editTime) :
-                base(chart, notes, n => n.PositionCoord, default, valueSelector)
+                ValueProvider newValue, bool editTime = true) :
+                base(chart, notes, n => n.PositionCoord, newValue)
             {
                 IsEditTime = editTime;
             }
@@ -433,31 +425,31 @@ namespace Deenote.Entities.Operations
                 NoteModel NoteRefAfterSort);
         }
 
-        public sealed class EditNotesDurationPropertyOperation : EditNotesPropertyOperationBase<float>
+        public abstract class EditNotesDurationPropertyOperationBase<T> : EditNotesPropertyOperationBase<T>
         {
             private readonly TailContext[] _tails;
             private int _holdCountDelta;
 
-            internal EditNotesDurationPropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes,
-                float newValue) :
-                base(chart, notes, n => n.Duration, newValue, null)
+            protected EditNotesDurationPropertyOperationBase(ChartModel chart, ImmutableArray<NoteModel> notes,
+                Func<NoteModel, T> oldValueSelector, ValueProvider newValue) :
+                base(chart, notes, oldValueSelector, newValue)
             {
                 _tails = new TailContext[notes.Length];
                 _holdCountDelta = 0;
             }
 
-            protected override void SetValue(NoteModel note, float value)
-                => note.Duration = value;
+            protected sealed override void SetValue(NoteModel note, T value)
+                => note.Duration = GetDurationValue(note, value);
 
             private SortedList<IStageNoteNode>.TrackingScope _tmpScope;
 
-            protected override void OnRedoingValueChanging(bool isFirstRedo, int index, float newValue)
+            protected sealed override void OnRedoingValueChanging(bool isFirstRedo, int index, T newValue)
             {
                 var note = _notes[index];
-                var oldValue = _oldValues[index];
+                var oldValue = GetDurationValue(note, _oldValues[index]);
 
                 if (isFirstRedo) {
-                    InitializeTailContexts();
+                    InitializeTailContexts(GetDurationValue(note, newValue));
                 }
 
                 var (tail, kind) = _tails[index];
@@ -467,9 +459,9 @@ namespace Deenote.Entities.Operations
                     case TailModifyKind.Move: _tmpScope = _chart.NoteNodes.EnterTrackingScope(tail); break;
                 }
 
-                void InitializeTailContexts()
+                void InitializeTailContexts(float newDurationValue)
                 {
-                    switch (oldValue, newValue) {
+                    switch (oldValue, newDurationValue) {
                         case (0, not 0): {
                             var tail = new NoteTailNode(note);
                             _tails[index] = new(tail, TailModifyKind.Add);
@@ -484,7 +476,7 @@ namespace Deenote.Entities.Operations
                             break;
                         }
                         default: {
-                            if (oldValue == newValue) {
+                            if (oldValue == newDurationValue) {
                                 _tails[index] = new(null!, TailModifyKind.None);
                             }
                             else {
@@ -498,7 +490,7 @@ namespace Deenote.Entities.Operations
                 }
             }
 
-            protected override void OnRedoingValueChanged(bool isFirstRedo, int index, float newValue)
+            protected sealed override void OnRedoingValueChanged(bool isFirstRedo, int index, T newValue)
             {
                 var (tail, kind) = _tails[index];
                 switch (kind) {
@@ -508,7 +500,7 @@ namespace Deenote.Entities.Operations
                 }
             }
 
-            protected override void OnUndoingValueChanging(int index)
+            protected sealed override void OnUndoingValueChanging(int index)
             {
                 var (tail, kind) = _tails[index];
                 switch (kind) {
@@ -518,7 +510,7 @@ namespace Deenote.Entities.Operations
                 }
             }
 
-            protected override void OnUndoingValueChanged(int index)
+            protected sealed override void OnUndoingValueChanged(int index)
             {
                 var (tail, kind) = _tails[index];
                 switch (kind) {
@@ -528,15 +520,17 @@ namespace Deenote.Entities.Operations
                 }
             }
 
-            protected override void OnRedone(bool isFirstRedo)
+            protected sealed override void OnRedone(bool isFirstRedo)
             {
                 _chart._holdCount += _holdCountDelta;
             }
 
-            protected override void OnUndone()
+            protected sealed override void OnUndone()
             {
                 _chart._holdCount -= _holdCountDelta;
             }
+
+            protected abstract float GetDurationValue(NoteModel note, T value);
 
             private readonly record struct TailContext(
                 NoteTailNode Tail,
@@ -545,12 +539,34 @@ namespace Deenote.Entities.Operations
             private enum TailModifyKind { None, Add, Remove, Move, }
         }
 
+        public sealed class EditNotesDurationPropertyOperation : EditNotesDurationPropertyOperationBase<float>
+        {
+            internal EditNotesDurationPropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes,
+                ValueProvider newValue) :
+                base(chart, notes, n => n.Duration, newValue)
+            { }
+
+            protected override float GetDurationValue(NoteModel note, float value) => value;
+        }
+
+        public sealed class EditNotesEndTimePropertyOperation : EditNotesDurationPropertyOperationBase<float>
+        {
+            internal EditNotesEndTimePropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes,
+                ValueProvider newValue) :
+                base(chart, notes, n => n.EndTime, newValue)
+            { }
+
+            // HACK: For consistency, here we should not use Mathf.Max(), and should call it in StageChartEditor.
+            // To achive this, the implementation of ValueProvider requires changing, as we should pass the NoteModel as argument to selector delegate
+            protected override float GetDurationValue(NoteModel note, float value) => Mathf.Max(0f, value - note.Time);
+        }
+
         public sealed class EditNotesKindPropertyOperation : EditNotesPropertyOperationBase<NoteModel.NoteKind>
         {
             private readonly ImmutableArray<LinkContext> _oldLinkContexts;
 
             public EditNotesKindPropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes, NoteModel.NoteKind newValue) :
-                base(chart, notes, notes.Select(n => n.Kind).ToImmutableArray(), newValue, null)
+                base(chart, notes, notes.Select(n => n.Kind).ToImmutableArray(), newValue)
             {
                 var oldLinks = new LinkContext[notes.Length];
                 for (int i = 0; i < notes.Length; i++) {
@@ -619,7 +635,7 @@ namespace Deenote.Entities.Operations
         {
             internal EditNotesSoundsPropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes,
                 ImmutableArray<PianoSoundValueModel> newValue) :
-                base(chart, notes, n => n.HasSounds ? n.Sounds.ToImmutableArray() : ImmutableArray<PianoSoundValueModel>.Empty, newValue, null)
+                base(chart, notes, n => n.HasSounds ? n.Sounds.ToImmutableArray() : ImmutableArray<PianoSoundValueModel>.Empty, newValue)
             { }
 
             protected override void SetValue(NoteModel note, ImmutableArray<PianoSoundValueModel> value)

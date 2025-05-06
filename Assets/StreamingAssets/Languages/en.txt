@@ -392,13 +392,16 @@ Dialog_AboutTurorials_Page_Shortcuts_Content="""
     <;> Remove sounds (Change to no sound notes)
     <Q> Quantize selected notes to the grids
     <W/A/S/D> Adjust selected notes' position/time by 0.01/1ms
-    <Shift+W/A/S/D> Adjust selected notes' position/time by 0.1/10ms
+    <Alt+W/A/S/D> Adjust selected notes' position/time by 0.1/10ms
+    <Shift+W/A/S/D> Snap selected notes' position/time to next grid
+    <R/F> Adjust selected notes' duration by 1ms
+    <Alt+R/F> Adjust selected notes' duration by 10ms
+    <Shift+R/F> Snap selected notes' end time to next grid
     <Z/X> Adjust selected notes' size values by -0.01/0.01
     <Shift+Z/X> Adjust selected notes' size values by -0.1/0.1
     <C/V> Adjust selected notes' speed values by -0.01/0.01
     <Shift+C/V> Adjust selected notes' size values by -0.1/0.1
     <M> Reflect selected notes across the middle line (position = 0 line)
-    <F> Fill notes on the curve
 
     <L Mouse> Select note/Cancel placing note
     <R Mouse> Press to start place note, move up-down placing hold, move left-right placing swipe
@@ -419,7 +422,9 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.3</b>
 
     - Fix the totally wrong behaviour of opening project from cli arg, I forgot to test it
-    
+    - Add shortcuts for adjusting notes' duration (R/F or Shift/Alt + R/F)
+    - Fix text mistakes of shortcut list
+  
     <b>Deenote 1.0.2</b>
 
     - Fix bug on save color code
