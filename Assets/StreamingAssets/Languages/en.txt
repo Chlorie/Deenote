@@ -423,6 +423,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
 
     - Fix the totally wrong behaviour of opening project from cli arg, I forgot to test it
     - Add shortcuts for adjusting notes' duration (R/F or Shift/Alt + R/F)
+    - Add feature of clicking to select one note
     - Fix text mistakes of shortcut list
   
     <b>Deenote 1.0.2</b>

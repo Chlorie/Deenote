@@ -1,16 +1,16 @@
 #nullable enable
 
 using Deenote.Core.GamePlay;
+using Deenote.Core.GameStage;
 using Deenote.Entities;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
-using Deenote.Library;
 using Deenote.Library.Collections;
-using Deenote.Library.Components;
 using Deenote.Library.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Deenote.Core.Editing
@@ -26,8 +26,9 @@ namespace Deenote.Core.Editing
         private NoteCoord _dragStartCoord;
         private NoteCoord _dragEndCoord;
         private readonly List<NoteModel> _inDragRangeNotes = new();
+        private DraggingSelectionState _state;
 
-        public bool IsDragSelecting { get; private set; }
+        public bool IsDragSelecting => _state != DraggingSelectionState.Idle;
 
         public ReadOnlySpan<NoteModel> SelectedNotes => _selectedNotes.AsSpan();
 
@@ -94,7 +95,29 @@ namespace Deenote.Core.Editing
             }
         }
 
+        private void AddSelectMultipleNonNotify(ReadOnlySpan<NoteModel> notes)
+        {
+            _game.AssertChartLoaded();
+            Debug.Assert(notes.ToArray().All(note => _game.CurrentChart.NoteNodes.Contains(note)));
+
+            var prevCount = _selectedNotes.Count;
+            _selectedNotes.AddRange(notes);
+            foreach (var note in _selectedNotes.AsSpan()[prevCount..]) {
+                note.IsSelected = true;
+            }
+        }
+
         public void Reselect(IEnumerable<NoteModel> notes)
+        {
+            OnSelectedNotesChanging();
+
+            ClearNonNotify();
+            AddSelectMultipleNonNotify(notes);
+
+            OnSelectedNotesChanged();
+        }
+
+        public void Reselect(ReadOnlySpan<NoteModel> notes)
         {
             OnSelectedNotesChanging();
 
@@ -187,19 +210,19 @@ namespace Deenote.Core.Editing
 
             _dragStartCoord = startCoord;
             _dragEndCoord = startCoord;
-            IsDragSelecting = true;
+            _state = DraggingSelectionState.StartedSelection;
 
             if (!toggleMode)
                 ClearNonNotify();
-            UpdateDragSelection(startCoord, startCoord);
 
             OnSelectedNotesChanged();
         }
 
         public void UpdateDragSelect(NoteCoord endCoord)
         {
-            if (!IsDragSelecting)
+            if (_state is DraggingSelectionState.Idle)
                 return;
+            _state = DraggingSelectionState.Dragging;
 
             if (!IsInDragSelectArea(endCoord))
                 return;
@@ -212,20 +235,27 @@ namespace Deenote.Core.Editing
             OnSelectedNotesChanged();
         }
 
-        public void EndDragSelect()
+        public void EndDragSelect(Vector2 viewportPoint)
         {
-            if (!IsDragSelecting)
+            if (_state is DraggingSelectionState.Idle)
                 return;
 
             _game.AssertStageLoaded();
             _game.Stage.SetSelectionPanelRectInvisible();
 
-            IsDragSelecting = false;
-
-            foreach (var note in _inDragRangeNotes) {
-                note.ApplySelection();
+            _state = DraggingSelectionState.Idle;
+            if (_dragStartCoord == _dragEndCoord) {
+                if (_game.TryRaycastPerspectiveViewportPointToNote(viewportPoint, out var noteController)) {
+                    var note = noteController.NoteModel;
+                    Reselect(MemoryMarshal.CreateReadOnlySpan(ref note, 1));
+                }
             }
-            _inDragRangeNotes.Clear();
+            else {
+                foreach (var note in _inDragRangeNotes) {
+                    note.ApplySelection();
+                }
+                _inDragRangeNotes.Clear();
+            }
         }
 
         private bool IsInDragSelectArea(NoteCoord coord)
@@ -316,6 +346,13 @@ namespace Deenote.Core.Editing
             foreach (var note in _game.NotesManager.OnStageNotes)
                 note.RefreshColoring();
             SelectedNotesChanged?.Invoke(this);
+        }
+
+        private enum DraggingSelectionState
+        {
+            Idle,
+            StartedSelection,
+            Dragging,
         }
     }
 }

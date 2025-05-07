@@ -1,7 +1,9 @@
 #nullable enable
 
+using Deenote.Core.GameStage;
 using Deenote.Entities;
 using Deenote.Entities.Models;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace Deenote.Core.GamePlay
@@ -76,7 +78,9 @@ namespace Deenote.Core.GamePlay
                 return false;
             }
 
-            if (Stage.TryConvertPerspectiveViewPointToNotePanelPosition(perspectiveViewPanelViewportPoint, out var notePanelPosition)) {
+            var stage = Stage;
+            var raycastViewportPoint = stage.ConvertPerspectiveViewportPointToRaycastingViewportPoint(perspectiveViewPanelViewportPoint);
+            if (stage.TryConvertRaycastingViewportPointToNotePanelPosition(raycastViewportPoint, out var notePanelPosition)) {
                 coord = new NoteCoord(
                     ConvertWorldXToNoteCoordPosition(notePanelPosition.X),
                     ConvertWorldZToNoteCoordTime(notePanelPosition.Z, noteSpeed) + MusicPlayer.Time);
@@ -84,6 +88,25 @@ namespace Deenote.Core.GamePlay
             }
 
             coord = default;
+            return false;
+
+            static bool IsInViewArea(Vector2 vp) => vp is { x: >= 0f and <= 1f, y: >= 0f and <= 1f };
+        }
+
+        internal bool TryRaycastPerspectiveViewportPointToNote(Vector2 perspectiveViewPanelViewportPoint, [MaybeNullWhen(false)] out GameStageNoteController note)
+        {
+            AssertStageLoaded();
+
+            if (!IsInViewArea(perspectiveViewPanelViewportPoint)) {
+                note = default;
+                return false;
+            }
+            var stage = Stage;
+
+            var raycastViewportPoint = stage.ConvertPerspectiveViewportPointToRaycastingViewportPoint(perspectiveViewPanelViewportPoint);
+            if (stage.TryRaycastRaycastingViewportPointToNote(raycastViewportPoint, out note)) {
+                return true;
+            }
             return false;
 
             static bool IsInViewArea(Vector2 vp) => vp is { x: >= 0f and <= 1f, y: >= 0f and <= 1f };

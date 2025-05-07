@@ -231,12 +231,12 @@ namespace Deenote.Core.GamePlay
                     var minZ = ConvertNoteCoordTimeToWorldZ(0f);
 
                     bool try0, try1;
-                    try0 = Stage.TryConvertNotePanelPositionToPerspectiveCameraViewportPoint((x, minZ), out var minVp);
-                    try1 = Stage.TryConvertNotePanelPositionToPerspectiveCameraViewportPoint((x, maxZ), out var maxVp);
+                    try0 = Stage.TryConvertNotePanelPositionToRaycastingViewportPoint((x, minZ), out var minVp);
+                    try1 = Stage.TryConvertNotePanelPositionToRaycastingViewportPoint((x, maxZ), out var maxVp);
                     Debug.Assert(try0 && try1);
 
                     var vp = new Vector2(maxVp.x, Mathf.Lerp(maxVp.y, minVp.y, SuddenPlus));
-                    try0 = Stage.TryConvertPerspectiveCameraViewportPointToNotePanelPosition(vp, out var pos);
+                    try0 = Stage.TryConvertRaycastingViewportPointToNotePanelPosition(vp, out var pos);
                     Debug.Assert(try0);
 
                     _cacheVisibleRangePercentage = Mathf.InverseLerp(minZ, maxZ, pos.Z);

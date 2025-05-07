@@ -425,6 +425,7 @@ Dialog_AboutTurorials_Page_Tutorial_Content="""
     - [M] 以Pos=0为线镜像音符位置
     - [Z] [X] 以0.01为单位调整音符的大小，按住[Shift]以更大幅度调整
     - [W] [A] [S] [D] 调整音符的时间/位置，按住[Shift]吸附到下一格线，按住[Alt]以更大幅度调整
+    - [R] [F] 调整音符时长，按住[Shift]吸附到下一格线，按住[Alt]以更大幅度调整
     - [C] [V] 调整音符的速度，按住[Shift]以更大幅度调整
 
     2.3 编辑面板
@@ -573,6 +574,7 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
     - 慢速音符提前显示：DEEMO II按音符的实际时间显示音符，因此提供了这个设置，可以使音符按出现时间显示
     - Flick音符(Swipe): 添加Flick音符，单音符种类为Click/Slide/Flick之一
     - Hold时长(Duration)：提供Hold时长的编辑，Duration编辑框右侧按钮或[H]键快速基于两个音符的时间生成hold
+      可以使用(Shift/Alt+)R/F调整
     - 速度(Speed)：可以使用(Shift+)C/V调整音符速度，Speed编辑框右侧按钮将当前速度应用为默认编辑速度。
       提供了默认音符放置速度的设置，并提供了两个按钮用于筛选当前指定速度的音符，应用音符差速效果。音符速度也可以应用于曲线填充
     
@@ -596,6 +598,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
 
     - 修正了上个版本有人忘了测的命令行参数功能
     - 新增了调整Note时长的快捷键(R/F或Shift/Alt + R/F)
+    - 新增点击单选Note功能
     - 修正快捷键列表的文本错误
 
     <b>Deenote 1.0.2</b>

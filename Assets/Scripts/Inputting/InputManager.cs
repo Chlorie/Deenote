@@ -17,8 +17,6 @@ namespace Deenote.Inputting
 {
     public sealed class InputManager : MonoBehaviour
     {
-        [SerializeField] RectTransform _viewRectTransform = default!;
-
         private KeyboardShortcutInputActions _inputActions = default!;
 
         private GamePlayManager _game = default!;
@@ -335,7 +333,8 @@ namespace Deenote.Inputting
         private void OnLeftMouseUp(Vector2 mousePosition)
         {
             if (_editor.Selector.IsDragSelecting) {
-                _editor.Selector.EndDragSelect();
+                if (MainWindow.Views.PerspectiveViewPanelView.TryConvertScreenPointToViewportPoint(mousePosition, out var vp))
+                    _editor.Selector.EndDragSelect(vp);
             }
         }
 
@@ -353,16 +352,10 @@ namespace Deenote.Inputting
         {
             MainSystem.GamePlayManager.AssertStageLoaded();
 
-            var tsfm = _viewRectTransform;
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(tsfm, screenPoint, null, out var localPoint)) {
+            if (!MainWindow.Views.PerspectiveViewPanelView.TryConvertScreenPointToViewportPoint(screenPoint, out var viewPoint)) {
                 coord = default;
                 return false;
             }
-
-            var tsfmrect = tsfm.rect;
-            var viewPoint = new Vector2(
-                localPoint.x / tsfmrect.width,
-                localPoint.y / tsfmrect.height);
 
             var res = MainSystem.GamePlayManager.TryConvertPerspectiveViewportPointToNoteCoord(viewPoint,
                 applyHighlightNoteSpeed ? MainSystem.StageChartEditor.Placer.PlacingNoteSpeed : 1f, out coord);

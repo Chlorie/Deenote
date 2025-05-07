@@ -125,6 +125,21 @@ namespace Deenote.UI.Views
             _raycaster.enabled = true;
         }
 
+        public bool TryConvertScreenPointToViewportPoint(Vector2 screenPoint, out Vector2 viewportPoint)
+        {
+            var tsfm = _viewRawImage.rectTransform;
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(tsfm, screenPoint, null, out var localPoint)) {
+                viewportPoint = default;
+                return false;
+            }
+
+            var tsfmrect = tsfm.rect;
+            viewportPoint = new Vector2(
+                localPoint.x / tsfmrect.width,
+                localPoint.y / tsfmrect.height);
+            return true;
+        }
+
         #region Pointer
 
         /// <summary>

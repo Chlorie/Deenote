@@ -38,7 +38,7 @@ namespace Deenote
             }
 #endif
 
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
             Debug.Log("Ignored command line args in editor mode");
 #else
             if (GetCommandLineArg0() is { } clfile) {
