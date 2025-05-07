@@ -83,7 +83,7 @@ namespace Deenote.Core.Editing
             {
                 var delta = args.NewTime - args.OldTime;
                 _updateNoteCoord.Time += delta;
-                UpdatePlaceNote(_updateNoteCoord, _updateMousePosition);
+                UpdatePlaceNote(_updateNoteCoord, _updateMousePosition, remainIndicatorVisibility: true);
             };
         }
 

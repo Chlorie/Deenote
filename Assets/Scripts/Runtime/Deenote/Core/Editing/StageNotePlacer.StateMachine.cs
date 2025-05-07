@@ -34,7 +34,7 @@ namespace Deenote.Core.Editing
             RefreshIndicatorVisibility();
         }
 
-        public void UpdatePlaceNote(NoteCoord coord, Vector2 mousePosition)
+        public void UpdatePlaceNote(NoteCoord coord, Vector2 mousePosition, bool remainIndicatorVisibility = false)
         {
             _updateNoteCoord = coord;
             _updateMousePosition = mousePosition;
@@ -53,7 +53,9 @@ namespace Deenote.Core.Editing
                     UpdateDragPlaceSlides(coord, mousePosition);
                     break;
             }
-            RefreshIndicatorVisibility();
+            if (!remainIndicatorVisibility) {
+                RefreshIndicatorVisibility();
+            }
         }
 
         public void EndPlaceNote(NoteCoord coord, Vector2 mousePosition)

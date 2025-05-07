@@ -596,10 +596,11 @@ AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.3</b>
 
-    - 修正了上个版本有人忘了测的命令行参数功能
+    - 修正了上个版本某人忘了测的命令行参数功能
+    - 修正快捷键列表的文本错误
+    - 修复鼠标移除预览界面播放时，摆放预览闪烁的问题
     - 新增了调整Note时长的快捷键(R/F或Shift/Alt + R/F)
     - 新增点击单选Note功能
-    - 修正快捷键列表的文本错误
 
     <b>Deenote 1.0.2</b>
 
