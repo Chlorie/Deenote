@@ -6,6 +6,7 @@ using Deenote.Localization;
 using Deenote.UI;
 using Deenote.UI.Dialogs.Elements;
 using System;
+using System.IO;
 using UnityEngine;
 
 namespace Deenote
@@ -40,9 +41,9 @@ namespace Deenote
 
 #if UNITY_EDITOR
             Debug.Log("Ignored command line args in editor mode");
-#else
+#elif UNITY_STANDALONE_WIN
             if (GetCommandLineArg0() is { } clfile) {
-                _ = MainWindow.Views.MenuNavigationPageView.MenuOpenProjectAsync();
+                _ = OpenProjectFromCommandLineAsync(clfile);
             }
 #endif
         }
