@@ -720,6 +720,60 @@ namespace Deenote.InputSystem.InputActions
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DurationInc"",
+                    ""type"": ""Button"",
+                    ""id"": ""25274cd0-e46d-4fb4-8d9b-3b00d5325acd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DurationDec"",
+                    ""type"": ""Button"",
+                    ""id"": ""834af250-d656-4412-9bb8-97d5363ec8ff"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DurationIncLarge"",
+                    ""type"": ""Button"",
+                    ""id"": ""aa29f149-e6ac-42ae-aebf-d44fed0635eb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DurationDecLarge"",
+                    ""type"": ""Button"",
+                    ""id"": ""08394f8c-0523-417d-a0a1-83621bbcc574"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DurationIncByGrid"",
+                    ""type"": ""Button"",
+                    ""id"": ""18c47cf5-02d5-43b9-8e6d-3e459b935c63"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DurationDecByGrid"",
+                    ""type"": ""Button"",
+                    ""id"": ""8a22e8f6-b892-400a-aa6b-ffae1d933409"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1558,6 +1612,160 @@ namespace Deenote.InputSystem.InputActions
                     ""action"": ""SpeedInc"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""a518171c-a77d-488e-883d-d0435dae37e3"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationDecByGrid"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""27b5b6a3-4b48-4e37-b171-899c2499b1af"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationDecByGrid"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""6ab15cca-651a-4eb1-88a0-588c0504f80c"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationDecByGrid"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a4329768-64af-4e6a-9905-9b4c522acf07"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationInc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8074dc3c-edd4-42f4-8d3d-5efb039db833"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationDec"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""6455f4bc-15f9-4312-9df8-9c1eb0cac811"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationIncLarge"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""a7736755-a636-4983-b560-b757b6942cd9"",
+                    ""path"": ""<Keyboard>/alt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationIncLarge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""06863838-1977-4faa-aa58-d4d6fc2baa90"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationIncLarge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""dc3f1e00-ef45-48d0-9759-4d01aa9a511c"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationDecLarge"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""95d32c83-6abd-4011-9fb1-05ab3dd61088"",
+                    ""path"": ""<Keyboard>/alt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationDecLarge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""d791ecf5-3311-48ca-813a-41b9b9cc717f"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationDecLarge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""3c56249b-f358-4347-861f-cb82e7582f9b"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationIncByGrid"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""e998f1bc-ba2e-4c24-90dd-c0e415bc39d4"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationIncByGrid"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""81c2b48f-717b-4de3-b613-1363ff2f1a73"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DurationIncByGrid"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -1934,6 +2142,12 @@ namespace Deenote.InputSystem.InputActions
             m_NoteEdit_SoundAdd = m_NoteEdit.FindAction("SoundAdd", throwIfNotFound: true);
             m_NoteEdit_SoundRemove = m_NoteEdit.FindAction("SoundRemove", throwIfNotFound: true);
             m_NoteEdit_CreateHoldBetween = m_NoteEdit.FindAction("CreateHoldBetween", throwIfNotFound: true);
+            m_NoteEdit_DurationInc = m_NoteEdit.FindAction("DurationInc", throwIfNotFound: true);
+            m_NoteEdit_DurationDec = m_NoteEdit.FindAction("DurationDec", throwIfNotFound: true);
+            m_NoteEdit_DurationIncLarge = m_NoteEdit.FindAction("DurationIncLarge", throwIfNotFound: true);
+            m_NoteEdit_DurationDecLarge = m_NoteEdit.FindAction("DurationDecLarge", throwIfNotFound: true);
+            m_NoteEdit_DurationIncByGrid = m_NoteEdit.FindAction("DurationIncByGrid", throwIfNotFound: true);
+            m_NoteEdit_DurationDecByGrid = m_NoteEdit.FindAction("DurationDecByGrid", throwIfNotFound: true);
             // EditorSettings
             m_EditorSettings = asset.FindActionMap("EditorSettings", throwIfNotFound: true);
             m_EditorSettings_SnapToGrids = m_EditorSettings.FindAction("SnapToGrids", throwIfNotFound: true);
@@ -2215,6 +2429,12 @@ namespace Deenote.InputSystem.InputActions
         private readonly InputAction m_NoteEdit_SoundAdd;
         private readonly InputAction m_NoteEdit_SoundRemove;
         private readonly InputAction m_NoteEdit_CreateHoldBetween;
+        private readonly InputAction m_NoteEdit_DurationInc;
+        private readonly InputAction m_NoteEdit_DurationDec;
+        private readonly InputAction m_NoteEdit_DurationIncLarge;
+        private readonly InputAction m_NoteEdit_DurationDecLarge;
+        private readonly InputAction m_NoteEdit_DurationIncByGrid;
+        private readonly InputAction m_NoteEdit_DurationDecByGrid;
         public struct NoteEditActions
         {
             private @KeyboardShortcutInputActions m_Wrapper;
@@ -2254,6 +2474,12 @@ namespace Deenote.InputSystem.InputActions
             public InputAction @SoundAdd => m_Wrapper.m_NoteEdit_SoundAdd;
             public InputAction @SoundRemove => m_Wrapper.m_NoteEdit_SoundRemove;
             public InputAction @CreateHoldBetween => m_Wrapper.m_NoteEdit_CreateHoldBetween;
+            public InputAction @DurationInc => m_Wrapper.m_NoteEdit_DurationInc;
+            public InputAction @DurationDec => m_Wrapper.m_NoteEdit_DurationDec;
+            public InputAction @DurationIncLarge => m_Wrapper.m_NoteEdit_DurationIncLarge;
+            public InputAction @DurationDecLarge => m_Wrapper.m_NoteEdit_DurationDecLarge;
+            public InputAction @DurationIncByGrid => m_Wrapper.m_NoteEdit_DurationIncByGrid;
+            public InputAction @DurationDecByGrid => m_Wrapper.m_NoteEdit_DurationDecByGrid;
             public InputActionMap Get() { return m_Wrapper.m_NoteEdit; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -2368,6 +2594,24 @@ namespace Deenote.InputSystem.InputActions
                 @CreateHoldBetween.started += instance.OnCreateHoldBetween;
                 @CreateHoldBetween.performed += instance.OnCreateHoldBetween;
                 @CreateHoldBetween.canceled += instance.OnCreateHoldBetween;
+                @DurationInc.started += instance.OnDurationInc;
+                @DurationInc.performed += instance.OnDurationInc;
+                @DurationInc.canceled += instance.OnDurationInc;
+                @DurationDec.started += instance.OnDurationDec;
+                @DurationDec.performed += instance.OnDurationDec;
+                @DurationDec.canceled += instance.OnDurationDec;
+                @DurationIncLarge.started += instance.OnDurationIncLarge;
+                @DurationIncLarge.performed += instance.OnDurationIncLarge;
+                @DurationIncLarge.canceled += instance.OnDurationIncLarge;
+                @DurationDecLarge.started += instance.OnDurationDecLarge;
+                @DurationDecLarge.performed += instance.OnDurationDecLarge;
+                @DurationDecLarge.canceled += instance.OnDurationDecLarge;
+                @DurationIncByGrid.started += instance.OnDurationIncByGrid;
+                @DurationIncByGrid.performed += instance.OnDurationIncByGrid;
+                @DurationIncByGrid.canceled += instance.OnDurationIncByGrid;
+                @DurationDecByGrid.started += instance.OnDurationDecByGrid;
+                @DurationDecByGrid.performed += instance.OnDurationDecByGrid;
+                @DurationDecByGrid.canceled += instance.OnDurationDecByGrid;
             }
 
             private void UnregisterCallbacks(INoteEditActions instance)
@@ -2477,6 +2721,24 @@ namespace Deenote.InputSystem.InputActions
                 @CreateHoldBetween.started -= instance.OnCreateHoldBetween;
                 @CreateHoldBetween.performed -= instance.OnCreateHoldBetween;
                 @CreateHoldBetween.canceled -= instance.OnCreateHoldBetween;
+                @DurationInc.started -= instance.OnDurationInc;
+                @DurationInc.performed -= instance.OnDurationInc;
+                @DurationInc.canceled -= instance.OnDurationInc;
+                @DurationDec.started -= instance.OnDurationDec;
+                @DurationDec.performed -= instance.OnDurationDec;
+                @DurationDec.canceled -= instance.OnDurationDec;
+                @DurationIncLarge.started -= instance.OnDurationIncLarge;
+                @DurationIncLarge.performed -= instance.OnDurationIncLarge;
+                @DurationIncLarge.canceled -= instance.OnDurationIncLarge;
+                @DurationDecLarge.started -= instance.OnDurationDecLarge;
+                @DurationDecLarge.performed -= instance.OnDurationDecLarge;
+                @DurationDecLarge.canceled -= instance.OnDurationDecLarge;
+                @DurationIncByGrid.started -= instance.OnDurationIncByGrid;
+                @DurationIncByGrid.performed -= instance.OnDurationIncByGrid;
+                @DurationIncByGrid.canceled -= instance.OnDurationIncByGrid;
+                @DurationDecByGrid.started -= instance.OnDurationDecByGrid;
+                @DurationDecByGrid.performed -= instance.OnDurationDecByGrid;
+                @DurationDecByGrid.canceled -= instance.OnDurationDecByGrid;
             }
 
             public void RemoveCallbacks(INoteEditActions instance)
@@ -2697,6 +2959,12 @@ namespace Deenote.InputSystem.InputActions
             void OnSoundAdd(InputAction.CallbackContext context);
             void OnSoundRemove(InputAction.CallbackContext context);
             void OnCreateHoldBetween(InputAction.CallbackContext context);
+            void OnDurationInc(InputAction.CallbackContext context);
+            void OnDurationDec(InputAction.CallbackContext context);
+            void OnDurationIncLarge(InputAction.CallbackContext context);
+            void OnDurationDecLarge(InputAction.CallbackContext context);
+            void OnDurationIncByGrid(InputAction.CallbackContext context);
+            void OnDurationDecByGrid(InputAction.CallbackContext context);
         }
         public interface IEditorSettingsActions
         {

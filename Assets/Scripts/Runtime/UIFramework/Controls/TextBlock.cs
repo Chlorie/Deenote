@@ -46,6 +46,9 @@ namespace Deenote.UIFramework.Controls
                 RefreshDisplayText();
         }
 
+        public void SetText(ArgedLocalizableText text)
+            => SetText(text.LocalizableText, text.Args);
+
         public void SetLocalizedText(string key, ReadOnlySpan<string> args = default)
             => SetText(LocalizableText.Localized(key), args);
 

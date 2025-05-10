@@ -18,8 +18,8 @@ namespace Deenote.Runtime.Plugins
         {
             Plugins = ImmutableArray.Create(
                 ImmutableArray.Create<IDeenotePlugin>(
-                    new DelegatePlugin("Undo", new[] { ("zh", "撤销") }, context => { context.Editor.OperationMemento.Undo(); return default; }),
-                    new DelegatePlugin("Redo", new[] { ("zh", "重做") }, context => { context.Editor.OperationMemento.Redo(); return default; })),
+                    new DelegatePlugin("Undo", new[] { ("zh", "撤销") }, context => { context.Editor.OperationMemento.Undo(context.GameManager.CurrentChart); return default; }),
+                    new DelegatePlugin("Redo", new[] { ("zh", "重做") }, context => { context.Editor.OperationMemento.Redo(context.GameManager.CurrentChart); return default; })),
                 ImmutableArray.Create<IDeenotePlugin>(
                     new DelegatePlugin("Cut", new[] { ("zh", "剪切") }, context => { context.Editor.CutSelectedNotes(); return default; }),
                     new DelegatePlugin("Copy", new[] { ("zh", "复制") }, context => { context.Editor.CopySelectedNotes(); return default; }),

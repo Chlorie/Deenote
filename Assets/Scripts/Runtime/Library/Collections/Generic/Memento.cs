@@ -133,6 +133,29 @@ namespace Deenote.Library.Collections.Generic
             return true;
         }
 
+        public bool TryPeekLastActive([MaybeNullWhen(false)] out T item)
+        {
+            if (_activeCount == 0) {
+                item = null;
+                return false;
+            }
+            var index = _index;
+            Decrement(ref index);
+            item = _array[index];
+            return true;
+        }
+
+        public bool TryPeekFirstInactive([MaybeNullWhen(false)] out T item)
+        {
+            if(_activeCount == _count) {
+                item = null;
+                return false;
+            }
+
+            item = _array[_index];
+            return true;
+        }
+
         public void Clear()
         {
             if (_count == 0)

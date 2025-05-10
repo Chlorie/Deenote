@@ -195,6 +195,7 @@ namespace Deenote.Core.Project
             IsSaving,
 
             AutoSave,
+            AutoSaveInterval,
 
             CurrentProject,
             ProjectAudio,

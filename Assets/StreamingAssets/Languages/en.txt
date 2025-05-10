@@ -157,6 +157,7 @@ Dialog_PreferencesAutoSave_Label=Auto Save
 Dialog_PreferencesAutoSaveOff_Option=Off
 Dialog_PreferencesAutoSaveOn_Option=On
 Dialog_PreferencesAutoSaveOnAndSaveJson_Option=On And Save Json
+Dialog_PreferencesAutoSaveMinutes_Option={0} mins
 Dialog_PreferencesCheckUpdate_Label=Check update on startup
 Dialog_PreferencesEmbedProjectAudio_Label=Embed Audio Data In Project
 Dialog_PreferencesUI_Header=UI
@@ -392,13 +393,16 @@ Dialog_AboutTurorials_Page_Shortcuts_Content="""
     <;> Remove sounds (Change to no sound notes)
     <Q> Quantize selected notes to the grids
     <W/A/S/D> Adjust selected notes' position/time by 0.01/1ms
-    <Shift+W/A/S/D> Adjust selected notes' position/time by 0.1/10ms
+    <Alt+W/A/S/D> Adjust selected notes' position/time by 0.1/10ms
+    <Shift+W/A/S/D> Snap selected notes' position/time to next grid
+    <R/F> Adjust selected notes' duration by 1ms
+    <Alt+R/F> Adjust selected notes' duration by 10ms
+    <Shift+R/F> Snap selected notes' end time to next grid
     <Z/X> Adjust selected notes' size values by -0.01/0.01
     <Shift+Z/X> Adjust selected notes' size values by -0.1/0.1
     <C/V> Adjust selected notes' speed values by -0.01/0.01
     <Shift+C/V> Adjust selected notes' size values by -0.1/0.1
     <M> Reflect selected notes across the middle line (position = 0 line)
-    <F> Fill notes on the curve
 
     <L Mouse> Select note/Cancel placing note
     <R Mouse> Press to start place note, move up-down placing hold, move left-right placing swipe
@@ -416,6 +420,16 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.3</b>
+
+    - Fix the totally wrong behaviour of opening project from cli arg, I forgot to test it
+    - Fix text mistakes of shortcut list
+    - Fix bug that note indicator flashes if play music while mouse is not on preview panel
+    - Add shortcuts for adjusting notes' duration (R/F or Shift/Alt + R/F)
+    - Add feature of clicking to select one note
+    - Add Auto-save interval preference
+    - Optimize undo history. Now application wont auto save if no unsaved operation.
+  
     <b>Deenote 1.0.2</b>
 
     - Fix bug on save color code

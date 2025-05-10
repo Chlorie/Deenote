@@ -13,7 +13,6 @@ namespace Deenote
 {
     public sealed class AutoSaveTrigger : MonoBehaviour
     {
-        private const float AutoSaveIntervalTime_s = 5 * 60f;
         private const string AutoSaveJsonDirName = $"Deenote_AutoSave";
 
         private const string AutoSaveSavingStatusKey = "AutoSaveProject_Status_Saving";
@@ -48,7 +47,7 @@ namespace Deenote
 
         private void Update()
         {
-            if (MathUtils.IncAndTryWrap(ref _timer, Time.unscaledDeltaTime, AutoSaveIntervalTime_s)) {
+            if (MathUtils.IncAndTryWrap(ref _timer, Time.unscaledDeltaTime, MainSystem.ProjectManager.AutoSaveIntervalTime)) {
                 _ = AutoSaveProjectAsync();
             }
         }
@@ -59,12 +58,14 @@ namespace Deenote
                 return;
             if (MainSystem.ProjectManager.IsSaving)
                 return;
+            if (!MainSystem.StageChartEditor.OperationMemento.HasUnsavedChange)
+                return;
 
             switch (MainSystem.ProjectManager.AutoSave) {
                 case Core.Project.ProjectAutoSaveOption.On:
                     MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavingStatusKey);
                     await MainSystem.ProjectManager.SaveCurrentProjectAsync();
-                    MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey, DateTime.Now.ToString("HH:mm"));
+                    MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey, DateTime.Now.ToString("HH:mm"), duration: 10f);
                     return;
                 case Core.Project.ProjectAutoSaveOption.OnAndSaveJson:
                     MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavingStatusKey);
@@ -73,7 +74,7 @@ namespace Deenote
                     var charts = MainSystem.ProjectManager.SaveCurrentProjectChartJsonsToAsync(dir);
                     await proj;
                     await charts;
-                    MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey, DateTime.Now.ToString("HH:mm"));
+                    MainWindow.StatusBar.SetLocalizedStatusMessage(AutoSaveSavedStatusKey, DateTime.Now.ToString("HH:mm"), duration: 10f);
                     return;
                 default:
                     break;

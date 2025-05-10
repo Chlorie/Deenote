@@ -17,8 +17,6 @@ namespace Deenote.Inputting
 {
     public sealed class InputManager : MonoBehaviour
     {
-        [SerializeField] RectTransform _viewRectTransform = default!;
-
         private KeyboardShortcutInputActions _inputActions = default!;
 
         private GamePlayManager _game = default!;
@@ -190,6 +188,8 @@ namespace Deenote.Inputting
         private const float SizeDeltaLarge = 0.1f;
         private const float SpeedDelta = 0.01f;
         private const float SpeedDeltaLarge = 0.1f;
+        private const float DurationDelta = 0.001f;
+        private const float DurationDeltaLarge = 0.01f;
 
         private void RegisterNoteEdit()
         {
@@ -199,8 +199,8 @@ namespace Deenote.Inputting
             actions.Copy.started += _ => _editor.CopySelectedNotes();
             actions.Cut.started += _ => _editor.CutSelectedNotes();
             actions.Paste.started += _ => _editor.PasteNotes();
-            actions.Redo.started += _ => _editor.OperationMemento.Redo();
-            actions.Undo.started += _ => _editor.OperationMemento.Undo();
+            actions.Redo.started += _ => _editor.OperationMemento.Redo(_game.CurrentChart);
+            actions.Undo.started += _ => _editor.OperationMemento.Undo(_game.CurrentChart);
             actions.TimeDec.started += _ => _editor.EditSelectedNotesTime(t => t - TimeDelta);
             actions.TimeInc.started += _ => _editor.EditSelectedNotesTime(t => t + TimeDelta);
             actions.TimeDecLarge.started += _ => _editor.EditSelectedNotesTime(t => t - TimeDeltaLarge);
@@ -228,6 +228,12 @@ namespace Deenote.Inputting
             actions.KindSwipe.started += _ => _editor.EditSelectedNotesKind(NoteModel.NoteKind.Swipe);
             actions.SoundAdd.started += _ => _editor.EditSelectedNoteSounds(true);
             actions.SoundRemove.started += _ => _editor.EditSelectedNoteSounds(false);
+            actions.DurationDec.started += _ => _editor.EditSelectedNotesDuration(d => d - DurationDelta);
+            actions.DurationInc.started += _ => _editor.EditSelectedNotesDuration(d => d + DurationDelta);
+            actions.DurationDecLarge.started += _ => _editor.EditSelectedNotesDuration(d => d - DurationDeltaLarge);
+            actions.DurationIncLarge.started += _ => _editor.EditSelectedNotesDuration(d => d + DurationDeltaLarge);
+            actions.DurationDecByGrid.started += _ => _editor.EditSelectedNotesEndTime(t => _game.Grids.FloorToNearestNextTimeGridTime(t) ?? t);
+            actions.DurationIncByGrid.started += _ => _editor.EditSelectedNotesEndTime(t => _game.Grids.CeilToNearestNextTimeGridTime(t) ?? t);
             actions.CreateHoldBetween.started += _ =>
             {
                 if (_editor.Selector.SelectedNotes.Length != 2)
@@ -327,7 +333,8 @@ namespace Deenote.Inputting
         private void OnLeftMouseUp(Vector2 mousePosition)
         {
             if (_editor.Selector.IsDragSelecting) {
-                _editor.Selector.EndDragSelect();
+                if (MainWindow.Views.PerspectiveViewPanelView.TryConvertScreenPointToViewportPoint(mousePosition, out var vp))
+                    _editor.Selector.EndDragSelect(vp);
             }
         }
 
@@ -345,16 +352,10 @@ namespace Deenote.Inputting
         {
             MainSystem.GamePlayManager.AssertStageLoaded();
 
-            var tsfm = _viewRectTransform;
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(tsfm, screenPoint, null, out var localPoint)) {
+            if (!MainWindow.Views.PerspectiveViewPanelView.TryConvertScreenPointToViewportPoint(screenPoint, out var viewPoint)) {
                 coord = default;
                 return false;
             }
-
-            var tsfmrect = tsfm.rect;
-            var viewPoint = new Vector2(
-                localPoint.x / tsfmrect.width,
-                localPoint.y / tsfmrect.height);
 
             var res = MainSystem.GamePlayManager.TryConvertPerspectiveViewportPointToNoteCoord(viewPoint,
                 applyHighlightNoteSpeed ? MainSystem.StageChartEditor.Placer.PlacingNoteSpeed : 1f, out coord);

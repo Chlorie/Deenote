@@ -11,6 +11,7 @@ using Deenote.Entities.Operations;
 using Deenote.Library.Collections;
 using System;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Deenote.Core.Editing
 {
@@ -155,6 +156,30 @@ namespace Deenote.Core.Editing
                 .EditNotes(Selector.SelectedNotes, EntityArgs.ClampNoteSpeed(newValue),
                     n => n.Speed, (n, v) => n.Speed = v)
                 .OnDone(notes => OnNotePropertyEdited(true, false, NotificationFlag.NoteSpeed)));
+        }
+
+        public void EditSelectedNotesDuration(Func<float, float> valueSelector)
+        {
+            if (!_game.IsChartLoaded())
+                return;
+            if (Selector.SelectedNotes.IsEmpty)
+                return;
+
+            _operations.Do(_game.CurrentChart
+                .EditNotesDuration(Selector.SelectedNotes, v => Mathf.Max(0, valueSelector(v)))
+                .OnDone(notes => OnNotePropertyEdited(true, true, NotificationFlag.NoteDuration)));
+        }
+
+        public void EditSelectedNotesEndTime(Func<float, float> newValueSelector)
+        {
+            if (!_game.IsChartLoaded())
+                return;
+            if (Selector.SelectedNotes.IsEmpty)
+                return;
+
+            _operations.Do(_game.CurrentChart
+                .EditNotesEndTime(Selector.SelectedNotes, v => Mathf.Max(0, newValueSelector(v)))
+                .OnDone(notes => OnNotePropertyEdited(true, true, NotificationFlag.NoteDuration)));
         }
 
         public void EditSelectedNotesDuration(float newValue)

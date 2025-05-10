@@ -6,6 +6,7 @@ using Deenote.Localization;
 using Deenote.UI;
 using Deenote.UI.Dialogs.Elements;
 using System;
+using System.IO;
 using UnityEngine;
 
 namespace Deenote
@@ -19,6 +20,15 @@ namespace Deenote
             LocalizableText.Localized("NewVersion_MsgBox_1"),
             LocalizableText.Localized("NewVersion_MsgBox_N"));
 
+        private static readonly MessageBoxArgs _loadProjFailedMsgBoxArgs = new(
+            LocalizableText.Localized("OpenProject_MsgBox_Title"),
+            LocalizableText.Localized("LoadProjectFailed_MsgBox_Content"),
+            LocalizableText.Localized("LoadProjectFailed_MsgBox_Y"),
+            LocalizableText.Localized("LoadProjectFailed_MsgBox_N"));
+
+        private const string OpenProjectLoadingStatusKey = "OpenProject_Status_Loading";
+        private const string OpenProjectLoadedStatusKey = "OpenProject_Status_Loaded";
+
         private void Start()
         {
 #if UNITY_EDITOR
@@ -31,9 +41,9 @@ namespace Deenote
 
 #if UNITY_EDITOR
             Debug.Log("Ignored command line args in editor mode");
-#else
+#elif UNITY_STANDALONE_WIN
             if (GetCommandLineArg0() is { } clfile) {
-                _ = MainWindow.Views.MenuNavigationPageView.MenuOpenProjectAsync();
+                _ = OpenProjectFromCommandLineAsync(clfile);
             }
 #endif
         }
@@ -53,8 +63,18 @@ namespace Deenote
             // We do not pop up any fail message on startup-check
         }
 
-        private void OpenProjectFromCommandLine()
+        private async UniTaskVoid OpenProjectFromCommandLineAsync(string filePath)
         {
+            MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectLoadingStatusKey);
+            bool isLoaded = await MainSystem.ProjectManager.OpenLoadProjectFileAsync(filePath);
+            if (isLoaded) {
+                MainWindow.StatusBar.SetLocalizedStatusMessage(OpenProjectLoadedStatusKey);
+                MainWindow.Views.MenuNavigationPageView.AddOrTouchRecentFiles(filePath);
+            }
+            else {
+                MainWindow.StatusBar.SetReadyStatusMessage();
+                await MainWindow.DialogManager.OpenMessageBoxAsync(_loadProjFailedMsgBoxArgs);
+            }
         }
 
         private string? GetCommandLineArg0()

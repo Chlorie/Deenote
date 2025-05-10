@@ -1,7 +1,9 @@
 #nullable enable
 
+using Deenote.Entities.Models;
 using Deenote.Entities.Operations;
 using Deenote.Library.Collections.Generic;
+using UnityEngine;
 
 namespace Deenote.Core.Editing
 {
@@ -33,20 +35,64 @@ namespace Deenote.Core.Editing
             _saveOffset++;
         }
 
-        public void Redo()
+        /// <summary>
+        /// If next operation is a <see cref="IUndoableChartOperation"/>, redo the operation only when 
+        /// <c>Chart</c> is <paramref name="operationChart"/>
+        /// <br/>
+        /// otherwise, always redo the operation
+        /// </summary>
+        /// <param name="operationChart"></param>
+        public void Redo(ChartModel? operationChart)
         {
-            if (_memento.TryReapply(out var operation)) {
-                operation.Redo();
-                _saveOffset++;
+            if (_memento.TryPeekFirstInactive(out var operation)) {
+                if (operation is IUndoableChartOperation chartOp) {
+                    if (chartOp.Chart == operationChart)
+                        goto Apply;
+                    else
+                        return;
+                }
+                else {
+                    goto Apply;
+                }
             }
+            return;
+
+        Apply:
+            Debug.Log("Redo");
+            _memento.Reapply(out var op);
+            Debug.Assert(op == operation);
+            operation.Redo();
+            _saveOffset++;
         }
 
-        public void Undo()
+        /// <summary>
+        /// If previous operation is a <see cref="IUndoableChartOperation"/>, undo the operation only when 
+        /// <c>Chart</c> is <paramref name="operationChart"/>
+        /// <br/>
+        /// otherwise, always redo the operation
+        /// </summary>
+        /// <param name="operationChart"></param>
+        public void Undo(ChartModel? operationChart)
         {
-            if (_memento.TryRollback(out var operation)) {
-                operation.Undo();
-                _saveOffset--;
+            if (_memento.TryPeekLastActive(out var operation)) {
+                if (operation is IUndoableChartOperation chartOp) {
+                    if (chartOp.Chart == operationChart)
+                        goto Apply;
+                    else
+                        return;
+                }
+                else {
+                    goto Apply;
+                }
             }
+            return;
+
+        Apply:
+            Debug.Log("Undo");
+            _memento.Rollback(out var op);
+            Debug.Assert(op == operation);
+            operation.Undo();
+            _saveOffset--;
         }
 
         public void Reset()
