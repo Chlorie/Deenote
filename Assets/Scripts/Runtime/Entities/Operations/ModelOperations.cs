@@ -58,7 +58,19 @@ namespace Deenote.Entities.Operations
             protected void OnUndone(TArgs args) => _onUndone?.Invoke(args);
         }
 
-        public abstract class EditNotesPropertyOperationBase<TProperty> : OperationBase
+        public abstract class NotifiableChartOperation<TArgs> : NotifiableOperation<TArgs>, IUndoableChartOperation
+        {
+            protected readonly ChartModel _chart;
+
+            protected NotifiableChartOperation(ChartModel chart)
+            {
+                _chart = chart;
+            }
+
+            ChartModel IUndoableChartOperation.Chart => _chart;
+        }
+
+        public abstract class EditNotesPropertyOperationBase<TProperty> : OperationBase, IUndoableChartOperation
         {
             protected readonly ChartModel _chart;
             protected readonly ImmutableArray<NoteModel> _notes;
@@ -92,6 +104,9 @@ namespace Deenote.Entities.Operations
             }
 
             private Action<ImmutableArray<NoteModel>>? _onDone;
+
+            ChartModel IUndoableChartOperation.Chart => _chart;
+
             public EditNotesPropertyOperationBase<TProperty> OnDone(Action<ImmutableArray<NoteModel>> action)
             {
                 _onDone = action;

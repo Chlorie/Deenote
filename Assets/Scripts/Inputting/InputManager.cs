@@ -199,8 +199,8 @@ namespace Deenote.Inputting
             actions.Copy.started += _ => _editor.CopySelectedNotes();
             actions.Cut.started += _ => _editor.CutSelectedNotes();
             actions.Paste.started += _ => _editor.PasteNotes();
-            actions.Redo.started += _ => _editor.OperationMemento.Redo();
-            actions.Undo.started += _ => _editor.OperationMemento.Undo();
+            actions.Redo.started += _ => _editor.OperationMemento.Redo(_game.CurrentChart);
+            actions.Undo.started += _ => _editor.OperationMemento.Undo(_game.CurrentChart);
             actions.TimeDec.started += _ => _editor.EditSelectedNotesTime(t => t - TimeDelta);
             actions.TimeInc.started += _ => _editor.EditSelectedNotesTime(t => t + TimeDelta);
             actions.TimeDecLarge.started += _ => _editor.EditSelectedNotesTime(t => t - TimeDeltaLarge);

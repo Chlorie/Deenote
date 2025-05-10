@@ -60,12 +60,21 @@ namespace Deenote.Core.Editing
             Placer = new StageNotePlacer(this);
             Selector = new StageNoteSelector(game);
 
+            _project.RegisterNotification(
+                ProjectManager.NotificationFlag.CurrentProject,
+                manager =>
+                {
+                    _operations.Reset();
+                });
+
+            /*
             _game.RegisterNotification(
                 GamePlayManager.NotificationFlag.CurrentChart,
                 manager =>
                 {
                     _operations.Reset();
                 });
+            */
         }
 
         #region Add Remove

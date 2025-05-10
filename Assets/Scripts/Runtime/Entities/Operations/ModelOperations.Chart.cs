@@ -79,17 +79,15 @@ namespace Deenote.Entities.Operations
         public static EditNotesPropertyOperationBase<ImmutableArray<PianoSoundValueModel>> EditNotesSounds(this ChartModel chart, ReadOnlySpan<NoteModel> notes, ReadOnlySpan<PianoSoundValueModel> value)
             => new EditNotesSoundsPropertyOperation(chart, notes.ToImmutableArray(), value.ToImmutableArray());
 
-        public sealed class AddNoteOperation : NotifiableOperation<NoteModel>
+        public sealed class AddNoteOperation : NotifiableChartOperation<NoteModel>
         {
-            private readonly ChartModel _chart;
             private readonly NoteModel _note;
 
             private NoteTailNode? _tail;
             private ChartModel.CollisionResult? _collision;
 
-            internal AddNoteOperation(ChartModel chart, NoteModel note)
+            internal AddNoteOperation(ChartModel chart, NoteModel note) : base(chart)
             {
-                _chart = chart;
                 _note = note;
             }
 
@@ -122,17 +120,15 @@ namespace Deenote.Entities.Operations
             }
         }
 
-        public sealed class AddMultipleNotesOperation : NotifiableOperation<ImmutableArray<NoteModel>>
+        public sealed class AddMultipleNotesOperation : NotifiableChartOperation<ImmutableArray<NoteModel>>
         {
-            private readonly ChartModel _chart;
             private readonly ImmutableArray<NoteModel> _notes;
 
             private List<NoteTailNode>? _tails;
             private List<ChartModel.CollisionResult>? _collisions;
 
-            internal AddMultipleNotesOperation(ChartModel chart, ImmutableArray<NoteModel> notes)
+            internal AddMultipleNotesOperation(ChartModel chart, ImmutableArray<NoteModel> notes) : base(chart)
             {
-                _chart = chart;
                 _notes = notes;
             }
 
@@ -189,18 +185,16 @@ namespace Deenote.Entities.Operations
             }
         }
 
-        public sealed class RemoveNotesOperation : NotifiableOperation<ImmutableArray<NoteModel>>
+        public sealed class RemoveNotesOperation : NotifiableChartOperation<ImmutableArray<NoteModel>>
         {
-            private readonly ChartModel _chart;
             private readonly ImmutableArray<NoteModel> _notes;
 
             private IUndoableOperation _unlinkOperation;
             private List<NoteTailNode>? _tails;
             private List<ChartModel.CollisionResult>? _collisions;
 
-            internal RemoveNotesOperation(ChartModel chart, ImmutableArray<NoteModel> notes)
+            internal RemoveNotesOperation(ChartModel chart, ImmutableArray<NoteModel> notes) : base(chart)
             {
-                _chart = chart;
                 _notes = notes;
                 _unlinkOperation = new EditNotesKindPropertyOperation(_chart, _notes, NoteModel.NoteKind.Click);
             }

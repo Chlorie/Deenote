@@ -59,6 +59,8 @@ namespace Deenote
                 return;
             if (MainSystem.ProjectManager.IsSaving)
                 return;
+            if (!MainSystem.StageChartEditor.OperationMemento.HasUnsavedChange)
+                return;
 
             switch (MainSystem.ProjectManager.AutoSave) {
                 case Core.Project.ProjectAutoSaveOption.On:
