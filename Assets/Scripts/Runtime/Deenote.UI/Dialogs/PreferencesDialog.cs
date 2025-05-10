@@ -34,6 +34,7 @@ namespace Deenote.UI.Dialogs
         [SerializeField] ToggleSwitch _vSyncToggle = default!;
         [SerializeField] Dropdown _languageDropdown = default!;
         [SerializeField] Dropdown _autoSaveDropdown = default!;
+        [SerializeField] Dropdown _autoSaveIntervalDropdown = default!;
         [SerializeField] ToggleSwitch _checkUpdateToggle = default!;
         //[SerializeField] ToggleSwitch _embedAudioDataToggle = default!;
 
@@ -151,6 +152,11 @@ namespace Deenote.UI.Dialogs
             MainSystem.ProjectManager.RegisterNotificationAndInvoke(
                 ProjectManager.NotificationFlag.AutoSave,
                 manager => _autoSaveDropdown.SetValueWithoutNotify(GetAutoSaveDropdownIndex(manager.AutoSave)));
+            _autoSaveIntervalDropdown.ResetOptions(_autoSaveIntervals.AsSpan(), time => ArgedLocalizableText.Localized(AutoSaveIntervalMinutesKey, (time / 60).ToString()));
+            _autoSaveIntervalDropdown.SelectedIndexChanged += val => MainSystem.ProjectManager.AutoSaveIntervalTime = GetAutoSaveIntervalDropdownOption(val);
+            MainSystem.ProjectManager.RegisterNotificationAndInvoke(
+                ProjectManager.NotificationFlag.AutoSave,
+                manager => _autoSaveIntervalDropdown.SetValueWithoutNotify(GetAutoSaveIntervalDropdownIndex(manager.AutoSaveIntervalTime)));
 
             _checkUpdateToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.CheckUpdateOnStartup = val;
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
@@ -220,6 +226,28 @@ namespace Deenote.UI.Dialogs
                 ProjectAutoSaveOption.On => 1,
                 ProjectAutoSaveOption.OnAndSaveJson => 2,
                 _ => ThrowHelper.ThrowInvalidOperationException<int>(),
+            };
+
+        #endregion
+
+        #region AutoSaveInterval
+
+        private const string AutoSaveIntervalMinutesKey = "Dialog_PreferencesAutoSaveMinutes_Option";
+
+        // options: 1, 5, 10, 20, 30
+        private static readonly ImmutableArray<int> _autoSaveIntervals = ImmutableArray.Create(
+            60, 5 * 60, 10 * 60,30 * 60);
+
+        private static int GetAutoSaveIntervalDropdownOption(int optionIndex)
+            => _autoSaveIntervals[optionIndex];
+
+        private static int GetAutoSaveIntervalDropdownIndex(int second)
+            => second switch {
+                1 * 60 => 0,
+                5 * 60 => 1,
+                10 * 60 => 2,
+                30 * 60 => 3,
+                _ => -1,
             };
 
         #endregion

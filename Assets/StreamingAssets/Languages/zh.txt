@@ -154,6 +154,7 @@ Dialog_PreferencesAutoSave_Label=自动保存
 Dialog_PreferencesAutoSaveOff_Option=关闭
 Dialog_PreferencesAutoSaveOn_Option=打开
 Dialog_PreferencesAutoSaveOnAndSaveJson_Option=打开并保存Json
+Dialog_PreferencesAutoSaveMinutes_Option={0}分钟
 Dialog_PreferencesCheckUpdate_Label=启动时检查更新
 Dialog_PreferencesEmbedProjectAudio_Label=嵌入音频文件到项目中
 Dialog_PreferencesUI_Header=UI
@@ -598,10 +599,11 @@ AboutDialog_Versions_Dnt_1_0_Content="""
 
     - 修正了上个版本某人忘了测的命令行参数功能
     - 修正快捷键列表的文本错误
-    - 修复鼠标移除预览界面播放时，摆放预览闪烁的问题
+    - 修复鼠标移出预览界面播放时，摆放预览闪烁的问题
     - 新增了调整Note时长的快捷键(R/F或Shift/Alt + R/F)
     - 新增点击单选Note功能
-    - 优化操作历史记录。现在没有未保存操作时不会自动保存，切换谱面不会丢失操作记录（只能撤销/重做当前谱面的操作）
+    - 新增自动保存间隔设置
+    - 优化操作历史记录。现在没有未保存操作时不会重复保存
 
     <b>Deenote 1.0.2</b>
 

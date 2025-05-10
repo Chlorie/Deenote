@@ -109,6 +109,8 @@ namespace Deenote.UI.Views
 
         #endregion
 
+        private const float SaveStatusMessageDuration = 10f;
+
         private void Awake()
         {
             _recentFiles = new(UnityUtils.CreateObjectPool(
@@ -250,7 +252,7 @@ namespace Deenote.UI.Views
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectAsync();
-            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
+            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey, duration: SaveStatusMessageDuration);
             AddOrTouchRecentFiles(proj.ProjectFilePath);
         }
 
@@ -276,7 +278,7 @@ namespace Deenote.UI.Views
 
             MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavingStatusKey);
             await MainSystem.ProjectManager.SaveCurrentProjectToAsync(feRes.Path);
-            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey);
+            MainWindow.StatusBar.SetLocalizedStatusMessage(SaveProjectSavedStatusKey, duration: SaveStatusMessageDuration);
             AddOrTouchRecentFiles(MainSystem.ProjectManager.CurrentProject.ProjectFilePath);
         }
 

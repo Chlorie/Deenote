@@ -157,6 +157,7 @@ Dialog_PreferencesAutoSave_Label=Auto Save
 Dialog_PreferencesAutoSaveOff_Option=Off
 Dialog_PreferencesAutoSaveOn_Option=On
 Dialog_PreferencesAutoSaveOnAndSaveJson_Option=On And Save Json
+Dialog_PreferencesAutoSaveMinutes_Option={0} mins
 Dialog_PreferencesCheckUpdate_Label=Check update on startup
 Dialog_PreferencesEmbedProjectAudio_Label=Embed Audio Data In Project
 Dialog_PreferencesUI_Header=UI
@@ -426,6 +427,8 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     - Fix bug that note indicator flashes if play music while mouse is not on preview panel
     - Add shortcuts for adjusting notes' duration (R/F or Shift/Alt + R/F)
     - Add feature of clicking to select one note
+    - Add Auto-save interval preference
+    - Optimize undo history. Now application wont auto save if no unsaved operation.
   
     <b>Deenote 1.0.2</b>
 

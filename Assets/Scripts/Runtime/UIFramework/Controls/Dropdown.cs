@@ -121,11 +121,11 @@ namespace Deenote.UIFramework.Controls
         public struct Option
         {
             public Sprite? Sprite;
-            public LocalizableText Text;
+            public ArgedLocalizableText Text;
             public object? Item;
         }
 
-        public int FindIndex(Predicate<LocalizableText> predicate)
+        public int FindIndex(Predicate<ArgedLocalizableText> predicate)
         {
             for (int i = 0; i < _options.Count; i++) {
                 if (predicate(_options[i].Text))
@@ -189,7 +189,37 @@ namespace Deenote.UIFramework.Controls
             _dropdownItems.SetSiblingIndicesInOrder();
         }
 
+        public void ResetOptions<T>(ReadOnlySpan<T> items, Func<T, ArgedLocalizableText> textSelector)
+        {
+            _options.Clear();
+            using (var resetter = _dropdownItems.Resetting()) {
+                int i = 0;
+                foreach (var item in items) {
+                    var option = new Option { Text = textSelector(item), Item = item };
+                    _options.Add(option);
+                    resetter.Add(out var dropdownItem);
+                    dropdownItem.Initialize(i, option);
+                    i++;
+                }
+            }
+            _dropdownItems.SetSiblingIndicesInOrder();
+        }
+
         public void ResetOptions(ReadOnlySpan<LocalizableText> texts)
+        {
+            _options.Clear();
+            using (var resetter = _dropdownItems.Resetting()) {
+                for (int i = 0; i < texts.Length; i++) {
+                    var option = new Option { Text = texts[i] };
+                    _options.Add(option);
+                    resetter.Add(out var item);
+                    item.Initialize(i, option);
+                }
+            }
+            _dropdownItems.SetSiblingIndicesInOrder();
+        }
+
+        public void ResetOptions(ReadOnlySpan<ArgedLocalizableText> texts)
         {
             _options.Clear();
             using (var resetter = _dropdownItems.Resetting()) {
