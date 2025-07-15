@@ -595,6 +595,10 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.4</b>
+
+    - 修复了将click转为hold（或根据首尾创建note）会创建无效hold的问题
+
     <b>Deenote 1.0.3</b>
 
     - 修正了上个版本某人忘了测的命令行参数功能

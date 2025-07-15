@@ -445,6 +445,7 @@ namespace Deenote.Entities.Operations
                 if (isFirstRedo) {
                     InitializeTailContexts(GetDurationValue(note, newValue));
                 }
+                Debug.Assert(_tails[index].ModifyKind != TailModifyKind.None);
 
                 var (tail, kind) = _tails[index];
                 switch (kind) {

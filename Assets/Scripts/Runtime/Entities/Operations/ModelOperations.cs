@@ -116,7 +116,6 @@ namespace Deenote.Entities.Operations
             protected override void Redo()
             {
                 OnRedoing(_firstRedo);
-                _firstRedo = false;
                 for (int i = 0; i < _notes.Length; i++) {
                     var note = _notes[i];
                     var old = _oldValues[i];
@@ -127,6 +126,8 @@ namespace Deenote.Entities.Operations
                 }
                 OnRedone(_firstRedo);
                 _onDone?.Invoke(_notes);
+
+                _firstRedo = false;
             }
 
             protected override void Undo()
