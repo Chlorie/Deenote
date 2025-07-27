@@ -81,6 +81,9 @@ namespace Deenote.UI.Views
                 {
                     AssertProjectLoaded();
                     _rcts.CancelAndReset();
+                    var cancellationToken = _rcts.Token;
+
+                    using var ctr = cancellationToken.Register(() => MainWindow.StatusBar.SetReadyStatusMessage());
 
                     while (true) {
                         var res = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
@@ -93,11 +96,11 @@ namespace Deenote.UI.Views
                         MainWindow.StatusBar.SetLocalizedStatusMessage(LoadAudioLoadingStatusKey, fileName);
 
                         using var fs = File.OpenRead(res.Path);
-                        var clip = await AudioUtils.TryLoadAsync(fs, Path.GetExtension(res.Path), _rcts.Token);
+                        var clip = await AudioUtils.TryLoadAsync(fs, Path.GetExtension(res.Path), cancellationToken);
                         if (clip is null) {
                             MainWindow.StatusBar.SetReadyStatusMessage();
 
-                            _rcts.Token.ThrowIfCancellationRequested();
+                            cancellationToken.ThrowIfCancellationRequested();
                             var btn = await MainWindow.DialogManager.OpenMessageBoxAsync(_loadAudioFailedMsgBoxArgs);
                             if (btn != 0)
                                 return;
