@@ -423,6 +423,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.4</b>
 
     - Fix bug that creating a hold from click (or create with head-tail notes) cause a invalid hold
+    - Fix bug that fail to load chart that contains slide note linked to a background note
 
     <b>Deenote 1.0.3</b>
 

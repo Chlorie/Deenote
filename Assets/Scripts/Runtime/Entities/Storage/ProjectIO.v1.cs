@@ -7,6 +7,7 @@ using Deenote.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -72,12 +73,27 @@ namespace Deenote.Entities.Storage
 
             using var dp_linkNotes = DictionaryPool<NoteModel, int>.Get(out var linkNotesLookup);
             int noteIndex = 0;
+
+            int noteModelCount;
+
             foreach (var note in chart.EnumerateNoteModels()) {
                 if (note.NextLink is not null)
                     linkNotesLookup.Add(note, noteIndex);
                 noteIndex++;
             }
-            writer.Write(noteIndex); // noteModelCount
+            noteModelCount = noteIndex;
+            foreach (var note in chart.BackgroundSoundNotes) {
+                if (note._noteModel.NextLink is not null)
+                    linkNotesLookup.Add(note._noteModel, noteIndex);
+                noteIndex++;
+            }
+            foreach (var note in chart.SpeedChangeWarnings) {
+                if (note._noteModel.NextLink is not null)
+                    linkNotesLookup.Add(note._noteModel, noteIndex);
+                noteIndex++;
+            }
+
+            writer.Write(noteModelCount);
             foreach (var note in chart.EnumerateNoteModels()) {
                 WriteNote(writer, note, linkNotesLookup);
             }
@@ -114,7 +130,6 @@ namespace Deenote.Entities.Storage
                 Level = level,
             };
 
-
             var noteCount = reader.ReadInt32();
             using var so_notes = SpanOwner<NoteModel>.Allocate(noteCount);
             using var so_links = SpanOwner<int>.Allocate(noteCount);
@@ -124,33 +139,50 @@ namespace Deenote.Entities.Storage
                 notes[i] = ReadNote(reader, out var prev);
                 links[i] = prev;
             }
-            for (int i = 0; i < notes.Length; i++) {
-                var prevLink = links[i];
-                if (prevLink != -1) {
-                    var note = notes[i];
-                    var prevNote = notes[prevLink];
-                    prevNote._nextLink = note;
-                    note._prevLink = prevNote;
-                }
-            }
             ChartModel.Marshal.SetNoteModels(chart, notes);
 
             var soundCount = reader.ReadInt32();
+            using var so_sounds = SpanOwner<SoundNoteModel>.Allocate(soundCount);
+            var sounds = so_sounds.Span;
+            for (int i = 0; i < soundCount; i++) {
+                sounds[i] = ReadSoundNote(reader);
+            }
             chart.BackgroundSoundNotes.EnsureCapacity(soundCount);
             for (int i = 0; i < soundCount; i++) {
-                chart.BackgroundSoundNotes.AddFromEnd(ReadSoundNote(reader));
+                var index = chart.BackgroundSoundNotes.AddFromEnd(ReadSoundNote(reader));
+                Debug.Assert(index == i);
             }
 
             var speedChangeCount = reader.ReadInt32();
             chart.SpeedChangeWarnings.EnsureCapacity(speedChangeCount);
             for (int i = 0; i < speedChangeCount; i++) {
-                chart.SpeedChangeWarnings.AddFromEnd(ReadSpeedChangeWarning(reader));
+                var index = chart.SpeedChangeWarnings.AddFromEnd(ReadSpeedChangeWarning(reader));
+                Debug.Assert(index == i);
             }
 
             var lineCount = reader.ReadInt32();
             chart.SpeedLines.EnsureCapacity(lineCount);
             for (int i = 0; i < lineCount; i++) {
-                chart.SpeedLines.AddFromEnd(ReadSpeedLine(reader));
+                var index = chart.SpeedLines.AddFromEnd(ReadSpeedLine(reader));
+                Debug.Assert(index == i);
+            }
+
+            // Recover note links
+            for (int i = 0; i < notes.Length; i++) {
+                var prevLink = links[i];
+                if (prevLink != -1) {
+                    var note = notes[i];
+                    NoteModel prevNote;
+                    if (prevLink < noteCount)
+                        prevNote = notes[prevLink];
+                    else if (prevLink < noteCount + soundCount)
+                        prevNote = chart.BackgroundSoundNotes[prevLink - noteCount]._noteModel;
+                    else
+                        prevNote = chart.SpeedChangeWarnings[prevLink - soundCount - noteCount]._noteModel;
+
+                    prevNote._nextLink = note;
+                    note._prevLink = prevNote;
+                }
             }
 
             return chart;

@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Deenote.Library.Collections.Generic;
 public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
@@ -113,16 +114,20 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
     public void AddRange<TDerived>(Span<TDerived> collection) where TDerived : T
         => AddRange((ReadOnlySpan<TDerived>)collection);
 
-    public void AddFromEnd(T item)
+    public int AddFromEnd(T item)
     {
-        var index = BinarySearch(item);
-        NumberUtils.FlipNegative(ref index);
+        var index = LinearSearchFromEnd(item);
+        if (index < 0)
+            index = ~index;
+        else
+            index++; // If found, we should insert after the existing item
         InsertAt(index, item);
+        return index;
     }
 
     public void AddFromStart(T item)
     {
-        var index = BinarySearch(item);
+        var index = LinearSearch(item);
         NumberUtils.FlipNegative(ref index);
         InsertAt(index, item);
     }
@@ -316,6 +321,33 @@ public sealed class SortedList<T> : IList<T>, IReadOnlyList<T>
     void IList<T>.Insert(int index, T item) => ThrowHelper.ThrowInvalidOperationException("Cannot insert at specific position to SortedList");
     bool ICollection<T>.Remove(T item) => Remove(item) >= 0;
     void ICollection<T>.Add(T item) => Add(item);
+
+    public bool TryCopyFromSorted(ReadOnlySpan<T> items)
+    {
+        var enumerator = items.GetEnumerator();
+        if (!enumerator.MoveNext()) {
+            Clear();
+            return true;
+        }
+        var prev = enumerator.Current;
+
+        while (enumerator.MoveNext()) {
+            var current = enumerator.Current;
+            if (_comparer.Compare(current, prev) < 0)
+                return false;
+            prev = current;
+        }
+
+        if (_array.Length < items.Length) {
+            ArrayGrowHelper.Grow(ref _array, items.Length, 0);
+        }
+        items.CopyTo(_array);
+        if (_count > items.Length) {
+            ArrayGrowHelper.FreeManaged(_array, _count, items.Length - _count);
+        }
+        _count = items.Length;
+        return true;
+    }
 
     public struct Enumerator : IEnumerator<T>
     {
