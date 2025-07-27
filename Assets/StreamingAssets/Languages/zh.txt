@@ -603,6 +603,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     - 修复了将click转为hold（或根据首尾创建note）会创建无效hold的问题
     - 修复了有时无法加载带ID3 tag的mp3文件的问题
     - 修复了含slide note与背景note相连的谱面无法导入的问题
+    - 优化部分ui展示
 
     <b>Deenote 1.0.3</b>
 
