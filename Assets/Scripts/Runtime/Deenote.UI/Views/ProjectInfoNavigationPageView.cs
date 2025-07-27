@@ -11,6 +11,7 @@ using Deenote.Library.Components;
 using Deenote.Localization;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
+using Deenote.UIFramework;
 using Deenote.UIFramework.Controls;
 using System.Collections.Generic;
 using System.IO;
@@ -42,6 +43,8 @@ namespace Deenote.UI.Views
         [SerializeField] ProjectInfoChartListItem _chartListItemPrefab = default!;
         private PooledObjectListView<ProjectInfoChartListItem> _chartItems = default!;
 
+        private ResetableCancellationTokenSource _rcts = default!;
+
         #region MessageBoxArgs
 
         private static readonly MessageBoxArgs _loadAudioFailedMsgBoxArgs = new(
@@ -61,6 +64,8 @@ namespace Deenote.UI.Views
         private const string SelectAudioFileExplorerTitleKey = "SelectAudio_FileExplorer_Title";
         private const string SelectChartFileExplorerTitleKey = "SelectChart_FileExplorer_Title";
         private const string ChartLoadedStatusKey = "LoadChart_Status_Loaded";
+        private const string LoadAudioLoadingStatusKey = "LoadAudio_Status_Loading";
+        private const string LoadAudioLoadedStatusKey = "LoadAudio_Status_Loaded";
 
         #endregion
 
@@ -68,12 +73,14 @@ namespace Deenote.UI.Views
         {
             _chartItems = new(UnityUtils.CreateObjectPool(_chartListItemPrefab, _chartsCollapsable.Content,
                 item => item.OnInstantiate(this), defaultCapacity: 0));
+            _rcts = new();
 
             #region Project
             {
                 _audioButton.Clicked += UniTask.Action(async () =>
                 {
                     AssertProjectLoaded();
+                    _rcts.CancelAndReset();
 
                     while (true) {
                         var res = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
@@ -82,9 +89,15 @@ namespace Deenote.UI.Views
                         if (res.IsCancelled)
                             return;
 
+                        var fileName = Path.GetFileName(res.Path);
+                        MainWindow.StatusBar.SetLocalizedStatusMessage(LoadAudioLoadingStatusKey, fileName);
+
                         using var fs = File.OpenRead(res.Path);
-                        var clip = await AudioUtils.TryLoadAsync(fs, Path.GetExtension(res.Path));
+                        var clip = await AudioUtils.TryLoadAsync(fs, Path.GetExtension(res.Path), _rcts.Token);
                         if (clip is null) {
+                            MainWindow.StatusBar.SetReadyStatusMessage();
+
+                            _rcts.Token.ThrowIfCancellationRequested();
                             var btn = await MainWindow.DialogManager.OpenMessageBoxAsync(_loadAudioFailedMsgBoxArgs);
                             if (btn != 0)
                                 return;
@@ -95,6 +108,8 @@ namespace Deenote.UI.Views
                         fs.Seek(0, SeekOrigin.Begin);
                         fs.Read(bytes);
                         MainSystem.ProjectManager.EditProjectAudio(res.Path, bytes, clip);
+
+                        MainWindow.StatusBar.SetLocalizedStatusMessage(LoadAudioLoadedStatusKey, fileName, 3f);
 
                         break;
                     }

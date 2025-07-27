@@ -18,7 +18,7 @@ namespace Deenote.Library
             _cts!.Cancel();
         }
 
-        public void Reset()
+        public void CancelAndReset()
         {
             if (_cts is not null) {
                 _cts.Cancel();
