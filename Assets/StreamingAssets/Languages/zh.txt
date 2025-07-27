@@ -285,6 +285,9 @@ LoadAudioFailed_MsgBox_Content=音频文件加载失败，请尝试选择其他�
 LoadAudioFailed_MsgBox_Y=OK
 SelectAudio_FileExplorer_Title=选择音频文件
 
+LoadAudio_Status_Loading=正在加载音频{0}...
+LoadAudio_Status_Loaded=音频{0}已加载。
+
 LoadChart_MsgBox_Title=加载谱面
 LoadChart_Status_Loaded=谱面已加载。
 SelectChart_FileExplorer_Title=选择谱面文件
@@ -598,6 +601,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.4</b>
 
     - 修复了将click转为hold（或根据首尾创建note）会创建无效hold的问题
+    - 修复了有时无法加载带ID3 tag的mp3文件的问题
 
     <b>Deenote 1.0.3</b>
 

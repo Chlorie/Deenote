@@ -22,7 +22,7 @@ namespace Deenote.UI.Dialogs
             OpenSelfModalDialog();
             ResetDialog();
 
-            _cts.Reset();
+            _cts.CancelAndReset();
 
             try {
             ReAwaitButtonClick:

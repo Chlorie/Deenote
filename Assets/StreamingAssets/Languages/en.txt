@@ -285,6 +285,9 @@ LoadAudioFailed_MsgBox_Content=Failed to load audio. Try another file.
 LoadAudioFailed_MsgBox_Y=OK
 SelectAudio_FileExplorer_Title=Select audio file.
 
+LoadAudio_Status_Loading=Loading audio {0}...
+LoadAudio_Status_Loaded=Audio {0} Loaded.
+
 LoadChart_MsgBox_Title=Load Chart.
 LoadChart_Status_Loaded=Chart loaded.
 SelectChart_FileExplorer_Title=Select chart file.
@@ -423,6 +426,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.4</b>
 
     - Fix bug that creating a hold from click (or create with head-tail notes) cause a invalid hold
+    - Fix bug that sometimes fail to load .mp3 with custom ID3 tag
 
     <b>Deenote 1.0.3</b>
 

@@ -103,7 +103,7 @@ namespace Deenote.Core.Project
         {
             ValidateProject();
 
-            _saveCts.Reset();
+            _saveCts.CancelAndReset();
             await SaveCurrentProjectToAsyncInternal(CurrentProject.ProjectFilePath, _saveCts.Token);
             ProjectSaved?.Invoke(new ProjectSaveEventArgs(ProjectSaveContents.Project));
         }
@@ -112,7 +112,7 @@ namespace Deenote.Core.Project
         {
             ValidateProject();
 
-            _saveCts.Reset();
+            _saveCts.CancelAndReset();
             await SaveCurrentProjectToAsyncInternal(targetFilePath, _saveCts.Token);
             ProjectSaved?.Invoke(new ProjectSaveEventArgs(ProjectSaveContents.Project));
         }
@@ -143,7 +143,7 @@ namespace Deenote.Core.Project
         {
             AssertProjectLoaded();
 
-            _saveChartsCts.Reset();
+            _saveChartsCts.CancelAndReset();
 
             var time = DateTime.Now;
             string dir = Path.Combine(Path.GetDirectoryName(CurrentProject.ProjectFilePath), AutoSaveJsonDirName);
