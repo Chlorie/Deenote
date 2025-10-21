@@ -79,6 +79,83 @@ namespace Deenote.Entities.Operations
         public static EditNotesPropertyOperationBase<ImmutableArray<PianoSoundValueModel>> EditNotesSounds(this ChartModel chart, ReadOnlySpan<NoteModel> notes, ReadOnlySpan<PianoSoundValueModel> value)
             => new EditNotesSoundsPropertyOperation(chart, notes.ToImmutableArray(), value.ToImmutableArray());
 
+        [Obsolete("Builtin for chart concatenation, this may be changed or removed in the future")]
+        public static ConcatNotesOperation ConcatNotes(this ChartModel chart, ChartModel newChart, float offset, float multiplier) => new ConcatNotesOperation(chart, newChart, offset, multiplier);
+
+        [Obsolete("Builtin for chart concatenation, this may be changed removed in the future")]
+        public sealed class ConcatNotesOperation : NotifiableChartOperation<ChartModel>
+        {
+            private readonly ChartModel _oldChart;
+            private readonly ChartModel _newChart;
+            private readonly float _offset;
+            private readonly float _multiplier;
+
+            public ConcatNotesOperation(ChartModel chart, ChartModel newChart, float offset, float multiplier) : base(chart)
+            {
+                _oldChart = chart.Clone();
+                _newChart = newChart.Clone();
+                _offset = offset;
+                _multiplier = multiplier;
+            }
+
+            protected override void Redo()
+            {
+                var noteModels = new List<NoteModel>();
+                foreach (var note in _oldChart.EnumerateNoteModels()) {
+                    noteModels.Add(note);
+                }
+                foreach (var note in _newChart.EnumerateNoteModels()) {
+                    note.Time = _offset + (note.Time / _multiplier);
+                    if (note.IsHold) {
+                        note.Duration /= _multiplier;
+                    }
+                    noteModels.Add(note);
+                }
+                _chart.NoteNodes.Clear();
+                ChartModel.Marshal.SetNoteModels(_chart, noteModels.AsSpan());
+
+                _chart._holdCount = _oldChart._holdCount + _newChart._holdCount;
+
+                foreach (var note in _newChart.BackgroundSoundNotes) {
+                    note.Time = _offset + (note.Time / _multiplier);
+                    _chart.BackgroundSoundNotes.Add(note);
+                }
+
+                foreach (var note in _newChart.SpeedChangeWarnings) {
+                    note.Time = _offset + (note.Time / _multiplier);
+                    _chart.SpeedChangeWarnings.Add(note);
+                }
+
+                foreach (var line in _newChart.SpeedLines) {
+                    var newline = line;
+                    newline.StartTime = _offset + (line.StartTime / _multiplier);
+                    _chart.SpeedLines.Add(newline);
+                }
+
+                OnRedone(_chart);
+            }
+
+            protected override void Undo()
+            {
+                var noteModels = new List<NoteModel>();
+                foreach (var note in _oldChart.EnumerateNoteModels()) {
+                    noteModels.Add(note);
+                }
+                _chart.NoteNodes.Clear();
+                ChartModel.Marshal.SetNoteModels(_chart, noteModels.AsSpan());
+
+                _chart._holdCount = _oldChart._holdCount;
+                _chart.BackgroundSoundNotes.Clear();
+                _chart.BackgroundSoundNotes.AddRange(_oldChart.BackgroundSoundNotes.AsSpan());
+                _chart.SpeedChangeWarnings.Clear();
+                _chart.SpeedChangeWarnings.AddRange(_oldChart.SpeedChangeWarnings.AsSpan());
+                _chart.SpeedLines.Clear();
+                _chart.SpeedLines.AddRange(_oldChart.SpeedLines.AsSpan());
+
+                OnUndone(_chart);
+            }
+        }
+
         public sealed class AddNoteOperation : NotifiableChartOperation<NoteModel>
         {
             private readonly NoteModel _note;

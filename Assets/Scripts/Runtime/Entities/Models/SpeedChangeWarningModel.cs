@@ -8,7 +8,11 @@ namespace Deenote.Entities.Models
     {
         internal readonly NoteModel _noteModel;
 
-        public float Time => _noteModel.Time;
+        public float Time
+        {
+            get => _noteModel.Time;
+            set => _noteModel.Time = value;
+        }
 
         internal SpeedChangeWarningModel(NoteModel note)
         {

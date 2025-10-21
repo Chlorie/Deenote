@@ -13,6 +13,7 @@ using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
 using Deenote.UIFramework;
 using Deenote.UIFramework.Controls;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -38,6 +39,9 @@ namespace Deenote.UI.Views
         [SerializeField] TextBox _chartSpeedInput = default!;
         [SerializeField] TextBox _chartRemapMinVolumeInput = default!;
         [SerializeField] TextBox _chartRemapMaxVolumeInput = default!;
+        [SerializeField] TextBox _chartConcatOffsetInput = default!;
+        [SerializeField] TextBox _chartConcatMultiplierInput = default!;
+        [SerializeField] Button _chartConcatLoadButton = default!;
 
         [Header("Prefabs")]
         [SerializeField] ProjectInfoChartListItem _chartListItemPrefab = default!;
@@ -68,6 +72,9 @@ namespace Deenote.UI.Views
         private const string LoadAudioLoadedStatusKey = "LoadAudio_Status_Loaded";
 
         #endregion
+
+        private float _chartConcatOffset = 0f;
+        private float _chartConcatMultiplier = 1f;
 
         private void Awake()
         {
@@ -309,6 +316,47 @@ namespace Deenote.UI.Views
                             SetRemapMaxVolume(chart.RemapMaxVolume);
                         }
                     });
+
+                _chartConcatOffsetInput.EditSubmitted += val =>
+                {
+                    if (float.TryParse(val, out var offset))
+                        _chartConcatOffset = offset;
+                    _chartConcatOffsetInput.SetValueWithoutNotify(_chartConcatOffset.ToString("F3"));
+                };
+                _chartConcatMultiplierInput.EditSubmitted += val =>
+                {
+                    if (float.TryParse(val, out var multiplier))
+                        _chartConcatMultiplier = multiplier;
+                    if (_chartConcatMultiplier <= 0)
+                        _chartConcatMultiplier = 0.1f;
+                    _chartConcatMultiplierInput.SetValueWithoutNotify(_chartConcatMultiplier.ToString("F3"));
+                };
+                _chartConcatLoadButton.Clicked += [Obsolete] async () =>
+                {
+                    if (!MainSystem.GamePlayManager.IsChartLoaded())
+                        return;
+
+                    Reselect:
+                    var fileRes = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
+                        LocalizableText.Raw("Select file to concatenate"),
+                        MainSystem.Args.SupportLoadChartFileExtensions);
+                    if (fileRes.IsCancelled)
+                        return;
+                    var file = fileRes.Path;
+
+                    if (!ChartModel.TryParse(File.ReadAllText(file), out var chart)) {
+                        var button = await MainWindow.DialogManager.OpenMessageBoxAsync(new MessageBoxArgs(
+                            LocalizableText.Raw("Load chart failed."),
+                            LocalizableText.Raw("Failed to parse chart file, please select another file."),
+                            LocalizableText.Raw("Reselect"),
+                            LocalizableText.Raw("Cancel")));
+                        if (button != 0)
+                            return;
+                        goto Reselect;
+                    }
+
+                    MainSystem.StageChartEditor.ConcatNotes(chart, _chartConcatOffset, _chartConcatMultiplier);
+                };
 
                 void SetName(string name) => _chartNameInput.SetValueWithoutNotify(name);
                 void SetDifficulty(Difficulty difficulty)

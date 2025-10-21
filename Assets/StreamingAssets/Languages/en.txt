@@ -429,6 +429,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     - Fix bug that sometimes fail to load .mp3 with custom ID3 tag
     - Fix bug that fail to load chart that contains slide note linked to a background note
     - Optimize some ui displaying
+    - Add Chart concatenation (Temporarily)
 
     <b>Deenote 1.0.3</b>
 

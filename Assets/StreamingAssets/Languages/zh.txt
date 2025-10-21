@@ -604,6 +604,7 @@ AboutDialog_Versions_Dnt_1_0_Content="""
     - 修复了有时无法加载带ID3 tag的mp3文件的问题
     - 修复了含slide note与背景note相连的谱面无法导入的问题
     - 优化部分ui展示
+    - 添加谱面连接功能（项目->谱面->Chart concatenation）（该功能为临时添加，后续可能会移动或修改）
 
     <b>Deenote 1.0.3</b>
 
