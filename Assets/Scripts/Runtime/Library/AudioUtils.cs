@@ -2,6 +2,8 @@
 
 using Cysharp.Threading.Tasks;
 using NAudio.Wave;
+using System;
+using System.Buffers;
 using System.IO;
 using System.Threading;
 using UnityEngine;
@@ -30,15 +32,16 @@ namespace Deenote.Library
                 WaveStream wave;
                 int initialSampleCount;
                 switch (audioType) {
-                    case ".wav":
+                    case ".wav" or ".WAV":
                         wave = new WaveFileReader(stream);
                         initialSampleCount = 0;
                         break;
-                    case ".mp3":
+                    case ".mp3" or ".MP3":
+                        var id3TagLength = SkipID3Tag(stream);
                         wave = new Mp3FileReader(stream);
                         Mp3Frame frame = Mp3Frame.LoadFromStream(stream);
                         initialSampleCount = frame.SampleCount * wave.WaveFormat.Channels;
-                        stream.Seek(0, SeekOrigin.Begin);
+                        stream.Seek(id3TagLength, SeekOrigin.Begin);
                         break;
                     default:
                         return null;
@@ -48,18 +51,52 @@ namespace Deenote.Library
 
                 ISampleProvider provider = wave.ToSampleProvider();
                 long length = wave.Length / (wave.WaveFormat.BitsPerSample / 8);
-                float[] raw = new float[length];
+                float[] raw = ArrayPool<float>.Shared.Rent((int)length);
                 try {
-                    provider.Read(raw, 0, (int)length);
-                } catch (NAudio.MmException) {
-                    return null;
+                    try {
+                        provider.Read(raw, 0, (int)length);
+                    } catch (NAudio.MmException) {
+                        return null;
+                    }
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    float[] samples = new float[length + initialSampleCount];
+                    raw.CopyTo(samples, initialSampleCount);
+                    return (samples, wave);
+                } finally {
+                    ArrayPool<float>.Shared.Return(raw);
                 }
+            }
 
-                cancellationToken.ThrowIfCancellationRequested();
+            /// <return>Length of ID3 tag</return>
+            int SkipID3Tag(Stream stream)
+            {
+                // byte[3] identifier
+                // byte version
+                // byte revision
+                // byte flags
+                // byte[4] size, Big Endian, ignore the leading 1 bit (always 0) of every byte
 
-                float[] samples = new float[length + initialSampleCount];
-                raw.CopyTo(samples, initialSampleCount);
-                return (samples, wave);
+                var resetPos = stream.Position;
+                Span<byte> id3 = stackalloc byte[3];
+                stream.Read(id3);
+                if (id3[0] == 'I' && id3[1] == 'D' && id3[2] == '3') {
+                    stream.Position += 3;
+                    Span<byte> sizeData = stackalloc byte[4];
+                    stream.Read(sizeData);
+                    uint size = 0;
+                    size |= (uint)sizeData[0] << 21;
+                    size |= (uint)sizeData[1] << 14;
+                    size |= (uint)sizeData[2] << 7;
+                    size |= sizeData[3];
+                    stream.Position += size;
+                    return 10 + checked((int)size);
+                }
+                else {
+                    stream.Position = resetPos;
+                    return 0;
+                }
             }
         }
 

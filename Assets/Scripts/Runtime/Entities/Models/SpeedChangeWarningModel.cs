@@ -6,9 +6,13 @@ namespace Deenote.Entities.Models
 {
     public sealed class SpeedChangeWarningModel : IStageTimeNode
     {
-        private readonly NoteModel _noteModel;
+        internal readonly NoteModel _noteModel;
 
-        public float Time => _noteModel.Time;
+        public float Time
+        {
+            get => _noteModel.Time;
+            set => _noteModel.Time = value;
+        }
 
         internal SpeedChangeWarningModel(NoteModel note)
         {

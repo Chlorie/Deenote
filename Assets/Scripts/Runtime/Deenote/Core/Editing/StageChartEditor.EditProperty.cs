@@ -30,6 +30,17 @@ namespace Deenote.Core.Editing
             _game.UpdateNotes(notesVerticalPositionChanged, notesVisualDataChanged);
         }
 
+        [Obsolete("Builtin for chart concatenation, this may be changed removed in the future")]
+        public void ConcatNotes(ChartModel other, float offset, float multiplier)
+        {
+            if (!_game.IsChartLoaded())
+                return;
+            _operations.Do(_game.CurrentChart
+                .ConcatNotes(other, offset, multiplier)
+                .OnRedone(_ => _game.UpdateNotes(true, true))
+                .OnUndone(_ => _game.UpdateNotes(true, true)));
+        }
+
         public void EditSelectedNotesPositionCoord(Func<NoteCoord, NoteCoord> valueSelector)
         {
             if (!_game.IsChartLoaded())

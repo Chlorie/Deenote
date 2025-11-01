@@ -33,7 +33,7 @@ namespace Deenote.UI.Dialogs
                 }
             }
 
-#if UNITY_EDITOR
+#if false && UNITY_EDITOR
             _pinnedItems.Add(out var dbgitem);
             dbgitem.Initialize(@"D:\Project Charts\Deenote\Music");
 #endif

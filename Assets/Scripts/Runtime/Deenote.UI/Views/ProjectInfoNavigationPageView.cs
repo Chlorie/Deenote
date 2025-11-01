@@ -11,7 +11,9 @@ using Deenote.Library.Components;
 using Deenote.Localization;
 using Deenote.UI.Dialogs.Elements;
 using Deenote.UI.Views.Elements;
+using Deenote.UIFramework;
 using Deenote.UIFramework.Controls;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -37,10 +39,15 @@ namespace Deenote.UI.Views
         [SerializeField] TextBox _chartSpeedInput = default!;
         [SerializeField] TextBox _chartRemapMinVolumeInput = default!;
         [SerializeField] TextBox _chartRemapMaxVolumeInput = default!;
+        [SerializeField] TextBox _chartConcatOffsetInput = default!;
+        [SerializeField] TextBox _chartConcatMultiplierInput = default!;
+        [SerializeField] Button _chartConcatLoadButton = default!;
 
         [Header("Prefabs")]
         [SerializeField] ProjectInfoChartListItem _chartListItemPrefab = default!;
         private PooledObjectListView<ProjectInfoChartListItem> _chartItems = default!;
+
+        private ResetableCancellationTokenSource _rcts = default!;
 
         #region MessageBoxArgs
 
@@ -61,19 +68,29 @@ namespace Deenote.UI.Views
         private const string SelectAudioFileExplorerTitleKey = "SelectAudio_FileExplorer_Title";
         private const string SelectChartFileExplorerTitleKey = "SelectChart_FileExplorer_Title";
         private const string ChartLoadedStatusKey = "LoadChart_Status_Loaded";
+        private const string LoadAudioLoadingStatusKey = "LoadAudio_Status_Loading";
+        private const string LoadAudioLoadedStatusKey = "LoadAudio_Status_Loaded";
 
         #endregion
+
+        private float _chartConcatOffset = 0f;
+        private float _chartConcatMultiplier = 1f;
 
         private void Awake()
         {
             _chartItems = new(UnityUtils.CreateObjectPool(_chartListItemPrefab, _chartsCollapsable.Content,
                 item => item.OnInstantiate(this), defaultCapacity: 0));
+            _rcts = new();
 
             #region Project
             {
                 _audioButton.Clicked += UniTask.Action(async () =>
                 {
                     AssertProjectLoaded();
+                    _rcts.CancelAndReset();
+                    var cancellationToken = _rcts.Token;
+
+                    using var ctr = cancellationToken.Register(() => MainWindow.StatusBar.SetReadyStatusMessage());
 
                     while (true) {
                         var res = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
@@ -82,9 +99,15 @@ namespace Deenote.UI.Views
                         if (res.IsCancelled)
                             return;
 
+                        var fileName = Path.GetFileName(res.Path);
+                        MainWindow.StatusBar.SetLocalizedStatusMessage(LoadAudioLoadingStatusKey, fileName);
+
                         using var fs = File.OpenRead(res.Path);
-                        var clip = await AudioUtils.TryLoadAsync(fs, Path.GetExtension(res.Path));
+                        var clip = await AudioUtils.TryLoadAsync(fs, Path.GetExtension(res.Path), cancellationToken);
                         if (clip is null) {
+                            MainWindow.StatusBar.SetReadyStatusMessage();
+
+                            cancellationToken.ThrowIfCancellationRequested();
                             var btn = await MainWindow.DialogManager.OpenMessageBoxAsync(_loadAudioFailedMsgBoxArgs);
                             if (btn != 0)
                                 return;
@@ -95,6 +118,8 @@ namespace Deenote.UI.Views
                         fs.Seek(0, SeekOrigin.Begin);
                         fs.Read(bytes);
                         MainSystem.ProjectManager.EditProjectAudio(res.Path, bytes, clip);
+
+                        MainWindow.StatusBar.SetLocalizedStatusMessage(LoadAudioLoadedStatusKey, fileName, 3f);
 
                         break;
                     }
@@ -291,6 +316,47 @@ namespace Deenote.UI.Views
                             SetRemapMaxVolume(chart.RemapMaxVolume);
                         }
                     });
+
+                _chartConcatOffsetInput.EditSubmitted += val =>
+                {
+                    if (float.TryParse(val, out var offset))
+                        _chartConcatOffset = offset;
+                    _chartConcatOffsetInput.SetValueWithoutNotify(_chartConcatOffset.ToString("F3"));
+                };
+                _chartConcatMultiplierInput.EditSubmitted += val =>
+                {
+                    if (float.TryParse(val, out var multiplier))
+                        _chartConcatMultiplier = multiplier;
+                    if (_chartConcatMultiplier <= 0)
+                        _chartConcatMultiplier = 0.1f;
+                    _chartConcatMultiplierInput.SetValueWithoutNotify(_chartConcatMultiplier.ToString("F3"));
+                };
+                _chartConcatLoadButton.Clicked += [Obsolete] async () =>
+                {
+                    if (!MainSystem.GamePlayManager.IsChartLoaded())
+                        return;
+
+                    Reselect:
+                    var fileRes = await MainWindow.DialogManager.OpenFileExplorerSelectFileAsync(
+                        LocalizableText.Raw("Select file to concatenate"),
+                        MainSystem.Args.SupportLoadChartFileExtensions);
+                    if (fileRes.IsCancelled)
+                        return;
+                    var file = fileRes.Path;
+
+                    if (!ChartModel.TryParse(File.ReadAllText(file), out var chart)) {
+                        var button = await MainWindow.DialogManager.OpenMessageBoxAsync(new MessageBoxArgs(
+                            LocalizableText.Raw("Load chart failed."),
+                            LocalizableText.Raw("Failed to parse chart file, please select another file."),
+                            LocalizableText.Raw("Reselect"),
+                            LocalizableText.Raw("Cancel")));
+                        if (button != 0)
+                            return;
+                        goto Reselect;
+                    }
+
+                    MainSystem.StageChartEditor.ConcatNotes(chart, _chartConcatOffset, _chartConcatMultiplier);
+                };
 
                 void SetName(string name) => _chartNameInput.SetValueWithoutNotify(name);
                 void SetDifficulty(Difficulty difficulty)

@@ -285,6 +285,9 @@ LoadAudioFailed_MsgBox_Content=Failed to load audio. Try another file.
 LoadAudioFailed_MsgBox_Y=OK
 SelectAudio_FileExplorer_Title=Select audio file.
 
+LoadAudio_Status_Loading=Loading audio {0}...
+LoadAudio_Status_Loaded=Audio {0} Loaded.
+
 LoadChart_MsgBox_Title=Load Chart.
 LoadChart_Status_Loaded=Chart loaded.
 SelectChart_FileExplorer_Title=Select chart file.
@@ -420,6 +423,14 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.4</b>
+
+    - Fix bug that creating a hold from click (or create with head-tail notes) cause a invalid hold
+    - Fix bug that sometimes fail to load .mp3 with custom ID3 tag
+    - Fix bug that fail to load chart that contains slide note linked to a background note
+    - Optimize some ui displaying
+    - Add Chart concatenation (Temporarily)
+
     <b>Deenote 1.0.3</b>
 
     - Fix the totally wrong behaviour of opening project from cli arg, I forgot to test it
