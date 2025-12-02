@@ -250,12 +250,20 @@ namespace Deenote.UI.Dialogs
 
             internal bool IsFilePathShouldShow(string path)
             {
-                return Kind switch {
-                    PathFilterKind.NoFilter => true,
-                    PathFilterKind.DirectoriesOnly => false,
-                    PathFilterKind.FilterByExtensions => path.EndsWithOneOf(_filters.AsSpan()),
-                    _ => true,
-                };
+                switch (Kind) {
+                    case PathFilterKind.NoFilter:
+                        return true;
+                    case PathFilterKind.DirectoriesOnly:
+                        return false;
+                    case PathFilterKind.FilterByExtensions:
+                        foreach (var filter in _filters) {
+                            if (path.EndsWith(filter, StringComparison.OrdinalIgnoreCase))
+                                return true;
+                        }
+                        return false;
+                    default:
+                        return true;
+                }
             }
 
             private FilePathFilter(ImmutableArray<string> filters)

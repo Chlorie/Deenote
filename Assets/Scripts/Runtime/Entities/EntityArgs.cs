@@ -16,7 +16,7 @@ namespace Deenote.Entities
         private const float MinNoteSize = 0.1f;
         //private const float MaxNoteSize = 5f;
         private const float MinNoteSpeed = 0.1f;
-        private const float MaxNoteSpeed = 20f;
+        private const float MaxNoteSpeed = 100f;
 
         public static float ClampTime(float time, float maxTime) => Mathf.Clamp(time, 0f, maxTime);
 
@@ -24,7 +24,12 @@ namespace Deenote.Entities
 
         public static float ClampSize(float size) => Mathf.Max(size, MinNoteSize);
 
-        public static float ClampNoteSpeed(float speed) => Mathf.Clamp(speed, MinNoteSpeed, MaxNoteSpeed);
+        public static float ClampNoteSpeed(float speed)
+        {
+            if (speed <= 0f)
+                return MinNoteSpeed;
+            return Mathf.Min(speed, MaxNoteSpeed);
+        }
 
         private static bool IsTimeCollided(float left, float right)
             => Mathf.Abs(right - left) <= NoteTimeCollisionThreshold;

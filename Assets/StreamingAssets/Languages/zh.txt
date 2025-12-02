@@ -598,6 +598,15 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.5</b>
+
+    - 修复了多次复制粘贴可能引起slide连线错乱的问题
+    - 允许设置note的speed属性为(0, 0.1)范围内的数值，调整最大允许速度为100
+    - 修复了文件浏览器不识别非小写扩展名的问题
+    - 修复了在文件浏览器中选择项后，下次以输入模式打开不会填充默认输入的问题
+    - 修复了修改自动保存间隔不及时生效的问题
+    - 修复了Shift粘贴时，吸附选项的错误
+
     <b>Deenote 1.0.4</b>
 
     - 修复了将click转为hold（或根据首尾创建note）会创建无效hold的问题

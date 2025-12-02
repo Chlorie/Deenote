@@ -163,6 +163,11 @@ namespace Deenote.Entities.Models
         {
             Guard.HasSizeEqualTo(to, from.Length);
 
+            foreach (var tn in to) {
+                tn._prevLink = null;
+                tn._nextLink = null;
+            }
+
             using var dp_slideLookup = DictionaryPool<NoteModel, NoteModel>.Get(out var slideLookup);
 
             for (int i = 0; i < from.Length; i++) {
