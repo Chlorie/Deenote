@@ -423,6 +423,15 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.5</b>
+
+    - Fix bug that copy notes may cause invalid link lines
+    - Allow set notes' speed to value in range (0, 0.1), adjust max speed to 100
+    - Fix bug that file explorer does not display files with non-lower-case extension
+    - Fix bug that when select a file item in file explorer, the next time default input won't be filled
+    - Fix bug that changing auto save interval is not activated immediately
+    - Fix wrong option when paste notes with position-remembering(holding shift key)
+
     <b>Deenote 1.0.4</b>
 
     - Fix bug that creating a hold from click (or create with head-tail notes) cause a invalid hold

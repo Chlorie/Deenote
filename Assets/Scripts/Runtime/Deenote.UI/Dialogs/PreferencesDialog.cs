@@ -155,7 +155,7 @@ namespace Deenote.UI.Dialogs
             _autoSaveIntervalDropdown.ResetOptions(_autoSaveIntervals.AsSpan(), time => ArgedLocalizableText.Localized(AutoSaveIntervalMinutesKey, (time / 60).ToString()));
             _autoSaveIntervalDropdown.SelectedIndexChanged += val => MainSystem.ProjectManager.AutoSaveIntervalTime = GetAutoSaveIntervalDropdownOption(val);
             MainSystem.ProjectManager.RegisterNotificationAndInvoke(
-                ProjectManager.NotificationFlag.AutoSave,
+                ProjectManager.NotificationFlag.AutoSaveInterval,
                 manager => _autoSaveIntervalDropdown.SetValueWithoutNotify(GetAutoSaveIntervalDropdownIndex(manager.AutoSaveIntervalTime)));
 
             _checkUpdateToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.CheckUpdateOnStartup = val;

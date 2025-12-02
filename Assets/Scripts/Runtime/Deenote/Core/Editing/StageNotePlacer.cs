@@ -398,7 +398,7 @@ namespace Deenote.Core.Editing
             NoteCoord placeCoord;
             if (PasteRememberPositionModifier) {
                 placeCoord = coord with { Position = _editor.ClipBoard.BaseCoord.Position };
-                placeCoord = _editor._game.Grids.Quantize(placeCoord, false, SnapToPositionGrid);
+                placeCoord = _editor._game.Grids.Quantize(placeCoord, false, SnapToTimeGrid);
             }
             else {
                 placeCoord = _editor._game.Grids.Quantize(coord, SnapToPositionGrid, SnapToTimeGrid);

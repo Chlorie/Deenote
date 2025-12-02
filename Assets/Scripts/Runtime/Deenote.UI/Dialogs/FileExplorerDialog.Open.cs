@@ -24,8 +24,8 @@ namespace Deenote.UI.Dialogs
             // Initialization
 
             _pathFilter = pathFilter;
-            SetInputBar(inputBar);
             CurrentSelectedFilePath = null;
+            SetInputBar(inputBar);
 
             NavigateToDirectory(initialDirectory ?? CurrentDirectory, true, true);
 
