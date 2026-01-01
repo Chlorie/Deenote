@@ -394,10 +394,6 @@ namespace Deenote.UI.Views
             Debug.Assert(ReferenceEquals(item.ChartModel, MainSystem.ProjectManager.CurrentProject.Charts[findIndex]),
                 "Chart in ProjectInfo page and in current project not match");
             MainSystem.ProjectManager.RemoveProjectChartAt(findIndex);
-
-            if (_chartItems.Count == 0) {
-                MainSystem.ProjectManager.AddProjectChart(new ChartModel());
-            }
         }
 
         #endregion

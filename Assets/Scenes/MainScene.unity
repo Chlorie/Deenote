@@ -6190,6 +6190,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 904203c3d3a8e1441ab71c1d81eade00, type: 3}
   - {fileID: 8300000, guid: aa7159e933e8d2741805f43eeae0f024, type: 3}
   - {fileID: 8300000, guid: 88c4641fe6146c2479341cf501f48a01, type: 3}
+  _interpolateVelocity: 1
 --- !u!1 &321757947
 GameObject:
   m_ObjectHideFlags: 0

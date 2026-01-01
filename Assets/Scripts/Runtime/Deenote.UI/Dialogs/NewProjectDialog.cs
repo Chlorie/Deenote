@@ -45,17 +45,23 @@ namespace Deenote.UI.Dialogs
         private static readonly MessageBoxArgs _audioNotExistsMsgBoxArgs = new(
             LocalizableText.Localized("NewProject_MsgBox_Title"),
             LocalizableText.Localized("NewProjectAudioNotExists_MsgBox_Content"),
-            LocalizableText.Localized("NewProjectAudioNotExists_MsgBox_Y"), -1);
+            LocalizableText.Localized("NewProjectAudioNotExists_MsgBox_Y")) {
+            HighlightIndex=-1
+        };
 
         private static readonly MessageBoxArgs _audioLoadFailedMsgBoxArgs = new(
             LocalizableText.Localized("NewProject_MsgBox_Title"),
             LocalizableText.Localized("NewProjectAudioLoadFailed_MsgBox_Content"),
-            LocalizableText.Localized("NewProjectAudioLoadFailed_MsgBox_Y"), -1);
+            LocalizableText.Localized("NewProjectAudioLoadFailed_MsgBox_Y")) {
+            HighlightIndex = -1
+        };
 
         private static readonly MessageBoxArgs _dirExistsMsgBoxArgs = new(
             LocalizableText.Localized("NewProject_MsgBox_Title"),
             LocalizableText.Localized("DirExists_MsgBox_Content"),
-            LocalizableText.Localized("DirExists_MsgBox_Y"), -1);
+            LocalizableText.Localized("DirExists_MsgBox_Y")) {
+            HighlightIndex = -1
+        };
 
         private static readonly MessageBoxArgs _fileExistsMsgBoxArgs = new(
             LocalizableText.Localized("NewProject_MsgBox_Title"),

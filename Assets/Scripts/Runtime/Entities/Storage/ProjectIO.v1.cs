@@ -142,11 +142,6 @@ namespace Deenote.Entities.Storage
             ChartModel.Marshal.SetNoteModels(chart, notes);
 
             var soundCount = reader.ReadInt32();
-            using var so_sounds = SpanOwner<SoundNoteModel>.Allocate(soundCount);
-            var sounds = so_sounds.Span;
-            for (int i = 0; i < soundCount; i++) {
-                sounds[i] = ReadSoundNote(reader);
-            }
             chart.BackgroundSoundNotes.EnsureCapacity(soundCount);
             for (int i = 0; i < soundCount; i++) {
                 var index = chart.BackgroundSoundNotes.AddFromEnd(ReadSoundNote(reader));
