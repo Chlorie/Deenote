@@ -278,6 +278,13 @@ OpenRecentProjectFileNotFound_MsgBox_Y=移除
 OpenRecentProjectFileNotFound_MsgBox_X=重新选择
 OpenRecentProjectFileNotFound_MsgBox_N=取消
 
+### Remove Chart
+
+RemoveChart_MsgBox_Title=删除谱面
+RemoveChart_MsgBox_Content=是否确认要删除该谱面？<br/><color=#ff5555>该操作无法撤销。</color>
+RemoveChart_MsgBox_Y=确认
+RemoveChart_MsgBox_N=取消
+
 ### Project
 
 LoadAudio_MsgBox_Title=加载音频文件

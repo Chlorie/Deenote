@@ -56,6 +56,9 @@ namespace Deenote.Core.Project
             ValidateProject();
 
             CurrentProject.Charts.RemoveAt(chartIndex);
+            if(CurrentProject.Charts.Count == 0)
+                AddProjectChart(new ChartModel());
+
             NotifyFlag(NotificationFlag.ProjectCharts);
         }
     }

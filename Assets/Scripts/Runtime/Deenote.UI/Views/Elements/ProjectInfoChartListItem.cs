@@ -9,6 +9,7 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Deenote.UI.Dialogs.Elements;
 
 namespace Deenote.UI.Views.Elements
 {
@@ -33,10 +34,26 @@ namespace Deenote.UI.Views.Elements
 
         #endregion
 
+        private readonly static MessageBoxArgs _removeConfirmMsgBoxArgs = new(
+            LocalizableText.Localized("RemoveChart_MsgBox_Title"),
+            LocalizableText.Localized("RemoveChart_MsgBox_Content"),
+            LocalizableText.Localized("RemoveChart_MsgBox_Y"),
+            LocalizableText.Localized("RemoveChart_MsgBox_N")) {
+            HighlightColorSet = Button.ButtonColorSet.Caution
+        };
+
         private void Awake()
         {
             _button.Clicked += () => _parent.LoadChartToStage(this);
-            _removeButton.Clicked += () => _parent.RemoveChart(this);
+            _removeButton.Clicked += UniTask.Action(async () =>
+            {
+                var confirm = await MainWindow.DialogManager.OpenMessageBoxAsync(
+                    _removeConfirmMsgBoxArgs);
+                if (confirm != 0)
+                    return;
+
+                _parent.RemoveChart(this);
+            });
             _exportButton.Clicked += UniTask.Action(async () =>
             {
                 MainSystem.ProjectManager.AssertProjectLoaded();

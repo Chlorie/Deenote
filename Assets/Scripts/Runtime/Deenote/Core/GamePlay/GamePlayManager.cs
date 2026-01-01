@@ -135,6 +135,20 @@ namespace Deenote.Core.GamePlay
                     manager.AssertProjectLoaded();
                     _musicPlayer.ReplaceClip(new DecodedClipProvider(manager.AudioClip!));
                 });
+
+            MainSystem.ProjectManager.RegisterNotification(
+                ProjectManager.NotificationFlag.ProjectCharts,
+                manager =>
+                {
+                    if (CurrentChart is null)
+                        return;
+                    if (manager.CurrentProject is null)
+                        return;
+                    // Simple check, if current chart is removed from project, unload this and load the first chart
+                    if (!manager.CurrentProject.Charts.Contains(CurrentChart)) {
+                        LoadChartInCurrentProject(manager.CurrentProject.Charts[0]);
+                    }
+                });
         }
 
         private void OnDestroy()

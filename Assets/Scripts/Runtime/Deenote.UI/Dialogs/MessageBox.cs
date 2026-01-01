@@ -48,9 +48,9 @@ namespace Deenote.UI.Dialogs
                 }
             }
             _buttons.SetSiblingIndicesInOrder();
-            if ((uint)data.HightlightIndex < (uint)_buttons.Count) {
-                _prevHightlightButton = _buttons[data.HightlightIndex];
-                _prevHightlightButton.ColorSet = Button.ButtonColorSet.Accent;
+            if ((uint)data.HighlightIndex < (uint)_buttons.Count) {
+                _prevHightlightButton = _buttons[data.HighlightIndex];
+                _prevHightlightButton.ColorSet = data.HighlightColorSet;
             }
 
             return Impl();
