@@ -430,6 +430,13 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.6</b>
+
+    - Fix bug that when remove the only chart in project, the gameplay preview won't update
+    - Fix bug of loading a project file with background sounds
+    - Add double confirmation for removing a chart
+    - Optimize piano sound effects
+
     <b>Deenote 1.0.5</b>
 
     - Fix bug that copy notes may cause invalid link lines

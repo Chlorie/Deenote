@@ -605,6 +605,13 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.6</b>
+
+    - 修复了删除最后一张谱面时，预览界面未更新的bug
+    - 修复了带背景钢琴音的项目文件的导入bug
+    - 增加了删除谱面的二次确认
+    - 优化了钢琴音的音效
+
     <b>Deenote 1.0.5</b>
 
     - 修复了多次复制粘贴可能引起slide连线错乱的问题
