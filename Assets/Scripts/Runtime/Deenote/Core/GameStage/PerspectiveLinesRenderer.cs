@@ -36,6 +36,8 @@ namespace Deenote.Core.GameStage
         private List<VertexData> _vertices = new();
         private MaterialPropertyBlock _props = null!;
 
+        private Mesh _mesh;
+
         private GamePlayManager _game = default!;
 
         public event Action<LineCollector>? LineCollecting;
@@ -43,6 +45,7 @@ namespace Deenote.Core.GameStage
         private void Awake()
         {
             _meshRenderer.sortingLayerName = "Lines";
+            _mesh = new();
             _props = new MaterialPropertyBlock();
         }
 
@@ -76,7 +79,7 @@ namespace Deenote.Core.GameStage
         {
             var collector = new LineCollector(this);
             LineCollecting?.Invoke(collector);
-            _meshFilter.mesh = GenerateMesh();
+            _meshFilter.mesh = UpdateMesh();
         }
 
         private void _OnSuddenPlusChanged(GamePlayManager manager)
@@ -90,7 +93,7 @@ namespace Deenote.Core.GameStage
             _props.SetFloat(FadeInZ, cutoff * args.NoteFadeInRangePercent);
         }
 
-        private Mesh GenerateMesh()
+        private Mesh UpdateMesh()
         {
             // No lines
             if (_vertices.Count == 0) {
@@ -107,13 +110,17 @@ namespace Deenote.Core.GameStage
             sentinel.Positions.w = sentinel.Positions.y;
             _vertices.Add(sentinel);
 
-            Mesh mesh = new();
+            var mesh = _mesh;
+            mesh.Clear();
             mesh.SetVertexBufferParams(_vertices.Count, VertexLayout);
             mesh.SetVertexBufferData(_vertices, 0, 0, _vertices.Count);
+
             NativeArray<int> indices = new(_vertices.Count, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             for (int i = 0; i < _vertices.Count; i++)
                 indices[i] = i;
             mesh.SetIndices(indices, MeshTopology.LineStrip, 0);
+            indices.Dispose();
+
             _vertices.Clear();
             return mesh;
         }
