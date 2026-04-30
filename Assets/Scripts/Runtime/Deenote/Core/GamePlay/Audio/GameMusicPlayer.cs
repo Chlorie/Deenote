@@ -12,7 +12,11 @@ namespace Deenote.Core.GamePlay.Audio
         [SerializeField] AudioSource _source = default!;
 
         private float _time;
+        private double _timeRealtimeAnchor;
+        private float _lastSourceTimeForEvent;
+        private float _lastNotifiedTime;
         private IClipProvider? _factory;
+        private const float DriftHardSyncThreshold = 0.10f;
 
         /// <summary>
         /// The current playback position in seconds.
@@ -22,6 +26,26 @@ namespace Deenote.Core.GamePlay.Audio
         {
             get => _time;
             set => SetTime(value, true);
+        }
+        private float GetSourceTime()
+        {
+            if (_source.clip == null)
+                return _time;
+
+            return Mathf.Clamp(
+                (float)((double)_source.timeSamples / _source.clip.frequency),
+                0f,
+                ClipLength);
+        }
+        private float GetCurrentTime()
+        {
+            if (!IsPlaying || _source.clip == null)
+                return _time;
+
+            var elapsed = UnityEngine.Time.realtimeSinceStartupAsDouble - _timeRealtimeAnchor;
+            var time = _time + (float)elapsed * _source.pitch;
+
+            return Mathf.Clamp(time, 0f, ClipLength);
         }
 
         public float ClipLength
@@ -59,17 +83,31 @@ namespace Deenote.Core.GamePlay.Audio
         /// </summary>
         public event Action<AudioClip>? ClipChanged;
 
+        private void SyncTimeAnchor(float time)
+        {
+            _time = Mathf.Clamp(time, 0f, ClipLength);
+            _timeRealtimeAnchor = UnityEngine.Time.realtimeSinceStartupAsDouble;
+
+            _lastSourceTimeForEvent = _time;
+            _lastNotifiedTime = _time;
+        }
+
         private void SetTime(float value, bool isByJump)
         {
+            value = Mathf.Clamp(value, 0f, ClipLength);
+
             if (Mathf.Approximately(value, _time)) {
-                _time = value;
+                if (isByJump)
+                    _source.time = value;
                 return;
             }
 
             var oldValue = _time;
             _time = value;
+
             if (isByJump)
                 _source.time = value;
+
             TimeChanged?.Invoke(new TimeChangedEventArgs(oldValue, value, isByJump));
         }
 
@@ -80,8 +118,9 @@ namespace Deenote.Core.GamePlay.Audio
         {
             if (IsPlaying)
                 return;
+
+            _source.time = _time;
             _source.Play();
-            _source.time = Time;
         }
 
         /// <summary>
@@ -91,7 +130,19 @@ namespace Deenote.Core.GamePlay.Audio
         {
             if (!IsPlaying)
                 return;
+
+            var oldTime = _time;
+            var sourceTime = GetSourceTime();
+
             _source.Stop();
+            _time = sourceTime;
+
+            if (!Mathf.Approximately(_time, oldTime)) {
+                TimeChanged?.Invoke(new TimeChangedEventArgs(
+                    oldTime,
+                    _time,
+                    false));
+            }
         }
 
         public void TogglePlayingState()
@@ -137,8 +188,31 @@ namespace Deenote.Core.GamePlay.Audio
 
         private void Update()
         {
-            if (IsPlaying) {
-                SetTime(_source.time, isByJump: false);
+            if (!IsPlaying || _source.clip == null)
+                return;
+
+            var oldTime = _time;
+
+            var predictedTime = Mathf.Clamp(
+                _time + UnityEngine.Time.unscaledDeltaTime * _source.pitch,
+                0f,
+                ClipLength);
+
+            var sourceTime = GetSourceTime();
+            var drift = sourceTime - predictedTime;
+
+            if (Mathf.Abs(drift) > DriftHardSyncThreshold) {
+                _time = sourceTime;
+            }
+            else {
+                _time = predictedTime;
+            }
+
+            if (!Mathf.Approximately(_time, oldTime)) {
+                TimeChanged?.Invoke(new TimeChangedEventArgs(
+                    oldTime,
+                    _time,
+                    false));
             }
         }
 
