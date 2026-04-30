@@ -53,6 +53,7 @@ NavPanel_ChartRemapVolume_Label=Remap Volume
 Nav_Player=Player
 NavPanel_Player_Header=PLAYER
 NavPanel_View_Label=View
+NavPanel_Scale_Label=Render Scale
 NavPanel_PlayerNoteFallSpeed_Label=Note Speed
 NavPanel_MusicVolume_Label=Music Volume
 NavPanel_EffectVolume_Label=Effect Volume

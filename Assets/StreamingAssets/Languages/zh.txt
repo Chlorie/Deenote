@@ -53,6 +53,7 @@ NavPanel_ChartRemapVolume_Label=重映射音量
 Nav_Player=播放器
 NavPanel_Player_Header=播放器
 NavPanel_View_Label=预览视图
+NavPanel_Scale_Label=渲染倍率
 NavPanel_PlayerNoteFallSpeed_Label=音符下落速度
 NavPanel_MusicVolume_Label=音乐音量
 NavPanel_EffectVolume_Label=音效音量

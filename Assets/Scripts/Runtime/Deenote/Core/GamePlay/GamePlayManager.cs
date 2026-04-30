@@ -160,10 +160,15 @@ namespace Deenote.Core.GamePlay
         {
             if (!IsChartLoaded())
                 return;
-            if (!MusicPlayer.IsPlaying && _manualPlaySpeedMultiplier is { } manuallPlaySpeed)
-                MusicPlayer.Nudge(Time.deltaTime * manuallPlaySpeed);
-        }
 
+            if (!MusicPlayer.IsPlaying && _manualPlaySpeedMultiplier is { } manuallPlaySpeed) {
+                MusicPlayer.Nudge(Time.deltaTime * manuallPlaySpeed);
+            }
+
+            if (IsStageLoaded()) {
+                NotesManager.RefreshStageNoteTimeDisplay();
+            }
+        }
         private void OnApplicationFocus(bool focus)
         {
             if (!focus && PauseWhenLoseFocus) {

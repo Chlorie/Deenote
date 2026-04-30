@@ -16,6 +16,8 @@ namespace Deenote.UI.Views
 {
     public sealed partial class PerspectiveViewPanelView : MonoBehaviour
     {
+        [SerializeField] private float _renderScale = 1.0f;
+
         [SerializeField] AspectRatioFitter _aspectRatioFitter = default!;
         [SerializeField] RawImage _viewRawImage = default!;
         [SerializeField] IntegralSizeAspectRatioFitter _viewImageAspectRatioFitter = default!;
@@ -66,6 +68,51 @@ namespace Deenote.UI.Views
             }
         }
 
+        public event Action<float>? RenderScaleChanged;
+        public float RenderScale
+        {
+            get => _renderScale;
+            set {
+                var scale = Mathf.Clamp(value, 0.5f, 2.0f);
+
+                if (Mathf.Approximately(_renderScale, scale))
+                    return;
+
+                _renderScale = scale;
+
+                if (_viewRenderTexture != null) {
+                    ResizeTargetTexture(default, GetViewSize());
+                }
+
+                RenderScaleChanged?.Invoke(_renderScale);
+            }
+        }
+        private Vector2 GetViewSize()
+        {
+            var rect = _viewRawImage.rectTransform.rect;
+            var canvas = _viewRawImage.canvas;
+            var scaleFactor = canvas != null ? canvas.scaleFactor : 1f;
+
+            return new Vector2(
+                rect.width * scaleFactor * _renderScale,
+                rect.height * scaleFactor * _renderScale);
+        }
+        private void ResizeTargetTexture(Vector2 old, Vector2 size)
+        {
+            var rtSize = new Vector2Int(
+                Mathf.CeilToInt(size.x),
+                Mathf.CeilToInt(size.y));
+
+            if (_viewRenderTexture.width == rtSize.x &&
+                _viewRenderTexture.height == rtSize.y)
+                return;
+
+            _viewRenderTexture.Resize(rtSize);
+
+            MainSystem.GamePlayManager.Stage?
+                .PerspectiveCamera
+                .ApplyToRenderTexture(_viewRenderTexture);
+        }
         private void Awake()
         {
             InitAspectRatioController();
@@ -82,18 +129,6 @@ namespace Deenote.UI.Views
 
                 _viewSize_bf = new FrameCachedNotifyingProperty<Vector2>(GetViewSize, autoUpdate: true);
                 _viewSize_bf.OnValueChanged += ResizeTargetTexture;
-
-                Vector2 GetViewSize()
-                {
-                    var rect = _viewRawImage.rectTransform.rect;
-                    return new Vector2(rect.width, rect.height);
-                }
-
-                void ResizeTargetTexture(Vector2 old, Vector2 size)
-                {
-                    _viewRenderTexture.Resize(MathUtils.RoundToInt(size));
-                    MainSystem.GamePlayManager.Stage?.PerspectiveCamera.ApplyToRenderTexture(_viewRenderTexture);
-                }
             }
         }
 
