@@ -431,6 +431,13 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
+    <b>Deenote 1.0.8</b>
+    - Fix stage preview stutter. By @kafuu
+    - Fix low resolution for high DPI, Add render scale option. By @kafuu
+
+    <b>Deenote 1.0.7</b>
+    - Fix memory leak caused by grid lines renderering
+    
     <b>Deenote 1.0.6</b>
 
     - Fix bug that when remove the only chart in project, the gameplay preview won't update
