@@ -18664,7 +18664,7 @@ PrefabInstance:
     - target: {fileID: 1248514660341421392, guid: 992e72fc85f146e47ae9af5c0bfbc975,
         type: 3}
       propertyPath: m_text
-      value: View
+      value: Render Scale
       objectReference: {fileID: 0}
     - target: {fileID: 1248514660341421392, guid: 992e72fc85f146e47ae9af5c0bfbc975,
         type: 3}
@@ -18674,7 +18674,7 @@ PrefabInstance:
     - target: {fileID: 1992097893369130774, guid: 992e72fc85f146e47ae9af5c0bfbc975,
         type: 3}
       propertyPath: _localizableText._textOrKey
-      value: NavPanel_View_Label
+      value: NavPanel_Scale_Label
       objectReference: {fileID: 0}
     - target: {fileID: 1992097893369130774, guid: 992e72fc85f146e47ae9af5c0bfbc975,
         type: 3}
