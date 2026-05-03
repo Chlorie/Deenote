@@ -22,6 +22,7 @@ namespace Deenote.UI
         [SerializeField] NewProjectDialog _newProjectDialog = default!;
         [SerializeField] PreferencesDialog _preferencesDialog = default!;
         [SerializeField] AboutDialog _aboutDialog = default!;
+        [SerializeField] PezConvertDialog _pezConvertDialog = default!;
         [SerializeField] GameObject _raycastBlocker = default!;
 
         private readonly Stack<ModalDialog> _activeDialogs = new();
@@ -29,6 +30,7 @@ namespace Deenote.UI
         public NewProjectDialog NewProjectDialog => _newProjectDialog;
         public PreferencesDialog PreferencesDialog => _preferencesDialog;
         public AboutDialog AboutDialog => _aboutDialog;
+        public PezConvertDialog PezConvertDialog => _pezConvertDialog;
 
         internal List<string>? _configtmpFileExplorerPinned;
 

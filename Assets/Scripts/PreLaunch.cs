@@ -5,6 +5,7 @@ using Deenote.Core;
 using Deenote.Localization;
 using Deenote.Plugin;
 using Deenote.Runtime.Plugins;
+using Deenote.Runtime.Plugins.ChartConversion;
 using Deenote.UI;
 using Deenote.UI.Dialogs.Elements;
 using System.ComponentModel;
@@ -29,6 +30,7 @@ namespace Deenote
         {
             DeenotePluginManager.RegisterPluginGroup(new OldVersionCompatibility());
             DeenotePluginManager.RegisterPluginGroup(new CommandShortcutButtons());
+            DeenotePluginManager.RegisterPluginGroup(new ChartConversionPluginGroup());
         }
 
         [RuntimeInitializeOnLoadMethod]
