@@ -41,7 +41,7 @@ namespace Deenote
 
 #if UNITY_EDITOR
             Debug.Log("Ignored command line args in editor mode");
-#elif UNITY_STANDALONE_WIN
+#else
             if (GetCommandLineArg0() is { } clfile) {
                 _ = OpenProjectFromCommandLineAsync(clfile);
             }

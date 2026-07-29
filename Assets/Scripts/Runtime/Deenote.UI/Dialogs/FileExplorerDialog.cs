@@ -116,22 +116,10 @@ namespace Deenote.UI.Dialogs
                     _confirmButton.IsInteractable = PathUtils.IsValidFileName(fileName);
             };
 
-#if UNITY_STANDALONE_WIN
             _openInSystemExplorerButton.Clicked += () =>
             {
-                // We locate to the file only if selected file is in current displaying directory
-                if (CurrentSelectedFilePath is not null
-                    && Path.GetDirectoryName(CurrentSelectedFilePath.AsSpan()).SequenceEqual(CurrentDirectory)) {
-                    //                                                             Ensure path seperator charater is valid
-                    System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{Path.GetFullPath(CurrentSelectedFilePath)}""");
-                }
-                else {
-                    System.Diagnostics.Process.Start("explorer.exe", Path.GetFullPath(CurrentDirectory));
-                }
+                OpenInSystemFileManager();
             };
-#else
-            _openInSystemExplorerButton.gameObject.SetActive(false);
-#endif
         }
 
         private void OnDisable()
@@ -307,6 +295,39 @@ namespace Deenote.UI.Dialogs
 
             public static InputBar WithDefaultText(string? input, string? extension)
                 => new(InputBarKind.Input, input, extension);
+        }
+
+        private void OpenInSystemFileManager()
+        {
+#if UNITY_STANDALONE_WIN
+            // Windows: explorer.exe with /select flag to highlight the file
+            if (CurrentSelectedFilePath is not null
+                && Path.GetDirectoryName(CurrentSelectedFilePath.AsSpan()).SequenceEqual(CurrentDirectory)) {
+                System.Diagnostics.Process.Start("explorer.exe",
+                    string.Format("/select,\"{0}\"", Path.GetFullPath(CurrentSelectedFilePath)));
+            }
+            else {
+                System.Diagnostics.Process.Start("explorer.exe", Path.GetFullPath(CurrentDirectory));
+            }
+#elif UNITY_STANDALONE_OSX
+            // macOS: use 'open' command with -R flag to reveal in Finder
+            if (CurrentSelectedFilePath is not null
+                && Path.GetDirectoryName(CurrentSelectedFilePath.AsSpan()).SequenceEqual(CurrentDirectory)) {
+                System.Diagnostics.Process.Start("open",
+                    string.Format("-R \"{0}\"", Path.GetFullPath(CurrentSelectedFilePath)));
+            }
+            else {
+                System.Diagnostics.Process.Start("open", Path.GetFullPath(CurrentDirectory));
+            }
+#else
+            // Linux: use xdg-open (freedesktop.org standard)
+            // xdg-open does not support file-selection flags; open the parent directory
+            var target = CurrentSelectedFilePath is not null
+                && Path.GetDirectoryName(CurrentSelectedFilePath.AsSpan()).SequenceEqual(CurrentDirectory)
+                ? Path.GetDirectoryName(CurrentSelectedFilePath)
+                : CurrentDirectory;
+            System.Diagnostics.Process.Start("xdg-open", Path.GetFullPath(target));
+#endif
         }
     }
 }

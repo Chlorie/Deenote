@@ -2,6 +2,7 @@
 
 using Cysharp.Threading.Tasks;
 using NAudio.Wave;
+using NLayer.NAudioSupport;
 using System;
 using System.Buffers;
 using System.IO;
@@ -38,7 +39,8 @@ namespace Deenote.Library
                         break;
                     case ".mp3" or ".MP3":
                         var id3TagLength = SkipID3Tag(stream);
-                        wave = new Mp3FileReader(stream);
+                        var builder = new Mp3FileReaderBase.FrameDecompressorBuilder(wf => new Mp3FrameDecompressor(wf));
+                        wave = new Mp3FileReaderBase(stream, builder);
                         Mp3Frame frame = Mp3Frame.LoadFromStream(stream);
                         initialSampleCount = frame.SampleCount * wave.WaveFormat.Channels;
                         stream.Seek(id3TagLength, SeekOrigin.Begin);
@@ -55,7 +57,7 @@ namespace Deenote.Library
                 try {
                     try {
                         provider.Read(raw, 0, (int)length);
-                    } catch (NAudio.MmException) {
+                    } catch (Exception ex) when (ex is NAudio.MmException or InvalidDataException or IOException or EndOfStreamException) {
                         return null;
                     }
 

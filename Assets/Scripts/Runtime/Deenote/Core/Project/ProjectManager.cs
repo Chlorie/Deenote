@@ -10,7 +10,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
