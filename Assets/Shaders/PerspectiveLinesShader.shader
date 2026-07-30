@@ -115,7 +115,9 @@
 					float2 dir = (i.ndcLine.zw - i.ndcLine.xy) * aspectRatio;
 					dir = normalize(float2(-dir.y, dir.x));
 					float2 ndc = (i.vertex.xy / _ScreenParams.xy) * 2 - 1;
+					#if UNITY_UV_STARTS_AT_TOP
 					ndc.y = -ndc.y;
+					#endif
 					const float2 frag2p0 = (i.ndcLine.zw - ndc) * aspect;
 					const float2 dist = abs(dot(frag2p0, dir));
 					alpha *= clamp((i.width / 2 - dist) / _SmoothingPx + 0.5, 0, 1);
