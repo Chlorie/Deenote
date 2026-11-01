@@ -38,7 +38,10 @@ namespace Deenote.Entities.Models
                 var tailsBuffer = new List<NoteTailNode>();
 
                 foreach (var note in notes) {
-                    if (note.IsVisibleOnStage()) {
+                    if (note.WarningType is WarningType.SpeedChange) {
+                        speedChangeWarnings.Add(new SpeedChangeWarningModel(note));
+                    }
+                    else if (note.IsVisibleOnStage()) {
                         while (tailsBuffer.TryAt(0, out var tail) && tail.Time < note.Time) {
                             visibleNotes.Add(tail);
                             holdCount++;
@@ -49,9 +52,6 @@ namespace Deenote.Entities.Models
                             tailsBuffer.GetSortedModifier(NodeTimeComparer.Instance)
                                 .Add(new NoteTailNode(note));
                         }
-                    }
-                    else if (note.WarningType is WarningType.SpeedChange) {
-                        speedChangeWarnings.Add(new SpeedChangeWarningModel(note));
                     }
                     else {
                         backgroundNotes.Add(new SoundNoteModel(note));
@@ -88,15 +88,15 @@ namespace Deenote.Entities.Models
                 speedChangeWarnings = new SortedList<SpeedChangeWarningModel>(NodeTimeComparer.Instance);
 
                 foreach (var note in notes) {
-                    if (note.IsVisibleOnStage()) {
+                    if (note.WarningType is WarningType.SpeedChange) {
+                        speedChangeWarnings.AddFromEnd(new SpeedChangeWarningModel(note));
+                    }
+                    else if (note.IsVisibleOnStage()) {
                         visibleNotes.AddFromEnd(note);
                         if (note.IsHold) {
                             holdCount++;
                             visibleNotes.AddFromEnd(new NoteTailNode(note));
                         }
-                    }
-                    else if (note.WarningType is WarningType.SpeedChange) {
-                        speedChangeWarnings.AddFromEnd(new SpeedChangeWarningModel(note));
                     }
                     else {
                         soundNotes.Add(new SoundNoteModel(note));

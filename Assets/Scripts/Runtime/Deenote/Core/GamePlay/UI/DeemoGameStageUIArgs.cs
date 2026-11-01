@@ -41,5 +41,9 @@ namespace Deenote.GamePlay.UI
         public float ComboCharmingAlphaDecStartTime;
         public float ComboCharmingAlphaDecTime;
         public float ComboCharmingMaxScaleY;
+        [Header("Speed Change Warning Note")]
+        public float SpeedChangeWarningPulseDuration = 4f;
+        public int SpeedChangeWarningPulseCount = 4;
+        public float SpeedChangeWarningPulseMaxScale = 1.25f;
     }
 }

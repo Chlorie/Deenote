@@ -26,6 +26,20 @@ namespace Deenote.Entities.Operations
             return new AddMultipleNotesOperation(chart, notes);
         }
 
+        public static AddSpeedChangeWarningOperation AddSpeedChangeWarning(this ChartModel chart, SpeedChangeWarningModel warning)
+            => new(chart, warning);
+
+        public static RemoveSpeedChangeWarningsOperation RemoveSpeedChangeWarnings(this ChartModel chart, ImmutableArray<SpeedChangeWarningModel> warnings)
+            => new(chart, warnings);
+
+        public static EditSpeedChangeWarningsTimeOperation EditSpeedChangeWarningsTime(this ChartModel chart,
+            ReadOnlySpan<SpeedChangeWarningModel> warnings, float value)
+            => new(chart, warnings.ToImmutableArray(), _ => value);
+
+        public static EditSpeedChangeWarningsTimeOperation EditSpeedChangeWarningsTime(this ChartModel chart,
+            ReadOnlySpan<SpeedChangeWarningModel> warnings, Func<float, float> valueSelector)
+            => new(chart, warnings.ToImmutableArray(), valueSelector);
+
         public static RemoveNotesOperation RemoveOrderedNotes(this ChartModel chart, ImmutableArray<NoteModel> notes)
         {
             NodeTimeComparer.AssertInOrder(notes);
@@ -153,6 +167,106 @@ namespace Deenote.Entities.Operations
                 _chart.SpeedLines.AddRange(_oldChart.SpeedLines.AsSpan());
 
                 OnUndone(_chart);
+            }
+        }
+
+        public sealed class AddSpeedChangeWarningOperation : NotifiableChartOperation<SpeedChangeWarningModel>
+        {
+            private readonly SpeedChangeWarningModel _warning;
+
+            internal AddSpeedChangeWarningOperation(ChartModel chart, SpeedChangeWarningModel warning) : base(chart)
+            {
+                _warning = warning;
+            }
+
+            protected override void Redo()
+            {
+                _chart.SpeedChangeWarnings.Add(_warning);
+                OnRedone(_warning);
+            }
+
+            protected override void Undo()
+            {
+                var warnings = _chart.SpeedChangeWarnings;
+                for (int i = 0; i < warnings.Count; i++) {
+                    if (ReferenceEquals(warnings[i], _warning)) {
+                        warnings.RemoveAt(i);
+                        OnUndone(_warning);
+                        return;
+                    }
+                }
+
+                Debug.Assert(false, "The speed change warning is not found in chart");
+                OnUndone(_warning);
+            }
+        }
+
+        public sealed class RemoveSpeedChangeWarningsOperation : NotifiableChartOperation<ImmutableArray<SpeedChangeWarningModel>>
+        {
+            private readonly ImmutableArray<SpeedChangeWarningModel> _warnings;
+
+            internal RemoveSpeedChangeWarningsOperation(ChartModel chart, ImmutableArray<SpeedChangeWarningModel> warnings) : base(chart)
+            {
+                _warnings = warnings;
+            }
+
+            protected override void Redo()
+            {
+                var warnings = _chart.SpeedChangeWarnings;
+                foreach (var warning in _warnings) {
+                    bool removed = false;
+                    for (int i = 0; i < warnings.Count; i++) {
+                        if (ReferenceEquals(warnings[i], warning)) {
+                            warnings.RemoveAt(i);
+                            removed = true;
+                            break;
+                        }
+                    }
+                    Debug.Assert(removed, "The speed change warning is not found in chart");
+                }
+
+                OnRedone(_warnings);
+            }
+
+            protected override void Undo()
+            {
+                foreach (var warning in _warnings) {
+                    _chart.SpeedChangeWarnings.Add(warning);
+                }
+                OnUndone(_warnings);
+            }
+        }
+
+        public sealed class EditSpeedChangeWarningsTimeOperation : NotifiableChartOperation<ImmutableArray<SpeedChangeWarningModel>>
+        {
+            private readonly ImmutableArray<SpeedChangeWarningModel> _warnings;
+            private readonly ImmutableArray<float> _oldTimes;
+            private readonly Func<float, float> _timeSelector;
+
+            internal EditSpeedChangeWarningsTimeOperation(ChartModel chart,
+                ImmutableArray<SpeedChangeWarningModel> warnings, Func<float, float> timeSelector) : base(chart)
+            {
+                _warnings = warnings;
+                _oldTimes = warnings.Select(w => w.Time).ToImmutableArray();
+                _timeSelector = timeSelector;
+            }
+
+            protected override void Redo()
+            {
+                for (int i = 0; i < _warnings.Length; i++) {
+                    _warnings[i].Time = _timeSelector(_oldTimes[i]);
+                }
+                _chart.SpeedChangeWarnings.ResortBubble();
+                OnRedone(_warnings);
+            }
+
+            protected override void Undo()
+            {
+                for (int i = 0; i < _warnings.Length; i++) {
+                    _warnings[i].Time = _oldTimes[i];
+                }
+                _chart.SpeedChangeWarnings.ResortBubble();
+                OnUndone(_warnings);
             }
         }
 

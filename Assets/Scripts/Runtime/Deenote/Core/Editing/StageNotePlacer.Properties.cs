@@ -19,6 +19,21 @@ namespace Deenote.Core.Editing
 
         private bool _placeSlideModifier_bf;
         private bool _pasteRememberPosition_bf;
+        private bool _isSpeedChangeWarningMode_bf;
+
+        /// <summary>
+        /// When enabled, the placement preview and newly placed element are speed change warnings.
+        /// </summary>
+        public bool IsSpeedChangeWarningMode
+        {
+            get => _isSpeedChangeWarningMode_bf;
+            set {
+                if (Utils.SetField(ref _isSpeedChangeWarningMode_bf, value)) {
+                    RefreshIndicatorVisibility();
+                    NotifyFlag(NotificationFlag.IsSpeedChangeWarningMode);
+                }
+            }
+        }
 
         public bool PlaceSoundNoteByDefault
         {
@@ -125,19 +140,25 @@ namespace Deenote.Core.Editing
             if (_indicatorPanelTransform == null)
                 return;
 
-            if (IsForceShowIndicator() || IsIndicatorOn) {
-                _indicatorPanelTransform.gameObject.SetActive(true);
-            }
-            else {
-                _indicatorPanelTransform.gameObject.SetActive(false);
+            bool visible = IsForceShowIndicator() || IsIndicatorOn;
+            _indicatorPanelTransform.gameObject.SetActive(visible);
+            
+            if (visible) {
+                bool showWarning = IsSpeedChangeWarningMode;
+                foreach (var indicator in _indicators) {
+                    indicator.gameObject.SetActive(!showWarning);
+                }
+
+                _speedChangeWarningIndicator?.gameObject.SetActive(showWarning);
+                _speedChangeWarningIndicator?.LineRenderer.SetVisible(showWarning);
             }
         }
 
         private void SetIndicatorVisibility(bool visible)
         {
-            if (_indicatorPanelTransform != null) {
-                _indicatorPanelTransform.gameObject.SetActive(visible);
-            }
+            RefreshIndicatorVisibility();
+            if (!visible && _indicatorPanelTransform != null)
+                _indicatorPanelTransform.gameObject.SetActive(false);
         }
     }
 }

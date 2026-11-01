@@ -78,6 +78,8 @@ namespace Deenote.Core.Editing
                     indicator.Initialize(note);
                 }
                 _indicators = indicators;
+
+                InitializeSpeedChangeWarningIndicator(args.Stage);
             };
             _editor._game.MusicPlayer.TimeChanged += args =>
             {
@@ -95,6 +97,7 @@ namespace Deenote.Core.Editing
         {
             var moveCoord = _editor._game.Grids.Quantize(NoteCoord.ClampPosition(coord), SnapToPositionGrid, SnapToTimeGrid);
             MoveIndicatorsTo(moveCoord);
+            MoveSpeedChangeWarningIndicatorTo(GetWarningTime(coord));
         }
 
         #endregion
@@ -472,6 +475,7 @@ namespace Deenote.Core.Editing
             SnapToTimeGrid,
 
             PlacingNoteSpeed,
+            IsSpeedChangeWarningMode,
         }
     }
 }

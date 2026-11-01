@@ -1,6 +1,7 @@
 #nullable enable
 
 using CommunityToolkit.HighPerformance.Buffers;
+using Deenote.Core.Editing.Operations;
 using Deenote.Core.GamePlay;
 using Deenote.Core.Project;
 using Deenote.Entities;
@@ -173,7 +174,54 @@ namespace Deenote.Core.Editing
                 });
         }
 
-        public void RemoveSelectedNotes() => RemoveNotes(Selector.SelectedNotes);
+        public IUndoableOperation GetRemoveSpeedChangeWarningsOperation(ReadOnlySpan<SpeedChangeWarningModel> warnings)
+        {
+            _game.AssertChartLoaded();
+
+            return _game.CurrentChart.RemoveSpeedChangeWarnings(warnings.ToImmutableArray())
+                .OnRedone(_ =>
+                {
+                    this.Selector.Clear();
+                    OnSpeedChangeWarningCollectionChanged();
+                })
+                .OnUndone(warnings =>
+                {
+                    foreach (var warning in warnings) {
+                        this.Selector.AddSelectWarning(warning);
+                    }
+                    OnSpeedChangeWarningCollectionChanged();
+                });
+        }
+
+        public void RemoveSelectedNotes()
+        {
+            if (!_game.IsChartLoaded())
+                return;
+
+            var notes = Selector.SelectedNotes;
+            var warnings = Selector.SelectedWarnings;
+            if (notes.IsEmpty && warnings.IsEmpty) return;
+
+            IUndoableOperation? notesOperation = notes.IsEmpty ? null : GetRemoveNotesOperation(notes);
+            IUndoableOperation? warningsOperation = warnings.IsEmpty ? null : GetRemoveSpeedChangeWarningsOperation(warnings);
+            _operations.Do(new CombinedPairOperation(notesOperation, warningsOperation));
+        }
+
+        public void AddSpeedChangeWarning(SpeedChangeWarningModel warning)
+        {
+            if (!_game.IsChartLoaded())
+                return;
+
+            _operations.Do(_game.CurrentChart.AddSpeedChangeWarning(warning)
+                .OnRedone(_ => OnSpeedChangeWarningCollectionChanged())
+                .OnUndone(_ => OnSpeedChangeWarningCollectionChanged()));
+        }
+
+        private void OnSpeedChangeWarningCollectionChanged()
+        {
+            _game.AssertChartLoaded();
+            _game.UpdateSpeedChangeWarnings();
+        }
 
         public void AddNotesSnappingToCurve(int count, ReadOnlySpan<GridsManager.CurveApplyProperty> applyProperties = default)
         {

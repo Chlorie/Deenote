@@ -2,6 +2,7 @@
 
 using CommunityToolkit.Diagnostics;
 using Deenote.Core.Editing;
+using Deenote.Entities;
 using Deenote.Entities.Models;
 using Deenote.Library.Collections;
 using Deenote.Library.Components;
@@ -9,7 +10,6 @@ using Deenote.Localization;
 using Deenote.UI.Views.Panels;
 using Deenote.UIFramework.Controls;
 using System;
-using UnityEditor;
 using UnityEngine;
 
 namespace Deenote.UI.Views
@@ -26,6 +26,7 @@ namespace Deenote.UI.Views
         [SerializeField] ToggleButton _clickNoteKindToggle = default!;
         [SerializeField] ToggleButton _slideNoteKindToggle = default!;
         [SerializeField] ToggleButton _swipeNoteKindToggle = default!;
+        [SerializeField] ToggleButton _speedChangeWarningNoteKindToggle = default!;
         [SerializeField] TextBox _speedInput = default!;
         [SerializeField] Button _speedToPlaceSpeedButton = default!;
         [SerializeField] Button _soundsButton = default!;
@@ -33,7 +34,6 @@ namespace Deenote.UI.Views
         [SerializeField] NoteInfoPianoSoundEditPanel _soundEditPanel = default!;
         [SerializeField] TextBox _shiftInput = default!;
         [SerializeField] TextBox _eventIdInput = default!;
-        //[SerializeField] Dropdown _warningTypeDropdown = default!;
         [SerializeField] CheckBox _vibrateCheckBox = default!;
 
         [SerializeField] GameObject[] _ineffectivePropertyGameObjects = default!;
@@ -153,6 +153,13 @@ namespace Deenote.UI.Views
                 if (check)
                     MainSystem.StageChartEditor.EditSelectedNotesKind(NoteModel.NoteKind.Swipe);
             };
+            _speedChangeWarningNoteKindToggle.IsCheckedChanged += check =>
+            {
+                MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = check;
+            };
+            MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
+                StageNotePlacer.NotificationFlag.IsSpeedChangeWarningMode,
+                placer => _speedChangeWarningNoteKindToggle.SetIsCheckedWithoutNotify(placer.IsSpeedChangeWarningMode));
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteKind,
                 editor => NotifyMultiKindChanged(editor.Selector.SelectedNotes));
@@ -219,16 +226,6 @@ namespace Deenote.UI.Views
                 StageChartEditor.NotificationFlag.NoteEventId,
                 editor => NotifyMultiEventIdChanged(editor.Selector.SelectedNotes));
 
-            //_warningTypeDropdown.ResetOptions(WarningTypeExt.DropdownOptions);
-            //_warningTypeDropdown.SelectedIndexChanged += index =>
-            //{
-            //    if (index >= 0)
-            //        MainSystem.StageChartEditor.EditSelectedNotesWarningType(WarningTypeExt.FromIndex(index));
-            //};
-            //MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
-            //    StageChartEditor.NotificationFlag.NoteWarningType,
-            //    editor => NotifyMultiWarningTypeChanged(editor.Selector.SelectedNotes));
-
             _vibrateCheckBox.IsCheckedChanged += check =>
             {
                 if (check is { } c) {
@@ -242,11 +239,15 @@ namespace Deenote.UI.Views
             #endregion
 
             MainSystem.StageChartEditor.Selector.SelectedNotesChanged += _OnSelectedNotesChanged;
+            MainSystem.StageChartEditor.Selector.SelectedWarningsChanged += _OnSelectedWarningsChanged;
             _OnSelectedNotesChanged(MainSystem.StageChartEditor.Selector);
 
             void _OnSelectedNotesChanged(StageNoteSelector selector)
             {
                 var notes = selector.SelectedNotes;
+
+                if (notes.Length == 0 && selector.SelectedWarnings.Length > 0)
+                    return;
 
                 _linkAsHoldButton.IsInteractable = notes.Length == 2;
 
@@ -284,8 +285,8 @@ namespace Deenote.UI.Views
                         NotifyMultiSoundsChanged(notes);
                         SyncFloatInput(_shiftInput, note.Shift);
                         _eventIdInput.SetValueWithoutNotify(note.EventId);
-                        //_warningTypeDropdown.SetValueWithoutNotify(note.WarningType.ToIndex());
                         _vibrateCheckBox.SetValueWithoutNotify(note.Vibrate);
+                        MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = false;
                         break;
                     default:
                         _noteHeaderText.SetLocalizedText(NoteSelectedHeader, notes.Length.ToString());
@@ -299,10 +300,21 @@ namespace Deenote.UI.Views
                         NotifyMultiSoundsChanged(notes);
                         NotifyMultiFloatValueChanged(_shiftInput, notes, n => n.Shift);
                         NotifyMultiEventIdChanged(notes);
-                        //NotifyMultiWarningTypeChanged(notes);
                         NotifyMultiBoolValueChanged(_vibrateCheckBox, notes, n => n.Vibrate);
+                        MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = false;
                         break;
                 }
+            }
+
+            void _OnSelectedWarningsChanged(StageNoteSelector selector)
+            {
+                var warnings = selector.SelectedWarnings;
+                if (warnings.Length == 0) return;
+
+                _linkAsHoldButton.IsInteractable = false;
+                _speedToPlaceSpeedButton.IsInteractable = false;
+                SetControlsActive(false);
+                MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = true;
             }
 
             void SetControlsActive(bool active)
@@ -327,7 +339,6 @@ namespace Deenote.UI.Views
 
                         _noteKindToggleGroup.ForceToggleOff();
                         _soundsButton.Text.SetRawText(NoSoundButtonText);
-                        //_warningTypeDropdown.SetValueWithoutNotify(-1);
                         _vibrateCheckBox.SetValueWithoutNotify(null);
 
                         foreach (var ctrl in _interactableControls)
@@ -454,13 +465,5 @@ namespace Deenote.UI.Views
                 _eventIdInput.SetPlaceHolderText(LocalizableText.Localized(MultipleValuesPlaceHolderKey));
             }
         }
-
-        //private void NotifyMultiWarningTypeChanged(ReadOnlySpan<NoteModel> notes)
-        //{
-        //    if (notes.IsSameForAll(n => n.WarningType, out var warningType))
-        //        _warningTypeDropdown.SetValueWithoutNotify(warningType.ToIndex());
-        //    else
-        //        _warningTypeDropdown.SetValueWithoutNotify(-1);
-        //}
     }
 }

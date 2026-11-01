@@ -35,3 +35,6 @@ MonoBehaviour:
   ComboCharmingAlphaDecStartTime: 0.25
   ComboCharmingAlphaDecTime: 0
   ComboCharmingMaxScaleY: 1.25
+  SpeedChangeWarningPulseDuration: 3.333
+  SpeedChangeWarningPulseCount: 4
+  SpeedChangeWarningPulseMaxScale: 1.25

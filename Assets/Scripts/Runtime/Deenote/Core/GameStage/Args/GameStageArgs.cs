@@ -45,6 +45,13 @@ namespace Deenote.Core.GameStage.Args
         internal GameStageNoteController GamePlayNotePrefab = default!;
         [SerializeField]
         internal PlacementNoteIndicatorController PlacementNoteIndicatorPrefab = default!;
+        [SerializeField]
+        internal GameStageSpeedChangeWarningNoteController SpeedChangeWarningNotePrefab = default!;
+        [SerializeField]
+        internal SpeedChangeWarningIndicatorController SpeedChangeWarningIndicatorPrefab = default!;
+
+        [Header("Speed Change Warning")]
+        public NoteSpritePrefab SpeedChangeWarningSpritePrefab;
 
         [Header("Note")]
         public AudioClip EffectSoundAudioClip = default!;
