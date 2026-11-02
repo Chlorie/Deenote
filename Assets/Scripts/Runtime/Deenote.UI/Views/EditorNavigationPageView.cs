@@ -30,6 +30,7 @@ namespace Deenote.UI.Views
         [SerializeField] ToggleButton _verticalGridSnapToggle = default!;
         [SerializeField] ToggleButton _verticalGridVisibleToggle = default!;
 
+        [SerializeField] ToggleButton _soundedNoteModeToggle = default!;
         [SerializeField] RadioButton _noteModeRadio = default!;
         [SerializeField] RadioButton _speedWarningModeRadio = default!;
         //[SerializeField] RadioButtonGroup _curveKindRadioGroup = default!;
@@ -98,8 +99,13 @@ namespace Deenote.UI.Views
                     GamePlayManager.NotificationFlag.MusicSpeed,
                     stage => _musicSpeedNumericStepper.SetValueWithoutNotify(stage.MusicSpeed));
 
+                _soundedNoteModeToggle.IsCheckedChanged += val => MainSystem.StageChartEditor.Placer.PlaceSoundNoteByDefault = val;
                 _noteModeRadio.Checked += () => MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = false;
                 _speedWarningModeRadio.Checked += () => MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = true;
+                MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
+                    StageNotePlacer.NotificationFlag.PlaceSoundNoteByDefault,
+                    placer => _soundedNoteModeToggle.SetIsCheckedWithoutNotify(placer.PlaceSoundNoteByDefault)
+                );
                 MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
                     StageNotePlacer.NotificationFlag.IsSpeedChangeWarningMode,
                     placer =>

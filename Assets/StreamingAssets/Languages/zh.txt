@@ -609,6 +609,15 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 ## Update History
 
+AboutDialog_Versions_Dnt_1_1=Deenote 1.1
+AboutDialog_Versions_Dnt_1_1_Content="""
+    <b>Deenote 1.1.0</b>
+    - 修复Linux兼容性支持。 @ictye
+    - 提供变速提示编辑支持。 @斯诺格
+    - 提供默认放置钢琴音音符的切换按钮
+    - 修改tab快捷键功能为切换放置note/变速提示模式
+    """
+
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.8</b>

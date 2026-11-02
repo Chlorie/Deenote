@@ -434,6 +434,15 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 ## Update History
 
+AboutDialog_Versions_Dnt_1_1=Deenote 1.1
+AboutDialog_Versions_Dnt_1_1_Content="""
+    <b>Deenote 1.1.0</b>
+    - Fix Linux compatibility. By @ictye
+    - Support editing speed change warning. By @Senolytics
+    - Add button piano-note-by-default mode
+    - Change tab key shortcut function to switching between note and speed warning edit mode
+    """
+
 AboutDialog_Versions_Dnt_1_0=Deenote 1.0
 AboutDialog_Versions_Dnt_1_0_Content="""
     <b>Deenote 1.0.8</b>
