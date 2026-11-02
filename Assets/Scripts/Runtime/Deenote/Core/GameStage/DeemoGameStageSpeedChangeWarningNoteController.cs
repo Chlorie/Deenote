@@ -12,12 +12,12 @@ namespace Deenote.Core.GameStage
 
         protected override void SetNoteSprite()
         {
-            _noteSpriteRenderer.sprite = GetSpritePrefab().Sprite; 
+            _noteSpriteRenderer.sprite = _game.Stage!.Args.SpeedChangeWarningSpritePrefab.Sprite; 
         }
 
         protected override void SetNoteSize()
         {
-            var prefab = GetSpritePrefab();
+            var prefab = _game.Stage!.Args.SpeedChangeWarningSpritePrefab;
             _noteSpriteRenderer.transform.localScale = Vector3.one * prefab.Scale;
         }
 

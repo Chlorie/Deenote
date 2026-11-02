@@ -31,7 +31,12 @@ namespace Deenote.UIFramework.Controls
 
         public void SetChecked()
         {
-            Group.SetCheckedRatio(this);
+            Group.SetCheckedRatio(this, notify: true);
+        }
+
+        public void SetCheckedWithoutNotify()
+        {
+            Group.SetCheckedRatio(this, notify: false);
         }
 
         internal void SetIsCheckedInternal(bool value, bool notify)

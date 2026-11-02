@@ -30,6 +30,8 @@ namespace Deenote.UI.Views
         [SerializeField] ToggleButton _verticalGridSnapToggle = default!;
         [SerializeField] ToggleButton _verticalGridVisibleToggle = default!;
 
+        [SerializeField] RadioButton _noteModeRadio = default!;
+        [SerializeField] RadioButton _speedWarningModeRadio = default!;
         //[SerializeField] RadioButtonGroup _curveKindRadioGroup = default!;
         [SerializeField] RadioButton _linearCurveRadio = default!;
         [SerializeField] RadioButton _cubicCurveRadio = default!;
@@ -95,6 +97,19 @@ namespace Deenote.UI.Views
                 MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                     GamePlayManager.NotificationFlag.MusicSpeed,
                     stage => _musicSpeedNumericStepper.SetValueWithoutNotify(stage.MusicSpeed));
+
+                _noteModeRadio.Checked += () => MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = false;
+                _speedWarningModeRadio.Checked += () => MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = true;
+                MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
+                    StageNotePlacer.NotificationFlag.IsSpeedChangeWarningMode,
+                    placer =>
+                    {
+                        if (placer.IsSpeedChangeWarningMode)
+                            _speedWarningModeRadio.SetCheckedWithoutNotify();
+                        else
+                            _noteModeRadio.SetCheckedWithoutNotify();
+                    }
+                );
             }
 
             // Grids

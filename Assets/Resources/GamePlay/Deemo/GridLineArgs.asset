@@ -26,4 +26,4 @@ MonoBehaviour:
   PositionGridLineWidth: 2
   PositionGridBorderWidth: 4
   CurveLineWidth: 2
-  SpeedChangeWarningLineWidth: 3
+  SpeedChangeWarningLineWidth: 2

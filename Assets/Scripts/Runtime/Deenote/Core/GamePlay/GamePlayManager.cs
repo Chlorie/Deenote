@@ -316,6 +316,7 @@ namespace Deenote.Core.GamePlay
             DistinguishPianoNotes,
             EarlyDisplaySlowNotes,
             PauseWhenLoseFocus,
+            WarningNoteDisplay,
 
             ActiveNoteUpdated,
             ActiveSpeedChangeWarningUpdated,

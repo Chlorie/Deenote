@@ -133,11 +133,6 @@ namespace Deenote.Core.GameStage
                         warning = collider.WarningController;
                         return true;
                     }
-
-                    if (c.GetComponentInParent<GameStageSpeedChangeWarningNoteController>() is { } warningController) {
-                        warning = warningController;
-                        return true;
-                    }
                 }
             }
 

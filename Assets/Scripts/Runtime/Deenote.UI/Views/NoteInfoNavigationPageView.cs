@@ -26,7 +26,6 @@ namespace Deenote.UI.Views
         [SerializeField] ToggleButton _clickNoteKindToggle = default!;
         [SerializeField] ToggleButton _slideNoteKindToggle = default!;
         [SerializeField] ToggleButton _swipeNoteKindToggle = default!;
-        [SerializeField] ToggleButton _speedChangeWarningNoteKindToggle = default!;
         [SerializeField] TextBox _speedInput = default!;
         [SerializeField] Button _speedToPlaceSpeedButton = default!;
         [SerializeField] Button _soundsButton = default!;
@@ -153,13 +152,6 @@ namespace Deenote.UI.Views
                 if (check)
                     MainSystem.StageChartEditor.EditSelectedNotesKind(NoteModel.NoteKind.Swipe);
             };
-            _speedChangeWarningNoteKindToggle.IsCheckedChanged += check =>
-            {
-                MainSystem.StageChartEditor.Placer.IsSpeedChangeWarningMode = check;
-            };
-            MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
-                StageNotePlacer.NotificationFlag.IsSpeedChangeWarningMode,
-                placer => _speedChangeWarningNoteKindToggle.SetIsCheckedWithoutNotify(placer.IsSpeedChangeWarningMode));
             MainSystem.StageChartEditor.RegisterNotificationAndInvoke(
                 StageChartEditor.NotificationFlag.NoteKind,
                 editor => NotifyMultiKindChanged(editor.Selector.SelectedNotes));

@@ -49,6 +49,9 @@ namespace Deenote.Core.GameStage
             if (!_visible || _game is null || !_game.IsStageLoaded())
                 return;
 
+            if (_alpha <= 0)
+                return;
+
             var z = _game.ConvertNoteCoordTimeToWorldZ(_localTime, _speed);
             var xl = _game.ConvertNoteCoordPositionToWorldX(_lineStartPosition);
             var xr = _game.ConvertNoteCoordPositionToWorldX(_lineEndPosition);

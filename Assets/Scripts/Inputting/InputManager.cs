@@ -263,7 +263,7 @@ namespace Deenote.Inputting
             actions.PasteRememberPosition.canceled += _ => _editor.Placer.PasteRememberPositionModifier = false;
             actions.PlaceNoteSlideFlag.started += _ => _editor.Placer.PlaceSlideModifier = true;
             actions.PlaceNoteSlideFlag.canceled += _ => _editor.Placer.PlaceSlideModifier = false;
-            actions.PlaceSoundNote.started += _ => _editor.Placer.PlaceSoundNoteByDefault = !_editor.Placer.PlaceSoundNoteByDefault;
+            actions.PlaceSoundNote.started += _ => _editor.Placer.IsSpeedChangeWarningMode = !_editor.Placer.IsSpeedChangeWarningMode;
         }
 
         #endregion

@@ -17,7 +17,7 @@ namespace Deenote.Core.GameStage
         /// <summary>
         /// Position of the warning body, in note-coordinate space.
         /// </summary>
-        internal const float SpritePosition = -2.5f;
+        internal const float SpritePosition = -3f;
 
         [SerializeField] private SpeedChangeWarningLineRenderer _lineRenderer = default!;
         [SerializeField] private Collider _selectionCollider = default!;
@@ -80,12 +80,11 @@ namespace Deenote.Core.GameStage
                 transform.WithLocalPositionZ(
                     _game.ConvertNoteCoordTimeToWorldZ(_stageDeltaTime, _game.HighlightedNoteSpeed));
 
-                // Warnings are a part of the time grid, so they are hidden together with it
-                bool timeGridVisible = _game.Grids.TimeGridVisible;
+                bool timeGridVisible = _game.WarningNoteVisibility.HasFlag(GamePlayManager.SpeedWarningNoteVisibility.ShowLine);
                 if (_selectionCollider is not null)
                     _selectionCollider.enabled = timeGridVisible;
                 _lineRenderer?.SetTime(_stageDeltaTime, _game.HighlightedNoteSpeed, timeGridVisible ? 1f : 0f);
-                SetNoteSpriteAlpha(timeGridVisible);
+                SetNoteSpriteAlpha(_game.WarningNoteVisibility.HasFlag(GamePlayManager.SpeedWarningNoteVisibility.ShowNote));
                 RefreshColoring();
             }
         }
@@ -100,6 +99,13 @@ namespace Deenote.Core.GameStage
             SetNoteSprite();
             SetNoteSize();
             RefreshColoring();
+            RefreshVisibility();
+        }
+
+        internal void RefreshVisibility()
+        {
+            _lineRenderer.SetVisible(_game.WarningNoteVisibility.HasFlag(GamePlayManager.SpeedWarningNoteVisibility.ShowNoteLine));
+            SetNoteSpriteAlpha(_game.WarningNoteVisibility.HasFlag(GamePlayManager.SpeedWarningNoteVisibility.ShowNote));
         }
 
         internal void RefreshColoring()
@@ -123,7 +129,7 @@ namespace Deenote.Core.GameStage
         private void SetNoteSpriteAlpha(bool visible)
         {
             _game.AssertStageLoaded();
-            Debug.Assert(_isActive);
+            // Debug.Assert(_isActive);
 
             if (!visible) {
                 SetNoteSpriteRendererAlpha(0f);

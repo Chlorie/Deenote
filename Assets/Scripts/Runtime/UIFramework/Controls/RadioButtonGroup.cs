@@ -33,14 +33,14 @@ namespace Deenote.UIFramework.Controls
             _radioButtons.Add(radioButton);
         }
 
-        internal void SetCheckedRatio(RadioButton radio)
+        internal void SetCheckedRatio(RadioButton radio, bool notify)
         {
             Guard.IsTrue(radio.Group == this, nameof(radio), "Radio button has wrong group");
 
             if (_currentActiveRadio != null) {
-                _currentActiveRadio.SetIsCheckedInternal(false, true);
+                _currentActiveRadio.SetIsCheckedInternal(false, notify);
             }
-            radio.SetIsCheckedInternal(true, true);
+            radio.SetIsCheckedInternal(true, notify);
             _currentActiveRadio = radio;
         }
 

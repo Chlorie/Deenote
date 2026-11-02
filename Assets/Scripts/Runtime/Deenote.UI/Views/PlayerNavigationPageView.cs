@@ -26,6 +26,8 @@ namespace Deenote.UI.Views
         [SerializeField] Slider _suddenPlusSlider = default!;
         [SerializeField] TextBox _suddenPlusInput = default!;
         [SerializeField] ToggleSwitch _linksIndicatorToggle = default!;
+        [SerializeField] ToggleSwitch _warningNoteToggle = default!;
+        [SerializeField] ToggleSwitch _warningLineToggle = default!;
         [SerializeField] ToggleSwitch _placementIndicatorToggle = default!;
         [SerializeField] ToggleSwitch _earlyDisplaySlowNotesToggle = default!;
 
@@ -122,12 +124,34 @@ namespace Deenote.UI.Views
             #endregion
 
             _linksIndicatorToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.IsShowLinkLines = val;
+            _warningNoteToggle.IsCheckedChanged += val =>
+            {
+                if(val)
+                    MainSystem.GamePlayManager.WarningNoteVisibility |= GamePlayManager.SpeedWarningNoteVisibility.ShowNote;
+                else
+                    MainSystem.GamePlayManager.WarningNoteVisibility &= ~GamePlayManager.SpeedWarningNoteVisibility.ShowNote;
+
+            };
+            _warningLineToggle.IsCheckedChanged += val =>
+            {
+                if(val)
+                    MainSystem.GamePlayManager.WarningNoteVisibility |= GamePlayManager.SpeedWarningNoteVisibility.ShowLine;
+                else
+                    MainSystem.GamePlayManager.WarningNoteVisibility &= ~GamePlayManager.SpeedWarningNoteVisibility.ShowLine;
+            };
             _placementIndicatorToggle.IsCheckedChanged += val => MainSystem.StageChartEditor.Placer.IsIndicatorOn = val;
             _earlyDisplaySlowNotesToggle.IsCheckedChanged += val => MainSystem.GamePlayManager.EarlyDisplaySlowNotes = val;
 
             MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
                 GamePlayManager.NotificationFlag.IsShowLinkLines,
                 manager => _linksIndicatorToggle.SetIsCheckedWithoutNotify(manager.IsShowLinkLines));
+            MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
+                GamePlayManager.NotificationFlag.WarningNoteDisplay,
+                manager =>
+                {
+                    _warningNoteToggle.SetIsCheckedWithoutNotify(manager.WarningNoteVisibility.HasFlag(GamePlayManager.SpeedWarningNoteVisibility.ShowNote));
+                    _warningLineToggle.SetIsCheckedWithoutNotify(manager.WarningNoteVisibility.HasFlag(GamePlayManager.SpeedWarningNoteVisibility.ShowLine));
+                });
             MainSystem.StageChartEditor.Placer.RegisterNotificationAndInvoke(
                 StageNotePlacer.NotificationFlag.IsIndicatorOn,
                 placer => _placementIndicatorToggle.SetIsCheckedWithoutNotify(placer.IsIndicatorOn));
@@ -136,7 +160,7 @@ namespace Deenote.UI.Views
                 manager => _earlyDisplaySlowNotesToggle.SetIsCheckedWithoutNotify(manager.EarlyDisplaySlowNotes));
         }
 
-        private static readonly string[] _predefinedAspectTexts = { "16:9","16:10", "4:3" };
+        private static readonly string[] _predefinedAspectTexts = { "16:9", "16:10", "4:3" };
 
         private static float GetAspectRatioDropdownOption(int optionIndex)
             => optionIndex switch {

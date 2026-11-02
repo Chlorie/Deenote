@@ -79,12 +79,6 @@ namespace Deenote.Entities.Models
             };
             GenerateSpeedLines();
 
-            if (version is ChartSerializationVersion.DeemoV2 && SpeedChangeWarnings.Count > 0) {
-                var legacyChart = Clone();
-                legacyChart.SpeedChangeWarnings.Clear();
-                return ChartSerializer.Serialize(legacyChart, versions);
-            }
-
             return ChartSerializer.Serialize(this, versions);
         }
     }
