@@ -11,7 +11,8 @@ namespace Deenote.Core.Editing
         private NoteCoord _updateNoteCoord;
         private Vector2 _updateMousePosition;
 
-        public bool IsPlacing => _currentState is StateFlag.PlacingSingleNote or StateFlag.PlacingSlides or StateFlag.PlacingPastedNotes;
+        public bool IsPlacing => _currentState is StateFlag.PlacingSingleNote or StateFlag.PlacingSlides
+            or StateFlag.PlacingPastedNotes or StateFlag.PlacingSpeedChangeWarningNote;
 
         public void BeginPlaceNote(NoteCoord coord, Vector2 mousePosition)
         {
@@ -19,6 +20,17 @@ namespace Deenote.Core.Editing
                 SetIndicatorVisibility(false);
                 return;
             }
+
+            _updateNoteCoord = coord;
+
+            if (IsSpeedChangeWarningMode) {
+                _currentState = BeginPlaceSpeedChangeWarning(coord, mousePosition);
+                RefreshIndicatorVisibility();
+                return;
+            }
+
+            if (_currentState is StateFlag.IdlePlacingSpeedChangeWarningNote)
+                _currentState = StateFlag.Idle;
 
             switch (_currentState) {
                 case StateFlag.Idle:
@@ -40,7 +52,7 @@ namespace Deenote.Core.Editing
             _updateMousePosition = mousePosition;
 
             switch (_currentState) {
-                case StateFlag.Idle or StateFlag.IdlePlacingSlides:
+                case StateFlag.Idle or StateFlag.IdlePlacingSlides or StateFlag.IdlePlacingSpeedChangeWarningNote:
                     UpdateMoveIndicator(coord, mousePosition);
                     break;
                 case StateFlag.IdlePastingNotes or StateFlag.PlacingPastedNotes:
@@ -51,6 +63,9 @@ namespace Deenote.Core.Editing
                     break;
                 case StateFlag.PlacingSlides:
                     UpdateDragPlaceSlides(coord, mousePosition);
+                    break;
+                case StateFlag.PlacingSpeedChangeWarningNote:
+                    UpdatePlaceSpeedChangeWarning(coord, mousePosition);
                     break;
             }
             if (!remainIndicatorVisibility) {
@@ -71,17 +86,23 @@ namespace Deenote.Core.Editing
                     _currentState = EndPasteNotes(coord, mousePosition);
                     ResetNotePrototypesToIdle();
                     break;
+                case StateFlag.PlacingSpeedChangeWarningNote:
+                    _currentState = EndPlaceSpeedChangeWarning(coord, mousePosition);
+                    break;
             }
             RefreshIndicatorVisibility();
         }
 
         public void CancelPlaceNote()
         {
-            if (PlaceSlideModifier)
+            if (_currentState is StateFlag.PlacingSpeedChangeWarningNote)
+                _currentState = StateFlag.Idle;
+            else if (PlaceSlideModifier)
                 _currentState = StateFlag.IdlePlacingSlides;
             else
                 _currentState = StateFlag.Idle;
             ResetNotePrototypesToIdle();
+            RefreshIndicatorVisibility();
         }
 
         private void SwitchPlaceSlideModifier(bool flag)
@@ -174,9 +195,11 @@ namespace Deenote.Core.Editing
             Idle,
             IdlePlacingSlides,
             IdlePastingNotes,
+            IdlePlacingSpeedChangeWarningNote,
             PlacingSingleNote,
             PlacingSlides,
             PlacingPastedNotes,
+            PlacingSpeedChangeWarningNote,
         }
     }
 }

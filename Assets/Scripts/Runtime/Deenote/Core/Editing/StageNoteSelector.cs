@@ -22,18 +22,23 @@ namespace Deenote.Core.Editing
         private GamePlayManager _game = default!;
 
         private readonly List<NoteModel> _selectedNotes = new();
+        private readonly List<SpeedChangeWarningModel> _selectedWarnings = new();
 
         private NoteCoord _dragStartCoord;
         private NoteCoord _dragEndCoord;
         private readonly List<NoteModel> _inDragRangeNotes = new();
+        private readonly List<SpeedChangeWarningModel> _inDragRangeWarnings = new();
         private DraggingSelectionState _state;
 
         public bool IsDragSelecting => _state != DraggingSelectionState.Idle;
 
         public ReadOnlySpan<NoteModel> SelectedNotes => _selectedNotes.AsSpan();
+        public ReadOnlySpan<SpeedChangeWarningModel> SelectedWarnings => _selectedWarnings.AsSpan();
 
         public event Action<StageNoteSelector>? SelectedNotesChanging;
         public event Action<StageNoteSelector>? SelectedNotesChanged;
+        public event Action<StageNoteSelector>? SelectedWarningsChanging;
+        public event Action<StageNoteSelector>? SelectedWarningsChanged;
 
         internal StageNoteSelector(GamePlayManager game)
         {
@@ -41,6 +46,14 @@ namespace Deenote.Core.Editing
             _game.RegisterNotification(
                 GamePlayManager.NotificationFlag.CurrentChart,
                 manager => Clear());
+
+            _game.StageLoaded += _ =>
+            {
+                _game.Grids.RegisterNotification(
+                    GridsManager.NotificationFlag.TimeGridVisible,
+                    OnTimeGridVisibleChanged);
+            };
+
             _game.MusicPlayer.TimeChanged += args =>
             {
                 if (!IsDragSelecting)
@@ -71,6 +84,24 @@ namespace Deenote.Core.Editing
         {
             _selectedNotes.Add(note);
             note.IsSelected = true;
+        }
+
+        public void AddSelectWarning(SpeedChangeWarningModel warning)
+        {
+            _game.AssertChartLoaded();
+
+            if (warning.IsSelected)
+                return;
+
+            OnSelectedWarningsChanging();
+            AddSelectWarningNonNotify(warning);
+            OnSelectedWarningsChanged();
+        }
+
+        private void AddSelectWarningNonNotify(SpeedChangeWarningModel warning)
+        {
+            _selectedWarnings.Add(warning);
+            warning.IsSelected = true;
         }
 
         public void AddSelectMultiple(IEnumerable<NoteModel> notes)
@@ -110,20 +141,39 @@ namespace Deenote.Core.Editing
         public void Reselect(IEnumerable<NoteModel> notes)
         {
             OnSelectedNotesChanging();
+            OnSelectedWarningsChanging();
 
             ClearNonNotify();
+            ClearWarningsNonNotify();
             AddSelectMultipleNonNotify(notes);
 
+            OnSelectedWarningsChanged();
             OnSelectedNotesChanged();
         }
 
         public void Reselect(ReadOnlySpan<NoteModel> notes)
         {
             OnSelectedNotesChanging();
+            OnSelectedWarningsChanging();
 
             ClearNonNotify();
+            ClearWarningsNonNotify();
             AddSelectMultipleNonNotify(notes);
 
+            OnSelectedWarningsChanged();
+            OnSelectedNotesChanged();
+        }
+
+        public void ReselectWarning(SpeedChangeWarningModel warning)
+        {
+            OnSelectedNotesChanging();
+            OnSelectedWarningsChanging();
+
+            ClearNonNotify();
+            ClearWarningsNonNotify();
+            AddSelectWarningNonNotify(warning);
+
+            OnSelectedWarningsChanged();
             OnSelectedNotesChanged();
         }
 
@@ -132,12 +182,15 @@ namespace Deenote.Core.Editing
             _game.AssertChartLoaded();
 
             OnSelectedNotesChanging();
+            OnSelectedWarningsChanging();
 
             ClearNonNotify();
+            ClearWarningsNonNotify();
             foreach (var note in _game.CurrentChart.EnumerateNoteModels()) {
                 AddSelectNonNotify(note);
             }
 
+            OnSelectedWarningsChanged();
             OnSelectedNotesChanged();
         }
 
@@ -182,10 +235,47 @@ namespace Deenote.Core.Editing
             OnSelectedNotesChanged();
         }
 
+        public void DeselectWarning(SpeedChangeWarningModel warning)
+        {
+            OnSelectedWarningsChanging();
+
+            if (_selectedWarnings.Remove(warning))
+                warning.IsSelected = false;
+
+            OnSelectedWarningsChanged();
+        }
+
+        public void ClearWarnings()
+        {
+            OnSelectedWarningsChanging();
+            ClearWarningsNonNotify();
+            OnSelectedWarningsChanged();
+        }
+
+        private void OnTimeGridVisibleChanged(GridsManager grids)
+        {
+            if (grids.TimeGridVisible)
+                return;
+
+            // Warnings are drawn as a part of the time grid, so they cannot be selected when it is hidden
+            if (_selectedWarnings.Count == 0 && _inDragRangeWarnings.Count == 0)
+                return;
+
+            foreach (var warning in _inDragRangeWarnings) {
+                warning.SetIsInSelectionRange(false);
+            }
+            _inDragRangeWarnings.Clear();
+
+            ClearWarnings();
+        }
+
         public void Clear()
         {
             OnSelectedNotesChanging();
+            OnSelectedWarningsChanging();
             ClearNonNotify();
+            ClearWarningsNonNotify();
+            OnSelectedWarningsChanged();
             OnSelectedNotesChanged();
         }
 
@@ -195,6 +285,14 @@ namespace Deenote.Core.Editing
                 note.IsSelected = false;
             }
             _selectedNotes.Clear();
+        }
+
+        private void ClearWarningsNonNotify()
+        {
+            foreach (var warning in _selectedWarnings) {
+                warning.IsSelected = false;
+            }
+            _selectedWarnings.Clear();
         }
 
         #endregion
@@ -207,14 +305,18 @@ namespace Deenote.Core.Editing
                 return;
 
             OnSelectedNotesChanging();
+            OnSelectedWarningsChanging();
 
             _dragStartCoord = startCoord;
             _dragEndCoord = startCoord;
             _state = DraggingSelectionState.StartedSelection;
 
-            if (!toggleMode)
+            if (!toggleMode) {
                 ClearNonNotify();
+                ClearWarningsNonNotify();
+            }
 
+            OnSelectedWarningsChanged();
             OnSelectedNotesChanged();
         }
 
@@ -228,10 +330,12 @@ namespace Deenote.Core.Editing
                 return;
 
             OnSelectedNotesChanging();
+            OnSelectedWarningsChanging();
 
             _dragEndCoord = endCoord;
             UpdateDragSelection(_dragStartCoord, _dragEndCoord);
 
+            OnSelectedWarningsChanged();
             OnSelectedNotesChanged();
         }
 
@@ -244,8 +348,13 @@ namespace Deenote.Core.Editing
             _game.Stage.SetSelectionPanelRectInvisible();
 
             _state = DraggingSelectionState.Idle;
-            if (_dragStartCoord == _dragEndCoord) {
-                if (_game.TryRaycastPerspectiveViewportPointToNote(viewportPoint, out var noteController)) {
+            bool isClick = (_dragStartCoord == _dragEndCoord) || (_inDragRangeNotes.Count == 0 && _inDragRangeWarnings.Count == 0);
+            if (isClick) {
+                if (_game.Grids.TimeGridVisible
+                    && _game.TryRaycastPerspectiveViewportPointToWarning(viewportPoint, out var warningController)) {
+                    ReselectWarning(warningController.Model);
+                }
+                else if (_game.TryRaycastPerspectiveViewportPointToNote(viewportPoint, out var noteController)) {
                     var note = noteController.NoteModel;
                     Reselect(MemoryMarshal.CreateReadOnlySpan(ref note, 1));
                 }
@@ -255,6 +364,11 @@ namespace Deenote.Core.Editing
                     note.ApplySelection();
                 }
                 _inDragRangeNotes.Clear();
+
+                foreach (var warning in _inDragRangeWarnings) {
+                    warning.ApplySelection();
+                }
+                _inDragRangeWarnings.Clear();
             }
         }
 
@@ -279,6 +393,7 @@ namespace Deenote.Core.Editing
             // 我在考虑从raycast映射后的coord直接就是考虑sprite size后的coord，
             // 这个size问题能不能试着在raycast2coord的方法里解决
             _selectedNotes.Clear();
+            _selectedWarnings.Clear();
 
             foreach (var note in _game.CurrentChart.EnumerateNoteModels()) {
                 bool inRange = _game.IsNoteHighlighted(note) && IsInSelectionRange(note);
@@ -289,6 +404,19 @@ namespace Deenote.Core.Editing
 
                 if (note.IsSelected) {
                     _selectedNotes.Add(note);
+                }
+            }
+
+            bool warningsSelectable = _game.Grids.TimeGridVisible;
+            foreach (var warning in _game.CurrentChart.SpeedChangeWarnings) {
+                bool inRange = warningsSelectable && IsWarningInSelectionRange(warning);
+
+                warning.SetIsInSelectionRange(inRange);
+                if (inRange)
+                    _inDragRangeWarnings.Add(warning);
+
+                if (warning.IsSelected) {
+                    _selectedWarnings.Add(warning);
                 }
             }
 
@@ -336,6 +464,36 @@ namespace Deenote.Core.Editing
                 float ToAboveStagePseudoTime(float time, float speed)
                     => time + (_game.StageNoteAppearAheadTime - _game.GetStageNoteAppearAheadTime(speed));
             }
+
+            bool IsWarningInSelectionRange(SpeedChangeWarningModel warning)
+            {
+                float pos = GameStageSpeedChangeWarningNoteController.SpritePosition;
+                const float halfSize = 0.5f;
+                float time = warning.Time;
+                float currentTime = _game.MusicPlayer.Time;
+                float displaySpeed = _game.HighlightedNoteSpeed;
+
+                if (time < currentTime) {
+                    return time >= startCoord.Time
+                        && time <= endCoord.Time
+                        && pos + halfSize >= startCoord.Position
+                        && pos - halfSize <= endCoord.Position;
+                }
+
+                if (time < currentTime + _game.GetStageNoteAppearAheadTime(displaySpeed)) {
+                    var pseudoTime = currentTime + (time - currentTime) * _game.GetDisplayNoteSpeed(displaySpeed);
+                    return pseudoTime >= startCoord.Time
+                        && pseudoTime <= endCoord.Time
+                        && pos + halfSize >= startCoord.Position
+                        && pos - halfSize <= endCoord.Position;
+                }
+
+                var aboveStageTime = time + (_game.StageNoteAppearAheadTime - _game.GetStageNoteAppearAheadTime(displaySpeed));
+                return aboveStageTime >= startCoord.Time
+                    && aboveStageTime <= endCoord.Time
+                    && pos + halfSize >= startCoord.Position
+                    && pos - halfSize <= endCoord.Position;
+            }
         }
 
         #endregion
@@ -346,6 +504,14 @@ namespace Deenote.Core.Editing
             foreach (var note in _game.NotesManager.OnStageNotes)
                 note.RefreshColoring();
             SelectedNotesChanged?.Invoke(this);
+        }
+
+        private void OnSelectedWarningsChanging() => SelectedWarningsChanging?.Invoke(this);
+        private void OnSelectedWarningsChanged()
+        {
+            foreach (var warning in _game.SpeedChangeWarningsManager.OnStageWarnings)
+                warning.RefreshColoring();
+            SelectedWarningsChanged?.Invoke(this);
         }
 
         private enum DraggingSelectionState

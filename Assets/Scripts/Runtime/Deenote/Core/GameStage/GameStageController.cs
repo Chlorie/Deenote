@@ -120,6 +120,31 @@ namespace Deenote.Core.GameStage
             return false;
         }
 
+        internal bool TryRaycastRaycastingViewportPointToWarning(Vector2 raycastingViewportPoint,
+            [NotNullWhen(true)] out GameStageSpeedChangeWarningNoteController? warning)
+        {
+            var camera = _perspectiveCamera.Camera;
+            var ray = camera.ViewportPointToRay(raycastingViewportPoint);
+            if (Physics.Raycast(ray, out var hitInfo)) {
+                var c = hitInfo.collider;
+                if (c != null) {
+                    if (c.TryGetComponent<SpeedChangeWarningRaycastingCollider>(out var collider)
+                        && collider.WarningController is not null) {
+                        warning = collider.WarningController;
+                        return true;
+                    }
+
+                    if (c.GetComponentInParent<GameStageSpeedChangeWarningNoteController>() is { } warningController) {
+                        warning = warningController;
+                        return true;
+                    }
+                }
+            }
+
+            warning = null;
+            return false;
+        }
+
         internal bool TryConvertNotePanelPositionToRaycastingViewportPoint((float X, float Z) notePanelPosition, out Vector2 viewportPoint)
         {
             var y = _notePanelTransform.position.y;

@@ -3,9 +3,12 @@
 using Deenote.Core.GamePlay;
 using Deenote.Core.Project;
 using Deenote.Entities;
+using Deenote.Entities.Models;
 using Deenote.Library;
 using Deenote.Library.Components;
 using Deenote.Library.Mathematics;
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,12 +33,17 @@ namespace Deenote.GamePlay.UI
         [SerializeField] RectTransform _shockWaveEnterPosTransform = default!;
         [SerializeField] RectTransform _shockWaveExitPosTransform = default!;
         [SerializeField] Image _charmingImage = default!;
+        [Header("Speed Change Warning UI")]
+        [SerializeField] List<Image> _speedChangeWarningImages = new();
 
         [Header("Resources")]
         [SerializeField] DeemoGameStageUIArgs _args = default!;
 
         private float _shockWaveEnterPosX;
         private float _shockWaveExitPosX;
+
+        private Vector3[] _speedChangeWarningBaseScales = Array.Empty<Vector3>();
+        private Color[] _speedChangeWarningBaseColors = Array.Empty<Color>();
 
         private Difficulty _difficulty_bf;
         private Difficulty Difficulty
@@ -65,6 +73,17 @@ namespace Deenote.GamePlay.UI
         {
             _shockWaveEnterPosX = _shockWaveEnterPosTransform.anchorMin.x;
             _shockWaveExitPosX = _shockWaveExitPosTransform.anchorMin.x;
+
+            _speedChangeWarningBaseScales = new Vector3[_speedChangeWarningImages.Count];
+            _speedChangeWarningBaseColors = new Color[_speedChangeWarningImages.Count];
+            for (int i = 0; i < _speedChangeWarningImages.Count; i++) {
+                var image = _speedChangeWarningImages[i];
+                if (image is null)
+                    continue;
+                _speedChangeWarningBaseScales[i] = image.transform.localScale;
+                _speedChangeWarningBaseColors[i] = image.color;
+                image.gameObject.SetActive(false);
+            }
         }
 
         private void Start()
@@ -121,6 +140,7 @@ namespace Deenote.GamePlay.UI
                     else {
                         gameObject.SetActive(false);
                     }
+                    UpdateSpeedChangeWarningRegistrant(manager);
                 });
 
             MainSystem.GamePlayManager.RegisterNotificationAndInvoke(
@@ -131,6 +151,7 @@ namespace Deenote.GamePlay.UI
                         return;
 
                     UpdateComboRegistrant(manager);
+                    UpdateSpeedChangeWarningRegistrant(manager);
 
                     var currentCombo = manager.NotesManager.CurrentCombo;
                     if (currentCombo <= 0) {
@@ -149,6 +170,85 @@ namespace Deenote.GamePlay.UI
                     float score = accScore * 80_00f + comboScore * 20_00f;
                     _scoreText.text = $"{Mathf.Floor(score) / 100f:F2} %";
                 });
+
+            MainSystem.GamePlayManager.RegisterNotification(
+                GamePlayManager.NotificationFlag.ActiveSpeedChangeWarningUpdated,
+                UpdateSpeedChangeWarningRegistrant);
+        }
+
+        private void UpdateSpeedChangeWarningRegistrant(GamePlayManager stage)
+        {
+            if (stage.CurrentChart is not { } chart) {
+                SetSpeedChangeWarningImagesActive(false);
+                return;
+            }
+
+            var currentTime = stage.MusicPlayer.Time;
+            var warnings = chart.SpeedChangeWarnings.AsSpan();
+            int warningIndex = FindPreviousWarningIndex(warnings, currentTime);
+            float duration = _args.SpeedChangeWarningPulseDuration;
+            if (warningIndex < 0 || duration <= 0f) {
+                SetSpeedChangeWarningImagesActive(false);
+                return;
+            }
+
+            float elapsed = currentTime - warnings[warningIndex].Time;
+            if (elapsed < 0f || elapsed >= duration) {
+                SetSpeedChangeWarningImagesActive(false);
+                return;
+            }
+
+            SetSpeedChangeWarningImagesActive(true);
+
+            int pulseCount = Mathf.Max(1, _args.SpeedChangeWarningPulseCount);
+            float pulseDuration = duration / pulseCount;
+            int pulseIndex = Mathf.Min((int)(elapsed / pulseDuration), pulseCount - 1);
+            float pulseRatio = Mathf.Clamp01((elapsed - pulseIndex * pulseDuration) / pulseDuration);
+
+            // Eased instead of linear, so the scale grows and recovers smoothly
+            float growRatio = pulseRatio < 0.5f ? pulseRatio * 2f : (1f - pulseRatio) * 2f;
+            float scale = Mathf.Lerp(1f, _args.SpeedChangeWarningPulseMaxScale, Mathf.SmoothStep(0f, 1f, growRatio));
+            float alpha = pulseIndex == pulseCount - 1
+                ? 1f - Mathf.SmoothStep(0f, 1f, pulseRatio)
+                : pulseIndex == 0
+                    ? Mathf.SmoothStep(0f, 1f, Mathf.Min(pulseRatio * 2, 1))
+                    : 1f;
+
+            for (int i = 0; i < _speedChangeWarningImages.Count; i++) {
+                var image = _speedChangeWarningImages[i];
+                if (image is null)
+                    continue;
+                image.transform.localScale = _speedChangeWarningBaseScales[i] * scale;
+                var color = _speedChangeWarningBaseColors[i];
+                image.color = color with { a = color.a * alpha };
+            }
+
+            return;
+
+            void SetSpeedChangeWarningImagesActive(bool active)
+            {
+                foreach (var image in _speedChangeWarningImages) {
+                    if (image is not null && image.gameObject.activeSelf != active)
+                        image.gameObject.SetActive(active);
+                }
+            }
+
+            static int FindPreviousWarningIndex(ReadOnlySpan<SpeedChangeWarningModel> warnings, float time)
+            {
+                int left = 0, right = warnings.Length - 1;
+                int result = -1;
+                while (left <= right) {
+                    int mid = (left + right) >> 1;
+                    if (warnings[mid].Time <= time) {
+                        result = mid;
+                        left = mid + 1;
+                    }
+                    else {
+                        right = mid - 1;
+                    }
+                }
+                return result;
+            }
         }
 
         private void UpdateComboRegistrant(GamePlayManager stage)

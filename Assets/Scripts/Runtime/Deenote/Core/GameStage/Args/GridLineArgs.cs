@@ -15,6 +15,7 @@ namespace Deenote.Core.GameStage.Args
         public Color TempoLineColor = new(0f, 0.5f, 0.5f, 1f);
         public Color PositionGridLineColor = new(42f / 255f, 42 / 255f, 42 / 255f, 0.75f);
         public Color CurveLineColor = new(85f / 255, 192f / 255, 1f);
+        public Color SpeedChangeWarningLineColor = new(1f, 233f / 255f, 135f / 255f);
 
         public float LinkLineWidth = 2f;
         public float TimeGridLineWidth = 2f;
@@ -23,5 +24,6 @@ namespace Deenote.Core.GameStage.Args
         public float PositionGridLineWidth = 2f;
         public float PositionGridBorderWidth = 4f;
         public float CurveLineWidth = 2f;
+        public float SpeedChangeWarningLineWidth = 2f;
     }
 }

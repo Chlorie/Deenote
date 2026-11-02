@@ -58,26 +58,51 @@ namespace Deenote.Core.Editing
         {
             if (!_game.IsChartLoaded())
                 return;
-            if (Selector.SelectedNotes.IsEmpty)
+
+            var notes = Selector.SelectedNotes;
+            var warnings = Selector.SelectedWarnings;
+            if (notes.IsEmpty && warnings.IsEmpty)
                 return;
 
             float clipLength = _game.MusicPlayer.ClipLength;
-            _operations.Do(_game.CurrentChart
-                .EditNotesTime(Selector.SelectedNotes, v => EntityArgs.ClampTime(valueSelector(v), clipLength))
-                .OnDone(notes => OnNotePropertyEdited(true, false, NotificationFlag.NoteTime)));
+            IUndoableOperation? notesOperation = notes.IsEmpty 
+                ? null
+                : _game.CurrentChart
+                    .EditNotesTime(notes, v => EntityArgs.ClampTime(valueSelector(v), clipLength))
+                    .OnDone(_ => OnNotePropertyEdited(true, false, NotificationFlag.NoteTime));
+            IUndoableOperation? warningsOperation = warnings.IsEmpty
+                ? null
+                : _game.CurrentChart
+                    .EditSpeedChangeWarningsTime(warnings, v => EntityArgs.ClampTime(valueSelector(v), clipLength))
+                    .OnRedone(_ => OnSpeedChangeWarningCollectionChanged())
+                    .OnUndone(_ => OnSpeedChangeWarningCollectionChanged());
+
+            _operations.Do(new CombinedPairOperation(notesOperation, warningsOperation));
         }
 
         public void EditSelectedNotesTime(float newValue)
         {
             if (!_game.IsChartLoaded())
                 return;
-            if (Selector.SelectedNotes.IsEmpty)
+
+            var notes = Selector.SelectedNotes;
+            var warnings = Selector.SelectedWarnings;
+            if (notes.IsEmpty && warnings.IsEmpty)
                 return;
 
             float clipLength = _game.MusicPlayer.ClipLength;
-            _operations.Do(_game.CurrentChart
-                .EditNotesTime(Selector.SelectedNotes, EntityArgs.ClampTime(newValue, clipLength))
-                .OnDone(notes => OnNotePropertyEdited(true, false, NotificationFlag.NoteTime)));
+            float time = EntityArgs.ClampTime(newValue, clipLength);
+            IUndoableOperation? notesOperation = notes.IsEmpty ? null
+                : _game.CurrentChart
+                    .EditNotesTime(notes, time)
+                    .OnDone(_ => OnNotePropertyEdited(true, false, NotificationFlag.NoteTime));
+            IUndoableOperation? warningsOperation = warnings.IsEmpty ? null
+                : _game.CurrentChart
+                    .EditSpeedChangeWarningsTime(warnings, time)
+                    .OnRedone(_ => OnSpeedChangeWarningCollectionChanged())
+                    .OnUndone(_ => OnSpeedChangeWarningCollectionChanged());
+
+            _operations.Do(new CombinedPairOperation(notesOperation, warningsOperation));
         }
 
         public void EditSelectedNotesPosition(Func<float, float> valueSelector)

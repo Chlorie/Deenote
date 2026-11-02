@@ -96,6 +96,7 @@ namespace Deenote.Core.GamePlay
                 if (Utils.SetField(ref _applySpeedDifference_bf, value)) {
                     if (IsChartLoaded() && IsStageLoaded()) {
                         NotesManager.RefreshStageActiveNotes();
+                        SpeedChangeWarningsManager.RefreshStageActiveWarnings();
                     }
                     NotifyFlag(NotificationFlag.IsApplySpeedDifference);
                 }
@@ -147,6 +148,7 @@ namespace Deenote.Core.GamePlay
                 if (Utils.SetField(ref _noteSpeed_bf, value)) {
                     if (IsStageLoaded() && IsChartLoaded()) {
                         NotesManager.RefreshStageActiveNotes();
+                        SpeedChangeWarningsManager.RefreshStageActiveWarnings();
                     }
                     NotifyFlag(NotificationFlag.NoteSpeed);
                 }
@@ -210,6 +212,7 @@ namespace Deenote.Core.GamePlay
                     _cacheVisibleRangePercentage = null;
                     if (IsStageLoaded() && IsChartLoaded()) {
                         NotesManager.RefreshStageActiveNotes();
+                        SpeedChangeWarningsManager.RefreshStageActiveWarnings();
                         foreach (var note in NotesManager.OnStageNotes) {
                             note.RefreshColorAlpha();
                         }
@@ -274,6 +277,7 @@ namespace Deenote.Core.GamePlay
                 if (Utils.SetField(ref _ignoreNoteSpeed_bf, value)) {
                     if (IsStageLoaded() && IsChartLoaded()) {
                         NotesManager.RefreshStageActiveNotes();
+                        SpeedChangeWarningsManager.RefreshStageActiveWarnings();
                     }
                 }
             }

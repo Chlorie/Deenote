@@ -38,11 +38,13 @@ namespace Deenote.Entities.Models
         [JsonProperty("notes", Order = 5), Obsolete("For serialzation only")]
         private IEnumerable<NoteModel> _SerializeNotes
             => NoteNodes.OfType<NoteModel>()
-                .Merge(BackgroundSoundNotes.Select(n => n._noteModel), NodeTimeComparer.Instance);
+                .Merge(BackgroundSoundNotes.Select(n => n._noteModel), NodeTimeComparer.Instance)
+                .Merge(SpeedChangeWarnings.Select(n => n._noteModel), NodeTimeComparer.Instance);
 
         [JsonProperty("links", Order = 6), Obsolete("For serialzation only")]
         private IEnumerable<NoteLinkIterator> _SerializeLinks
-            => _SerializeNotes
+            => NoteNodes.OfType<NoteModel>()
+                .Merge(BackgroundSoundNotes.Select(n => n._noteModel), NodeTimeComparer.Instance)
                 .Where(n => n.IsSlide && n.PrevLink is null)
                 .Select(n => new NoteLinkIterator(n));
 

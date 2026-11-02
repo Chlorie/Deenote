@@ -112,6 +112,26 @@ namespace Deenote.Core.GamePlay
             static bool IsInViewArea(Vector2 vp) => vp is { x: >= 0f and <= 1f, y: >= 0f and <= 1f };
         }
 
+        internal bool TryRaycastPerspectiveViewportPointToWarning(Vector2 perspectiveViewPanelViewportPoint,
+            [MaybeNullWhen(false)] out GameStageSpeedChangeWarningNoteController warning)
+        {
+            AssertStageLoaded();
+
+            if (!IsInViewArea(perspectiveViewPanelViewportPoint)) {
+                warning = default;
+                return false;
+            }
+            var stage = Stage;
+
+            var raycastViewportPoint = stage.ConvertPerspectiveViewportPointToRaycastingViewportPoint(perspectiveViewPanelViewportPoint);
+            if (stage.TryRaycastRaycastingViewportPointToWarning(raycastViewportPoint, out warning)) {
+                return true;
+            }
+            return false;
+
+            static bool IsInViewArea(Vector2 vp) => vp is { x: >= 0f and <= 1f, y: >= 0f and <= 1f };
+        }
+
         private float ConvertNoteCoordTimeToWorldZBase(float time)
             => time * Stage!.Args.NoteTimeToZBaseMultiplierFunction.GetY(ActualNoteFallSpeed);
 

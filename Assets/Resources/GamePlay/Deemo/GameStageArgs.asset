@@ -39,6 +39,14 @@ MonoBehaviour:
     type: 3}
   PlacementNoteIndicatorPrefab: {fileID: 3287208875695698390, guid: d258ceafb7b62de4ba218040a2b6f8eb,
     type: 3}
+  SpeedChangeWarningNotePrefab: {fileID: 8149453575187749862, guid: 60f031f0b2b235841826cc4e7010517a,
+    type: 3}
+  SpeedChangeWarningIndicatorPrefab: {fileID: 4034772007280929675, guid: 3977324161e803a439fb4c8fdab17a6b,
+    type: 3}
+  SpeedChangeWarningSpritePrefab:
+    Scale: 1
+    Sprite: {fileID: 21300000, guid: d7cdfaafd1eb7a3428e3ce20e6303488, type: 3}
+    WaveColor: {r: 0, g: 0, b: 0, a: 0}
   EffectSoundAudioClip: {fileID: 8300000, guid: 13a0e647201f5094880b4da85ec719ee,
     type: 3}
   BlackNoteSpritePrefab:

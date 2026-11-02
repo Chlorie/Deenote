@@ -14,10 +14,18 @@ namespace Deenote.Entities.Models
             set => _noteModel.Time = value;
         }
 
+        public bool IsSelected
+        {
+            get => _noteModel.IsSelected;
+            set => _noteModel.IsSelected = value;
+        }
+
+        public void SetIsInSelectionRange(bool value) => _noteModel.SetIsInSelectionRange(value);
+
+        public void ApplySelection() => _noteModel.ApplySelection();
+
         internal SpeedChangeWarningModel(NoteModel note)
         {
-            Debug.Assert(!note.IsVisibleOnStage());
-            Debug.Assert(!note.HasSounds);
             Debug.Assert(note.WarningType is WarningType.SpeedChange);
             _noteModel = note;
         }
@@ -27,6 +35,6 @@ namespace Deenote.Entities.Models
         { }
 
         public SpeedChangeWarningModel Clone()
-            => new(_noteModel.Clone(cloneSounds: false));
+            => new(_noteModel.Clone(cloneSounds: true));
     }
 }

@@ -19,6 +19,7 @@ namespace Deenote.Core.GamePlay
     public sealed partial class GamePlayManager : FlagNotifiableMonoBehaviour<GamePlayManager, GamePlayManager.NotificationFlag>
     {
         private NotesManager _notesManager = default!;
+        private SpeedChangeWarningsManager _speedChangeWarningsManager = default!;
         private GridsManager _gridsManager = default!;
         [SerializeField] GameMusicPlayer _musicPlayer = default!;
         private StagePianoSoundPlayer _pianoSoundPlayer = default!;
@@ -28,6 +29,7 @@ namespace Deenote.Core.GamePlay
         public GameStageController? Stage { get; private set; }
 
         public NotesManager NotesManager => _notesManager;
+        public SpeedChangeWarningsManager SpeedChangeWarningsManager => _speedChangeWarningsManager;
         public GridsManager Grids => _gridsManager;
         public GameMusicPlayer MusicPlayer => _musicPlayer;
         public StagePianoSoundPlayer PianoSoundPlayer => _pianoSoundPlayer;
@@ -71,6 +73,7 @@ namespace Deenote.Core.GamePlay
             _gridsManager = new GridsManager(this, MainSystem.StageChartEditor);
             _pianoSoundPlayer = new StagePianoSoundPlayer(MainSystem.PianoSoundSource);
             _notesManager = new NotesManager(this);
+            _speedChangeWarningsManager = new SpeedChangeWarningsManager(this);
 
             RegisterConfigurations();
             RegisterCustomPropertiesConfigurations();
@@ -84,6 +87,13 @@ namespace Deenote.Core.GamePlay
                         Stage.Args.GamePlayNotePrefab,
                         Stage.NotePanelTransform,
                         item => item.OnInstantiate(this)));
+
+                SpeedChangeWarningsManager.Initialize(
+                    UnityUtils.CreateObjectPool(
+                        Stage.Args.SpeedChangeWarningNotePrefab,
+                        Stage.NotePanelTransform,
+                        item => item.OnInstantiate(this)));
+
                 OnStageLoaded_Properties(loader);
 
                 if (IsChartLoaded()) {
@@ -100,6 +110,7 @@ namespace Deenote.Core.GamePlay
 
                 var forward = args.NewTime > args.OldTime;
                 NotesManager.ShiftStageActiveNotes(!args.IsByJump && _manualPlaySpeedMultiplier is null);
+                SpeedChangeWarningsManager.ShiftStageActiveWarnings();
                 NotifyFlag(NotificationFlag.ActiveNoteUpdated);
                 // In previous version, note time was controlled by StageNoteController.Update,
                 // so we have to manually call update when manually change music time.
@@ -167,6 +178,7 @@ namespace Deenote.Core.GamePlay
 
             if (IsStageLoaded()) {
                 NotesManager.RefreshStageNoteTimeDisplay();
+                SpeedChangeWarningsManager.RefreshStageWarningTimeDisplay();
             }
         }
         private void OnApplicationFocus(bool focus)
@@ -199,6 +211,15 @@ namespace Deenote.Core.GamePlay
             NotifyFlag(NotificationFlag.ActiveNoteUpdated);
         }
 
+        public void UpdateSpeedChangeWarnings()
+        {
+            AssertChartLoaded();
+            if (IsStageLoaded()) {
+                SpeedChangeWarningsManager.RefreshStageActiveWarnings();
+            }
+            NotifyFlag(NotificationFlag.ActiveSpeedChangeWarningUpdated);
+        }
+
         public void LoadChartInCurrentProject(ChartModel chart)
         {
             Debug.Assert(MainSystem.ProjectManager.CurrentProject?.Charts.Contains(chart) is true);
@@ -210,6 +231,7 @@ namespace Deenote.Core.GamePlay
             CheckCollision();
             if (IsStageLoaded()) {
                 UpdateNotes(true, true);
+                UpdateSpeedChangeWarnings();
             }
             NotifyFlag(NotificationFlag.CurrentChart);
 
@@ -242,6 +264,7 @@ namespace Deenote.Core.GamePlay
                 return;
             CurrentChart = null;
             MusicPlayer.Stop();
+            SpeedChangeWarningsManager.ClearTrackingWarnings();
             NotifyFlag(NotificationFlag.CurrentChart);
         }
 
@@ -295,6 +318,7 @@ namespace Deenote.Core.GamePlay
             PauseWhenLoseFocus,
 
             ActiveNoteUpdated,
+            ActiveSpeedChangeWarningUpdated,
 
             CurrentChart,
             ChartName,

@@ -6,10 +6,10 @@ namespace Deenote.Core.Editing.Operations
 {
     public sealed class CombinedPairOperation : IUndoableOperation
     {
-        private readonly IUndoableOperation _first;
-        private readonly IUndoableOperation _second;
+        private readonly IUndoableOperation? _first;
+        private readonly IUndoableOperation? _second;
 
-        public CombinedPairOperation(IUndoableOperation first, IUndoableOperation second)
+        public CombinedPairOperation(IUndoableOperation? first, IUndoableOperation? second)
         {
             _first = first;
             _second = second;
@@ -17,14 +17,14 @@ namespace Deenote.Core.Editing.Operations
 
         void IUndoableOperation.Redo()
         {
-            _first.Redo();
-            _second.Redo();
+            _first?.Redo();
+            _second?.Redo();
         }
 
         void IUndoableOperation.Undo()
         {
-            _second.Undo();
-            _first.Undo();
+            _second?.Undo();
+            _first?.Undo();
         }
     }
 }
