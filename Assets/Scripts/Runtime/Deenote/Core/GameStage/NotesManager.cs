@@ -432,15 +432,15 @@ namespace Deenote.Core.GameStage
             UpdateNotesAppearOrder();
             ReselectActiveVisibleNotes();
 
-            RefreshNoteSoundsIndices();
+            CancelScheduledAudio();
+            ResetScheduledAudio(_game.MusicPlayer.PreciseTime, _game.MusicPlayer.Transport.Epoch);
             _time = currentTime;
         }
 
         /// <summary>
         /// Called when music time changed
         /// </summary>
-        /// <param name="playSound"></param>
-        internal void ShiftStageActiveNotes(bool playSound)
+        internal void ShiftStageActiveNotes()
         {
             var currentTime = _game.MusicPlayer.Time;
 
@@ -449,7 +449,7 @@ namespace Deenote.Core.GameStage
                 note.RefreshStageDeltaTime();
             }
 
-            UpdateNoteSoundsRelatively(currentTime >= _time, playSound);
+            // Audio is scheduled independently from render-time updates.
             _time = currentTime;
         }
 
