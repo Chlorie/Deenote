@@ -30,9 +30,6 @@ namespace Deenote.Core.GameStage
             var musicPlayer = _game.MusicPlayer;
             var transport = musicPlayer.Transport;
 
-            if (_scheduledAudioInitialized && _scheduledAudioEpoch != transport.Epoch)
-                CancelScheduledAudio();
-
             if (!transport.CanSchedule)
                 return;
 
@@ -107,6 +104,18 @@ namespace Deenote.Core.GameStage
             _scheduledAudioInitialized = false;
             _game.HitSoundPlayer.CancelScheduledSounds();
             _game.PianoSoundPlayer.CancelScheduledSounds();
+        }
+
+        internal void CancelPendingAudio()
+        {
+            _scheduledAudioInitialized = false;
+            _game.HitSoundPlayer.CancelPendingSounds();
+            _game.PianoSoundPlayer.CancelPendingSounds();
+        }
+
+        internal void RebaseScheduledAudio()
+        {
+            _scheduledAudioInitialized = false;
         }
     }
 }

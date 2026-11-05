@@ -82,6 +82,7 @@ namespace Deenote.Core.GamePlay.Audio
             source.SetScheduledEndTime(endDsp);
 
             voice.EndDsp = endDsp;
+            voice.StartDsp = targetDspTime;
             voice.Active = true;
             return true;
         }
@@ -91,6 +92,19 @@ namespace Deenote.Core.GamePlay.Audio
             for (int i = 0; i < _voices.Count; i++) {
                 var voice = _voices[i];
                 if (!voice.Active)
+                    continue;
+
+                voice.Source.Stop();
+                voice.Active = false;
+            }
+        }
+
+        public void CancelPendingSounds()
+        {
+            double dspTime = AudioSettings.dspTime;
+            for (int i = 0; i < _voices.Count; i++) {
+                var voice = _voices[i];
+                if (!voice.Active || voice.Source.isPlaying || dspTime >= voice.StartDsp)
                     continue;
 
                 voice.Source.Stop();
@@ -156,6 +170,7 @@ namespace Deenote.Core.GamePlay.Audio
         private sealed class Voice
         {
             public readonly AudioSource Source;
+            public double StartDsp;
             public double EndDsp;
             public bool Active;
 

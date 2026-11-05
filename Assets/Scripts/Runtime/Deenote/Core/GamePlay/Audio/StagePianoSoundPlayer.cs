@@ -48,5 +48,7 @@ namespace Deenote.Core.GamePlay.Audio
         }
 
         public void CancelScheduledSounds() => _source.CancelScheduledSounds();
+
+        public void CancelPendingSounds() => _source.CancelPendingSounds();
     }
 }

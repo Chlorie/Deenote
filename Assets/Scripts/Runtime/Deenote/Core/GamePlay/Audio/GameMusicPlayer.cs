@@ -6,6 +6,14 @@ using UnityEngine;
 
 namespace Deenote.Core.GamePlay.Audio
 {
+    public enum TransportChangeReason
+    {
+        Started,
+        Paused,
+        Seeked,
+        RateChanged,
+    }
+
     [RequireComponent(typeof(AudioSource))]
     public sealed class GameMusicPlayer : MonoBehaviour
     {
@@ -88,7 +96,7 @@ namespace Deenote.Core.GamePlay.Audio
                     _transport.SetRate(value);
                 }
 
-                TransportChanged?.Invoke();
+                TransportChanged?.Invoke(TransportChangeReason.RateChanged);
             }
         }
 
@@ -103,7 +111,7 @@ namespace Deenote.Core.GamePlay.Audio
         /// Called when playback state, rate, or position changes. Audio
         /// scheduling uses this to immediately rebase its lookahead window.
         /// </summary>
-        public event Action? TransportChanged;
+        public event Action<TransportChangeReason>? TransportChanged;
 
         /// <summary>
         /// Called when the audio clip is changed.
@@ -165,7 +173,7 @@ namespace Deenote.Core.GamePlay.Audio
             _source.pitch = (float)_rate;
             _transport.Start(startDsp, chartTime, _rate);
             _source.PlayScheduled(startDsp);
-            TransportChanged?.Invoke();
+            TransportChanged?.Invoke(TransportChangeReason.Started);
         }
 
         /// <summary>
@@ -188,7 +196,7 @@ namespace Deenote.Core.GamePlay.Audio
             SetRenderedTime(newTime);
             if (!Mathf.Approximately(oldTime, newTime))
                 TimeChanged?.Invoke(new TimeChangedEventArgs(oldTime, newTime, false));
-            TransportChanged?.Invoke();
+            TransportChanged?.Invoke(TransportChangeReason.Paused);
         }
 
         public void TogglePlayingState()
@@ -231,7 +239,7 @@ namespace Deenote.Core.GamePlay.Audio
             if (!Mathf.Approximately(oldTime, value)) {
                 TimeChanged?.Invoke(new TimeChangedEventArgs(oldTime, value, true));
             }
-            TransportChanged?.Invoke();
+            TransportChanged?.Invoke(TransportChangeReason.Seeked);
         }
 
         public void ReplaceClip(IClipProvider provider)

@@ -118,10 +118,27 @@ namespace Deenote.Core.GamePlay
                 // if (args.IsManuallyChanged) RefreshNotesTimeState();
             };
 
-            MusicPlayer.TransportChanged += () =>
+            MusicPlayer.TransportChanged += reason =>
             {
-                if (IsChartLoaded())
-                    NotesManager.ScheduleAudio();
+                if (!IsChartLoaded())
+                    return;
+
+                switch (reason) {
+                    case TransportChangeReason.Paused:
+                        // Let already-started voices ring out, but discard
+                        // everything that has only been scheduled for the future.
+                        NotesManager.CancelPendingAudio();
+                        return;
+                    case TransportChangeReason.Seeked:
+                    case TransportChangeReason.RateChanged:
+                        NotesManager.CancelScheduledAudio();
+                        break;
+                    case TransportChangeReason.Started:
+                        NotesManager.RebaseScheduledAudio();
+                        break;
+                }
+
+                NotesManager.ScheduleAudio();
             };
 
             MainSystem.ProjectManager.RegisterNotification(

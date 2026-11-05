@@ -201,13 +201,28 @@ namespace Deenote.Audio
 
             double endDspTime = targetDspTime + endAfter;
             source.SetScheduledEndTime(endDspTime);
-            _scheduledVoices.Add(new ScheduledVoice(source, endDspTime));
+            _scheduledVoices.Add(new ScheduledVoice(source, targetDspTime, endDspTime));
         }
 
         public void CancelScheduledSounds()
         {
             for (int i = _scheduledVoices.Count - 1; i >= 0; i--) {
                 var voice = _scheduledVoices[i];
+                voice.Source.Stop();
+                voice.Source.enabled = false;
+                _audioPlayerPool.Release(voice.Source);
+                _scheduledVoices.RemoveAt(i);
+            }
+        }
+
+        public void CancelPendingSounds()
+        {
+            double dspTime = AudioSettings.dspTime;
+            for (int i = _scheduledVoices.Count - 1; i >= 0; i--) {
+                var voice = _scheduledVoices[i];
+                if (voice.Source.isPlaying || dspTime >= voice.StartDspTime)
+                    continue;
+
                 voice.Source.Stop();
                 voice.Source.enabled = false;
                 _audioPlayerPool.Release(voice.Source);
@@ -324,11 +339,13 @@ namespace Deenote.Audio
         private readonly struct ScheduledVoice
         {
             public readonly AudioSource Source;
+            public readonly double StartDspTime;
             public readonly double EndDspTime;
 
-            public ScheduledVoice(AudioSource source, double endDspTime)
+            public ScheduledVoice(AudioSource source, double startDspTime, double endDspTime)
             {
                 Source = source;
+                StartDspTime = startDspTime;
                 EndDspTime = endDspTime;
             }
         }
