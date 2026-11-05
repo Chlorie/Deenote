@@ -14,7 +14,6 @@ namespace Deenote.Audio
         public const int MaxPitch = 127;
         public const int MinPitch = 0;
 
-        private const float ScheduledFadeDurationSeconds = 0.75f;
         private const double ActiveStartGraceSeconds = 0.01d;
 
         private static readonly int[] _pitches = { 24, 38, 43, 48, 53, 57, 60, 64, 67, 71, 74, 77, 81, 84, 89, 95 };
@@ -203,20 +202,13 @@ namespace Deenote.Audio
                 ? durationValue / safeSpeed
                 : naturalDuration;
 
-            double naturalEndDspTime = targetDspTime + naturalDuration;
-            double fadeStartDspTime = targetDspTime +
+            double endDspTime = targetDspTime +
                 Math.Min(requestedDuration, naturalDuration);
-            double endDspTime = Math.Min(
-                fadeStartDspTime + ScheduledFadeDurationSeconds,
-                naturalEndDspTime);
-
             source.SetScheduledEndTime(endDspTime);
             _scheduledVoices.Add(new ScheduledVoice(
                 source,
                 targetDspTime,
-                fadeStartDspTime,
-                endDspTime,
-                source.volume));
+                endDspTime));
         }
 
         public void CancelScheduledSounds()
@@ -349,17 +341,8 @@ namespace Deenote.Audio
                     voice.State = ScheduledVoiceState.Active;
                 }
 
-                if (dspTime < voice.EndDspTime + 0.01d) {
-                    if (voice.State == ScheduledVoiceState.Active &&
-                        dspTime >= voice.FadeStartDspTime &&
-                        voice.EndDspTime > voice.FadeStartDspTime) {
-                        double fadeProgress = (dspTime - voice.FadeStartDspTime) /
-                            (voice.EndDspTime - voice.FadeStartDspTime);
-                        voice.Source.volume = voice.InitialVolume *
-                            (float)Math.Clamp(1d - fadeProgress, 0d, 1d);
-                    }
+                if (dspTime < voice.EndDspTime + 0.01d)
                     continue;
-                }
 
                 voice.Source.Stop();
                 voice.Source.enabled = false;
@@ -380,19 +363,15 @@ namespace Deenote.Audio
         {
             public readonly AudioSource Source;
             public readonly double StartDspTime;
-            public readonly double FadeStartDspTime;
             public readonly double EndDspTime;
-            public readonly float InitialVolume;
             public ScheduledVoiceState State;
 
             public ScheduledVoice(AudioSource source, double startDspTime,
-                double fadeStartDspTime, double endDspTime, float initialVolume)
+                double endDspTime)
             {
                 Source = source;
                 StartDspTime = startDspTime;
-                FadeStartDspTime = fadeStartDspTime;
                 EndDspTime = endDspTime;
-                InitialVolume = initialVolume;
                 State = ScheduledVoiceState.Scheduled;
             }
         }
