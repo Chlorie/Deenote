@@ -14,6 +14,9 @@ namespace Deenote.Audio
         public const int MaxPitch = 127;
         public const int MinPitch = 0;
 
+        private const float ScheduledFadeDurationSeconds = 0.75f;
+        private const double ActiveStartGraceSeconds = 0.01d;
+
         private static readonly int[] _pitches = { 24, 38, 43, 48, 53, 57, 60, 64, 67, 71, 74, 77, 81, 84, 89, 95 };
         private static readonly int[] _velocities = { 38, 63, 111, 127 };
 
@@ -195,13 +198,25 @@ namespace Deenote.Audio
             source.PlayScheduled(targetDspTime);
 
             float safeSpeed = Mathf.Max(0.01f, speed);
-            float endAfter = duration is { } durationValue && durationValue > 0f
+            float naturalDuration = clip.length / Mathf.Max(0.01f, Mathf.Abs(pitch));
+            float requestedDuration = duration is { } durationValue && durationValue > 0f
                 ? durationValue / safeSpeed
-                : clip.length / Mathf.Max(0.01f, Mathf.Abs(pitch));
+                : naturalDuration;
 
-            double endDspTime = targetDspTime + endAfter;
+            double naturalEndDspTime = targetDspTime + naturalDuration;
+            double fadeStartDspTime = targetDspTime +
+                Math.Min(requestedDuration, naturalDuration);
+            double endDspTime = Math.Min(
+                fadeStartDspTime + ScheduledFadeDurationSeconds,
+                naturalEndDspTime);
+
             source.SetScheduledEndTime(endDspTime);
-            _scheduledVoices.Add(new ScheduledVoice(source, targetDspTime, endDspTime));
+            _scheduledVoices.Add(new ScheduledVoice(
+                source,
+                targetDspTime,
+                fadeStartDspTime,
+                endDspTime,
+                source.volume));
         }
 
         public void CancelScheduledSounds()
@@ -220,7 +235,12 @@ namespace Deenote.Audio
             double dspTime = AudioSettings.dspTime;
             for (int i = _scheduledVoices.Count - 1; i >= 0; i--) {
                 var voice = _scheduledVoices[i];
-                if (voice.Source.isPlaying || dspTime >= voice.StartDspTime)
+                if (voice.State == ScheduledVoiceState.Scheduled &&
+                    dspTime + ActiveStartGraceSeconds >= voice.StartDspTime) {
+                    voice.State = ScheduledVoiceState.Active;
+                }
+
+                if (voice.State != ScheduledVoiceState.Scheduled)
                     continue;
 
                 voice.Source.Stop();
@@ -324,8 +344,22 @@ namespace Deenote.Audio
             double dspTime = AudioSettings.dspTime;
             for (int i = _scheduledVoices.Count - 1; i >= 0; i--) {
                 var voice = _scheduledVoices[i];
-                if (dspTime < voice.EndDspTime + 0.01d)
+                if (voice.State == ScheduledVoiceState.Scheduled &&
+                    dspTime + ActiveStartGraceSeconds >= voice.StartDspTime) {
+                    voice.State = ScheduledVoiceState.Active;
+                }
+
+                if (dspTime < voice.EndDspTime + 0.01d) {
+                    if (voice.State == ScheduledVoiceState.Active &&
+                        dspTime >= voice.FadeStartDspTime &&
+                        voice.EndDspTime > voice.FadeStartDspTime) {
+                        double fadeProgress = (dspTime - voice.FadeStartDspTime) /
+                            (voice.EndDspTime - voice.FadeStartDspTime);
+                        voice.Source.volume = voice.InitialVolume *
+                            (float)Math.Clamp(1d - fadeProgress, 0d, 1d);
+                    }
                     continue;
+                }
 
                 voice.Source.Stop();
                 voice.Source.enabled = false;
@@ -336,17 +370,30 @@ namespace Deenote.Audio
             Array.Fill(_clearPitch, false);
         }
 
-        private readonly struct ScheduledVoice
+        private enum ScheduledVoiceState
+        {
+            Scheduled,
+            Active,
+        }
+
+        private sealed class ScheduledVoice
         {
             public readonly AudioSource Source;
             public readonly double StartDspTime;
+            public readonly double FadeStartDspTime;
             public readonly double EndDspTime;
+            public readonly float InitialVolume;
+            public ScheduledVoiceState State;
 
-            public ScheduledVoice(AudioSource source, double startDspTime, double endDspTime)
+            public ScheduledVoice(AudioSource source, double startDspTime,
+                double fadeStartDspTime, double endDspTime, float initialVolume)
             {
                 Source = source;
                 StartDspTime = startDspTime;
+                FadeStartDspTime = fadeStartDspTime;
                 EndDspTime = endDspTime;
+                InitialVolume = initialVolume;
+                State = ScheduledVoiceState.Scheduled;
             }
         }
     }

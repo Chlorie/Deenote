@@ -130,8 +130,12 @@ namespace Deenote.Core.GamePlay
                         NotesManager.CancelPendingAudio();
                         return;
                     case TransportChangeReason.Seeked:
+                        // Time jumps only invalidate scheduled voices. Active
+                        // voices continue as tails.
+                        NotesManager.CancelPendingAudio();
+                        break;
                     case TransportChangeReason.RateChanged:
-                        NotesManager.CancelScheduledAudio();
+                        NotesManager.CancelPendingAudio();
                         break;
                     case TransportChangeReason.Started:
                         NotesManager.RebaseScheduledAudio();

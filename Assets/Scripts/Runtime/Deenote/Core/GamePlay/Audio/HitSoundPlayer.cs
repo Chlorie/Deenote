@@ -11,12 +11,20 @@ namespace Deenote.Core.GamePlay.Audio
     {
         private const double MinScheduleLeadSeconds = 0.01d;
         private const double VoiceRecycleSlackSeconds = 0.01d;
+        private const double ActiveStartGraceSeconds = 0.01d;
 
         [SerializeField] private AudioSource _source = default!;
         [SerializeField] private HitSoundArgs _args = default!;
         [SerializeField, Min(1)] private int _maxVoices = 16;
 
         private readonly List<Voice> _voices = new();
+
+        private enum VoiceState
+        {
+            Free,
+            Scheduled,
+            Active,
+        }
 
         public float Volume { get; internal set; }
 
@@ -32,11 +40,21 @@ namespace Deenote.Core.GamePlay.Audio
             double dspTime = AudioSettings.dspTime;
             for (int i = 0; i < _voices.Count; i++) {
                 var voice = _voices[i];
-                if (!voice.Active || dspTime < voice.EndDsp + VoiceRecycleSlackSeconds)
+                if (voice.State == VoiceState.Free)
+                    continue;
+
+                if (voice.State == VoiceState.Scheduled &&
+                    dspTime + ActiveStartGraceSeconds >= voice.StartDsp) {
+                    voice.State = VoiceState.Active;
+                }
+
+                if (voice.State == VoiceState.Scheduled)
+                    continue;
+                if (dspTime < voice.EndDsp + VoiceRecycleSlackSeconds)
                     continue;
 
                 voice.Source.Stop();
-                voice.Active = false;
+                voice.State = VoiceState.Free;
             }
         }
 
@@ -83,7 +101,7 @@ namespace Deenote.Core.GamePlay.Audio
 
             voice.EndDsp = endDsp;
             voice.StartDsp = targetDspTime;
-            voice.Active = true;
+            voice.State = VoiceState.Scheduled;
             return true;
         }
 
@@ -91,11 +109,11 @@ namespace Deenote.Core.GamePlay.Audio
         {
             for (int i = 0; i < _voices.Count; i++) {
                 var voice = _voices[i];
-                if (!voice.Active)
+                if (voice.State == VoiceState.Free)
                     continue;
 
                 voice.Source.Stop();
-                voice.Active = false;
+                voice.State = VoiceState.Free;
             }
         }
 
@@ -104,11 +122,16 @@ namespace Deenote.Core.GamePlay.Audio
             double dspTime = AudioSettings.dspTime;
             for (int i = 0; i < _voices.Count; i++) {
                 var voice = _voices[i];
-                if (!voice.Active || voice.Source.isPlaying || dspTime >= voice.StartDsp)
+                if (voice.State == VoiceState.Scheduled &&
+                    dspTime + ActiveStartGraceSeconds >= voice.StartDsp) {
+                    voice.State = VoiceState.Active;
+                }
+
+                if (voice.State != VoiceState.Scheduled)
                     continue;
 
                 voice.Source.Stop();
-                voice.Active = false;
+                voice.State = VoiceState.Free;
             }
         }
 
@@ -117,7 +140,7 @@ namespace Deenote.Core.GamePlay.Audio
             Voice? oldest = null;
             for (int i = 0; i < _voices.Count; i++) {
                 var voice = _voices[i];
-                if (!voice.Active)
+                if (voice.State == VoiceState.Free)
                     return voice;
                 if (oldest is null || voice.EndDsp < oldest.EndDsp)
                     oldest = voice;
@@ -172,7 +195,7 @@ namespace Deenote.Core.GamePlay.Audio
             public readonly AudioSource Source;
             public double StartDsp;
             public double EndDsp;
-            public bool Active;
+            public VoiceState State;
 
             public Voice(AudioSource source)
             {
