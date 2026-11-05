@@ -611,6 +611,10 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_1=Deenote 1.1
 AboutDialog_Versions_Dnt_1_1_Content="""
+    <b>Deenote 1.1.1</b>
+    - 添加ogg文件导入支持。 @星砂风子
+    - 优化音频与音效播放延迟问题。 @芋圆
+
     <b>Deenote 1.1.0</b>
     - 修复Linux兼容性支持。 @ictye
     - 提供变速提示编辑支持。 @斯诺格

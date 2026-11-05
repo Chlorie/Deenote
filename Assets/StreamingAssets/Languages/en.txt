@@ -436,6 +436,10 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_1=Deenote 1.1
 AboutDialog_Versions_Dnt_1_1_Content="""
+    <b>Deenote 1.1.1</b>
+    - Support .ogg audio file. By @SeisaFuko
+    - Optimize audio and sound effect playback latency. By @kafuu
+
     <b>Deenote 1.1.0</b>
     - Fix Linux compatibility. By @ictye
     - Support editing speed change warning. By @Senolytics
