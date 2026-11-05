@@ -59,7 +59,7 @@ namespace Deenote
             public static readonly ImmutableArray<string> SupportLoadProjectFileExtensions
                 = ImmutableArray.Create(DeenotePreferFileExtension, ".dsproj");
             public static readonly ImmutableArray<string> SupportLoadAudioFileExtensions
-                = ImmutableArray.Create(".mp3", ".wav");
+                = ImmutableArray.Create(".mp3", ".wav", ".ogg");
             public static readonly ImmutableArray<string> SupportLoadChartFileExtensions
                 = ImmutableArray.Create(".json", ".txt");
         }

@@ -1,6 +1,7 @@
 #nullable enable
 
 using Cysharp.Threading.Tasks;
+using NAudio.Vorbis;
 using NAudio.Wave;
 using NLayer.NAudioSupport;
 using System;
@@ -35,6 +36,10 @@ namespace Deenote.Library
                 switch (audioType) {
                     case ".wav" or ".WAV":
                         wave = new WaveFileReader(stream);
+                        initialSampleCount = 0;
+                        break;
+                    case ".ogg" or ".OGG":
+                        wave = new VorbisWaveReader(stream);
                         initialSampleCount = 0;
                         break;
                     case ".mp3" or ".MP3":
