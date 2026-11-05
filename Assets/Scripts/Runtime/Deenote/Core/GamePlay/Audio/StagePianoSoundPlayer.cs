@@ -34,5 +34,21 @@ namespace Deenote.Core.GamePlay.Audio
                 PlaySound(sound);
             }
         }
+
+        public void ScheduleSound(PianoSoundValueModel sound, double targetDspTime)
+        {
+            if (Volume == 0f) return;
+
+            _source.ScheduleSound(
+                sound.Pitch,
+                (int)(sound.Velocity * Volume),
+                sound.Duration,
+                Speed,
+                targetDspTime);
+        }
+
+        public void CancelScheduledSounds() => _source.CancelScheduledSounds();
+
+        public void CancelPendingSounds() => _source.CancelPendingSounds();
     }
 }

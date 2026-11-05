@@ -1,6 +1,6 @@
 #nullable enable
 
-using CommunityToolkit.HighPerformance;
+using Deenote.Core.GamePlay.Audio;
 using Deenote.Entities.Comparisons;
 using Deenote.Entities.Models;
 using Deenote.Library.Collections;
@@ -10,61 +10,112 @@ namespace Deenote.Core.GameStage
 {
     partial class NotesManager
     {
-        private int _nextHitBackgroundNoteIndex;
-        private int _nextHitSoundNoteIndex;
+        private const double AudioLookaheadSeconds = 0.25d;
+        private const double MinAudioScheduleLeadSeconds = 0.01d;
 
-        private void UpdateNoteSoundsRelatively(bool forward, bool playSound)
+        private long _scheduledAudioEpoch;
+        private int _nextScheduledNoteIndex;
+        private int _nextScheduledBackgroundNoteIndex;
+        private bool _scheduledAudioInitialized;
+
+        /// <summary>
+        /// Schedules chart audio ahead of the DSP clock. This is deliberately
+        /// separate from the render-time update path.
+        /// </summary>
+        internal void ScheduleAudio()
         {
-            _game.AssertChartLoaded();
+            if (!_game.IsChartLoaded())
+                return;
 
-            int prevHitNoteIndex = _nextHitSoundNoteIndex;
-            int prevHitBackgroundNoteIndex = _nextHitBackgroundNoteIndex;
+            var musicPlayer = _game.MusicPlayer;
+            var transport = musicPlayer.Transport;
+
+            if (!transport.CanSchedule)
+                return;
+
+            double dspNow = AudioSettings.dspTime;
+            if (!_scheduledAudioInitialized) {
+                ResetScheduledAudio(
+                    transport.ChartTimeAtDsp(dspNow),
+                    transport.Epoch);
+            }
 
             var chart = _game.CurrentChart;
-            var musicPlayer = _game.MusicPlayer;
+            double horizonChartTime = transport.ChartTimeAtDsp(dspNow + AudioLookaheadSeconds);
 
-            if (forward) {
-                while (_nextHitSoundNoteIndex < chart.NoteNodes.Count && chart.NoteNodes[_nextHitSoundNoteIndex].Time <= musicPlayer.Time)
-                    _nextHitSoundNoteIndex++;
-                while (_nextHitBackgroundNoteIndex < chart.BackgroundSoundNotes.Count && chart.BackgroundSoundNotes[_nextHitBackgroundNoteIndex].Time <= musicPlayer.Time)
-                    _nextHitBackgroundNoteIndex++;
-            }
-            else {
-                while (_nextHitSoundNoteIndex > 0 && chart.NoteNodes[_nextHitSoundNoteIndex - 1].Time > musicPlayer.Time)
-                    _nextHitSoundNoteIndex--;
-                while (_nextHitBackgroundNoteIndex > 0 && chart.BackgroundSoundNotes[_nextHitBackgroundNoteIndex - 1].Time > musicPlayer.Time)
-                    _nextHitBackgroundNoteIndex--;
-            }
+            while (_nextScheduledNoteIndex < chart.NoteNodes.Count) {
+                var node = chart.NoteNodes[_nextScheduledNoteIndex];
+                if (node.Time > horizonChartTime)
+                    break;
 
-            if (!playSound)
-                return;
-            if (!musicPlayer.IsPlaying)
-                return;
-
-            // HACK: If drag time slider while music player, in MusicPlay.Update the SetTime may cause Time smaller
-            // So I changed the Debug.Assert to if statement. Maybe handle it later
-            if (!forward)
-                return;
-
-            for (int i = prevHitNoteIndex; i < _nextHitSoundNoteIndex; i++) {
-                if (chart.NoteNodes[i] is NoteModel note) {
-                    _game.HitSoundPlayer.PlaySound(note.Kind);
-                    _game.PianoSoundPlayer.PlaySounds(note.Sounds.AsSpan());
+                // Holds intentionally trigger only at their head. NoteTailNode
+                // participates in display/combo logic but never schedules audio.
+                if (node is NoteModel note) {
+                    double targetDspTime = transport.DspTimeAtChart(note.Time);
+                    if (targetDspTime >= dspNow + MinAudioScheduleLeadSeconds) {
+                        _game.HitSoundPlayer.ScheduleSound(note.Kind, targetDspTime);
+                        foreach (var sound in note.Sounds) {
+                            double soundDspTime = transport.DspTimeAtChart(note.Time + sound.Delay);
+                            _game.PianoSoundPlayer.ScheduleSound(sound, soundDspTime);
+                        }
+                    }
                 }
+
+                _nextScheduledNoteIndex++;
             }
-            for (int i = prevHitBackgroundNoteIndex; i < _nextHitBackgroundNoteIndex; i++) {
-                _game.PianoSoundPlayer.PlaySounds(chart.BackgroundSoundNotes[i].Sounds);
+
+            while (_nextScheduledBackgroundNoteIndex < chart.BackgroundSoundNotes.Count) {
+                var note = chart.BackgroundSoundNotes[_nextScheduledBackgroundNoteIndex];
+                if (note.Time > horizonChartTime)
+                    break;
+
+                double targetDspTime = transport.DspTimeAtChart(note.Time);
+                if (targetDspTime >= dspNow + MinAudioScheduleLeadSeconds) {
+                    foreach (var sound in note.Sounds) {
+                        double soundDspTime = transport.DspTimeAtChart(note.Time + sound.Delay);
+                        _game.PianoSoundPlayer.ScheduleSound(sound, soundDspTime);
+                    }
+                }
+
+                _nextScheduledBackgroundNoteIndex++;
             }
         }
 
-        private void RefreshNoteSoundsIndices()
+        private void ResetScheduledAudio(double chartTime, long epoch)
         {
-            _game.AssertChartLoaded();
-            var chart = _game.CurrentChart;
-            var musicPlayer = _game.MusicPlayer;
+            _scheduledAudioEpoch = epoch;
+            _scheduledAudioInitialized = true;
 
-            _nextHitSoundNoteIndex = chart.NoteNodes.AsSpan().FindUpperBoundIndex(new NodeTimeComparable(musicPlayer.Time));
-            _nextHitBackgroundNoteIndex = chart.BackgroundSoundNotes.AsSpan().FindUpperBoundIndex(new NodeTimeComparable(musicPlayer.Time));
+            if (!_game.IsChartLoaded()) {
+                _nextScheduledNoteIndex = 0;
+                _nextScheduledBackgroundNoteIndex = 0;
+                return;
+            }
+
+            var chart = _game.CurrentChart;
+            _nextScheduledNoteIndex = chart.NoteNodes.AsSpan()
+                .FindLowerBoundIndex(new NodeTimeComparable((float)chartTime));
+            _nextScheduledBackgroundNoteIndex = chart.BackgroundSoundNotes.AsSpan()
+                .FindLowerBoundIndex(new NodeTimeComparable((float)chartTime));
+        }
+
+        internal void CancelScheduledAudio()
+        {
+            _scheduledAudioInitialized = false;
+            _game.HitSoundPlayer.CancelScheduledSounds();
+            _game.PianoSoundPlayer.CancelScheduledSounds();
+        }
+
+        internal void CancelPendingAudio()
+        {
+            _scheduledAudioInitialized = false;
+            _game.HitSoundPlayer.CancelPendingSounds();
+            _game.PianoSoundPlayer.CancelPendingSounds();
+        }
+
+        internal void RebaseScheduledAudio()
+        {
+            _scheduledAudioInitialized = false;
         }
     }
 }
