@@ -611,6 +611,9 @@ Dialog_AboutTurorials_Page_UpgradeGuide_Content="""
 
 AboutDialog_Versions_Dnt_1_1=Deenote 1.1
 AboutDialog_Versions_Dnt_1_1_Content="""
+    <b>Deenote 1.1.3</b>
+    - 修复钢琴音播放问题
+
     <b>Deenote 1.1.2</b>
     - 修复mp3文件解码后的偏移
 
