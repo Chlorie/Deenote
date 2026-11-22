@@ -120,9 +120,7 @@ namespace Deenote.Entities.Operations
                 }
                 foreach (var note in _newChart.EnumerateNoteModels()) {
                     note.Time = _offset + (note.Time / _multiplier);
-                    if (note.IsHold) {
-                        note.Duration /= _multiplier;
-                    }
+                    note.Duration /= _multiplier;
                     noteModels.Add(note);
                 }
                 _chart.NoteNodes.Clear();
@@ -387,31 +385,33 @@ namespace Deenote.Entities.Operations
             internal RemoveNotesOperation(ChartModel chart, ImmutableArray<NoteModel> notes) : base(chart)
             {
                 _notes = notes;
-                _unlinkOperation = new EditNotesKindPropertyOperation(_chart, _notes, NoteModel.NoteKind.Click);
+                // Tail nodes are managed by this operation (based on the original hold state),
+                // so the unlink operation must not add or remove them
+                _unlinkOperation = new EditNotesKindPropertyOperation(
+                    _chart, _notes, NoteModel.NoteKind.Click, manageHoldTails: false);
             }
 
             protected override void Redo()
             {
+                if (_tails is null) {
+                    Initialize();
+                }
+
                 _unlinkOperation.Redo();
 
-                if (_tails is null) {
-                    RedoWithInit();
-                }
-                else {
-                    if (_collisions is not null) {
-                        foreach (var collision in _collisions) {
-                            collision.DecrementModelCollisionCounts();
-                        }
+                if (_collisions is not null) {
+                    foreach (var collision in _collisions) {
+                        collision.DecrementModelCollisionCounts();
                     }
-                    _chart.NoteNodes.RemoveRange(_tails.AsSpan());
-                    _chart.NoteNodes.RemoveRange(_notes.AsSpan());
-                    _chart._holdCount -= _tails.Count;
                 }
+                _chart.NoteNodes.RemoveRange(_tails!.AsSpan());
+                _chart.NoteNodes.RemoveRange(_notes.AsSpan());
+                _chart._holdCount -= _tails!.Count;
 
                 OnRedone(_notes);
             }
 
-            private void RedoWithInit()
+            private void Initialize()
             {
                 _tails = new();
                 foreach (var note in _notes) {
@@ -426,9 +426,7 @@ namespace Deenote.Entities.Operations
                         _tails.Add(tail!);
                         _chart.NoteNodes.Remove(tail!);
                     }
-                    _chart.NoteNodes.Remove(note);
                 }
-                _chart._holdCount -= _tails.Count;
             }
 
             protected override void Undo()
@@ -632,11 +630,11 @@ namespace Deenote.Entities.Operations
             {
                 var note = _notes[index];
                 var oldValue = GetDurationValue(note, _oldValues[index]);
+                var newDurationValue = GetDurationValue(note, newValue);
 
                 if (isFirstRedo) {
-                    InitializeTailContexts(GetDurationValue(note, newValue));
+                    InitializeTailContext(oldValue, newDurationValue);
                 }
-                Debug.Assert(_tails[index].ModifyKind != TailModifyKind.None);
 
                 var (tail, kind) = _tails[index];
                 switch (kind) {
@@ -645,32 +643,34 @@ namespace Deenote.Entities.Operations
                     case TailModifyKind.Move: _tmpScope = _chart.NoteNodes.EnterTrackingScope(tail); break;
                 }
 
-                void InitializeTailContexts(float newDurationValue)
+                void InitializeTailContext(float oldDurationValue, float newDurationValue)
                 {
-                    switch (oldValue, newDurationValue) {
-                        case (0, not 0): {
-                            var tail = new NoteTailNode(note);
-                            _tails[index] = new(tail, TailModifyKind.Add);
-                            _holdCountDelta++;
-                            break;
+                    bool oldIsHold = note.Kind is not NoteModel.NoteKind.Swipe && oldDurationValue > 0f;
+                    bool newIsHold = note.Kind is not NoteModel.NoteKind.Swipe && newDurationValue > 0f;
+
+                    switch (oldIsHold, newIsHold) {
+                        case (false, false):
+                        case (true, true) when (oldDurationValue == newDurationValue): {
+                            _tails[index] = new(null!, TailModifyKind.None);
+                            return;
                         }
-                        case (not 0, 0): {
+                        case (true, true): {
+                            var tail = _chart.FindTailOf(note);
+                            Debug.Assert(tail is not null);
+                            _tails[index] = new(tail!, TailModifyKind.Move);
+                            return;
+                        }
+                        case (false, true): {
+                            _tails[index] = new(new NoteTailNode(note), TailModifyKind.Add);
+                            _holdCountDelta++;
+                            return;
+                        }
+                        case (true, false): {
                             var tail = _chart.FindTailOf(note);
                             Debug.Assert(tail is not null);
                             _tails[index] = new(tail!, TailModifyKind.Remove);
                             _holdCountDelta--;
-                            break;
-                        }
-                        default: {
-                            if (oldValue == newDurationValue) {
-                                _tails[index] = new(null!, TailModifyKind.None);
-                            }
-                            else {
-                                var tail = _chart.FindTailOf(note);
-                                Debug.Assert(tail is not null);
-                                _tails[index] = new(tail!, TailModifyKind.Move);
-                            }
-                            break;
+                            return;
                         }
                     }
                 }
@@ -750,8 +750,16 @@ namespace Deenote.Entities.Operations
         public sealed class EditNotesKindPropertyOperation : EditNotesPropertyOperationBase<NoteModel.NoteKind>
         {
             private readonly ImmutableArray<LinkContext> _oldLinkContexts;
+            private readonly TailContext[] _tails;
+            private readonly bool _manageHoldTails;
+            private int _holdCountDelta;
 
             public EditNotesKindPropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes, NoteModel.NoteKind newValue) :
+                this(chart, notes, newValue, manageHoldTails: true)
+            { }
+
+            internal EditNotesKindPropertyOperation(ChartModel chart, ImmutableArray<NoteModel> notes,
+                NoteModel.NoteKind newValue, bool manageHoldTails) :
                 base(chart, notes, notes.Select(n => n.Kind).ToImmutableArray(), newValue)
             {
                 var oldLinks = new LinkContext[notes.Length];
@@ -760,6 +768,8 @@ namespace Deenote.Entities.Operations
                     oldLinks[i] = new LinkContext(note.PrevLink, note.NextLink);
                 }
                 _oldLinkContexts = ImmutableCollectionsMarshal.AsImmutableArray(oldLinks);
+                _tails = new TailContext[notes.Length];
+                _manageHoldTails = manageHoldTails;
             }
 
             protected override void SetValue(NoteModel note, NoteModel.NoteKind value)
@@ -768,6 +778,15 @@ namespace Deenote.Entities.Operations
             protected override void OnRedoingValueChanging(bool isFirstRedo, int index, NoteModel.NoteKind newValue)
             {
                 var note = _notes[index];
+
+                if (isFirstRedo && _manageHoldTails) {
+                    InitializeTailContext(index, _oldValues[index], newValue);
+                }
+
+                if (_tails[index].ModifyKind is TailModifyKind.Remove) {
+                    _chart.NoteNodes.Remove(_tails[index].Tail);
+                }
+
                 if (note.IsSlide) {
                     note.UnlinkWithoutCutChain();
                 }
@@ -775,6 +794,10 @@ namespace Deenote.Entities.Operations
 
             protected override void OnRedoingValueChanged(bool isFirstRedo, int index, NoteModel.NoteKind newValue)
             {
+                if (_tails[index].ModifyKind is TailModifyKind.Add) {
+                    _chart.NoteNodes.Add(_tails[index].Tail);
+                }
+
                 if (newValue is NoteModel.NoteKind.Slide) {
                     if (index > 0) {
                         var note = _notes[index];
@@ -785,8 +808,19 @@ namespace Deenote.Entities.Operations
                 }
             }
 
+            protected override void OnUndoingValueChanging(int index)
+            {
+                if (_tails[index].ModifyKind is TailModifyKind.Add) {
+                    _chart.NoteNodes.Remove(_tails[index].Tail);
+                }
+            }
+
             protected override void OnUndoingValueChanged(int index)
             {
+                if (_tails[index].ModifyKind is TailModifyKind.Remove) {
+                    _chart.NoteNodes.Add(_tails[index].Tail);
+                }
+
                 var note = _notes[index];
                 var (prev, next) = _oldLinkContexts[index];
                 if (note.IsSlide) {
@@ -811,6 +845,43 @@ namespace Deenote.Entities.Operations
                     }
                 }
             }
+
+            protected override void OnRedone(bool isFirstRedo)
+            {
+                _chart._holdCount += _holdCountDelta;
+            }
+
+            protected override void OnUndone()
+            {
+                _chart._holdCount -= _holdCountDelta;
+            }
+
+            private void InitializeTailContext(int index, NoteModel.NoteKind oldKind, NoteModel.NoteKind newKind)
+            {
+                var note = _notes[index];
+                // Swipe (flick) is never a hold note even if Duration > 0, so only Click/Slide can have a tail.
+                bool oldIsHold = oldKind is not NoteModel.NoteKind.Swipe && note.Duration > 0f;
+                bool newIsHold = newKind is not NoteModel.NoteKind.Swipe && note.Duration > 0f;
+                if (oldIsHold == newIsHold)
+                    return;
+
+                if (newIsHold) {
+                    _tails[index] = new(new NoteTailNode(note), TailModifyKind.Add);
+                    _holdCountDelta++;
+                }
+                else {
+                    var tail = _chart.FindTailOf(note);
+                    Debug.Assert(tail is not null);
+                    _tails[index] = new(tail!, TailModifyKind.Remove);
+                    _holdCountDelta--;
+                }
+            }
+
+            private readonly record struct TailContext(
+                NoteTailNode Tail,
+                TailModifyKind ModifyKind);
+
+            private enum TailModifyKind { None, Add, Remove, }
 
             private readonly record struct LinkContext(
                 NoteModel? PrevLink,

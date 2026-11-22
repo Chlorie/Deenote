@@ -36,6 +36,7 @@ namespace Deenote.UI.Dialogs
         [SerializeField] Dropdown _autoSaveDropdown = default!;
         [SerializeField] Dropdown _autoSaveIntervalDropdown = default!;
         [SerializeField] ToggleSwitch _checkUpdateToggle = default!;
+        [SerializeField] ToggleSwitch _backupProjectFileToggle = default!;
         //[SerializeField] ToggleSwitch _embedAudioDataToggle = default!;
 
         [SerializeField] Dropdown _uiThemeDropdown = default!;
@@ -162,6 +163,11 @@ namespace Deenote.UI.Dialogs
             MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
                 GlobalSettings.NotificationFlag.CheckUpdateOnStartup,
                 settings => _checkUpdateToggle.IsChecked = settings.CheckUpdateOnStartup);
+                
+            _backupProjectFileToggle.IsCheckedChanged += val => MainSystem.GlobalSettings.BackupProjectFileBeforeOverwrite = val;
+            MainSystem.GlobalSettings.RegisterNotificationAndInvoke(
+                GlobalSettings.NotificationFlag.BackupProjectFileBeforeOverwrite,
+                settings => _backupProjectFileToggle.IsChecked = settings.BackupProjectFileBeforeOverwrite);
 
             //_embedAudioDataToggle.IsCheckedChanged+=MainSystem.ProjectManager.
 

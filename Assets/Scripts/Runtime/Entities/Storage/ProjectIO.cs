@@ -16,11 +16,11 @@ namespace Deenote.Entities.Storage
         public static Task<ProjectModel?> LoadAsync(string projectFilePath, CancellationToken cancellationToken = default)
             => Task.Run(() => Load(projectFilePath), cancellationToken);
 
-        public static Task SaveAsync(ProjectModel project, string saveFilePath, CancellationToken cancellationToken = default)
+        public static Task SaveAsync(ProjectModel project, string saveFilePath, string? backupDir, CancellationToken cancellationToken = default)
         {
             project.ProjectFilePath = saveFilePath;
             var saveProj = project.CloneForSave();
-            return Task.Run(() => Save(saveProj, saveFilePath), cancellationToken);
+            return Task.Run(() => Save(saveProj, saveFilePath, backupDir), cancellationToken);
         }
 
         private static ProjectModel? Load(string projectFilePath)
@@ -45,7 +45,7 @@ namespace Deenote.Entities.Storage
             return proj;
         }
 
-        private static void Save(ProjectModel project, string saveFilePath)
+        private static void Save(ProjectModel project, string saveFilePath, string? backupDir)
         {
             var tmpPath = $"{saveFilePath}.tmp";
             using (var fs = File.OpenWrite(tmpPath)) {
@@ -56,8 +56,14 @@ namespace Deenote.Entities.Storage
                 project.ProjectFilePath = saveFilePath;
             }
 
-            if (File.Exists(saveFilePath))
+            if (File.Exists(saveFilePath)) {
+                // HACK: Backup original file before overwrite
+                if (!Directory.Exists(backupDir))
+                    Directory.CreateDirectory(backupDir);
+                var tempSavePath = Path.Combine(backupDir, $"{Path.GetFileName(saveFilePath)}-{System.DateTime.Now:yyyyMMddHHmmss}.bak");
+                File.Move(saveFilePath, tempSavePath);
                 File.Delete(saveFilePath);
+            }
             File.Move(tmpPath, saveFilePath);
         }
     }

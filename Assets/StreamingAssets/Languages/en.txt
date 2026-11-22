@@ -165,6 +165,7 @@ Dialog_PreferencesAutoSaveOn_Option=On
 Dialog_PreferencesAutoSaveOnAndSaveJson_Option=On And Save Json
 Dialog_PreferencesAutoSaveMinutes_Option={0} mins
 Dialog_PreferencesCheckUpdate_Label=Check update on startup
+Dialog_PreferencesBackupProjectFile_Label=Backup project file before overwrite
 Dialog_PreferencesEmbedProjectAudio_Label=Embed Audio Data In Project
 Dialog_PreferencesUI_Header=UI
 Dialog_PreferencesTheme_Label=Theme

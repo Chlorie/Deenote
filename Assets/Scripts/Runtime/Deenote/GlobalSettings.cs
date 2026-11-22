@@ -12,6 +12,7 @@ namespace Deenote
         private bool _isFpsShown;
         private float _gameViewScrollSensitivity_bf;
         private bool _checkUpdateOnStartup;
+        private bool _backupProjectFileBeforeOverwrite;
 
         public GlobalSettings()
         {
@@ -23,6 +24,7 @@ namespace Deenote
                 configs.Set("fps_shown", IsFpsShown);
                 configs.Set("scroll_sensitivity", GameViewScrollSensitivity);
                 configs.Set("check_update", CheckUpdateOnStartup);
+                configs.Set("backup_project_file", BackupProjectFileBeforeOverwrite);
             };
             MainSystem.SaveSystem.LoadedConfigurations += configs =>
             {
@@ -35,6 +37,7 @@ namespace Deenote
                 IsFpsShown = configs.GetBoolean("fps_shown");
                 GameViewScrollSensitivity = configs.GetSingle("scroll_sensitivity", 1f);
                 CheckUpdateOnStartup = configs.GetBoolean("check_update", true);
+                BackupProjectFileBeforeOverwrite = configs.GetBoolean("backup_project_file", true);
             };
         }
 
@@ -96,6 +99,18 @@ namespace Deenote
             }
         }
 
+        public bool BackupProjectFileBeforeOverwrite
+        {
+            get => _backupProjectFileBeforeOverwrite;
+            set {
+                if (_backupProjectFileBeforeOverwrite == value)
+                    return;
+
+                _backupProjectFileBeforeOverwrite = value;
+                NotifyFlag(NotificationFlag.BackupProjectFileBeforeOverwrite);
+            }
+        }
+
         public enum NotificationFlag
         {
             VSync,
@@ -103,6 +118,7 @@ namespace Deenote
             FpsShown,
             GameViewScrollSensitivity,
             CheckUpdateOnStartup,
+            BackupProjectFileBeforeOverwrite,
         }
 
     }
